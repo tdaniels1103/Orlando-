@@ -595,7 +595,10 @@
       <div class="hero-sub">Your ultimate Orlando travel companion</div>
       <div class="hero-search"><span>🔍</span><input type="text" placeholder="Search places, parks, food..." id="hero-search-input"></div>
     </div>
-    <div id="home-xp-bar" style="display:none;padding:0 16px;margin-bottom:0;"></div><div id="home-missions-panel" style="display:none;"></div><div class="section-hdr" style="padding-bottom:4px;"><h3>Explore Orlando</h3></div>
+    <div id="home-xp-bar" style="display:none;padding:0 16px;margin-bottom:0;"></div><div id="home-missions-panel" style="display:none;"></div><div id="home-friends-activity" style="display:none;"></div>
+<div id="home-recent-photos" style="display:none;"></div>
+<div id="home-community-btn-section" style="display:none;"></div>
+<div class="section-hdr" style="padding-bottom:4px;"><h3>Explore Orlando</h3></div>
     <div class="categories">
       <div class="cat-pill" onclick="goToExplore('attractions')"><div class="cat-icon">🎡</div><div class="cat-label">Attractions</div></div>
       <div class="cat-pill" onclick="goToExplore('food')"><div class="cat-icon">🍽️</div><div class="cat-label">Food</div></div>
@@ -631,7 +634,7 @@
 </div>
 <div id="screen-mytrip" class="screen">
   <div class="screen-header"><h2>🗺️ My Trip</h2></div>
-  <div class="scroll-content" id="my-trip-content"></div>
+  <div id="trip-action-btns" style="display:none;"></div><div class="scroll-content" id="my-trip-content"></div>
 </div>
 <div id="screen-ai" class="screen">
   <div class="screen-header"><h2>🤖 AI Planner</h2></div>
@@ -976,7 +979,136 @@
     <div class="levelup-perks" id="levelup-perks"></div>
     <button class="levelup-ok" onclick="closeLevelUp()">Awesome! 🎉</button>
   </div>
-</div><nav class="bottom-nav">
+</div>
+<!-- USER PROFILE OVERLAY -->
+<div class="gamify-overlay" id="user-profile-overlay">
+  <div id="user-profile-cover" style="background:linear-gradient(135deg,#FF6B35,#FFD700);padding:20px 16px 60px;position:relative;">
+    <button class="gamify-close" onclick="document.getElementById('user-profile-overlay').classList.remove('open')" style="color:white;background:rgba(0,0,0,0.2);">✕</button>
+    <div id="user-profile-avatar" style="font-size:52px;text-align:center;"></div>
+  </div>
+  <div id="user-profile-body" class="gamify-scroll" style="padding-top:0;"></div>
+</div>
+
+<!-- FIND FRIENDS OVERLAY -->
+<div class="gamify-overlay" id="find-friends-overlay">
+  <div class="gamify-header" style="background:linear-gradient(135deg,#2196F3,#64B5F6);">
+    <button class="gamify-close" onclick="document.getElementById('find-friends-overlay').classList.remove('open')">✕</button>
+    <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:white;">Find Friends</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.85);margin-top:2px;">Discover Orlando explorers to follow</div>
+  </div>
+  <div style="padding:12px 16px;border-bottom:1px solid #F5F5F5;">
+    <div class="search-bar" style="margin:0;"><span>🔍</span><input type="text" placeholder="Search users..." id="friend-search-input" oninput="filterFriendSearch(this.value)"></div>
+  </div>
+  <div class="gamify-scroll" id="find-friends-list"></div>
+</div>
+
+<!-- COMMUNITY ITINERARIES OVERLAY -->
+<div class="gamify-overlay" id="community-itineraries-overlay">
+  <div class="gamify-header" style="background:linear-gradient(135deg,#4CAF50,#81C784);">
+    <button class="gamify-close" onclick="document.getElementById('community-itineraries-overlay').classList.remove('open')">✕</button>
+    <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:white;">Community Trips</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.85);margin-top:2px;">Itineraries from fellow explorers</div>
+  </div>
+  <div class="gamify-scroll" id="community-itineraries-list"></div>
+</div>
+
+<!-- GROUP TRIP OVERLAY -->
+<div class="gamify-overlay" id="group-trip-overlay">
+  <div id="group-trip-header" style="background:linear-gradient(135deg,#9C27B0,#E040FB);padding:16px;position:relative;">
+    <button class="gamify-close" onclick="document.getElementById('group-trip-overlay').classList.remove('open')" style="color:white;background:rgba(0,0,0,0.2);">✕</button>
+    <div id="group-trip-name" style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:white;margin-top:4px;"></div>
+    <div id="group-trip-meta" style="font-size:12px;color:rgba(255,255,255,0.8);margin-top:2px;"></div>
+  </div>
+  <div class="gamify-scroll" id="group-trip-body"></div>
+</div>
+
+<!-- COMMUNITY FORUM OVERLAY -->
+<div class="gamify-overlay" id="community-forum-overlay">
+  <div class="gamify-header" style="background:linear-gradient(135deg,#FF6B35,#FF8C42);">
+    <button class="gamify-close" onclick="document.getElementById('community-forum-overlay').classList.remove('open')">✕</button>
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <div>
+        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:white;">Community</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.85);margin-top:2px;">Orlando Explorer Forum</div>
+      </div>
+      <button onclick="openNewPost()" style="background:white;color:#FF6B35;border:none;border-radius:20px;padding:8px 14px;font-size:13px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;">+ Post</button>
+    </div>
+  </div>
+  <div style="padding:8px 16px;border-bottom:1px solid #F5F5F5;">
+    <div class="search-bar" style="margin:0;"><span>🔍</span><input type="text" placeholder="Search posts..." id="forum-search-input" oninput="filterForum(this.value)"></div>
+  </div>
+  <div class="hscroll" id="forum-category-tabs" style="padding:10px 16px;gap:8px;"></div>
+  <div class="gamify-scroll" id="forum-posts-list" style="padding-top:0;"></div>
+</div>
+
+<!-- POST DETAIL OVERLAY -->
+<div class="gamify-overlay" id="post-detail-overlay">
+  <div style="padding:12px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #F5F5F5;background:white;position:sticky;top:0;z-index:10;">
+    <button onclick="document.getElementById('post-detail-overlay').classList.remove('open')" style="background:none;border:none;font-size:20px;cursor:pointer;">←</button>
+    <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;">Post</div>
+  </div>
+  <div class="gamify-scroll" id="post-detail-body"></div>
+  <div style="padding:12px 16px;border-top:1px solid #F5F5F5;background:white;display:flex;gap:8px;">
+    <input type="text" id="post-reply-input" placeholder="Write a reply..." style="flex:1;border:1px solid #E0E0E0;border-radius:20px;padding:10px 14px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;">
+    <button onclick="submitReplyPost()" style="background:#FF6B35;color:white;border:none;border-radius:20px;padding:10px 16px;font-size:13px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;">Reply</button>
+  </div>
+</div>
+
+<!-- SHARE ITINERARY MODAL -->
+<div class="modal-overlay" id="share-itinerary-modal" style="display:none;z-index:8000;">
+  <div style="background:white;border-radius:20px;padding:24px;width:90%;max-width:340px;">
+    <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:16px;">Share Your Itinerary</div>
+    <input type="text" id="itin-title-input" placeholder="Itinerary title..." style="width:100%;border:1px solid #E0E0E0;border-radius:10px;padding:10px 12px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;box-sizing:border-box;margin-bottom:10px;">
+    <textarea id="itin-desc-input" placeholder="Short description..." rows="2" style="width:100%;border:1px solid #E0E0E0;border-radius:10px;padding:10px 12px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;resize:none;box-sizing:border-box;margin-bottom:10px;"></textarea>
+    <div style="display:flex;gap:6px;margin-bottom:16px;">
+      <button class="itin-vis-btn active" onclick="setItinVis(this,'public')" data-vis="public">🌍 Public</button>
+      <button class="itin-vis-btn" onclick="setItinVis(this,'friends')" data-vis="friends">👥 Friends</button>
+      <button class="itin-vis-btn" onclick="setItinVis(this,'private')" data-vis="private">🔒 Private</button>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button onclick="document.getElementById('share-itinerary-modal').style.display='none'" style="flex:1;background:none;border:2px solid #E0E0E0;border-radius:24px;padding:12px;font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;">Cancel</button>
+      <button onclick="publishItinerary()" style="flex:1;background:linear-gradient(135deg,#FF6B35,#FFD700);color:white;border:none;border-radius:24px;padding:12px;font-size:14px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;">Publish</button>
+    </div>
+  </div>
+</div>
+
+<!-- NEW POST MODAL -->
+<div class="modal-overlay" id="new-post-modal" style="display:none;z-index:8001;">
+  <div style="background:white;border-radius:20px;padding:24px;width:92%;max-width:360px;">
+    <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:14px;">New Post</div>
+    <select id="new-post-cat" style="width:100%;border:1px solid #E0E0E0;border-radius:10px;padding:10px;font-size:13px;font-family:'DM Sans',sans-serif;margin-bottom:10px;outline:none;">
+      <option value="Theme Parks">🎢 Theme Parks</option>
+      <option value="Food &amp; Dining">🍽️ Food &amp; Dining</option>
+      <option value="Hotels">🏨 Hotels</option>
+      <option value="Events">🎉 Events &amp; Nightlife</option>
+      <option value="Budget Tips">💰 Budget Tips</option>
+      <option value="Family Travel">👨‍👩‍👧 Family Travel</option>
+      <option value="Ask a Local">🌴 Ask a Local</option>
+    </select>
+    <input type="text" id="new-post-title" placeholder="Post title..." style="width:100%;border:1px solid #E0E0E0;border-radius:10px;padding:10px 12px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;box-sizing:border-box;margin-bottom:10px;">
+    <textarea id="new-post-body" placeholder="Share your thoughts..." rows="4" style="width:100%;border:1px solid #E0E0E0;border-radius:10px;padding:10px 12px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;resize:none;box-sizing:border-box;margin-bottom:14px;"></textarea>
+    <div style="display:flex;gap:8px;">
+      <button onclick="document.getElementById('new-post-modal').style.display='none'" style="flex:1;background:none;border:2px solid #E0E0E0;border-radius:24px;padding:12px;font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;">Cancel</button>
+      <button onclick="submitNewPost()" style="flex:1;background:linear-gradient(135deg,#FF6B35,#FFD700);color:white;border:none;border-radius:24px;padding:12px;font-size:14px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;">Post</button>
+    </div>
+  </div>
+</div>
+
+<!-- CREATE GROUP TRIP MODAL -->
+<div class="modal-overlay" id="create-group-modal" style="display:none;z-index:8002;">
+  <div style="background:white;border-radius:20px;padding:24px;width:92%;max-width:360px;max-height:80vh;overflow-y:auto;">
+    <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:14px;">Create Group Trip</div>
+    <input type="text" id="group-trip-title-input" placeholder="Trip name..." style="width:100%;border:1px solid #E0E0E0;border-radius:10px;padding:10px 12px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;box-sizing:border-box;margin-bottom:10px;">
+    <div style="font-size:13px;font-weight:600;margin-bottom:8px;">Invite Friends</div>
+    <div id="group-invite-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;"></div>
+    <div id="group-selected-chips" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;"></div>
+    <div style="display:flex;gap:8px;">
+      <button onclick="document.getElementById('create-group-modal').style.display='none'" style="flex:1;background:none;border:2px solid #E0E0E0;border-radius:24px;padding:12px;font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;">Cancel</button>
+      <button onclick="createGroupTrip()" style="flex:1;background:linear-gradient(135deg,#9C27B0,#E040FB);color:white;border:none;border-radius:24px;padding:12px;font-size:14px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;">Create</button>
+    </div>
+  </div>
+</div>
+<nav class="bottom-nav">
   <div class="nav-item active" onclick="showScreen('home',this)"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></div>
   <div class="nav-item" onclick="showScreen('explore',this)"><div class="nav-icon">🔍</div><div class="nav-label">Explore</div></div>
   <div class="nav-item" onclick="showScreen('mytrip',this)"><div class="nav-icon">🗺️</div><div class="nav-label">My Trip</div></div>
@@ -3009,4 +3141,987 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 // Also run now in case DOM already ready
 setTimeout(()=>{ if(appState.currentScreen==='home'){ renderHomeXPBar(); renderHomeMissions(); } }, 100);
+</script>
+<style>
+/* ===== SOCIAL FEATURES CSS ===== */
+.social-stat-row{display:flex;gap:0;margin:0 -1px;border-top:1px solid #F5F5F5;border-bottom:1px solid #F5F5F5;}
+.social-stat{flex:1;text-align:center;padding:12px 4px;border-right:1px solid #F5F5F5;}
+.social-stat:last-child{border-right:none;}
+.social-stat-val{font-size:18px;font-weight:800;}
+.social-stat-lbl{font-size:10px;color:#9E9E9E;margin-top:2px;}
+.follow-btn{padding:8px 20px;border-radius:20px;font-size:13px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;border:none;transition:all 0.2s;}
+.follow-btn.following{background:#F5F5F5;color:#9E9E9E;}
+.follow-btn.not-following{background:linear-gradient(135deg,#FF6B35,#FFD700);color:white;}
+/* Friends activity */
+.activity-wrap{padding:0 16px 4px;}
+.activity-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.activity-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #F8F8F8;}
+.activity-avatar{font-size:22px;min-width:32px;text-align:center;}
+.activity-text{flex:1;font-size:12px;color:#424242;line-height:1.4;}
+.activity-text b{color:#212121;}
+.activity-time{font-size:10px;color:#9E9E9E;white-space:nowrap;}
+.find-friends-btn{display:flex;align-items:center;gap:8px;padding:10px 14px;background:#F5F5F5;border-radius:10px;cursor:pointer;font-size:13px;font-weight:600;}
+/* User suggestion card */
+.user-suggestion{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid #F8F8F8;}
+.user-sug-avatar{font-size:28px;}
+.user-sug-info{flex:1;}
+.user-sug-name{font-weight:700;font-size:14px;}
+.user-sug-meta{font-size:11px;color:#9E9E9E;margin-top:1px;}
+/* Community itinerary card */
+.comm-itin-card{background:white;border-radius:16px;margin:12px 16px;padding:16px;box-shadow:var(--card-shadow);}
+.comm-itin-featured{background:linear-gradient(135deg,#FFD700,#FF8F00);color:white;font-size:10px;font-weight:700;padding:3px 8px;border-radius:8px;display:inline-block;margin-bottom:8px;}
+.comm-itin-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;margin-bottom:4px;}
+.comm-itin-meta{font-size:12px;color:#9E9E9E;margin-bottom:8px;}
+.comm-itin-emojis{font-size:18px;letter-spacing:3px;margin-bottom:10px;}
+.comm-itin-actions{display:flex;gap:8px;align-items:center;}
+.itin-action-btn{flex:1;padding:8px;border:1px solid #E0E0E0;border-radius:10px;font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;background:none;cursor:pointer;transition:all 0.2s;}
+.itin-action-btn.liked{background:#FFEBEE;border-color:#EF5350;color:#EF5350;}
+.from-follow-tag{font-size:10px;font-weight:700;color:#4CAF50;background:#E8F5E9;padding:2px 8px;border-radius:8px;}
+/* Group trip */
+.group-member-chip{display:inline-flex;align-items:center;gap:4px;background:#F5F5F5;border-radius:16px;padding:4px 10px;font-size:12px;font-weight:600;margin:2px;}
+.group-place-card{background:white;border-radius:12px;padding:12px;margin:8px 16px;box-shadow:var(--card-shadow);}
+.vote-row{display:flex;align-items:center;gap:8px;margin-top:8px;padding-top:8px;border-top:1px solid #F5F5F5;}
+.vote-btn{border:none;background:#F5F5F5;border-radius:8px;padding:5px 12px;font-size:14px;cursor:pointer;transition:all 0.2s;}
+.vote-btn.up.active{background:#E8F5E9;}.vote-btn.down.active{background:#FFEBEE;}
+.chat-msg{display:flex;gap:8px;padding:8px 16px;}
+.chat-avatar{font-size:18px;min-width:28px;}
+.chat-bubble{background:#F5F5F5;border-radius:12px 12px 12px 0;padding:8px 12px;max-width:220px;}
+.chat-bubble.me{background:linear-gradient(135deg,#FF6B35,#FFD700);color:white;border-radius:12px 12px 0 12px;}
+.chat-meta{font-size:10px;color:#9E9E9E;margin-bottom:3px;}
+.live-dot{display:inline-block;width:7px;height:7px;background:#4CAF50;border-radius:50%;animation:pulse 1.5s infinite;margin-right:4px;}
+/* Forum */
+.forum-cat-chip{padding:7px 14px;border-radius:20px;border:1.5px solid #E0E0E0;background:white;font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;white-space:nowrap;transition:all 0.2s;}
+.forum-cat-chip.active{background:#FF6B35;color:white;border-color:#FF6B35;}
+.forum-post-card{background:white;border-radius:14px;margin:10px 16px;padding:14px;box-shadow:var(--card-shadow);cursor:pointer;}
+.forum-pinned{font-size:10px;font-weight:700;color:#9C27B0;background:#F3E5F5;padding:2px 8px;border-radius:8px;display:inline-block;margin-bottom:6px;}
+.forum-post-title{font-weight:700;font-size:14px;margin-bottom:4px;line-height:1.3;}
+.forum-post-preview{font-size:12px;color:#757575;margin-bottom:8px;line-height:1.4;}
+.forum-post-footer{display:flex;align-items:center;gap:8px;}
+.forum-author{display:flex;align-items:center;gap:5px;flex:1;}
+.forum-author-name{font-size:11px;font-weight:600;}
+.forum-lv-badge{font-size:9px;background:#F5F5F5;padding:1px 5px;border-radius:6px;}
+.forum-local-badge{font-size:9px;background:#E8F5E9;color:#2E7D32;padding:1px 6px;border-radius:6px;font-weight:700;}
+.forum-friend-badge{font-size:9px;background:#E3F2FD;color:#1565C0;padding:1px 6px;border-radius:6px;font-weight:700;}
+.forum-stats{font-size:11px;color:#9E9E9E;display:flex;gap:8px;}
+.forum-cat-badge{font-size:10px;font-weight:600;color:#FF6B35;background:#FFF3E0;padding:2px 7px;border-radius:8px;}
+/* Photos */
+.photos-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px;}
+.photo-card{background:white;border-radius:12px;overflow:hidden;box-shadow:var(--card-shadow);}
+.photo-hero{height:90px;display:flex;align-items:center;justify-content:center;font-size:44px;}
+.photo-card-body{padding:8px 10px;}
+.photo-caption{font-size:11px;font-weight:600;margin-bottom:4px;line-height:1.3;}
+.photo-meta{font-size:10px;color:#9E9E9E;}
+.photo-like-row{display:flex;align-items:center;justify-content:space-between;margin-top:4px;}
+.photo-like-btn{background:none;border:none;font-size:14px;cursor:pointer;padding:2px 4px;}
+/* Recent photos on home */
+.rphoto-item{min-width:120px;background:white;border-radius:12px;overflow:hidden;box-shadow:var(--card-shadow);flex-shrink:0;}
+.rphoto-emoji{height:80px;display:flex;align-items:center;justify-content:center;font-size:38px;}
+.rphoto-info{padding:6px 8px;}
+.rphoto-place{font-size:11px;font-weight:700;}
+.rphoto-user{font-size:10px;color:#9E9E9E;}
+/* Profile overlay */
+.profile-overlay-stats{background:white;border-radius:16px;margin:-36px 16px 0;padding:16px;box-shadow:0 4px 20px rgba(0,0,0,0.12);position:relative;z-index:1;}
+.profile-badges-row{display:flex;gap:8px;overflow-x:auto;padding:12px 16px;border-bottom:1px solid #F5F5F5;}
+.profile-badge-mini{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+/* My photos in account */
+.my-photo-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid #F8F8F8;align-items:center;}
+.my-photo-emoji{font-size:32px;width:44px;text-align:center;}
+/* Itin vis buttons */
+.itin-vis-btn{flex:1;padding:8px 4px;border-radius:10px;font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;border:2px solid #E0E0E0;background:none;transition:all 0.2s;}
+.itin-vis-btn.active{border-color:#FF6B35;color:#FF6B35;background:#FFF3E0;}
+/* Selected invite chip */
+.invite-chip{display:inline-flex;align-items:center;gap:4px;background:#EDE7F6;color:#7B1FA2;border-radius:16px;padding:4px 10px;font-size:12px;font-weight:600;}
+.invite-chip button{background:none;border:none;cursor:pointer;font-size:12px;padding:0;color:#9E9E9E;}
+</style>
+<script>
+// ===== SOCIAL STATE =====
+const socialState = {
+  following: ['mock_sarah', 'mock_alex'], // pre-follow 2 for demo
+  followers: ['mock_dave','mock_jess'],
+  groupTrips: [],
+  activeGroupTrip: null,
+  sharedItineraries: [],
+  photos: {}, // placeId -> [photo]
+  userPhotos: [], // current user uploaded
+  forumPosts: [],
+  postReplies: {}, // postId -> [reply]
+  itinVisibility: 'public',
+  groupInvited: [],
+  likedItins: {},
+  likedPosts: {},
+  likedPhotos: {},
+};
+
+// ===== MOCK USERS =====
+const MOCK_USERS = [
+  {id:'mock_alex',    username:'OrlandoAlex',    avatar:'🧭', level:'Adventurer', followers:234, following:89,  badges:6, bio:'Orlando local exploring every corner 🌴', checkins:23, reviews:15, isLocal:true},
+  {id:'mock_sarah',   username:'SarahExplores',  avatar:'🌺', level:'Explorer',   followers:156, following:67,  badges:4, bio:'Theme park enthusiast & foodie 🎢🍕',    checkins:12, reviews:8,  isLocal:false},
+  {id:'mock_dave',    username:'DisneyDave',     avatar:'🏰', level:'Enthusiast', followers:412, following:203, badges:8, bio:'Disney World expert. 50+ visits!',        checkins:50, reviews:31, isLocal:true},
+  {id:'mock_jess',    username:'FoodieJess',     avatar:'🍕', level:'Explorer',   followers:98,  following:44,  badges:3, bio:'Hunting the best food in Orlando',        checkins:8,  reviews:22, isLocal:false},
+  {id:'mock_mike',    username:'MikeAdventures', avatar:'🎒', level:'Adventurer', followers:187, following:112, badges:5, bio:'Thrill seeker & adventure lover',          checkins:18, reviews:10, isLocal:false},
+  {id:'mock_king',    username:'ThemeParkKing',  avatar:'👑', level:'Legend',     followers:891, following:45,  badges:10,bio:'Visited every Orlando park 👑',            checkins:200,reviews:89, isLocal:true},
+  {id:'mock_laura',   username:'LocalLaura',     avatar:'🌴', level:'Local',      followers:321, following:178, badges:7, bio:'Born & raised in Orlando 🌴 Ask me anything!',checkins:67,reviews:43, isLocal:true},
+  {id:'mock_budget',  username:'BudgetTraveler', avatar:'💰', level:'Enthusiast', followers:267, following:134, badges:5, bio:'Orlando on a budget — tips & tricks!',    checkins:19, reviews:27, isLocal:false},
+];
+
+// ===== MOCK FORUM POSTS =====
+const MOCK_POSTS = [
+  {id:'p1',cat:'Theme Parks',title:'Disney World vs Universal: Which is better in 2025?',body:'After visiting both parks last month I have to say Universal has really stepped up their game. The new Epic Universe area is absolutely incredible. Disney still wins for atmosphere and nostalgia, but Universal now wins for thrills. What do you think?',authorId:'mock_dave',likes:47,time:'2h ago',pinned:true,replies:['r1_1','r1_2']},
+  {id:'p2',cat:'Food & Dining',title:'Top 5 hidden gem restaurants near I-Drive you MUST try',body:'Skip the tourist traps on International Drive! Here are my picks: 1. Cafe Tu Tu Tango for tapas, 2. The Ravenous Pig for craft cocktails, 3. Hunger Street Tacos for authentic Mexican... These are all local favorites that most visitors miss.',authorId:'mock_jess',likes:63,time:'4h ago',pinned:true,replies:['r2_1']},
+  {id:'p3',cat:'Budget Tips',title:'How I spent 5 days in Orlando for under $800 total',body:'Yes it is possible! Key tips: Stay at a hostel on I-Drive ($35/night), buy Universal tickets through AAA (save 20%), eat at food trucks on Kirkman Road, and use the LYNX bus system instead of rideshares. Full breakdown inside...',authorId:'mock_budget',likes:89,time:'1d ago',replies:['r3_1']},
+  {id:'p4',cat:'Family Travel',title:'Best rides at Magic Kingdom for toddlers under 3',body:'We just got back from taking our 2 year old to Magic Kingdom and here is what actually worked for us. Dumbo, Carousel of Progress, and the Tomorrowland Speedway were all huge hits. Avoid Space Mountain and Splash Mountain obviously. Tips for beating the heat with little ones included!',authorId:'mock_laura',likes:34,time:'3h ago',replies:[]},
+  {id:'p5',cat:'Events',title:'Epcot Food & Wine Festival insider tips from a 10-year regular',body:'Going to Epcot Food and Wine this year? Here is everything you need to know from a decade of experience. The Eat to the Beat concerts are free with admission, the best booths are in Africa and Asia, arrive at opening to beat lines, and always check the app for surprise evening entertainment.',authorId:'mock_alex',likes:28,time:'6h ago',replies:['r5_1']},
+  {id:'p6',cat:'Hotels',title:'Staying off-site at Disney: is it really worth the savings?',body:'I stayed at a value Disney resort for $180/night vs an off-site hotel for $75/night. Here is my honest comparison. The on-site transportation was super convenient, the magic hours were great, but honestly the off-site hotel was better value especially if you have a car. Pros and cons inside.',authorId:'mock_mike',likes:21,time:'8h ago',replies:[]},
+  {id:'p7',cat:'Ask a Local',title:'Best time to visit Orlando: honest answer from a local',body:'Everyone asks this so here is the truth from someone who lives here. January through March is genuinely perfect: low crowds, cooler weather, great deals. June through August is brutal heat and packed crowds but prices are lower. My pick: mid-January through Presidents Day week.',authorId:'mock_laura',likes:156,time:'2d ago',replies:['r7_1','r7_2']},
+  {id:'p8',cat:'Theme Parks',title:'Epic Universe opening day experience report',body:'I was there on opening day and wow. The Nintendo World area exceeded every expectation. The Harry Potter expansion is stunning. Lines were predictably brutal (3 hours for Mario Kart) but the park layout is genuinely smart and the theming is next-level. Worth every penny.',authorId:'mock_king',likes:201,time:'1d ago',replies:[]},
+  {id:'p9',cat:'Food & Dining',title:'Underrated: The restaurants inside Epcot countries',body:'Why does everyone overlook the World Showcase restaurants? Via Napoli makes arguably the best wood-fired pizza in Orlando. Teppan Edo is a spectacular dining experience. Morocco has incredible lamb tagine. Stop eating at the overpriced main street and explore the countries!',authorId:'mock_jess',likes:44,time:'5h ago',replies:[]},
+  {id:'p10',cat:'Budget Tips',title:'Free and cheap things to do in Orlando this week',body:'You do not need to spend $200 on park tickets every day! Free options: Disney Springs shopping and entertainment, Icon Park waterfront, Loch Haven Cultural Park, Lake Eola Park and fountain, Winter Park Scenic Boat Tour ($16). Full free Orlando guide below.',authorId:'mock_budget',likes:72,time:'12h ago',replies:['r10_1']},
+];
+
+// Mock replies
+const MOCK_REPLIES = {
+  'r1_1':{id:'r1_1',authorId:'mock_sarah',text:'Universal has been my favorite for years! The Hagrid ride alone is worth the price of admission.',time:'1h ago'},
+  'r1_2':{id:'r1_2',authorId:'mock_laura',text:'As a local I say it really depends on your age group. Families with young kids = Disney every time.',time:'45m ago'},
+  'r2_1':{id:'r2_1',authorId:'mock_alex',text:'Cafe Tu Tu Tango is SO underrated. The art studio atmosphere is unlike anything else in Orlando!',time:'3h ago'},
+  'r3_1':{id:'r3_1',authorId:'mock_mike',text:'Great tips! I did something similar — the key is avoiding resort dining completely.',time:'20h ago'},
+  'r5_1':{id:'r5_1',authorId:'mock_king',text:'10 years of Food and Wine and I still learn something new each time. Great tips!',time:'5h ago'},
+  'r7_1':{id:'r7_1',authorId:'mock_dave',text:'January is magical. Post-holiday crowds drop off a cliff and the weather is perfect.',time:'1d ago'},
+  'r7_2':{id:'r7_2',authorId:'mock_budget',text:'Confirmed! January is when I always go. Half the crowds and great hotel deals.',time:'22h ago'},
+  'r10_1':{id:'r10_1',authorId:'mock_jess',text:'The Winter Park Boat Tour is criminally underrated. Pure magic for $16!',time:'10h ago'},
+};
+
+MOCK_POSTS.forEach(p => {
+  socialState.postReplies[p.id] = (p.replies||[]).map(rid => MOCK_REPLIES[rid]).filter(Boolean);
+});
+
+// ===== MOCK COMMUNITY ITINERARIES =====
+const MOCK_ITINS = [
+  {id:'ci1',title:'Ultimate Disney Magic Kingdom Day',authorId:'mock_dave',places:['p1','a1','a4'],emojis:'🏰🎢🎡',desc:'Perfect 1-day Magic Kingdom itinerary with FastPass strategy and dining picks.',likes:83,saves:41,featured:true,time:'2d ago'},
+  {id:'ci2',title:'Best Orlando Food Crawl',authorId:'mock_jess',places:['r1','r2','r3'],emojis:'🍕🍔🥗',desc:'5 amazing restaurants you must try — from brunch to late night bites.',likes:67,saves:29,featured:true,time:'1d ago'},
+  {id:'ci3',title:'Budget Orlando 3 Days',authorId:'mock_budget',places:['a3','a9','r4'],emojis:'💰🎨🌊',desc:'See all the best of Orlando without breaking the bank. Full cost breakdown!',likes:45,saves:56,featured:false,time:'3d ago'},
+  {id:'ci4',title:'Universal Studios Weekend',authorId:'mock_king',places:['p2','p3','a7'],emojis:'🎢⚡🦖',desc:'2-day Universal itinerary — Islands of Adventure + Epic Universe tips.',likes:112,saves:78,featured:false,time:'4h ago'},
+  {id:'ci5',title:'Family Fun with Toddlers',authorId:'mock_laura',places:['p1','a6','r2'],emojis:'👶🎠🍦',desc:'Little ones will LOVE this gentle, fun-filled Orlando day. Tested with a 2-year-old!',likes:58,saves:34,featured:false,time:'6h ago'},
+];
+
+// ===== MOCK PHOTOS =====
+const PHOTO_EMOJIS = ['📸','🌟','✨','🎠','🌴','🎢','🎡','🏰','🎪','🌅'];
+function seedPhotos() {
+  const placeIds = ['p1','p2','a1','a3','r1','r2','h1'];
+  placeIds.forEach(pid => {
+    if(!socialState.photos[pid]) socialState.photos[pid] = [];
+    const mockPhotos = [
+      {id:pid+'_ph1',emoji:PHOTO_EMOJIS[Math.floor(Math.random()*PHOTO_EMOJIS.length)],caption:'Amazing view! 😍',uploaderId:'mock_sarah',uploaderAvatar:'🌺',uploaderName:'SarahExplores',date:'2 days ago',likes:12,placeId:pid},
+      {id:pid+'_ph2',emoji:PHOTO_EMOJIS[Math.floor(Math.random()*PHOTO_EMOJIS.length)],caption:'Best day ever at this spot!',uploaderId:'mock_alex',uploaderAvatar:'🧭',uploaderName:'OrlandoAlex',date:'1 week ago',likes:8,placeId:pid},
+    ];
+    socialState.photos[pid].push(...mockPhotos);
+  });
+}
+seedPhotos();
+</script>
+<script>
+// ===== HELPER: get user display info =====
+function getMockUser(id) { return MOCK_USERS.find(u=>u.id===id); }
+function getCurrentUserProfile() {
+  if(!appState.user) return null;
+  const lv = getLevel(gameState.xp);
+  return {
+    id: appState.user.id,
+    username: appState.user.name,
+    avatar: appState.user.avatar,
+    level: lv.name,
+    isLocal: gameState.isOrlandoLocal,
+    followers: socialState.followers.length,
+    following: socialState.following.length,
+    checkins: Object.keys(gameState.checkIns).length,
+    reviews: Object.values(appState.reviews).flat().filter(r=>r.userId===appState.user?.id).length,
+    xp: gameState.xp
+  };
+}
+
+// ===== USER PROFILE OVERLAY =====
+function openUserProfile(userId) {
+  const overlay = document.getElementById('user-profile-overlay');
+  const cover = document.getElementById('user-profile-cover');
+  const body = document.getElementById('user-profile-body');
+  const isSelf = appState.user && userId === appState.user.id;
+  const isFollowing = socialState.following.includes(userId);
+
+  let user, level, isLocal, followers, following, checkins, reviews, badges, bio, xp;
+  if(userId === 'me' || isSelf) {
+    const me = getCurrentUserProfile();
+    if(!me) { openAuthModal('view your profile'); return; }
+    user = me; level=me.level; isLocal=me.isLocal; followers=me.followers;
+    following=me.following; checkins=me.checkins; reviews=me.reviews;
+    badges=Object.values(gameState.badges).filter(b=>b.earned).length; bio='Orlando Explorer'; xp=me.xp;
+  } else {
+    const mock = getMockUser(userId);
+    if(!mock) return;
+    user=mock; level=mock.level; isLocal=mock.isLocal; followers=mock.followers;
+    following=mock.following; checkins=mock.checkins; reviews=mock.reviews; badges=mock.badges; bio=mock.bio; xp=1200;
+  }
+
+  const cfg = LEVEL_CONFIG[level]||LEVEL_CONFIG.Tourist;
+  cover.style.background = cfg.grad || 'linear-gradient(135deg,#FF6B35,#FFD700)';
+  document.getElementById('user-profile-avatar').textContent = user.avatar||user.emoji||'😊';
+
+  const earnedBadges = isSelf ? BADGES.filter(b=>gameState.badges[b.id]?.earned) : BADGES.slice(0,badges);
+  const itinCount = isSelf ? socialState.sharedItineraries.length : Math.floor(Math.random()*5)+1;
+
+  body.innerHTML = `
+    <div class="profile-overlay-stats">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div>
+          <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;">${user.username||user.name}</div>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:3px;">
+            <span style="font-size:11px;font-weight:700;color:${cfg.color};background:${cfg.color}18;padding:2px 8px;border-radius:8px;">${cfg.emoji} ${level}</span>
+            ${isLocal?'<span style="font-size:11px;font-weight:700;color:#2E7D32;background:#E8F5E9;padding:2px 8px;border-radius:8px;">🌴 Orlando Local</span>':''}
+          </div>
+          ${bio?`<div style="font-size:12px;color:#9E9E9E;margin-top:5px;">${bio}</div>`:''}
+        </div>
+        <div style="text-align:right;">
+          ${isSelf
+            ? `<button style="background:#F5F5F5;border:none;border-radius:20px;padding:8px 16px;font-size:13px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;">✏️ Edit</button>`
+            : `<button class="follow-btn ${isFollowing?'following':'not-following'}" id="pfl-follow-${userId}" onclick="toggleFollow('${userId}',this)">${isFollowing?'✓ Following':'+ Follow'}</button>`
+          }
+        </div>
+      </div>
+      <div class="social-stat-row" style="margin:0 -16px;border-radius:0;">
+        <div class="social-stat"><div class="social-stat-val">${followers}</div><div class="social-stat-lbl">Followers</div></div>
+        <div class="social-stat"><div class="social-stat-val">${following}</div><div class="social-stat-lbl">Following</div></div>
+        <div class="social-stat"><div class="social-stat-val">${checkins}</div><div class="social-stat-lbl">Check-ins</div></div>
+        <div class="social-stat"><div class="social-stat-val">${reviews}</div><div class="social-stat-lbl">Reviews</div></div>
+      </div>
+    </div>
+    ${earnedBadges.length?`<div style="padding:14px 16px 4px;font-weight:700;font-size:13px;">🏅 Badges</div>
+    <div class="profile-badges-row">${earnedBadges.map(b=>`<div class="profile-badge-mini" style="background:${b.color}20;">${b.emoji}</div>`).join('')}</div>`:''}
+    <div style="padding:14px 16px 4px;font-weight:700;font-size:13px;">🗺️ Passport (${checkins} stamps)</div>
+    <div style="padding:0 16px 16px;font-size:28px;letter-spacing:4px;">${Array(Math.min(checkins,8)).fill('📍').join('')}${checkins>8?'...':''}</div>
+    <div style="padding:0 16px;font-size:12px;color:#9E9E9E;margin-bottom:8px;">${itinCount} itinerar${itinCount!==1?'ies':'y'} shared · ${xp.toLocaleString()} total XP</div>
+    <div style="height:20px;"></div>`;
+  overlay.classList.add('open');
+}
+
+// ===== FOLLOW SYSTEM =====
+function toggleFollow(userId, btn) {
+  if(!appState.user) { openAuthModal('follow users'); return; }
+  const idx = socialState.following.indexOf(userId);
+  if(idx >= 0) {
+    socialState.following.splice(idx, 1);
+    if(btn) { btn.textContent='+ Follow'; btn.className='follow-btn not-following'; }
+    showToast('Unfollowed');
+  } else {
+    socialState.following.push(userId);
+    if(btn) { btn.textContent='✓ Following'; btn.className='follow-btn following'; }
+    showToast('Following! 🎉');
+    if(socialState.following.length === 1) addXP(5, 'First friend followed!');
+    logFriendActivity(userId);
+  }
+  // Update all follow buttons for this user
+  document.querySelectorAll(`[id^="pfl-follow-${userId}"]`).forEach(b=>{
+    const isNowFollowing = socialState.following.includes(userId);
+    b.textContent = isNowFollowing ? '✓ Following' : '+ Follow';
+    b.className = 'follow-btn ' + (isNowFollowing ? 'following' : 'not-following');
+  });
+}
+
+function logFriendActivity(userId) {
+  // When we follow someone, simulate they've done recent things
+}
+
+// ===== FIND FRIENDS =====
+function openFindFriends() {
+  if(!appState.user) { openAuthModal('find friends'); return; }
+  renderFindFriends(MOCK_USERS);
+  document.getElementById('find-friends-overlay').classList.add('open');
+}
+function filterFriendSearch(q) {
+  const filtered = q ? MOCK_USERS.filter(u=>u.username.toLowerCase().includes(q.toLowerCase())||u.bio.toLowerCase().includes(q.toLowerCase())) : MOCK_USERS;
+  renderFindFriends(filtered);
+}
+function renderFindFriends(users) {
+  const list = document.getElementById('find-friends-list');
+  if(!list) return;
+  list.innerHTML = '<div style="padding:8px 16px;font-size:12px;color:#9E9E9E;font-weight:600;">SUGGESTED FOR YOU</div>'
+    + users.map(u=>{
+      const isF = socialState.following.includes(u.id);
+      const cfg = LEVEL_CONFIG[u.level]||LEVEL_CONFIG.Tourist;
+      return `<div class="user-suggestion">
+        <div class="user-sug-avatar">${u.avatar}</div>
+        <div class="user-sug-info">
+          <div class="user-sug-name" onclick="openUserProfile('${u.id}')" style="cursor:pointer;">${u.username} ${u.isLocal?'🌴':''}</div>
+          <div class="user-sug-meta">${cfg.emoji} ${u.level} · ${u.followers} followers · ${u.checkins} check-ins</div>
+          <div style="font-size:11px;color:#757575;margin-top:2px;">${u.bio}</div>
+        </div>
+        <button class="follow-btn ${isF?'following':'not-following'}" id="pfl-follow-${u.id}" onclick="toggleFollow('${u.id}',this)">${isF?'✓ Following':'+ Follow'}</button>
+      </div>`;
+    }).join('') + '<div style="height:20px;"></div>';
+}
+
+// ===== FRIENDS ACTIVITY FEED =====
+const ACTIVITY_TEMPLATES = [
+  {type:'save',    fn:(u,place)=>u.username+' saved '+place+' to their trip',          emoji:'💾'},
+  {type:'checkin', fn:(u,place)=>u.username+' checked in to '+place,                   emoji:'📍'},
+  {type:'review',  fn:(u,place)=>u.username+' wrote a review for '+place,               emoji:'✍️'},
+  {type:'badge',   fn:(u,badge)=>u.username+' earned the '+badge+' badge',              emoji:'🏅'},
+  {type:'photo',   fn:(u,place)=>u.username+' shared a photo at '+place,                emoji:'📸'},
+];
+const PLACES_FOR_ACTIVITY = ['Disney World','Universal Studios','Disney Springs','SeaWorld','Fun Spot','Pizza Bruno','Café Tu Tu Tango','The Ravenous Pig','ICON Park','Gatorland'];
+const TIMES = ['just now','2m ago','15m ago','1h ago','2h ago','3h ago','yesterday'];
+
+function getMockActivity() {
+  const activities = [];
+  socialState.following.forEach(uid=>{
+    const u = getMockUser(uid); if(!u) return;
+    const tmpl = ACTIVITY_TEMPLATES[Math.floor(Math.random()*ACTIVITY_TEMPLATES.length)];
+    const place = PLACES_FOR_ACTIVITY[Math.floor(Math.random()*PLACES_FOR_ACTIVITY.length)];
+    const time = TIMES[Math.floor(Math.random()*TIMES.length)];
+    activities.push({avatar:u.avatar, text:tmpl.fn(u,place), emoji:tmpl.emoji, time, uid});
+  });
+  return activities.slice(0,4);
+}
+function renderFriendsActivity() {
+  const wrap = document.getElementById('home-friends-activity');
+  if(!wrap) return;
+  if(!appState.user || socialState.following.length===0) { wrap.style.display='none'; return; }
+  wrap.style.display='block';
+  const acts = getMockActivity();
+  wrap.innerHTML = `<div class="activity-wrap">
+    <div class="activity-hdr">
+      <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;">👥 Friends Activity</div>
+      <div class="find-friends-btn" onclick="openFindFriends()">+ Find Friends</div>
+    </div>
+    ${acts.map(a=>`<div class="activity-item">
+      <div class="activity-avatar">${a.avatar}</div>
+      <div class="activity-text">${a.emoji} <b>${a.text}</b></div>
+      <div class="activity-time">${a.time}</div>
+    </div>`).join('')}
+  </div>`;
+}
+</script>
+<script>
+// ===== SHARE ITINERARY =====
+let _itinVisibility = 'public';
+function openShareItinerary() {
+  if(!appState.user){ openAuthModal('share your itinerary'); return; }
+  if(Object.keys(appState.savedItems).length === 0){ showToast('Add some places to your trip first!'); return; }
+  document.getElementById('itin-title-input').value = '';
+  document.getElementById('itin-desc-input').value = '';
+  document.getElementById('share-itinerary-modal').style.display = 'flex';
+}
+function setItinVis(btn, vis) {
+  _itinVisibility = vis;
+  document.querySelectorAll('.itin-vis-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function publishItinerary() {
+  const title = document.getElementById('itin-title-input').value.trim();
+  if(!title){ showToast('Please enter a title!'); return; }
+  const desc = document.getElementById('itin-desc-input').value.trim();
+  const places = Object.values(appState.savedItems);
+  const u = appState.user;
+  const slug = (u.name+'-'+title).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  const itin = {
+    id:'user_itin_'+Date.now(), title, desc, authorId:'current_user',
+    authorName:u.name, authorAvatar:u.avatar, visibility:_itinVisibility,
+    places:places.map(p=>p.id), emojis:places.slice(0,5).map(p=>p.emoji).join(''),
+    likes:0, saves:0, featured:false, time:'just now', slug
+  };
+  socialState.sharedItineraries.unshift(itin);
+  document.getElementById('share-itinerary-modal').style.display='none';
+  addXP(20,'Shared itinerary: '+title);
+  // Show success with mock link
+  const link = 'orlandoexplorer.com/trips/'+slug;
+  showShareSuccess(itin.title, link);
+}
+function showShareSuccess(title, link) {
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.style.cssText = 'display:flex;z-index:9000;';
+  modal.innerHTML = `<div style="background:white;border-radius:20px;padding:28px 24px;text-align:center;width:88%;max-width:320px;">
+    <div style="font-size:48px;margin-bottom:12px;">🎉</div>
+    <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:8px;">${title}</div>
+    <div style="font-size:13px;color:#9E9E9E;margin-bottom:16px;">Your itinerary is now live!</div>
+    <div style="background:#F5F5F5;border-radius:10px;padding:10px 12px;font-size:12px;color:#424242;word-break:break-all;margin-bottom:14px;">${link}</div>
+    <div style="display:flex;gap:8px;">
+      <button onclick="navigator.clipboard&&navigator.clipboard.writeText('${link}').then(()=>showToast('Link copied! 📋'))" style="flex:1;background:#F5F5F5;border:none;border-radius:20px;padding:11px;font-size:13px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;">📋 Copy Link</button>
+      <button onclick="this.closest('.modal-overlay').remove()" style="flex:1;background:linear-gradient(135deg,#FF6B35,#FFD700);color:white;border:none;border-radius:20px;padding:11px;font-size:13px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;">Done</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+}
+
+// ===== COMMUNITY ITINERARIES =====
+function openCommunityItineraries() {
+  renderCommunityItineraries();
+  document.getElementById('community-itineraries-overlay').classList.add('open');
+}
+function renderCommunityItineraries() {
+  const list = document.getElementById('community-itineraries-list');
+  if(!list) return;
+  const allItins = [...MOCK_ITINS, ...socialState.sharedItineraries.filter(i=>i.visibility==='public')];
+  const sorted = [...allItins.filter(i=>i.featured), ...allItins.filter(i=>!i.featured)];
+  list.innerHTML = sorted.map(itin=>{
+    const author = itin.authorId==='current_user' ? {username:appState.user?.name||'You',avatar:appState.user?.avatar||'😊',isLocal:gameState.isOrlandoLocal} : getMockUser(itin.authorId)||{username:'Unknown',avatar:'😊',isLocal:false};
+    const isFollowed = socialState.following.includes(itin.authorId);
+    const isLiked = socialState.likedItins[itin.id];
+    return `<div class="comm-itin-card">
+      ${itin.featured?'<div class="comm-itin-featured">⭐ Featured</div>':''}
+      ${isFollowed?'<div class="from-follow-tag" style="margin-bottom:6px;">👥 From Someone You Follow</div>':''}
+      <div class="comm-itin-title">${itin.title}</div>
+      <div class="comm-itin-meta">by ${author.avatar} ${author.username}${author.isLocal?' 🌴':''} · ${itin.places.length} places · ${itin.time}</div>
+      <div class="comm-itin-emojis">${itin.emojis}</div>
+      ${itin.desc?`<div style="font-size:12px;color:#757575;margin-bottom:10px;line-height:1.4;">${itin.desc}</div>`:''}
+      <div class="comm-itin-actions">
+        <button class="itin-action-btn ${isLiked?'liked':''}" onclick="likeItin('${itin.id}',this)">❤️ ${itin.likes+(isLiked?1:0)}</button>
+        <button class="itin-action-btn" onclick="saveItin('${itin.id}')">💾 Save (${itin.saves})</button>
+        <button class="itin-action-btn" onclick="copyItin('${itin.id}')">📋 Copy</button>
+      </div>
+    </div>`;
+  }).join('') + '<div style="height:20px;"></div>';
+}
+function likeItin(id, btn) {
+  if(!appState.user){openAuthModal('like itineraries');return;}
+  socialState.likedItins[id] = !socialState.likedItins[id];
+  renderCommunityItineraries();
+}
+function saveItin(id) {
+  if(!appState.user){openAuthModal('save itineraries');return;}
+  const itin = [...MOCK_ITINS,...socialState.sharedItineraries].find(i=>i.id===id);
+  if(!itin){showToast('Itinerary not found');return;}
+  showToast('Itinerary saved to My Trip! 🗺️');
+  itin.saves++;
+  addXP(5,'Saved community itinerary');
+}
+function copyItin(id) {
+  if(!appState.user){openAuthModal('copy itineraries');return;}
+  showToast('Itinerary copied as your starting point! ✓');
+}
+
+// ===== RECENT PHOTOS ON HOME =====
+function renderHomeRecentPhotos() {
+  const wrap = document.getElementById('home-recent-photos');
+  if(!wrap || !appState.user) { if(wrap) wrap.style.display='none'; return; }
+  const allPhotos = Object.values(socialState.photos).flat();
+  const userPhotos = socialState.userPhotos;
+  // Photos from followed users first
+  const followedPhotos = allPhotos.filter(p=>socialState.following.includes(p.uploaderId));
+  const otherPhotos = allPhotos.filter(p=>!socialState.following.includes(p.uploaderId));
+  const sorted = [...userPhotos,...followedPhotos,...otherPhotos].slice(0,6);
+  if(sorted.length === 0) { wrap.style.display='none'; return; }
+  wrap.style.display='block';
+  wrap.innerHTML = `<div style="padding:0 16px 8px;">
+    <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;margin-bottom:10px;">📸 Recent Photos</div>
+    <div class="hscroll" style="gap:10px;">
+      ${sorted.map(p=>`<div class="rphoto-item" onclick="">
+        <div class="rphoto-emoji" style="background:#FFF3E0;">${p.emoji}</div>
+        <div class="rphoto-info">
+          <div class="rphoto-place">${p.caption.slice(0,20)}</div>
+          <div class="rphoto-user">${p.uploaderAvatar} ${p.uploaderName}</div>
+        </div>
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+// ===== HOME COMMUNITY SECTION =====
+function renderHomeCommunitySection() {
+  const wrap = document.getElementById('home-community-btn-section');
+  if(!wrap) return;
+  wrap.style.display='block';
+  wrap.innerHTML=`<div style="padding:0 16px 16px;">
+    <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;margin-bottom:10px;">🌴 Orlando Community</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div onclick="openCommunityForum()" style="background:linear-gradient(135deg,#FF6B35,#FF8C42);border-radius:14px;padding:16px;cursor:pointer;color:white;text-align:center;">
+        <div style="font-size:28px;margin-bottom:4px;">💬</div>
+        <div style="font-weight:700;font-size:13px;">Community Forum</div>
+        <div style="font-size:11px;opacity:0.85;margin-top:2px;">${MOCK_POSTS.length} posts</div>
+      </div>
+      <div onclick="openCommunityItineraries()" style="background:linear-gradient(135deg,#4CAF50,#81C784);border-radius:14px;padding:16px;cursor:pointer;color:white;text-align:center;">
+        <div style="font-size:28px;margin-bottom:4px;">🗺️</div>
+        <div style="font-weight:700;font-size:13px;">Community Trips</div>
+        <div style="font-size:11px;opacity:0.85;margin-top:2px;">${MOCK_ITINS.length} itineraries</div>
+      </div>
+      <div onclick="openFindFriends()" style="background:linear-gradient(135deg,#2196F3,#64B5F6);border-radius:14px;padding:16px;cursor:pointer;color:white;text-align:center;">
+        <div style="font-size:28px;margin-bottom:4px;">👥</div>
+        <div style="font-weight:700;font-size:13px;">Find Friends</div>
+        <div style="font-size:11px;opacity:0.85;margin-top:2px;">${socialState.following.length} following</div>
+      </div>
+      <div onclick="openUserProfile('me')" style="background:linear-gradient(135deg,#9C27B0,#CE93D8);border-radius:14px;padding:16px;cursor:pointer;color:white;text-align:center;">
+        <div style="font-size:28px;margin-bottom:4px;">👤</div>
+        <div style="font-weight:700;font-size:13px;">My Profile</div>
+        <div style="font-size:11px;opacity:0.85;margin-top:2px;">View public profile</div>
+      </div>
+    </div>
+  </div>`;
+}
+</script>
+<script>
+// ===== GROUP TRIP =====
+function openCreateGroupTrip() {
+  if(!appState.user){openAuthModal('create a group trip');return;}
+  socialState.groupInvited = [];
+  document.getElementById('group-trip-title-input').value = '';
+  const list = document.getElementById('group-invite-list');
+  const chips = document.getElementById('group-selected-chips');
+  chips.innerHTML = '';
+  const following = MOCK_USERS.filter(u=>socialState.following.includes(u.id));
+  const shown = following.length ? following : MOCK_USERS.slice(0,4);
+  list.innerHTML = shown.map(u=>`<div style="display:flex;align-items:center;gap:10px;padding:6px 0;">
+    <span style="font-size:20px;">${u.avatar}</span>
+    <div style="flex:1;"><div style="font-weight:600;font-size:13px;">${u.username}</div><div style="font-size:11px;color:#9E9E9E;">${u.level}</div></div>
+    <button onclick="toggleGroupInvite('${u.id}','${u.username}','${u.avatar}',this)" style="background:#F5F5F5;border:none;border-radius:16px;padding:5px 12px;font-size:12px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;">Invite</button>
+  </div>`).join('');
+  document.getElementById('create-group-modal').style.display='flex';
+}
+function toggleGroupInvite(id,name,avatar,btn) {
+  const idx = socialState.groupInvited.findIndex(x=>x.id===id);
+  if(idx>=0) {
+    socialState.groupInvited.splice(idx,1);
+    btn.textContent='Invite'; btn.style.background='#F5F5F5'; btn.style.color='';
+  } else {
+    socialState.groupInvited.push({id,name,avatar});
+    btn.textContent='✓ Added'; btn.style.background='#E8F5E9'; btn.style.color='#2E7D32';
+  }
+  const chips = document.getElementById('group-selected-chips');
+  chips.innerHTML = socialState.groupInvited.map(m=>`<div class="invite-chip">${m.avatar} ${m.name}<button onclick="toggleGroupInvite('${m.id}','${m.name}','${m.avatar}',document.querySelector('[data-uid=${m.id}]'))">✕</button></div>`).join('');
+}
+function createGroupTrip() {
+  const title = document.getElementById('group-trip-title-input').value.trim()||'My Group Trip';
+  const u = appState.user;
+  const members = [{id:u.id,name:u.name,avatar:u.avatar,isAdmin:true,active:true},...socialState.groupInvited.map(m=>({...m,active:Math.random()>0.4}))];
+  const defaultPlaces = Object.values(appState.savedItems).slice(0,3).map(p=>({...p,addedBy:u.name,addedAvatar:u.avatar,votes:0,upVoters:[],downVoters:[]}));
+  const trip = {id:'gt_'+Date.now(),title,members,places:defaultPlaces,chat:[
+    {avatar:members[1]?.avatar||'🌺',name:members[1]?.name||'Sarah',text:'This trip is going to be amazing! 🎉',time:'2m ago'},
+    {avatar:members[2]?.avatar||'🧭',name:members[2]?.name||'Alex',text:'I already have the Disney tickets booked 🏰',time:'1m ago'},
+    {avatar:u.avatar,name:u.name,text:'Can\'t wait to explore together! 🌴',time:'just now'},
+  ]};
+  socialState.activeGroupTrip = trip; socialState.groupTrips.push(trip);
+  document.getElementById('create-group-modal').style.display='none';
+  openGroupTrip(trip);
+}
+function openGroupTrip(trip) {
+  if(!trip) trip = socialState.activeGroupTrip;
+  if(!trip) return;
+  document.getElementById('group-trip-name').textContent = trip.title;
+  document.getElementById('group-trip-meta').textContent = trip.members.length + ' members · Created just now';
+  renderGroupTripBody(trip);
+  document.getElementById('group-trip-overlay').classList.add('open');
+}
+function renderGroupTripBody(trip) {
+  const body = document.getElementById('group-trip-body');
+  if(!body) return;
+  const membersHtml = trip.members.map(m=>`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;">
+    <div style="position:relative;"><span style="font-size:24px;">${m.avatar}</span>${m.active?'<span class="live-dot" style="position:absolute;bottom:0;right:0;"></span>':''}</div>
+    <div><div style="font-size:13px;font-weight:600;">${m.name}${m.isAdmin?' <span style="font-size:9px;background:#FFD700;color:#000;padding:1px 6px;border-radius:8px;font-weight:700;">ADMIN</span>':''}</div><div style="font-size:10px;color:#9E9E9E;">${m.active?'🟢 Active now':'Offline'}</div></div>
+  </div>`).join('');
+  const sortedPlaces = [...trip.places].sort((a,b)=>b.votes-a.votes);
+  const placesHtml = sortedPlaces.length ? sortedPlaces.map(p=>`<div class="group-place-card">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span style="font-size:28px;">${p.emoji}</span>
+      <div style="flex:1;"><div style="font-weight:700;font-size:14px;">${p.name}</div><div style="font-size:11px;color:#9E9E9E;">Added by ${p.addedAvatar} ${p.addedBy}</div></div>
+    </div>
+    <div class="vote-row">
+      <button class="vote-btn up" onclick="votePlace('${trip.id}','${p.id}','up',this)">👍</button>
+      <span style="font-size:13px;font-weight:700;min-width:24px;text-align:center;">${p.votes}</span>
+      <button class="vote-btn down" onclick="votePlace('${trip.id}','${p.id}','down',this)">👎</button>
+      <span style="flex:1;"></span>
+      <span style="font-size:11px;color:#9E9E9E;">${p.area||''}</span>
+    </div>
+  </div>`).join('') : '<div style="text-align:center;padding:20px;color:#9E9E9E;font-size:13px;">No places yet — go explore and add some!</div>';
+  const chatHtml = trip.chat.map(c=>`<div class="chat-msg"><div class="chat-avatar">${c.avatar}</div><div><div class="chat-meta">${c.name} · ${c.time}</div><div class="chat-bubble">${c.text}</div></div></div>`).join('');
+  body.innerHTML = `
+    <div class="adm-card" style="margin:12px 16px;"><div class="adm-card-title">👥 Members (${trip.members.length})</div>${membersHtml}</div>
+    <div style="padding:0 16px;font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:8px;">📍 Trip Places</div>
+    ${placesHtml}
+    <div style="padding:12px 16px;"><button onclick="document.getElementById('group-trip-overlay').classList.remove('open');showScreen('explore',document.querySelectorAll('.nav-item')[1])" style="width:100%;background:none;border:2px dashed #E0E0E0;border-radius:12px;padding:12px;font-size:13px;font-weight:600;color:#9E9E9E;cursor:pointer;">+ Add a Place</button></div>
+    <div style="padding:0 16px;font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:8px;">💬 Group Chat</div>
+    <div id="group-chat-messages">${chatHtml}</div>
+    <div style="padding:12px 16px;display:flex;gap:8px;">
+      <input type="text" id="group-chat-input" placeholder="Send a message..." style="flex:1;border:1px solid #E0E0E0;border-radius:20px;padding:10px 14px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;">
+      <button onclick="sendGroupMsg('${trip.id}')" style="background:#9C27B0;color:white;border:none;border-radius:20px;padding:10px 16px;font-size:13px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;">Send</button>
+    </div>
+    <div style="margin:8px 16px 8px;"><button onclick="leaveGroupTrip('${trip.id}')" style="width:100%;background:none;border:2px solid #EF5350;color:#EF5350;border-radius:20px;padding:10px;font-size:13px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;">Leave Trip</button></div>
+    <div style="height:20px;"></div>`;
+}
+function votePlace(tripId, placeId, dir, btn) {
+  const trip = socialState.groupTrips.find(t=>t.id===tripId)||socialState.activeGroupTrip;
+  if(!trip) return;
+  const place = trip.places.find(p=>p.id===placeId);
+  if(!place) return;
+  place.votes += dir==='up' ? 1 : -1;
+  renderGroupTripBody(trip);
+}
+function sendGroupMsg(tripId) {
+  const inp = document.getElementById('group-chat-input');
+  const text = inp?.value.trim(); if(!text) return;
+  const trip = socialState.groupTrips.find(t=>t.id===tripId)||socialState.activeGroupTrip;
+  if(!trip) return;
+  const u = appState.user;
+  trip.chat.push({avatar:u.avatar,name:u.name,text,time:'just now'});
+  inp.value = '';
+  renderGroupTripBody(trip);
+  const msgs = document.getElementById('group-chat-messages');
+  if(msgs) msgs.scrollTop = msgs.scrollHeight;
+}
+function leaveGroupTrip(tripId) {
+  if(confirm('Leave this group trip?')) {
+    document.getElementById('group-trip-overlay').classList.remove('open');
+    showToast('Left the group trip');
+  }
+}
+</script>
+<script>
+// ===== COMMUNITY FORUM =====
+const FORUM_CATS = ['All','Theme Parks','Food & Dining','Hotels','Events','Budget Tips','Family Travel','Ask a Local'];
+let _forumCat = 'All';
+let _forumSearch = '';
+let _activePostId = null;
+
+function openCommunityForum() {
+  renderForumCats();
+  renderForumPosts();
+  document.getElementById('community-forum-overlay').classList.add('open');
+}
+function renderForumCats() {
+  const tabs = document.getElementById('forum-category-tabs');
+  if(!tabs) return;
+  tabs.innerHTML = FORUM_CATS.map(cat=>`<button class="forum-cat-chip ${_forumCat===cat?'active':''}" onclick="setForumCat('${cat}')">${cat}</button>`).join('');
+}
+function setForumCat(cat) {
+  _forumCat = cat;
+  renderForumCats();
+  renderForumPosts();
+}
+function filterForum(q) {
+  _forumSearch = q.toLowerCase();
+  renderForumPosts();
+}
+function renderForumPosts() {
+  const list = document.getElementById('forum-posts-list');
+  if(!list) return;
+  let posts = [...MOCK_POSTS];
+  if(_forumCat !== 'All') posts = posts.filter(p=>p.cat===_forumCat||p.cat.includes(_forumCat));
+  if(_forumSearch) posts = posts.filter(p=>p.title.toLowerCase().includes(_forumSearch)||p.body.toLowerCase().includes(_forumSearch));
+  const pinned = posts.filter(p=>p.pinned);
+  const regular = posts.filter(p=>!p.pinned);
+  const sorted = [...pinned,...regular];
+  list.innerHTML = (sorted.length ? sorted.map(p=>forumPostCardHTML(p)).join('') : '<div style="text-align:center;padding:40px 20px;color:#9E9E9E;"><div style="font-size:40px;margin-bottom:12px;">💬</div><div style="font-size:15px;">No posts found</div></div>') + '<div style="height:20px;"></div>';
+}
+function forumPostCardHTML(p) {
+  const author = getMockUser(p.authorId)||{username:'Unknown',avatar:'😊',level:'Explorer',isLocal:false};
+  const isFriend = socialState.following.includes(p.authorId);
+  const isLiked = socialState.likedPosts[p.id];
+  const replies = socialState.postReplies[p.id]||[];
+  const catEmoji = {
+    'Theme Parks':'🎢','Food & Dining':'🍽️','Hotels':'🏨','Events':'🎉','Budget Tips':'💰','Family Travel':'👨‍👩‍👧','Ask a Local':'🌴'
+  }[p.cat]||'💬';
+  return `<div class="forum-post-card" onclick="openPostDetail('${p.id}')">
+    ${p.pinned?'<div class="forum-pinned">📌 Pinned</div>':''}
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+      <span class="forum-cat-badge">${catEmoji} ${p.cat}</span>
+    </div>
+    <div class="forum-post-title">${p.title}</div>
+    <div class="forum-post-preview">${p.body.slice(0,100)}...</div>
+    <div class="forum-post-footer">
+      <div class="forum-author">
+        <span style="font-size:16px;">${author.avatar}</span>
+        <span class="forum-author-name">${author.username}</span>
+        <span class="forum-lv-badge">${author.level}</span>
+        ${author.isLocal?'<span class="forum-local-badge">🌴 Local</span>':''}
+        ${isFriend?'<span class="forum-friend-badge">👥 Friend</span>':''}
+      </div>
+      <div class="forum-stats">
+        <span>❤️ ${p.likes+(isLiked?1:0)}</span>
+        <span>💬 ${replies.length}</span>
+        <span>${p.time}</span>
+      </div>
+    </div>
+  </div>`;
+}
+function openPostDetail(postId) {
+  _activePostId = postId;
+  const post = MOCK_POSTS.find(p=>p.id===postId);
+  if(!post) return;
+  const author = getMockUser(post.authorId)||{username:'Unknown',avatar:'😊',level:'Explorer',isLocal:false};
+  const replies = socialState.postReplies[postId]||[];
+  const isLiked = socialState.likedPosts[postId];
+  const body = document.getElementById('post-detail-body');
+  const catEmoji = {'Theme Parks':'🎢','Food & Dining':'🍽️','Hotels':'🏨','Events':'🎉','Budget Tips':'💰','Family Travel':'👨‍👩‍👧','Ask a Local':'🌴'}[post.cat]||'💬';
+  body.innerHTML = `<div style="padding:16px;">
+    <div style="margin-bottom:8px;"><span class="forum-cat-badge">${catEmoji} ${post.cat}</span></div>
+    <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:10px;line-height:1.3;">${post.title}</div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+      <span style="font-size:20px;">${author.avatar}</span>
+      <span style="font-weight:700;font-size:13px;">${author.username}</span>
+      <span class="forum-lv-badge">${author.level}</span>
+      ${author.isLocal?'<span class="forum-local-badge">🌴 Local</span>':''}
+      <span style="flex:1;"></span>
+      <span style="font-size:11px;color:#9E9E9E;">${post.time}</span>
+    </div>
+    <div style="font-size:14px;line-height:1.7;color:#424242;margin-bottom:16px;">${post.body}</div>
+    <div style="display:flex;gap:10px;margin-bottom:20px;">
+      <button onclick="likePost('${postId}')" style="background:${isLiked?'#FFEBEE':'#F5F5F5'};border:none;border-radius:20px;padding:8px 16px;font-size:13px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;color:${isLiked?'#EF5350':'#424242'};">❤️ ${post.likes+(isLiked?1:0)}</button>
+    </div>
+    <div style="font-weight:700;font-size:14px;margin-bottom:12px;">💬 Replies (${replies.length})</div>
+    ${replies.map(r=>{
+      const ra = getMockUser(r.authorId)||{username:'User',avatar:'😊',level:'Explorer',isLocal:false};
+      const isCurrent = r.authorId==='current_user';
+      return `<div style="display:flex;gap:10px;margin-bottom:14px;"><span style="font-size:20px;">${isCurrent?appState.user?.avatar||'😊':ra.avatar}</span><div style="flex:1;background:#F8F8F8;border-radius:12px;padding:10px 12px;"><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;"><span style="font-weight:700;font-size:12px;">${isCurrent?appState.user?.name||'You':ra.username}</span><span class="forum-lv-badge">${isCurrent?getLevel(gameState.xp).name:ra.level}</span>${ra.isLocal?'<span class="forum-local-badge">🌴</span>':''}<span style="flex:1;"></span><span style="font-size:10px;color:#9E9E9E;">${r.time}</span></div><div style="font-size:13px;color:#424242;">${r.text}</div></div></div>`;
+    }).join('')}
+    ${replies.length===0?'<div style="text-align:center;padding:16px;color:#9E9E9E;font-size:13px;">Be the first to reply!</div>':''}
+    <div style="height:60px;"></div>
+  </div>`;
+  document.getElementById('post-detail-overlay').classList.add('open');
+}
+function likePost(postId) {
+  if(!appState.user){openAuthModal('like posts');return;}
+  socialState.likedPosts[postId] = !socialState.likedPosts[postId];
+  openPostDetail(postId);
+}
+function submitReplyPost() {
+  if(!appState.user){openAuthModal('reply to posts');return;}
+  const inp = document.getElementById('post-reply-input');
+  const text = inp?.value.trim(); if(!text) return;
+  if(!socialState.postReplies[_activePostId]) socialState.postReplies[_activePostId]=[];
+  socialState.postReplies[_activePostId].push({id:'r_'+Date.now(),authorId:'current_user',text,time:'just now'});
+  inp.value='';
+  addXP(10,'Forum reply posted');
+  openPostDetail(_activePostId);
+}
+function openNewPost() {
+  if(!appState.user){openAuthModal('post to the forum');return;}
+  document.getElementById('new-post-modal').style.display='flex';
+}
+function submitNewPost() {
+  const title = document.getElementById('new-post-title').value.trim();
+  const body = document.getElementById('new-post-body').value.trim();
+  const cat = document.getElementById('new-post-cat').value;
+  if(!title||!body){showToast('Please fill in all fields!');return;}
+  const post = {id:'up_'+Date.now(),cat,title,body,authorId:'current_user',likes:0,time:'just now',pinned:false,replies:[]};
+  MOCK_POSTS.unshift(post);
+  document.getElementById('new-post-modal').style.display='none';
+  addXP(20,'Forum post published');
+  showToast('Post published! 🎉');
+  renderForumPosts();
+}
+</script>
+<script>
+// ===== PHOTO SHARING =====
+function getPlacePhotos(placeId) {
+  return socialState.photos[placeId] || [];
+}
+function renderPhotosTab(placeId) {
+  const photos = getPlacePhotos(placeId);
+  const liked = (id) => !!socialState.likedPhotos[id];
+  return `<div style="padding:0 12px 8px;">
+    <button onclick="openAddPhoto('${placeId}')" style="display:block;width:100%;background:linear-gradient(135deg,#FF6B35,#FFD700);color:white;border:none;border-radius:24px;padding:12px;font-size:14px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;margin-bottom:12px;">📷 Add Photo</button>
+  </div>
+  <div class="photos-grid">
+    ${photos.length ? photos.map(p=>`<div class="photo-card">
+      <div class="photo-hero" style="background:${['#FFF3E0','#E8F5E9','#E3F2FD','#F3E5F5'][Math.floor(Math.random()*4)]}">${p.emoji}</div>
+      <div class="photo-card-body">
+        <div class="photo-caption">${p.caption}</div>
+        <div class="photo-meta">${p.uploaderAvatar} ${p.uploaderName}</div>
+        <div class="photo-like-row">
+          <span style="font-size:10px;color:#9E9E9E;">${p.date}</span>
+          <div>
+            <button class="photo-like-btn" onclick="likePhoto('${p.id}','${placeId}',this)">${liked(p.id)?'❤️':'🤍'}</button>
+            <span style="font-size:11px;font-weight:600;">${p.likes+(liked(p.id)?1:0)}</span>
+          </div>
+        </div>
+      </div>
+    </div>`).join('')
+    : '<div style="grid-column:1/-1;text-align:center;padding:24px;color:#9E9E9E;"><div style="font-size:40px;margin-bottom:8px;">📷</div><div>No photos yet — be the first!</div></div>'}
+  </div>
+  <div style="height:16px;"></div>`;
+}
+function likePhoto(photoId, placeId, btn) {
+  if(!appState.user){openAuthModal('like photos');return;}
+  socialState.likedPhotos[photoId] = !socialState.likedPhotos[photoId];
+  const photos = getPlacePhotos(placeId);
+  // Re-render photos section
+  const tabContent = document.getElementById('detail-photos-tab');
+  if(tabContent) tabContent.innerHTML = renderPhotosTab(placeId);
+}
+function openAddPhoto(placeId) {
+  if(!appState.user){openAuthModal('share photos');return;}
+  const modal = document.createElement('div');
+  modal.className='modal-overlay'; modal.style.cssText='display:flex;z-index:9000;';
+  const randEmoji = PHOTO_EMOJIS[Math.floor(Math.random()*PHOTO_EMOJIS.length)];
+  modal.innerHTML=`<div style="background:white;border-radius:20px;padding:24px;width:90%;max-width:320px;">
+    <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:14px;">📷 Share a Photo</div>
+    <div style="background:#F5F5F5;border-radius:14px;height:100px;display:flex;align-items:center;justify-content:center;font-size:56px;margin-bottom:12px;cursor:pointer;" onclick="this.textContent=window._photoEmojis[Math.floor(Math.random()*window._photoEmojis.length)]" id="photo-preview-emoji">${randEmoji}</div>
+    <div style="font-size:11px;color:#9E9E9E;text-align:center;margin-bottom:10px;">Tap the photo to change ↑</div>
+    <input type="text" id="photo-caption-input" placeholder="Write a caption..." style="width:100%;border:1px solid #E0E0E0;border-radius:10px;padding:10px 12px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;box-sizing:border-box;margin-bottom:14px;">
+    <div style="display:flex;gap:8px;">
+      <button onclick="this.closest('.modal-overlay').remove()" style="flex:1;background:none;border:2px solid #E0E0E0;border-radius:20px;padding:11px;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;">Cancel</button>
+      <button onclick="submitPhoto('${placeId}',this.closest('.modal-overlay'))" style="flex:1;background:linear-gradient(135deg,#FF6B35,#FFD700);color:white;border:none;border-radius:20px;padding:11px;font-size:13px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;">Share</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+}
+window._photoEmojis = PHOTO_EMOJIS;
+function submitPhoto(placeId, modal) {
+  const caption = document.getElementById('photo-caption-input').value.trim()||'Great spot!';
+  const emoji = document.getElementById('photo-preview-emoji').textContent;
+  const u = appState.user;
+  const photo = {id:'ph_'+Date.now(),emoji,caption,uploaderId:u.id,uploaderAvatar:u.avatar,uploaderName:u.name,date:'Just now',likes:0,placeId};
+  if(!socialState.photos[placeId]) socialState.photos[placeId]=[];
+  socialState.photos[placeId].unshift(photo);
+  socialState.userPhotos.unshift(photo);
+  modal.remove();
+  addXP(15,'Photo shared at '+placeId);
+  showToast('Photo shared! 📸 +15 XP');
+  const tabContent = document.getElementById('detail-photos-tab');
+  if(tabContent) tabContent.innerHTML = renderPhotosTab(placeId);
+  if(appState.currentScreen==='home') renderHomeRecentPhotos();
+}
+
+// ===== PATCH buildDetailHTML — add Photos tab =====
+const _origBuildDetailHTML2 = buildDetailHTML;
+buildDetailHTML = function(item) {
+  let html = _origBuildDetailHTML2(item);
+  // Replace reviews section header to add tab buttons
+  const reviewsHdrTarget = '<div class="reviews-section"><div class="reviews-hdr"><h3>Reviews</h3>';
+  const tabsAndReviews = `<div class="reviews-section">
+    <div style="display:flex;border-bottom:2px solid #F5F5F5;margin-bottom:0;">
+      <button id="tab-btn-reviews-${item.id}" onclick="switchDetailTab('reviews','${item.id}')" style="flex:1;padding:12px 0;background:none;border:none;border-bottom:3px solid #FF6B35;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;color:#FF6B35;cursor:pointer;margin-bottom:-2px;">✍️ Reviews</button>
+      <button id="tab-btn-photos-${item.id}" onclick="switchDetailTab('photos','${item.id}')" style="flex:1;padding:12px 0;background:none;border:none;border-bottom:3px solid transparent;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;color:#9E9E9E;cursor:pointer;margin-bottom:-2px;">📸 Photos (${getPlacePhotos(item.id).length})</button>
+    </div>
+    <div id="detail-reviews-tab-${item.id}">
+    <div class="reviews-hdr"><h3 style="display:none;">Reviews</h3>`;
+  html = html.replace(reviewsHdrTarget, tabsAndReviews);
+  // Close the reviews inner div before end
+  html = html.replace(/<\/div><div style="height:20px;"><\/div>$/, '</div></div></div><div id="detail-photos-tab" style="display:none;padding:0;"></div><div style="height:20px;"></div>');
+  return html;
+};
+function switchDetailTab(tab, itemId) {
+  const reviewsDiv = document.getElementById('detail-reviews-tab-'+itemId);
+  const photosDiv = document.getElementById('detail-photos-tab');
+  const rBtn = document.getElementById('tab-btn-reviews-'+itemId);
+  const pBtn = document.getElementById('tab-btn-photos-'+itemId);
+  if(!reviewsDiv||!photosDiv) return;
+  if(tab==='reviews') {
+    reviewsDiv.style.display=''; photosDiv.style.display='none';
+    if(rBtn){rBtn.style.borderBottomColor='#FF6B35';rBtn.style.color='#FF6B35';}
+    if(pBtn){pBtn.style.borderBottomColor='transparent';pBtn.style.color='#9E9E9E';}
+  } else {
+    reviewsDiv.style.display='none'; photosDiv.style.display='';
+    if(photosDiv.innerHTML.trim()==='') photosDiv.innerHTML=renderPhotosTab(itemId);
+    if(pBtn){pBtn.style.borderBottomColor='#FF6B35';pBtn.style.color='#FF6B35';}
+    if(rBtn){rBtn.style.borderBottomColor='transparent';rBtn.style.color='#9E9E9E';}
+  }
+}
+</script>
+<script>
+// ===== PATCH renderHome — add social sections =====
+const _origRenderHomeBase2 = renderHome;
+renderHome = function() {
+  _origRenderHomeBase2();
+  if(appState.user) {
+    renderFriendsActivity();
+    renderHomeRecentPhotos();
+    renderHomeCommunitySection();
+  } else {
+    ['home-friends-activity','home-recent-photos','home-community-btn-section'].forEach(id=>{
+      const el=document.getElementById(id); if(el) el.style.display='none';
+    });
+    // Show community section even for guests (just forum/trips)
+    renderHomeCommunitySection();
+  }
+};
+
+// ===== PATCH renderMyTrip — add social action buttons =====
+const _origRenderMyTrip = renderMyTrip;
+renderMyTrip = function() {
+  _origRenderMyTrip();
+  const btns = document.getElementById('trip-action-btns');
+  if(!btns) return;
+  if(!appState.user || Object.keys(appState.savedItems).length === 0) { btns.style.display='none'; return; }
+  btns.style.display='block';
+  btns.innerHTML=`<div style="display:flex;gap:8px;padding:12px 16px 0;">
+    <button onclick="openShareItinerary()" style="flex:1;background:linear-gradient(135deg,#4CAF50,#81C784);color:white;border:none;border-radius:12px;padding:10px;font-size:12px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;">📤 Share Itinerary</button>
+    <button onclick="openCreateGroupTrip()" style="flex:1;background:linear-gradient(135deg,#9C27B0,#E040FB);color:white;border:none;border-radius:12px;padding:10px;font-size:12px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;">👥 Group Trip</button>
+    <button onclick="openCommunityItineraries()" style="flex:1;background:linear-gradient(135deg,#FF6B35,#FFD700);color:white;border:none;border-radius:12px;padding:10px;font-size:12px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;">🌍 Community</button>
+  </div>`;
+};
+
+// ===== PATCH renderAccount — add social sections =====
+const _origRenderAcct3 = renderAccount;
+renderAccount = function() {
+  _origRenderAcct3();
+  if(!appState.user) return;
+  const logoutBtnEl = document.querySelector('#account-content .account-menu-item.danger');
+  if(!logoutBtnEl) return;
+  // Avoid duplicate injections
+  if(document.getElementById('acct-social-section')) return;
+  const socialSection = document.createElement('div');
+  socialSection.id = 'acct-social-section';
+  const myPhotoCount = socialState.userPhotos.length;
+  const myItinCount = socialState.sharedItineraries.length;
+  socialSection.innerHTML = `
+    <div style="font-size:12px;font-weight:700;color:#9E9E9E;letter-spacing:0.5px;padding:4px 4px 8px;text-transform:uppercase;">Social</div>
+    <div class="account-menu-item" onclick="openUserProfile('me')" style="border-left:3px solid #9C27B0;">
+      <span class="icon">👤</span><div style="flex:1"><div>My Public Profile</div><div style="font-size:11px;color:#9E9E9E;">${socialState.following.length} following · ${socialState.followers.length} followers</div></div><span class="arrow">›</span>
+    </div>
+    <div class="account-menu-item" onclick="openFindFriends()" style="border-left:3px solid #2196F3;">
+      <span class="icon">👥</span><div style="flex:1"><div>Find Friends</div><div style="font-size:11px;color:#9E9E9E;">${socialState.following.length} following</div></div><span class="arrow">›</span>
+    </div>
+    <div class="account-menu-item" onclick="openCommunityForum()" style="border-left:3px solid #FF6B35;">
+      <span class="icon">💬</span><div style="flex:1"><div>Community Forum</div><div style="font-size:11px;color:#9E9E9E;">${MOCK_POSTS.length} posts</div></div><span class="arrow">›</span>
+    </div>
+    <div class="account-menu-item" onclick="openCommunityItineraries()" style="border-left:3px solid #4CAF50;">
+      <span class="icon">🗺️</span><div style="flex:1"><div>My Shared Itineraries</div><div style="font-size:11px;color:#9E9E9E;">${myItinCount} shared</div></div><span class="arrow">›</span>
+    </div>
+    <div class="account-menu-item" onclick="showMyPhotos()" style="border-left:3px solid #FFD700;">
+      <span class="icon">📸</span><div style="flex:1"><div>My Photos</div><div style="font-size:11px;color:#9E9E9E;">${myPhotoCount} uploaded</div></div><span class="arrow">›</span>
+    </div>`;
+  logoutBtnEl.parentNode.insertBefore(socialSection, logoutBtnEl);
+};
+
+function showMyPhotos() {
+  const photos = socialState.userPhotos;
+  const modal = document.createElement('div');
+  modal.className='gamify-overlay'; modal.style.zIndex='8500';
+  modal.innerHTML=`<div class="gamify-header" style="background:linear-gradient(135deg,#FFD700,#FF8F00);">
+    <button class="gamify-close" onclick="this.closest('.gamify-overlay').remove()">✕</button>
+    <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:white;">My Photos</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.85);margin-top:2px;">${photos.length} photos uploaded</div>
+  </div>
+  <div class="gamify-scroll">
+    ${photos.length ? photos.map(p=>`<div class="my-photo-item" style="margin:0 16px;">
+      <div class="my-photo-emoji" style="background:#FFF3E0;border-radius:10px;">${p.emoji}</div>
+      <div style="flex:1;"><div style="font-weight:700;font-size:13px;">${p.caption}</div><div style="font-size:11px;color:#9E9E9E;">${p.date}</div><div style="font-size:11px;color:#9E9E9E;">❤️ ${p.likes} likes</div></div>
+      <button onclick="deleteMyPhoto('${p.id}',this)" style="background:none;border:none;color:#EF5350;font-size:18px;cursor:pointer;">🗑</button>
+    </div>`).join('')
+    : '<div style="text-align:center;padding:40px 20px;color:#9E9E9E;"><div style="font-size:48px;margin-bottom:12px;">📷</div><div>No photos yet!<br>Add photos from any place page.</div></div>'}
+    <div style="height:20px;"></div>
+  </div>`;
+  modal.classList.add('open');
+  document.body.appendChild(modal);
+}
+function deleteMyPhoto(photoId, btn) {
+  socialState.userPhotos = socialState.userPhotos.filter(p=>p.id!==photoId);
+  Object.keys(socialState.photos).forEach(pid=>{
+    socialState.photos[pid] = socialState.photos[pid].filter(p=>p.id!==photoId);
+  });
+  btn.closest('.my-photo-item').remove();
+  showToast('Photo deleted');
+}
+
+// ===== INIT social on home load =====
+const _origShowScreen = showScreen;
+showScreen = function(name, navEl) {
+  _origShowScreen(name, navEl);
+  if(name==='home') { renderFriendsActivity(); renderHomeRecentPhotos(); renderHomeCommunitySection(); }
+};
+
+// Trigger on initial load
+setTimeout(()=>{
+  if(appState.currentScreen==='home'){
+    renderFriendsActivity();
+    renderHomeRecentPhotos();
+    renderHomeCommunitySection();
+  }
+}, 200);
 </script>
