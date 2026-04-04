@@ -168,6 +168,129 @@
   .tip-card { background: #FFF8E8; border-left: 4px solid var(--gold); border-radius: var(--radius-sm); padding: 12px 14px; margin: 0 16px 12px; font-size: 13px; color: var(--text); line-height: 1.5; }
   .tip-card strong { color: var(--sun); }
   .badge { display: inline-block; background: var(--sun); color: white; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 700; }
+  /* ---- VENDOR DASHBOARD ---- */
+  .vd-overlay{display:none;position:fixed;inset:0;background:var(--sand);z-index:160;overflow-y:auto;max-width:430px;left:50%;transform:translateX(-50%);}
+  .vd-overlay.open{display:block;}
+  .vd-header{background:linear-gradient(135deg,#1A1A2E 0%,#16213e 60%,#0f3460 100%);padding:24px 20px 32px;position:relative;}
+  .vd-back{position:absolute;top:16px;left:16px;background:rgba(255,255,255,0.15);border:none;color:white;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+  .vd-vendor-name{color:white;font-family:'Playfair Display',serif;font-size:22px;font-weight:900;margin-top:8px;}
+  .vd-plan-badge{display:inline-block;padding:3px 12px;border-radius:20px;font-size:11px;font-weight:700;margin-top:6px;}
+  .vd-plan-badge.basic{background:#4CAF50;color:white;}
+  .vd-plan-badge.pro{background:linear-gradient(135deg,#FFD166,#FF6B35);color:white;}
+  .vd-plan-badge.premium{background:linear-gradient(135deg,#9C27B0,#E91E63);color:white;}
+  .vd-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px;margin-top:-16px;}
+  .vd-stat{background:var(--white);border-radius:var(--radius-sm);padding:14px;box-shadow:var(--card-shadow);text-align:center;}
+  .vd-stat-val{font-size:24px;font-weight:700;color:var(--sun);}
+  .vd-stat-label{font-size:11px;color:var(--gray3);margin-top:2px;font-weight:600;}
+  .vd-section{padding:0 16px 16px;}
+  .vd-section-hdr{display:flex;align-items:center;justify-content:space-between;padding:8px 0 12px;}
+  .vd-section-hdr h3{font-family:'Playfair Display',serif;font-size:16px;}
+  .vd-add-btn{background:var(--sun);color:white;border:none;padding:8px 16px;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;}
+  .vd-plan-row{background:var(--white);border-radius:var(--radius-sm);padding:14px 16px;margin:0 16px 16px;box-shadow:var(--card-shadow);display:flex;align-items:center;gap:12px;}
+  .vd-plan-name{font-weight:700;font-size:15px;flex:1;}
+  .vd-plan-sub{font-size:12px;color:var(--gray3);}
+  .vd-upgrade-btn{background:linear-gradient(135deg,var(--gold),var(--sun));color:white;border:none;padding:8px 16px;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;}
+  /* ---- VENDOR EVENT CARD ---- */
+  .vec{background:var(--white);border-radius:var(--radius);box-shadow:var(--card-shadow);overflow:hidden;margin-bottom:14px;}
+  .vec-img{height:140px;display:flex;align-items:center;justify-content:center;font-size:56px;position:relative;}
+  .vec-status-badge{position:absolute;top:10px;right:10px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;color:white;}
+  .vec-status-badge.active{background:#2ECC71;}
+  .vec-status-badge.sold-out{background:#E53935;}
+  .vec-status-badge.cancelled{background:#9E9E9E;}
+  .vec-status-badge.postponed{background:#FF9800;}
+  .vec-status-badge.draft{background:#2196F3;}
+  .vec-body{padding:12px 14px;}
+  .vec-title{font-weight:700;font-size:15px;margin-bottom:4px;}
+  .vec-meta{font-size:12px;color:var(--gray4);margin-bottom:2px;}
+  .vec-analytics{display:flex;gap:14px;padding:8px 0;border-top:1px solid var(--gray2);border-bottom:1px solid var(--gray2);margin:8px 0;}
+  .vec-analytics-item{font-size:12px;color:var(--gray3);display:flex;align-items:center;gap:3px;}
+  .vec-actions{display:flex;gap:8px;padding-top:8px;}
+  .vec-action-btn{flex:1;padding:8px;border-radius:var(--radius-sm);border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;}
+  .vec-action-btn.edit{background:var(--sky);color:white;}
+  .vec-action-btn.status{background:var(--gray1);color:var(--gray4);}
+  .vec-action-btn.delete{background:#FFEBEE;color:#E53935;}
+  /* ---- VENDOR FORM ---- */
+  .vf-overlay{display:none;position:fixed;inset:0;background:var(--sand);z-index:170;overflow-y:auto;max-width:430px;left:50%;transform:translateX(-50%);}
+  .vf-overlay.open{display:block;}
+  .vf-header{background:linear-gradient(135deg,#1A1A2E,#16213e);padding:20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:5;}
+  .vf-header h2{color:white;font-family:'Playfair Display',serif;font-size:18px;flex:1;}
+  .vf-back{background:rgba(255,255,255,0.15);border:none;color:white;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;}
+  .vf-save-btn{background:var(--sun);color:white;border:none;padding:8px 18px;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;}
+  .vf-body{padding:16px;}
+  .vf-field{margin-bottom:14px;}
+  .vf-label{font-size:13px;font-weight:600;color:var(--gray4);margin-bottom:6px;display:block;}
+  .vf-input{width:100%;border:1.5px solid var(--gray2);border-radius:var(--radius-sm);padding:11px 14px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;background:var(--white);}
+  .vf-input:focus{border-color:var(--sky);}
+  .vf-input.error{border-color:#E53935;}
+  .vf-error{font-size:11px;color:#E53935;margin-top:4px;display:none;}
+  .vf-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .vf-select{width:100%;border:1.5px solid var(--gray2);border-radius:var(--radius-sm);padding:11px 14px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;background:var(--white);appearance:none;}
+  .vf-select:focus{border-color:var(--sky);}
+  .vf-textarea{width:100%;border:1.5px solid var(--gray2);border-radius:var(--radius-sm);padding:11px 14px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;resize:none;min-height:80px;background:var(--white);}
+  .vf-textarea:focus{border-color:var(--sky);}
+  /* ---- RECURRING CHIPS ---- */
+  .recurring-chips{display:flex;gap:8px;flex-wrap:wrap;}
+  .rec-chip{padding:7px 14px;border-radius:20px;border:2px solid var(--gray2);background:var(--white);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--gray4);transition:all 0.2s;}
+  .rec-chip.active{border-color:var(--sun);background:var(--sun);color:white;}
+  /* ---- UPLOAD AREA ---- */
+  .upload-area{border:2px dashed var(--gray2);border-radius:var(--radius-sm);padding:24px;text-align:center;cursor:pointer;transition:all 0.2s;margin-bottom:12px;}
+  .upload-area:active{border-color:var(--sky);background:#E8F6FF;}
+  .upload-icon{font-size:32px;margin-bottom:8px;}
+  .upload-label{font-size:13px;font-weight:600;color:var(--gray4);}
+  .upload-hint{font-size:11px;color:var(--gray3);margin-top:4px;}
+  .photo-thumbs{display:flex;gap:8px;flex-wrap:wrap;}
+  .photo-thumb{width:72px;height:72px;border-radius:var(--radius-sm);background:linear-gradient(135deg,var(--sky),var(--palm));display:flex;align-items:center;justify-content:center;font-size:28px;position:relative;overflow:visible;}
+  .photo-remove{position:absolute;top:-6px;right:-6px;width:20px;height:20px;background:#E53935;color:white;border:none;border-radius:50%;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;}
+  /* ---- TOGGLE SWITCHES ---- */
+  .toggle-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--gray2);}
+  .toggle-row:last-child{border-bottom:none;}
+  .toggle-info{flex:1;}
+  .toggle-info-label{font-size:14px;font-weight:600;}
+  .toggle-info-desc{font-size:12px;color:var(--gray3);margin-top:2px;}
+  .toggle-switch{position:relative;width:46px;height:26px;flex-shrink:0;}
+  .toggle-switch input{opacity:0;width:0;height:0;}
+  .toggle-slider{position:absolute;inset:0;background:var(--gray2);border-radius:20px;cursor:pointer;transition:0.3s;}
+  .toggle-slider:before{content:'';position:absolute;width:20px;height:20px;left:3px;bottom:3px;background:white;border-radius:50%;transition:0.3s;box-shadow:0 1px 4px rgba(0,0,0,0.2);}
+  .toggle-switch input:checked + .toggle-slider{background:var(--sun);}
+  .toggle-switch input:checked + .toggle-slider:before{transform:translateX(20px);}
+  /* ---- STATUS BOTTOM SHEET ---- */
+  .status-sheet-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:300;align-items:flex-end;}
+  .status-sheet-overlay.open{display:flex;}
+  .status-sheet{background:var(--white);width:100%;max-width:430px;margin:0 auto;border-radius:var(--radius) var(--radius) 0 0;padding:20px 20px 32px;animation:slideUp 0.3s ease;}
+  .status-sheet h3{font-family:'Playfair Display',serif;font-size:18px;margin-bottom:16px;}
+  .status-option{display:flex;align-items:center;gap:14px;padding:14px;border-radius:var(--radius-sm);cursor:pointer;transition:background 0.15s;margin-bottom:6px;}
+  .status-option:active{background:var(--gray1);}
+  .status-option-icon{font-size:24px;width:36px;text-align:center;}
+  .status-option-name{font-weight:700;font-size:14px;}
+  .status-option-desc{font-size:12px;color:var(--gray3);margin-top:2px;}
+  .status-cancel-btn{width:100%;padding:13px;border-radius:30px;border:2px solid var(--gray2);background:var(--white);font-size:15px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:8px;}
+  /* ---- PLANS MODAL ---- */
+  .plans-overlay{display:none;position:fixed;inset:0;background:var(--sand);z-index:180;overflow-y:auto;max-width:430px;left:50%;transform:translateX(-50%);}
+  .plans-overlay.open{display:block;}
+  .plans-header{background:linear-gradient(135deg,#1A1A2E,#16213e);padding:20px;display:flex;align-items:center;gap:12px;}
+  .plans-header h2{color:white;font-family:'Playfair Display',serif;font-size:20px;flex:1;}
+  .plans-back{background:rgba(255,255,255,0.15);border:none;color:white;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;}
+  .plan-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--card-shadow);margin:16px 16px 0;overflow:hidden;position:relative;}
+  .plan-card.popular{border:2px solid var(--sun);}
+  .plan-popular-banner{background:linear-gradient(135deg,var(--sun),var(--gold));color:white;text-align:center;padding:6px;font-size:12px;font-weight:700;}
+  .plan-body{padding:20px;}
+  .plan-icon{font-size:36px;margin-bottom:8px;}
+  .plan-name{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;}
+  .plan-price{font-size:28px;font-weight:700;color:var(--sun);margin:6px 0;}
+  .plan-price span{font-size:14px;color:var(--gray3);font-weight:400;}
+  .plan-perks{list-style:none;margin:12px 0;}
+  .plan-perks li{font-size:13px;color:var(--gray4);padding:4px 0;display:flex;align-items:center;gap:8px;}
+  .plan-perks li::before{content:'✓';color:var(--palm);font-weight:700;}
+  .plan-select-btn{width:100%;padding:13px;border-radius:30px;border:none;font-size:15px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:8px;}
+  .plan-select-btn.current{background:var(--gray1);color:var(--gray4);}
+  .plan-select-btn.choose{background:var(--sun);color:white;}
+  /* ---- ACCOUNT VENDOR BUTTON ---- */
+  .vendor-menu-item{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#1A1A2E,#16213e);padding:16px 18px;border-radius:var(--radius-sm);margin-bottom:10px;box-shadow:var(--card-shadow);cursor:pointer;font-weight:600;font-size:15px;color:white;}
+  .vendor-menu-item .icon{font-size:22px;}
+  .vendor-menu-item .pro-badge{background:linear-gradient(135deg,var(--gold),var(--sun));color:white;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;margin-left:4px;}
+  .vendor-menu-item .vmd-desc{font-size:12px;color:rgba(255,255,255,0.65);font-weight:400;margin-top:2px;}
+  .vendor-menu-item .arrow{margin-left:auto;color:rgba(255,255,255,0.5);}
+
 </style>
 </head>
 <body>
@@ -257,6 +380,155 @@
     <span class="cancel-link" onclick="closeAuthModal()">Continue as Guest</span>
   </div>
 </div>
+<!-- VENDOR DASHBOARD OVERLAY -->
+<div id="vendor-dashboard" class="vd-overlay">
+  <div class="vd-header">
+    <button class="vd-back" onclick="closeVendorDashboard()">←</button>
+    <div style="margin-top:12px;">
+      <div id="vd-vendor-name" class="vd-vendor-name"></div>
+      <span id="vd-plan-badge" class="vd-plan-badge pro">PRO</span>
+    </div>
+  </div>
+  <div class="vd-stats">
+    <div class="vd-stat"><div class="vd-stat-val" id="vd-views">0</div><div class="vd-stat-label">Total Views</div></div>
+    <div class="vd-stat"><div class="vd-stat-val" id="vd-saves">0</div><div class="vd-stat-label">Total Saves</div></div>
+    <div class="vd-stat"><div class="vd-stat-val" id="vd-clicks">0</div><div class="vd-stat-label">Clicks</div></div>
+    <div class="vd-stat"><div class="vd-stat-val" id="vd-listings">0</div><div class="vd-stat-label">Listings</div></div>
+  </div>
+  <div class="vd-plan-row">
+    <div>
+      <div class="vd-plan-name" id="vd-plan-name">Basic Plan</div>
+      <div class="vd-plan-sub">Current subscription</div>
+    </div>
+    <button class="vd-upgrade-btn" onclick="openPlansModal()">⭐ Upgrade</button>
+  </div>
+  <div class="vd-section">
+    <div class="vd-section-hdr">
+      <h3>🎟️ My Events</h3>
+      <button class="vd-add-btn" onclick="openEventForm(null)">+ Add New</button>
+    </div>
+    <div id="vendor-events-list"></div>
+  </div>
+</div>
+
+<!-- VENDOR EVENT FORM OVERLAY -->
+<div id="vendor-event-form" class="vf-overlay">
+  <div class="vf-header">
+    <button class="vf-back" onclick="closeEventForm()">←</button>
+    <h2 id="vf-title">Add Event</h2>
+    <button class="vf-save-btn" onclick="saveEvent()">Save</button>
+  </div>
+  <div class="vf-body">
+    <div class="vf-field">
+      <label class="vf-label">Event Name *</label>
+      <input class="vf-input" id="vf-name" placeholder="e.g. Jazz Night at Downtown" />
+      <div class="vf-error" id="vf-name-err">Event name is required</div>
+    </div>
+    <div class="vf-field">
+      <label class="vf-label">Category *</label>
+      <select class="vf-select" id="vf-category">
+        <option value="">Select category...</option>
+        <option>Live Music</option><option>Festival</option><option>Club</option>
+        <option>Comedy</option><option>Sports</option><option>Food & Drink</option>
+        <option>Arts & Culture</option><option>Family</option><option>Other</option>
+      </select>
+      <div class="vf-error" id="vf-cat-err">Category is required</div>
+    </div>
+    <div class="vf-field">
+      <label class="vf-label">Description *</label>
+      <textarea class="vf-textarea" id="vf-desc" placeholder="Describe your event..."></textarea>
+      <div class="vf-error" id="vf-desc-err">Description is required</div>
+    </div>
+    <div class="vf-row">
+      <div class="vf-field">
+        <label class="vf-label">Date *</label>
+        <input class="vf-input" id="vf-date" type="date" />
+        <div class="vf-error" id="vf-date-err">Date is required</div>
+      </div>
+      <div class="vf-field">
+        <label class="vf-label">Time *</label>
+        <input class="vf-input" id="vf-time" placeholder="e.g. 8:00 PM" />
+        <div class="vf-error" id="vf-time-err">Time is required</div>
+      </div>
+    </div>
+    <div class="vf-field">
+      <label class="vf-label">Venue / Location *</label>
+      <input class="vf-input" id="vf-location" placeholder="e.g. The Social, 54 N Orange Ave" />
+      <div class="vf-error" id="vf-loc-err">Location is required</div>
+    </div>
+    <div class="vf-row">
+      <div class="vf-field">
+        <label class="vf-label">Ticket Price</label>
+        <input class="vf-input" id="vf-price" placeholder="e.g. $15 or Free" />
+      </div>
+      <div class="vf-field">
+        <label class="vf-label">Emoji Icon</label>
+        <input class="vf-input" id="vf-emoji" placeholder="🎵" maxlength="4" />
+      </div>
+    </div>
+    <div class="vf-field">
+      <label class="vf-label">Recurring Schedule</label>
+      <div class="recurring-chips">
+        <button class="rec-chip active" onclick="setRecurring('One-time',this)">One-time</button>
+        <button class="rec-chip" onclick="setRecurring('Daily',this)">Daily</button>
+        <button class="rec-chip" onclick="setRecurring('Weekly',this)">Weekly</button>
+        <button class="rec-chip" onclick="setRecurring('Monthly',this)">Monthly</button>
+      </div>
+    </div>
+    <div class="vf-field">
+      <label class="vf-label">Photos / Media</label>
+      <div class="upload-area" onclick="simulateUpload()">
+        <div class="upload-icon">📷</div>
+        <div class="upload-label">Tap to upload photos or videos</div>
+        <div class="upload-hint">JPG, PNG, MP4 · Max 10MB per file</div>
+      </div>
+      <div class="photo-thumbs" id="photo-thumbs"></div>
+    </div>
+    <div class="vf-field" style="background:var(--white);border-radius:var(--radius-sm);padding:14px;box-shadow:var(--card-shadow);">
+      <div style="font-weight:700;font-size:14px;margin-bottom:10px;">Event Status Flags</div>
+      <div class="toggle-row">
+        <div class="toggle-info"><div class="toggle-info-label">Mark as Sold Out</div><div class="toggle-info-desc">Shows Sold Out badge and disables ticket links</div></div>
+        <label class="toggle-switch"><input type="checkbox" id="tog-soldout" onchange="syncToggle('sold-out')"><span class="toggle-slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-info"><div class="toggle-info-label">Mark as Cancelled</div><div class="toggle-info-desc">Greys out listing with Cancelled badge</div></div>
+        <label class="toggle-switch"><input type="checkbox" id="tog-cancelled" onchange="syncToggle('cancelled')"><span class="toggle-slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-info"><div class="toggle-info-label">Mark as Postponed</div><div class="toggle-info-desc">Keeps listing visible with Postponed badge</div></div>
+        <label class="toggle-switch"><input type="checkbox" id="tog-postponed" onchange="syncToggle('postponed')"><span class="toggle-slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-info"><div class="toggle-info-label">Save as Draft</div><div class="toggle-info-desc">Hides listing from public view until published</div></div>
+        <label class="toggle-switch"><input type="checkbox" id="tog-draft" onchange="syncToggle('draft')"><span class="toggle-slider"></span></label>
+      </div>
+    </div>
+    <div style="height:24px;"></div>
+  </div>
+</div>
+
+<!-- STATUS BOTTOM SHEET -->
+<div class="status-sheet-overlay" id="status-sheet">
+  <div class="status-sheet">
+    <h3>Update Status</h3>
+    <div class="status-option" onclick="applyStatus('active')"><div class="status-option-icon">✅</div><div><div class="status-option-name">Active</div><div class="status-option-desc">Event is live and tickets available</div></div></div>
+    <div class="status-option" onclick="applyStatus('sold-out')"><div class="status-option-icon">🔴</div><div><div class="status-option-name">Sold Out</div><div class="status-option-desc">Tickets are fully sold, listing stays visible</div></div></div>
+    <div class="status-option" onclick="applyStatus('postponed')"><div class="status-option-icon">⏸️</div><div><div class="status-option-name">Postponed</div><div class="status-option-desc">Event delayed, new date TBD</div></div></div>
+    <div class="status-option" onclick="applyStatus('cancelled')"><div class="status-option-icon">❌</div><div><div class="status-option-name">Cancelled</div><div class="status-option-desc">Event will not take place</div></div></div>
+    <div class="status-option" onclick="applyStatus('draft')"><div class="status-option-icon">📝</div><div><div class="status-option-name">Draft</div><div class="status-option-desc">Hidden from public, edit before publishing</div></div></div>
+    <button class="status-cancel-btn" onclick="closeStatusSheet()">Cancel</button>
+  </div>
+</div>
+
+<!-- SUBSCRIPTION PLANS MODAL -->
+<div id="plans-modal" class="plans-overlay">
+  <div class="plans-header">
+    <button class="plans-back" onclick="closePlansModal()">←</button>
+    <h2>Choose Your Plan</h2>
+  </div>
+  <div id="plans-list" style="padding-bottom:32px;"></div>
+</div>
+
 <nav class="bottom-nav">
   <div class="nav-item active" onclick="showScreen('home',this)"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></div>
   <div class="nav-item" onclick="showScreen('explore',this)"><div class="nav-icon">🔍</div><div class="nav-label">Explore</div></div>
@@ -376,7 +648,7 @@ function renderAI(){const container=document.getElementById('ai-content');const 
 function runAI(){const query=document.getElementById('ai-query')?.value.toLowerCase()||'';let matched=null;for(const[key,val]of Object.entries(aiResponses)){if(query.includes(key)){matched=val;break;}}if(!matched)matched=aiResponses['family day'];displayAIResult(matched);}
 function runAIPreset(key){const matched=aiResponses[key]||aiResponses['family day'];if(document.getElementById('ai-query'))document.getElementById('ai-query').value='Tell me about '+key+' in Orlando';displayAIResult(matched);}
 function displayAIResult(result){const el=document.getElementById('ai-results');if(!el)return;const bodyHTML=result.body.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');el.innerHTML='<div class="ai-response"><div class="ai-response-hdr"><div class="ai-icon">🤖</div><h4>'+result.title+'</h4></div><p>'+bodyHTML+'</p>'+(result.items?'<div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:6px;">'+result.items.map(i=>'<span class="tag sky">'+i+'</span>').join('')+'</div>':'')+'</div><div class="tip-card"><strong>💡 AI Tip:</strong> All recommendations are based on real Orlando locations. Save your favorites to My Trip!</div>';el.scrollIntoView({behavior:'smooth'});}
-function renderAccount(){const container=document.getElementById('account-content');if(!appState.user){container.innerHTML='<div class="account-guest"><div class="app-icon">🌴</div><h2>Orlando Explorer</h2><p>Sign in to save your favorite places, write reviews, and get personalized trip planning powered by AI.</p><button class="google-btn" onclick="loginWith(\'google\')"><svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg> Continue with Google</button><button class="apple-btn" onclick="loginWith(\'apple\')"><svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg> Continue with Apple</button><button onclick="continueGuest()" style="background:none;border:2px solid var(--gray2);color:var(--gray4);padding:12px;border-radius:30px;width:100%;font-size:14px;font-weight:600;cursor:pointer;font-family:\'DM Sans\',sans-serif;margin-top:4px;">Continue as Guest</button></div>';return;}const u=appState.user;const myReviews=Object.entries(appState.reviews).flatMap(([itemId,reviews])=>reviews.filter(r=>r.userId===u.id).map(r=>({...r,itemId})));const savedCount=Object.keys(appState.savedItems).length;container.innerHTML='<div class="account-loggedin"><div class="profile-header"><div class="profile-avatar">'+u.avatar+'</div><div><div class="profile-name">'+u.name+'</div><div class="profile-email">'+u.email+'</div></div></div><div style="display:flex;gap:12px;margin-bottom:20px;"><div style="flex:1;background:var(--white);border-radius:var(--radius-sm);padding:14px;text-align:center;box-shadow:var(--card-shadow);"><div style="font-size:22px;font-weight:700;color:var(--sun);">'+savedCount+'</div><div style="font-size:12px;color:var(--gray3);margin-top:2px;">Saved Places</div></div><div style="flex:1;background:var(--white);border-radius:var(--radius-sm);padding:14px;text-align:center;box-shadow:var(--card-shadow);"><div style="font-size:22px;font-weight:700;color:var(--sky);">'+myReviews.length+'</div><div style="font-size:12px;color:var(--gray3);margin-top:2px;">Reviews Written</div></div></div><div class="account-menu-item" onclick="showMyReviews()"><span class="icon">⭐</span><span>My Reviews</span><span class="arrow">›</span></div><div class="account-menu-item" onclick="showScreen(\'mytrip\',document.querySelectorAll(\'.nav-item\')[2])"><span class="icon">🗺️</span><span>My Saved Places</span><span class="arrow">›</span></div><div class="account-menu-item"><span class="icon">🔔</span><span>Notifications</span><span class="arrow">›</span></div><div class="account-menu-item"><span class="icon">⚙️</span><span>Settings</span><span class="arrow">›</span></div><div class="account-menu-item danger" onclick="logout()"><span class="icon">🚪</span><span>Log Out</span></div></div>';}
+function renderAccount(){const container=document.getElementById('account-content');if(!appState.user){container.innerHTML='<div class="account-guest"><div class="app-icon">🌴</div><h2>Orlando Explorer</h2><p>Sign in to save your favorite places, write reviews, and get personalized trip planning powered by AI.</p><button class="google-btn" onclick="loginWith(\'google\')"><svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg> Continue with Google</button><button class="apple-btn" onclick="loginWith(\'apple\')"><svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg> Continue with Apple</button><button onclick="continueGuest()" style="background:none;border:2px solid var(--gray2);color:var(--gray4);padding:12px;border-radius:30px;width:100%;font-size:14px;font-weight:600;cursor:pointer;font-family:\'DM Sans\',sans-serif;margin-top:4px;">Continue as Guest</button></div>';return;}const u=appState.user;const myReviews=Object.entries(appState.reviews).flatMap(([itemId,reviews])=>reviews.filter(r=>r.userId===u.id).map(r=>({...r,itemId})));const savedCount=Object.keys(appState.savedItems).length;container.innerHTML='<div class="account-loggedin"><div class="profile-header"><div class="profile-avatar">'+u.avatar+'</div><div><div class="profile-name">'+u.name+'</div><div class="profile-email">'+u.email+'</div></div></div><div style="display:flex;gap:12px;margin-bottom:20px;"><div style="flex:1;background:var(--white);border-radius:var(--radius-sm);padding:14px;text-align:center;box-shadow:var(--card-shadow);"><div style="font-size:22px;font-weight:700;color:var(--sun);">'+savedCount+'</div><div style="font-size:12px;color:var(--gray3);margin-top:2px;">Saved Places</div></div><div style="flex:1;background:var(--white);border-radius:var(--radius-sm);padding:14px;text-align:center;box-shadow:var(--card-shadow);"><div style="font-size:22px;font-weight:700;color:var(--sky);">'+myReviews.length+'</div><div style="font-size:12px;color:var(--gray3);margin-top:2px;">Reviews Written</div></div></div><div class="vendor-menu-item" onclick="openVendorDashboard()"><span class="icon">🎟️</span><div style="flex:1;"><div style="display:flex;align-items:center;gap:6px;">Vendor Dashboard <span class="pro-badge">PRO</span></div><div class="vmd-desc">Manage your events and listings</div></div><span class="arrow">›</span></div><div class="account-menu-item" onclick="showMyReviews()"><span class="icon">⭐</span><span>My Reviews</span><span class="arrow">›</span></div><div class="account-menu-item" onclick="showScreen(\'mytrip\',document.querySelectorAll(\'.nav-item\')[2])"><span class="icon">🗺️</span><span>My Saved Places</span><span class="arrow">›</span></div><div class="account-menu-item"><span class="icon">🔔</span><span>Notifications</span><span class="arrow">›</span></div><div class="account-menu-item"><span class="icon">⚙️</span><span>Settings</span><span class="arrow">›</span></div><div class="account-menu-item danger" onclick="logout()"><span class="icon">🚪</span><span>Log Out</span></div></div>';}
 function showMyReviews(){const u=appState.user;if(!u)return;const myReviews=Object.entries(appState.reviews).flatMap(([itemId,revs])=>revs.filter(r=>r.userId===u.id).map(r=>({...r,itemId})));const container=document.getElementById('account-content');if(!myReviews.length){container.innerHTML='<div style="padding:24px;text-align:center;color:var(--gray3);"><div style="font-size:48px;margin-bottom:12px;">✍️</div><div style="font-weight:600;">No reviews yet</div><button onclick="renderAccount()" style="margin-top:16px;background:none;border:none;color:var(--sky);font-size:14px;cursor:pointer;">← Back</button></div>';return;}container.innerHTML='<div style="padding:16px 20px;"><div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;"><button onclick="renderAccount()" style="background:var(--gray1);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;cursor:pointer;">←</button><span style="font-family:\'Playfair Display\',serif;font-size:18px;font-weight:700;">My Reviews</span></div>'+myReviews.map(r=>{const item=findItem(r.itemId);return'<div style="background:var(--white);border-radius:var(--radius-sm);padding:14px;margin-bottom:12px;box-shadow:var(--card-shadow);"><div style="font-weight:700;font-size:14px;margin-bottom:6px;">'+(item?item.name:'Unknown Place')+'</div>'+reviewCardHTML(r)+'</div>';}).join('')+'</div>';}
 const mockUsers={google:{id:'g1',name:'Alex Johnson',email:'alex.johnson@gmail.com',avatar:'😊',provider:'google'},apple:{id:'a1',name:'Jordan Lee',email:'j.lee@icloud.com',avatar:'🎵',provider:'apple'}};
 function loginWith(provider){closeAuthModal();showToast('Signing in…');setTimeout(()=>{appState.user={...mockUsers[provider]};showToast('Welcome, '+appState.user.name+'! 🎉');renderAccount();renderMyTrip();renderAI();if(appState.pendingAction){appState.pendingAction();appState.pendingAction=null;}},800);}
@@ -391,3 +663,270 @@ document.getElementById('hero-search-input').addEventListener('keyup',function(e
 </script>
 </body>
 </html>
+<script>
+// ===================== VENDOR STATE =====================
+const vendorState = {
+  currentPlan: 'Basic',
+  editingEventId: null,
+  statusTargetId: null,
+  recurringValue: 'One-time',
+  uploadedPhotos: [],
+  events: [
+    {id:'ve1',name:'Jazz Night at The Social',category:'Live Music',desc:'Live jazz featuring local Orlando artists every Friday night.',date:'2026-04-11',time:'8:00 PM',location:'The Social, 54 N Orange Ave',price:'$15',emoji:'🎷',recurring:'Weekly',status:'active',photos:[],views:312,saves:48,clicks:89},
+    {id:'ve2',name:'Rooftop Latin Dance Party',category:'Club',desc:'Dance the night away with the best salsa and bachata DJs in town.',date:'2026-04-18',time:'10:00 PM',location:'Tier Nightclub, I-Drive',price:'$25',emoji:'💃',recurring:'Monthly',status:'active',photos:[],views:541,saves:102,clicks:210},
+    {id:'ve3',name:'Comedy Open Mic Night',category:'Comedy',desc:'New comedians and surprise headliners every Thursday.',date:'2026-04-17',time:'7:30 PM',location:'SAK Comedy Lab, Downtown',price:'$10',emoji:'🎤',recurring:'Weekly',status:'draft',photos:[],views:88,saves:14,clicks:31}
+  ]
+};
+const plans = [
+  {id:'Basic',emoji:'🌱',name:'Basic',price:19,perks:['Up to 3 event listings','Basic analytics','Event status management','Standard support']},
+  {id:'Pro',emoji:'⚡',name:'Pro',price:49,perks:['Up to 20 event listings','Advanced analytics & insights','Priority listing placement','Photo & media uploads','Recurring event support','Priority support'],popular:true},
+  {id:'Premium',emoji:'👑',name:'Premium',price:99,perks:['Unlimited event listings','Full analytics dashboard','Featured homepage placement','Custom branding options','Dedicated account manager','API access for integrations']}
+];
+
+// ===================== VENDOR DASHBOARD =====================
+function openVendorDashboard() {
+  const u = appState.user;
+  if (!u) { openAuthModal('access Vendor Dashboard'); return; }
+  document.getElementById('vd-vendor-name').textContent = u.name + ' 🎟️';
+  updateVendorDashboardUI();
+  document.getElementById('vendor-dashboard').classList.add('open');
+}
+function closeVendorDashboard() {
+  document.getElementById('vendor-dashboard').classList.remove('open');
+}
+function updateVendorDashboardUI() {
+  const evts = vendorState.events;
+  const totalViews = evts.reduce((s,e)=>s+e.views,0);
+  const totalSaves = evts.reduce((s,e)=>s+e.saves,0);
+  const totalClicks = evts.reduce((s,e)=>s+e.clicks,0);
+  document.getElementById('vd-views').textContent = totalViews.toLocaleString();
+  document.getElementById('vd-saves').textContent = totalSaves.toLocaleString();
+  document.getElementById('vd-clicks').textContent = totalClicks.toLocaleString();
+  document.getElementById('vd-listings').textContent = evts.length;
+  const badge = document.getElementById('vd-plan-badge');
+  badge.textContent = vendorState.currentPlan;
+  badge.className = 'vd-plan-badge ' + vendorState.currentPlan.toLowerCase();
+  document.getElementById('vd-plan-name').textContent = vendorState.currentPlan + ' Plan';
+  renderVendorEvents();
+}
+function renderVendorEvents() {
+  const container = document.getElementById('vendor-events-list');
+  if (!vendorState.events.length) {
+    container.innerHTML = '<div style="text-align:center;padding:40px 0;color:var(--gray3);"><div style="font-size:48px;margin-bottom:12px;">🎟️</div><div style="font-weight:600;">No events yet</div><div style="font-size:13px;margin-top:6px;">Tap + Add New to create your first event</div></div>';
+    return;
+  }
+  container.innerHTML = vendorState.events.map(e => vendorEventCardHTML(e)).join('');
+}
+function vendorEventCardHTML(e) {
+  const statusLabels = {'active':'Active','sold-out':'Sold Out','cancelled':'Cancelled','postponed':'Postponed','draft':'Draft'};
+  const gradients = {'🎷':'linear-gradient(135deg,#1A1A2E,#0099CC)','💃':'linear-gradient(135deg,#FF6B35,#1A1A2E)','🎤':'linear-gradient(135deg,#2ECC71,#1A1A2E)','🎵':'linear-gradient(135deg,#9C27B0,#E91E63)','🎸':'linear-gradient(135deg,#FF9800,#E53935)'};
+  const bg = gradients[e.emoji] || 'linear-gradient(135deg,var(--sky),var(--sun))';
+  const photoHTML = e.photos && e.photos.length ? `<div style="font-size:56px;z-index:1">${e.photos[0]}</div>` : `<div style="font-size:56px;">${e.emoji}</div>`;
+  return `<div class="vec" id="vec-${e.id}">
+    <div class="vec-img" style="background:${bg}">${photoHTML}
+      <span class="vec-status-badge ${e.status}">${statusLabels[e.status]||e.status}</span>
+    </div>
+    <div class="vec-body">
+      <div class="vec-title">${e.name}</div>
+      <div class="vec-meta">📅 ${e.date} · ${e.time}</div>
+      <div class="vec-meta">📍 ${e.location}</div>
+      <div class="vec-meta">🎫 ${e.price||'Free'} &nbsp;·&nbsp; 🔁 ${e.recurring}</div>
+      <div class="vec-analytics">
+        <div class="vec-analytics-item">👁️ ${e.views} views</div>
+        <div class="vec-analytics-item">💾 ${e.saves} saves</div>
+        <div class="vec-analytics-item">👆 ${e.clicks} clicks</div>
+      </div>
+      <div class="vec-actions">
+        <button class="vec-action-btn edit" onclick="openEventForm('${e.id}')">✏️ Edit</button>
+        <button class="vec-action-btn status" onclick="openStatusSheet('${e.id}')">🔄 Status</button>
+        <button class="vec-action-btn delete" onclick="deleteEvent('${e.id}')">🗑️ Delete</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ===================== EVENT FORM =====================
+function openEventForm(eventId) {
+  vendorState.editingEventId = eventId;
+  vendorState.uploadedPhotos = [];
+  document.getElementById('photo-thumbs').innerHTML = '';
+  clearFormErrors();
+  if (eventId) {
+    const e = vendorState.events.find(x=>x.id===eventId);
+    document.getElementById('vf-title').textContent = 'Edit Event';
+    document.getElementById('vf-name').value = e.name;
+    document.getElementById('vf-category').value = e.category;
+    document.getElementById('vf-desc').value = e.desc;
+    document.getElementById('vf-date').value = e.date;
+    document.getElementById('vf-time').value = e.time;
+    document.getElementById('vf-location').value = e.location;
+    document.getElementById('vf-price').value = e.price||'';
+    document.getElementById('vf-emoji').value = e.emoji||'';
+    vendorState.recurringValue = e.recurring||'One-time';
+    document.getElementById('tog-soldout').checked = e.status==='sold-out';
+    document.getElementById('tog-cancelled').checked = e.status==='cancelled';
+    document.getElementById('tog-postponed').checked = e.status==='postponed';
+    document.getElementById('tog-draft').checked = e.status==='draft';
+    if (e.photos) { vendorState.uploadedPhotos = [...e.photos]; renderPhotoThumbs(); }
+  } else {
+    document.getElementById('vf-title').textContent = 'Add Event';
+    document.getElementById('vf-name').value = '';
+    document.getElementById('vf-category').value = '';
+    document.getElementById('vf-desc').value = '';
+    document.getElementById('vf-date').value = '';
+    document.getElementById('vf-time').value = '';
+    document.getElementById('vf-location').value = '';
+    document.getElementById('vf-price').value = '';
+    document.getElementById('vf-emoji').value = '';
+    vendorState.recurringValue = 'One-time';
+    document.getElementById('tog-soldout').checked = false;
+    document.getElementById('tog-cancelled').checked = false;
+    document.getElementById('tog-postponed').checked = false;
+    document.getElementById('tog-draft').checked = false;
+  }
+  document.querySelectorAll('.rec-chip').forEach(c => {
+    c.classList.toggle('active', c.textContent === vendorState.recurringValue);
+  });
+  document.getElementById('vendor-event-form').classList.add('open');
+}
+function closeEventForm() {
+  document.getElementById('vendor-event-form').classList.remove('open');
+}
+function clearFormErrors() {
+  document.querySelectorAll('.vf-error').forEach(e=>e.style.display='none');
+  document.querySelectorAll('.vf-input,.vf-select,.vf-textarea').forEach(i=>i.classList.remove('error'));
+}
+function setRecurring(val, btn) {
+  vendorState.recurringValue = val;
+  document.querySelectorAll('.rec-chip').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+}
+function syncToggle(status) {
+  const toggleMap = {'sold-out':'tog-soldout','cancelled':'tog-cancelled','postponed':'tog-postponed','draft':'tog-draft'};
+  Object.entries(toggleMap).forEach(([s,id]) => {
+    if (s !== status) document.getElementById(id).checked = false;
+  });
+}
+function saveEvent() {
+  clearFormErrors();
+  let valid = true;
+  const fields = [
+    {id:'vf-name',errId:'vf-name-err'},
+    {id:'vf-category',errId:'vf-cat-err'},
+    {id:'vf-desc',errId:'vf-desc-err'},
+    {id:'vf-date',errId:'vf-date-err'},
+    {id:'vf-time',errId:'vf-time-err'},
+    {id:'vf-location',errId:'vf-loc-err'}
+  ];
+  fields.forEach(f => {
+    const el = document.getElementById(f.id);
+    if (!el.value.trim()) {
+      el.classList.add('error');
+      document.getElementById(f.errId).style.display = 'block';
+      valid = false;
+    }
+  });
+  if (!valid) return;
+  let status = 'active';
+  if (document.getElementById('tog-draft').checked) status = 'draft';
+  else if (document.getElementById('tog-cancelled').checked) status = 'cancelled';
+  else if (document.getElementById('tog-postponed').checked) status = 'postponed';
+  else if (document.getElementById('tog-soldout').checked) status = 'sold-out';
+  const data = {
+    name: document.getElementById('vf-name').value.trim(),
+    category: document.getElementById('vf-category').value,
+    desc: document.getElementById('vf-desc').value.trim(),
+    date: document.getElementById('vf-date').value,
+    time: document.getElementById('vf-time').value.trim(),
+    location: document.getElementById('vf-location').value.trim(),
+    price: document.getElementById('vf-price').value.trim(),
+    emoji: document.getElementById('vf-emoji').value.trim() || '🎵',
+    recurring: vendorState.recurringValue,
+    status, photos: [...vendorState.uploadedPhotos]
+  };
+  if (vendorState.editingEventId) {
+    const idx = vendorState.events.findIndex(e=>e.id===vendorState.editingEventId);
+    vendorState.events[idx] = {...vendorState.events[idx], ...data};
+    showToast('Event updated! ✅');
+  } else {
+    const newId = 've' + Date.now();
+    vendorState.events.unshift({id:newId, views:0, saves:0, clicks:0, ...data});
+    showToast('Event created! 🎉');
+  }
+  closeEventForm();
+  updateVendorDashboardUI();
+}
+function deleteEvent(id) {
+  if (!confirm('Delete this event? This cannot be undone.')) return;
+  vendorState.events = vendorState.events.filter(e=>e.id!==id);
+  showToast('Event deleted');
+  updateVendorDashboardUI();
+}
+
+// ===================== PHOTO UPLOAD =====================
+const uploadEmojis = ['📸','🖼️','🌟','🎨','🌈','🎭','🎪','🌺','🔥','💫','🎬','🌙'];
+function simulateUpload() {
+  const emoji = uploadEmojis[Math.floor(Math.random()*uploadEmojis.length)];
+  vendorState.uploadedPhotos.push(emoji);
+  renderPhotoThumbs();
+}
+function renderPhotoThumbs() {
+  const container = document.getElementById('photo-thumbs');
+  container.innerHTML = vendorState.uploadedPhotos.map((p,i) =>
+    `<div class="photo-thumb"><span>${p}</span><button class="photo-remove" onclick="removePhoto(${i})">✕</button></div>`
+  ).join('');
+}
+function removePhoto(idx) {
+  vendorState.uploadedPhotos.splice(idx,1);
+  renderPhotoThumbs();
+}
+
+// ===================== STATUS SHEET =====================
+function openStatusSheet(eventId) {
+  vendorState.statusTargetId = eventId;
+  document.getElementById('status-sheet').classList.add('open');
+}
+function closeStatusSheet() {
+  document.getElementById('status-sheet').classList.remove('open');
+}
+function applyStatus(status) {
+  const idx = vendorState.events.findIndex(e=>e.id===vendorState.statusTargetId);
+  if (idx>-1) { vendorState.events[idx].status = status; }
+  closeStatusSheet();
+  const labels = {active:'Active ✅',  'sold-out':'Sold Out 🔴', postponed:'Postponed ⏸️', cancelled:'Cancelled ❌', draft:'Draft 📝'};
+  showToast('Status set to ' + (labels[status]||status));
+  renderVendorEvents();
+  updateVendorDashboardUI();
+}
+
+// ===================== PLANS MODAL =====================
+function openPlansModal() {
+  const container = document.getElementById('plans-list');
+  container.innerHTML = plans.map(p => {
+    const isCurrent = vendorState.currentPlan === p.id;
+    return `<div class="plan-card ${p.popular?'popular':''}">
+      ${p.popular ? '<div class="plan-popular-banner">⭐ Most Popular</div>' : ''}
+      <div class="plan-body">
+        <div class="plan-icon">${p.emoji}</div>
+        <div class="plan-name">${p.name}</div>
+        <div class="plan-price">$${p.price}<span>/month</span></div>
+        <ul class="plan-perks">${p.perks.map(k=>`<li>${k}</li>`).join('')}</ul>
+        <button class="plan-select-btn ${isCurrent?'current':'choose'}" onclick="selectPlan('${p.id}')">
+          ${isCurrent ? '✓ Current Plan' : 'Select ' + p.name}
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('plans-modal').classList.add('open');
+}
+function closePlansModal() {
+  document.getElementById('plans-modal').classList.remove('open');
+}
+function selectPlan(planId) {
+  vendorState.currentPlan = planId;
+  showToast(planId + ' Plan activated! 🎉');
+  closePlansModal();
+  updateVendorDashboardUI();
+  renderAccount();
+}
+</script>
