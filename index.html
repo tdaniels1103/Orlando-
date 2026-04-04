@@ -291,6 +291,146 @@
   .vendor-menu-item .vmd-desc{font-size:12px;color:rgba(255,255,255,0.65);font-weight:400;margin-top:2px;}
   .vendor-menu-item .arrow{margin-left:auto;color:rgba(255,255,255,0.5);}
 
+  /* ===== ADMIN DASHBOARD ===== */
+  .adm-overlay{display:none;position:fixed;inset:0;z-index:500;max-width:430px;left:50%;transform:translateX(-50%);background:#f0f2f5;font-family:'DM Sans',sans-serif;}
+  .adm-overlay.open{display:flex;flex-direction:column;}
+  /* LOGIN */
+  .adm-login{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#1A1A2E 0%,#16213e 60%,#0f3460 100%);padding:32px 24px;}
+  .adm-login-logo{font-family:'Playfair Display',serif;font-size:26px;color:white;font-weight:900;margin-bottom:4px;text-align:center;}
+  .adm-login-sub{color:rgba(255,255,255,0.6);font-size:13px;margin-bottom:32px;}
+  .adm-login-card{background:white;border-radius:18px;padding:28px 24px;width:100%;max-width:360px;box-shadow:0 20px 60px rgba(0,0,0,0.3);}
+  .adm-login-card h3{font-family:'Playfair Display',serif;font-size:20px;margin-bottom:20px;color:#1A1A2E;}
+  .adm-field{margin-bottom:14px;}
+  .adm-field label{display:block;font-size:12px;font-weight:600;color:#616161;margin-bottom:6px;}
+  .adm-field input{width:100%;border:1.5px solid #E0E0E0;border-radius:10px;padding:11px 14px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;}
+  .adm-field input:focus{border-color:#0099CC;}
+  .adm-login-err{background:#FFEBEE;color:#E53935;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px;display:none;}
+  .adm-login-btn{width:100%;background:linear-gradient(135deg,#FF6B35,#FF8A65);color:white;border:none;padding:14px;border-radius:30px;font-size:15px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:4px;}
+  /* MAIN LAYOUT */
+  .adm-main{display:flex;flex:1;overflow:hidden;flex-direction:column;}
+  .adm-topbar{background:#1A1A2E;padding:12px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+  .adm-topbar-logo{font-family:'Playfair Display',serif;color:white;font-size:15px;font-weight:900;flex:1;}
+  .adm-session-dot{width:8px;height:8px;background:#2ECC71;border-radius:50%;flex-shrink:0;}
+  .adm-session-label{color:rgba(255,255,255,0.6);font-size:11px;}
+  .adm-logout-btn{background:rgba(255,255,255,0.1);border:none;color:white;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;}
+  .adm-role-pill{padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;color:white;background:#FF6B35;}
+  /* SIDEBAR NAV */
+  .adm-body{display:flex;flex:1;overflow:hidden;}
+  .adm-sidebar{width:64px;background:#1A1A2E;display:flex;flex-direction:column;align-items:center;padding:8px 0;overflow-y:auto;flex-shrink:0;gap:2px;}
+  .adm-nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 6px;border-radius:10px;cursor:pointer;width:54px;transition:background 0.2s;}
+  .adm-nav-item:hover{background:rgba(255,255,255,0.08);}
+  .adm-nav-item.active{background:rgba(255,107,53,0.25);}
+  .adm-nav-icon{font-size:20px;line-height:1;}
+  .adm-nav-label{font-size:9px;color:rgba(255,255,255,0.55);font-weight:600;text-align:center;line-height:1.2;}
+  .adm-nav-item.active .adm-nav-label{color:#FF6B35;}
+  .adm-nav-badge{background:#E53935;color:white;border-radius:10px;font-size:9px;font-weight:700;padding:1px 5px;margin-top:1px;}
+  /* CONTENT */
+  .adm-content{flex:1;overflow-y:auto;background:#f0f2f5;}
+  .adm-section{display:none;padding:16px;animation:fadeIn 0.2s ease;}
+  .adm-section.active{display:block;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+  /* SKELETON */
+  .adm-skeleton{background:linear-gradient(90deg,#e0e0e0 25%,#f0f0f0 50%,#e0e0e0 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:8px;}
+  @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+  /* CARDS */
+  .adm-card{background:white;border-radius:12px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,0.06);margin-bottom:12px;}
+  .adm-card-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;color:#1A1A2E;}
+  /* STAT GRID */
+  .adm-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+  .adm-stat{background:white;border-radius:12px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,0.06);text-align:center;}
+  .adm-stat-val{font-size:22px;font-weight:700;color:#FF6B35;}
+  .adm-stat-lbl{font-size:11px;color:#9E9E9E;margin-top:2px;font-weight:600;}
+  /* TABLES */
+  .adm-table{width:100%;border-collapse:collapse;font-size:13px;}
+  .adm-table th{background:#F5F5F5;padding:8px 10px;text-align:left;font-weight:700;font-size:11px;color:#616161;text-transform:uppercase;letter-spacing:0.4px;}
+  .adm-table td{padding:9px 10px;border-bottom:1px solid #F5F5F5;vertical-align:middle;}
+  .adm-table tr:nth-child(even) td{background:#FAFAFA;}
+  .adm-table tr:hover td{background:#FFF8F0;}
+  /* BADGES */
+  .adm-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;}
+  .adm-badge.green{background:#E8F5E9;color:#2E7D32;}
+  .adm-badge.red{background:#FFEBEE;color:#C62828;}
+  .adm-badge.orange{background:#FFF3E0;color:#E65100;}
+  .adm-badge.blue{background:#E3F2FD;color:#1565C0;}
+  .adm-badge.gray{background:#F5F5F5;color:#616161;}
+  .adm-badge.purple{background:#F3E5F5;color:#6A1B9A;}
+  /* ACTION BTNS */
+  .adm-btn{display:inline-block;padding:5px 10px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:opacity 0.15s;}
+  .adm-btn:active{opacity:0.7;}
+  .adm-btn.blue{background:#E3F2FD;color:#1565C0;}
+  .adm-btn.green{background:#E8F5E9;color:#2E7D32;}
+  .adm-btn.red{background:#FFEBEE;color:#C62828;}
+  .adm-btn.orange{background:#FFF3E0;color:#E65100;}
+  .adm-btn.gray{background:#F5F5F5;color:#616161;}
+  .adm-btn.dark{background:#1A1A2E;color:white;}
+  /* FILTERS */
+  .adm-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+  .adm-filter{padding:5px 12px;border-radius:20px;border:1.5px solid #E0E0E0;background:white;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;color:#616161;}
+  .adm-filter.active{border-color:#FF6B35;background:#FF6B35;color:white;}
+  /* SEARCH */
+  .adm-search{display:flex;align-items:center;gap:8px;background:white;border-radius:10px;padding:8px 14px;box-shadow:0 2px 8px rgba(0,0,0,0.06);margin-bottom:12px;}
+  .adm-search input{flex:1;border:none;outline:none;font-size:13px;font-family:'DM Sans',sans-serif;}
+  /* BAR CHART */
+  .adm-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+  .adm-bar-label{font-size:11px;color:#616161;width:28px;text-align:right;flex-shrink:0;}
+  .adm-bar-wrap{flex:1;background:#F5F5F5;border-radius:6px;height:18px;overflow:hidden;}
+  .adm-bar-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,#FF6B35,#FFD166);transition:width 0.6s ease;}
+  .adm-bar-val{font-size:11px;font-weight:700;color:#FF6B35;width:32px;flex-shrink:0;}
+  /* TOGGLE */
+  .adm-toggle{position:relative;width:40px;height:22px;flex-shrink:0;}
+  .adm-toggle input{opacity:0;width:0;height:0;}
+  .adm-toggle-slider{position:absolute;inset:0;background:#E0E0E0;border-radius:20px;cursor:pointer;transition:0.3s;}
+  .adm-toggle-slider:before{content:'';position:absolute;width:16px;height:16px;left:3px;bottom:3px;background:white;border-radius:50%;transition:0.3s;box-shadow:0 1px 3px rgba(0,0,0,0.2);}
+  .adm-toggle input:checked + .adm-toggle-slider{background:#2ECC71;}
+  .adm-toggle input:checked + .adm-toggle-slider:before{transform:translateX(18px);}
+  /* SECTION HEADER */
+  .adm-section-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+  .adm-section-hdr h2{font-family:'Playfair Display',serif;font-size:18px;color:#1A1A2E;}
+  /* FORM */
+  .adm-form-field{margin-bottom:12px;}
+  .adm-form-field label{display:block;font-size:12px;font-weight:600;color:#616161;margin-bottom:5px;}
+  .adm-form-input{width:100%;border:1.5px solid #E0E0E0;border-radius:8px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;background:white;}
+  .adm-form-input:focus{border-color:#0099CC;}
+  .adm-form-select{width:100%;border:1.5px solid #E0E0E0;border-radius:8px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;background:white;appearance:none;}
+  .adm-form-textarea{width:100%;border:1.5px solid #E0E0E0;border-radius:8px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;resize:none;min-height:70px;background:white;}
+  .adm-form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  /* QUICK ACTIONS */
+  .adm-quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+  .adm-quick-btn{background:white;border:none;border-radius:12px;padding:14px 10px;text-align:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.06);font-family:'DM Sans',sans-serif;transition:transform 0.15s;}
+  .adm-quick-btn:active{transform:scale(0.97);}
+  .adm-quick-icon{font-size:24px;margin-bottom:6px;}
+  .adm-quick-label{font-size:11px;font-weight:700;color:#1A1A2E;}
+  /* HELP BTN */
+  .adm-help-btn{position:fixed;bottom:20px;right:20px;width:44px;height:44px;background:#FF6B35;border:none;border-radius:50%;color:white;font-size:20px;cursor:pointer;box-shadow:0 4px 16px rgba(255,107,53,0.4);z-index:600;display:none;}
+  .adm-overlay.open ~ .adm-help-btn, .adm-help-btn.visible{display:flex;align-items:center;justify-content:center;}
+  /* ACTIVITY FEED */
+  .adm-activity-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid #F5F5F5;}
+  .adm-activity-icon{font-size:18px;width:28px;text-align:center;flex-shrink:0;}
+  .adm-activity-text{flex:1;font-size:12px;color:#616161;line-height:1.4;}
+  .adm-activity-time{font-size:10px;color:#9E9E9E;flex-shrink:0;}
+  /* DETAIL PANEL */
+  .adm-detail-panel{background:white;border-radius:12px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);margin-top:12px;animation:fadeIn 0.2s;}
+  /* REVENUE BARS */
+  .adm-rev-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+  .adm-rev-label{font-size:12px;font-weight:600;color:#616161;width:70px;flex-shrink:0;}
+  .adm-rev-bar{flex:1;height:22px;border-radius:6px;display:flex;align-items:center;padding:0 8px;}
+  .adm-rev-bar span{font-size:11px;font-weight:700;color:white;}
+  /* NOTIF FORM */
+  .adm-color-swatches{display:flex;gap:8px;flex-wrap:wrap;}
+  .adm-swatch{width:28px;height:28px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:transform 0.15s;}
+  .adm-swatch.selected{border-color:#1A1A2E;transform:scale(1.15);}
+  /* ANNOUNCEMENT PREVIEW */
+  .adm-announce-preview{border-radius:8px;padding:10px 14px;font-size:13px;font-weight:600;color:white;margin-top:8px;}
+  /* MASKED INPUT */
+  .adm-masked-wrap{position:relative;display:flex;align-items:center;}
+  .adm-masked-wrap input{padding-right:40px;}
+  .adm-masked-toggle{position:absolute;right:10px;background:none;border:none;cursor:pointer;font-size:16px;color:#9E9E9E;}
+  /* ADMIN ACCOUNT BUTTON */
+  .adm-account-btn{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#E53935,#B71C1C);padding:16px 18px;border-radius:var(--radius-sm);margin-bottom:10px;box-shadow:var(--card-shadow);cursor:pointer;font-weight:600;font-size:15px;color:white;}
+  .adm-account-btn .icon{font-size:22px;}
+  .adm-account-btn .adm-tag{background:rgba(255,255,255,0.2);color:white;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;margin-left:4px;}
+  .adm-account-btn .arrow{margin-left:auto;color:rgba(255,255,255,0.6);}
+
 </style>
 </head>
 <body>
@@ -529,6 +669,62 @@
   <div id="plans-list" style="padding-bottom:32px;"></div>
 </div>
 
+<!-- ADMIN OVERLAY -->
+<div id="admin-overlay" class="adm-overlay">
+  <!-- LOGIN SCREEN -->
+  <div id="adm-login-screen" class="adm-login">
+    <div class="adm-login-logo">🛡️ Orlando Explorer</div>
+    <div class="adm-login-sub">Admin Control Panel</div>
+    <div class="adm-login-card">
+      <h3>Admin Sign In</h3>
+      <div class="adm-login-err" id="adm-login-err">Invalid username or password</div>
+      <div class="adm-field"><label>Username</label><input type="text" id="adm-username" placeholder="Enter username" /></div>
+      <div class="adm-field"><label>Password</label><input type="password" id="adm-password" placeholder="Enter password" /></div>
+      <button class="adm-login-btn" onclick="adminLogin()">Sign In to Admin Panel</button>
+    </div>
+  </div>
+  <!-- MAIN DASHBOARD -->
+  <div id="adm-main-screen" class="adm-main" style="display:none;">
+    <div class="adm-topbar">
+      <div class="adm-topbar-logo">🛡️ OE Admin</div>
+      <div class="adm-session-dot"></div>
+      <div class="adm-session-label">Session Active</div>
+      <span id="adm-role-pill" class="adm-role-pill">Super Admin</span>
+      <button class="adm-logout-btn" onclick="adminLogout()">Log Out</button>
+    </div>
+    <div class="adm-body">
+      <!-- SIDEBAR -->
+      <div class="adm-sidebar">
+        <div class="adm-nav-item active" onclick="showAdminSection('overview',this)" title="Overview"><div class="adm-nav-icon">📊</div><div class="adm-nav-label">Overview</div></div>
+        <div class="adm-nav-item" onclick="showAdminSection('users',this)" title="Users"><div class="adm-nav-icon">👥</div><div class="adm-nav-label">Users</div></div>
+        <div class="adm-nav-item" onclick="showAdminSection('vendors',this)" title="Vendors"><div class="adm-nav-icon">🏪</div><div class="adm-nav-label">Vendors</div></div>
+        <div class="adm-nav-item" onclick="showAdminSection('listings',this)" title="Listings"><div class="adm-nav-icon">📍</div><div class="adm-nav-label">Listings</div></div>
+        <div class="adm-nav-item" onclick="showAdminSection('events',this)" title="Events"><div class="adm-nav-icon">🎟️</div><div class="adm-nav-label">Events<div class="adm-nav-badge" id="events-badge">3</div></div></div>
+        <div class="adm-nav-item" onclick="showAdminSection('reviews',this)" title="Reviews"><div class="adm-nav-icon">⭐</div><div class="adm-nav-label">Reviews</div></div>
+        <div class="adm-nav-item" onclick="showAdminSection('revenue',this)" title="Revenue"><div class="adm-nav-icon">💰</div><div class="adm-nav-label">Revenue</div></div>
+        <div class="adm-nav-item" onclick="showAdminSection('notifications',this)" title="Notifications"><div class="adm-nav-icon">🔔</div><div class="adm-nav-label">Notifs</div></div>
+        <div class="adm-nav-item" onclick="showAdminSection('analytics',this)" title="Analytics"><div class="adm-nav-icon">📈</div><div class="adm-nav-label">Analytics</div></div>
+        <div class="adm-nav-item" onclick="showAdminSection('settings',this)" title="Settings"><div class="adm-nav-icon">⚙️</div><div class="adm-nav-label">Settings</div></div>
+      </div>
+      <!-- CONTENT AREA -->
+      <div class="adm-content">
+        <div id="adm-overview" class="adm-section active"></div>
+        <div id="adm-users" class="adm-section"></div>
+        <div id="adm-vendors" class="adm-section"></div>
+        <div id="adm-listings" class="adm-section"></div>
+        <div id="adm-events" class="adm-section"></div>
+        <div id="adm-reviews" class="adm-section"></div>
+        <div id="adm-revenue" class="adm-section"></div>
+        <div id="adm-notifications" class="adm-section"></div>
+        <div id="adm-analytics" class="adm-section"></div>
+        <div id="adm-settings" class="adm-section"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ADMIN HELP BTN -->
+<button class="adm-help-btn" id="adm-help-btn" onclick="showAdminHelp()" title="Keyboard Shortcuts">?</button>
+
 <nav class="bottom-nav">
   <div class="nav-item active" onclick="showScreen('home',this)"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></div>
   <div class="nav-item" onclick="showScreen('explore',this)"><div class="nav-icon">🔍</div><div class="nav-label">Explore</div></div>
@@ -648,7 +844,7 @@ function renderAI(){const container=document.getElementById('ai-content');const 
 function runAI(){const query=document.getElementById('ai-query')?.value.toLowerCase()||'';let matched=null;for(const[key,val]of Object.entries(aiResponses)){if(query.includes(key)){matched=val;break;}}if(!matched)matched=aiResponses['family day'];displayAIResult(matched);}
 function runAIPreset(key){const matched=aiResponses[key]||aiResponses['family day'];if(document.getElementById('ai-query'))document.getElementById('ai-query').value='Tell me about '+key+' in Orlando';displayAIResult(matched);}
 function displayAIResult(result){const el=document.getElementById('ai-results');if(!el)return;const bodyHTML=result.body.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');el.innerHTML='<div class="ai-response"><div class="ai-response-hdr"><div class="ai-icon">🤖</div><h4>'+result.title+'</h4></div><p>'+bodyHTML+'</p>'+(result.items?'<div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:6px;">'+result.items.map(i=>'<span class="tag sky">'+i+'</span>').join('')+'</div>':'')+'</div><div class="tip-card"><strong>💡 AI Tip:</strong> All recommendations are based on real Orlando locations. Save your favorites to My Trip!</div>';el.scrollIntoView({behavior:'smooth'});}
-function renderAccount(){const container=document.getElementById('account-content');if(!appState.user){container.innerHTML='<div class="account-guest"><div class="app-icon">🌴</div><h2>Orlando Explorer</h2><p>Sign in to save your favorite places, write reviews, and get personalized trip planning powered by AI.</p><button class="google-btn" onclick="loginWith(\'google\')"><svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg> Continue with Google</button><button class="apple-btn" onclick="loginWith(\'apple\')"><svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg> Continue with Apple</button><button onclick="continueGuest()" style="background:none;border:2px solid var(--gray2);color:var(--gray4);padding:12px;border-radius:30px;width:100%;font-size:14px;font-weight:600;cursor:pointer;font-family:\'DM Sans\',sans-serif;margin-top:4px;">Continue as Guest</button></div>';return;}const u=appState.user;const myReviews=Object.entries(appState.reviews).flatMap(([itemId,reviews])=>reviews.filter(r=>r.userId===u.id).map(r=>({...r,itemId})));const savedCount=Object.keys(appState.savedItems).length;container.innerHTML='<div class="account-loggedin"><div class="profile-header"><div class="profile-avatar">'+u.avatar+'</div><div><div class="profile-name">'+u.name+'</div><div class="profile-email">'+u.email+'</div></div></div><div style="display:flex;gap:12px;margin-bottom:20px;"><div style="flex:1;background:var(--white);border-radius:var(--radius-sm);padding:14px;text-align:center;box-shadow:var(--card-shadow);"><div style="font-size:22px;font-weight:700;color:var(--sun);">'+savedCount+'</div><div style="font-size:12px;color:var(--gray3);margin-top:2px;">Saved Places</div></div><div style="flex:1;background:var(--white);border-radius:var(--radius-sm);padding:14px;text-align:center;box-shadow:var(--card-shadow);"><div style="font-size:22px;font-weight:700;color:var(--sky);">'+myReviews.length+'</div><div style="font-size:12px;color:var(--gray3);margin-top:2px;">Reviews Written</div></div></div><div class="vendor-menu-item" onclick="openVendorDashboard()"><span class="icon">🎟️</span><div style="flex:1;"><div style="display:flex;align-items:center;gap:6px;">Vendor Dashboard <span class="pro-badge">PRO</span></div><div class="vmd-desc">Manage your events and listings</div></div><span class="arrow">›</span></div><div class="account-menu-item" onclick="showMyReviews()"><span class="icon">⭐</span><span>My Reviews</span><span class="arrow">›</span></div><div class="account-menu-item" onclick="showScreen(\'mytrip\',document.querySelectorAll(\'.nav-item\')[2])"><span class="icon">🗺️</span><span>My Saved Places</span><span class="arrow">›</span></div><div class="account-menu-item"><span class="icon">🔔</span><span>Notifications</span><span class="arrow">›</span></div><div class="account-menu-item"><span class="icon">⚙️</span><span>Settings</span><span class="arrow">›</span></div><div class="account-menu-item danger" onclick="logout()"><span class="icon">🚪</span><span>Log Out</span></div></div>';}
+function renderAccount(){const container=document.getElementById('account-content');if(!appState.user){container.innerHTML='<div class="account-guest"><div class="app-icon">🌴</div><h2>Orlando Explorer</h2><p>Sign in to save your favorite places, write reviews, and get personalized trip planning powered by AI.</p><button class="google-btn" onclick="loginWith(\'google\')"><svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg> Continue with Google</button><button class="apple-btn" onclick="loginWith(\'apple\')"><svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg> Continue with Apple</button><button onclick="continueGuest()" style="background:none;border:2px solid var(--gray2);color:var(--gray4);padding:12px;border-radius:30px;width:100%;font-size:14px;font-weight:600;cursor:pointer;font-family:\'DM Sans\',sans-serif;margin-top:4px;">Continue as Guest</button></div>';return;}const u=appState.user;const myReviews=Object.entries(appState.reviews).flatMap(([itemId,reviews])=>reviews.filter(r=>r.userId===u.id).map(r=>({...r,itemId})));const savedCount=Object.keys(appState.savedItems).length;container.innerHTML='<div class="account-loggedin"><div class="profile-header"><div class="profile-avatar">'+u.avatar+'</div><div><div class="profile-name">'+u.name+'</div><div class="profile-email">'+u.email+'</div></div></div><div style="display:flex;gap:12px;margin-bottom:20px;"><div style="flex:1;background:var(--white);border-radius:var(--radius-sm);padding:14px;text-align:center;box-shadow:var(--card-shadow);"><div style="font-size:22px;font-weight:700;color:var(--sun);">'+savedCount+'</div><div style="font-size:12px;color:var(--gray3);margin-top:2px;">Saved Places</div></div><div style="flex:1;background:var(--white);border-radius:var(--radius-sm);padding:14px;text-align:center;box-shadow:var(--card-shadow);"><div style="font-size:22px;font-weight:700;color:var(--sky);">'+myReviews.length+'</div><div style="font-size:12px;color:var(--gray3);margin-top:2px;">Reviews Written</div></div></div><div class="vendor-menu-item" onclick="openVendorDashboard()"><span class="icon">🎟️</span><div style="flex:1;"><div style="display:flex;align-items:center;gap:6px;">Vendor Dashboard <span class="pro-badge">PRO</span></div><div class="vmd-desc">Manage your events and listings</div></div><span class="arrow">›</span></div><div class="account-menu-item" onclick="showMyReviews()"><span class="icon">⭐</span><span>My Reviews</span><span class="arrow">›</span></div><div class="account-menu-item" onclick="showScreen(\'mytrip\',document.querySelectorAll(\'.nav-item\')[2])"><span class="icon">🗺️</span><span>My Saved Places</span><span class="arrow">›</span></div><div class="account-menu-item"><span class="icon">🔔</span><span>Notifications</span><span class="arrow">›</span></div><div class="account-menu-item"><span class="icon">⚙️</span><span>Settings</span><span class="arrow">›</span></div><div class="adm-account-btn" onclick="openAdminPanel()"><span class="icon">🛡️</span><div style="flex:1"><div style="display:flex;align-items:center;gap:6px;">Admin Dashboard <span class="adm-tag">ADMIN</span></div><div style="font-size:12px;opacity:0.7;font-weight:400;margin-top:2px;">Manage the Orlando Explorer app</div></div><span class="arrow">&#8250;</span></div><div class="account-menu-item danger" onclick="logout()"><span class="icon">🚪</span><span>Log Out</span></div></div>';}
 function showMyReviews(){const u=appState.user;if(!u)return;const myReviews=Object.entries(appState.reviews).flatMap(([itemId,revs])=>revs.filter(r=>r.userId===u.id).map(r=>({...r,itemId})));const container=document.getElementById('account-content');if(!myReviews.length){container.innerHTML='<div style="padding:24px;text-align:center;color:var(--gray3);"><div style="font-size:48px;margin-bottom:12px;">✍️</div><div style="font-weight:600;">No reviews yet</div><button onclick="renderAccount()" style="margin-top:16px;background:none;border:none;color:var(--sky);font-size:14px;cursor:pointer;">← Back</button></div>';return;}container.innerHTML='<div style="padding:16px 20px;"><div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;"><button onclick="renderAccount()" style="background:var(--gray1);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;cursor:pointer;">←</button><span style="font-family:\'Playfair Display\',serif;font-size:18px;font-weight:700;">My Reviews</span></div>'+myReviews.map(r=>{const item=findItem(r.itemId);return'<div style="background:var(--white);border-radius:var(--radius-sm);padding:14px;margin-bottom:12px;box-shadow:var(--card-shadow);"><div style="font-weight:700;font-size:14px;margin-bottom:6px;">'+(item?item.name:'Unknown Place')+'</div>'+reviewCardHTML(r)+'</div>';}).join('')+'</div>';}
 const mockUsers={google:{id:'g1',name:'Alex Johnson',email:'alex.johnson@gmail.com',avatar:'😊',provider:'google'},apple:{id:'a1',name:'Jordan Lee',email:'j.lee@icloud.com',avatar:'🎵',provider:'apple'}};
 function loginWith(provider){closeAuthModal();showToast('Signing in…');setTimeout(()=>{appState.user={...mockUsers[provider]};showToast('Welcome, '+appState.user.name+'! 🎉');renderAccount();renderMyTrip();renderAI();if(appState.pendingAction){appState.pendingAction();appState.pendingAction=null;}},800);}
@@ -929,4 +1125,585 @@ function selectPlan(planId) {
   updateVendorDashboardUI();
   renderAccount();
 }
+</script>
+<script>
+// ===== ADMIN STATE =====
+const adminState = {
+  loggedIn: false,
+  admin: null,
+  currentSection: 'overview',
+  userFilter: 'all', userSearch: '',
+  vendorFilter: 'all',
+  listingFilter: 'all', listingSearch: '',
+  eventFilter: 'pending',
+  reviewFilter: 'all', reviewSearch: '',
+  subFilter: 'all',
+  notifColor: '#FF6B35',
+  scheduleEnabled: false,
+  settings: { maintenance:false, registrations:true, vendorApps:true, guestBrowsing:true, basicMax:3, proMax:20, premiumMax:999, basicPrice:19, proPrice:49, premiumPrice:99, mapsKey:'AIza••••••••••••••••', anthropicKey:'sk-ant-••••••••••••••••' },
+  activityLog: [
+    {icon:'👤',text:'Approved vendor "Orlando Events Co"',time:'2m ago'},
+    {icon:'🗑️',text:'Deleted spam review on Kennedy Space Center',time:'8m ago'},
+    {icon:'🎟️',text:'Approved event "Jazz Night at The Social"',time:'15m ago'},
+    {icon:'⚙️',text:'Updated Basic Plan max listings to 3',time:'1h ago'},
+    {icon:'🔔',text:'Sent push notification to all users',time:'2h ago'},
+  ],
+  editingListingId: null,
+  showingUserDetail: null
+};
+const adminAccounts = [
+  {username:'admin',password:'orlando2025',name:'Orlando Admin',role:'Super Admin',email:'admin@orlandoexplorer.com'}
+];
+const admUsers = [
+  {id:'u1',name:'Alex Johnson',email:'alex.johnson@gmail.com',avatar:'😊',joined:'Jan 12, 2026',saves:8,reviews:3,status:'active'},
+  {id:'u2',name:'Jordan Lee',email:'j.lee@icloud.com',avatar:'🎵',joined:'Feb 3, 2026',saves:12,reviews:5,status:'active'},
+  {id:'u3',name:'Maria Garcia',email:'m.garcia@gmail.com',avatar:'🌺',joined:'Dec 20, 2025',saves:4,reviews:1,status:'active'},
+  {id:'u4',name:'Tyler Brown',email:'t.brown@outlook.com',avatar:'🏀',joined:'Mar 1, 2026',saves:0,reviews:0,status:'suspended'},
+  {id:'u5',name:'Aisha Williams',email:'a.williams@yahoo.com',avatar:'✨',joined:'Jan 28, 2026',saves:22,reviews:9,status:'active'},
+  {id:'u6',name:'Chris Davis',email:'c.davis@gmail.com',avatar:'🎸',joined:'Feb 15, 2026',saves:1,reviews:0,status:'banned'},
+];
+const admVendors = [
+  {id:'v1',name:'Orlando Events Co',plan:'Pro',listings:8,revenue:49,status:'active'},
+  {id:'v2',name:'I-Drive Entertainment',plan:'Premium',listings:22,revenue:99,status:'active'},
+  {id:'v3',name:'Downtown Eats Group',plan:'Basic',listings:3,revenue:19,status:'active'},
+  {id:'v4',name:'Theme Park Tours LLC',plan:'Pro',listings:11,revenue:49,status:'pending'},
+  {id:'v5',name:'Lake Nona Adventures',plan:'Basic',listings:2,revenue:19,status:'pending'},
+  {id:'v6',name:'Winter Park Events',plan:'Premium',listings:0,revenue:0,status:'suspended'},
+];
+const admReviews = [
+  {id:'rv1',user:'Alex Johnson',avatar:'😊',rating:5,text:'Absolutely mind-blowing! The rocket garden alone is worth the trip.',place:'Kennedy Space Center',date:'2 days ago',flagged:false,verified:true},
+  {id:'rv2',user:'MagicFamilyOf4',avatar:'🏰',rating:5,text:'We go every year and it never gets old. Tron is incredible!',place:'Walt Disney World',date:'1 week ago',flagged:false,verified:true},
+  {id:'rv3',user:'FoodieOrlando',avatar:'🍴',rating:5,text:'The most romantic dinner I\'ve had in Orlando.',place:'The Boheme',date:'5 days ago',flagged:false,verified:false},
+  {id:'rv4',user:'SpamUser99',avatar:'💀',rating:1,text:'CLICK HERE FOR FREE TICKETS!!!',place:'Universal Orlando',date:'1 day ago',flagged:true,verified:false},
+  {id:'rv5',user:'LuxuryTraveler',avatar:'👑',rating:5,text:'Worth every penny. The Disney fireworks from the balcony are magical.',place:'Four Seasons Orlando',date:'1 week ago',flagged:false,verified:true},
+];
+const admEvents = [
+  {id:'ae1',name:'Jazz Night at The Social',vendor:'Orlando Events Co',date:'Apr 11',category:'Live Music',price:'$15',desc:'Live jazz every Friday.',status:'pending'},
+  {id:'ae2',name:'Rooftop Latin Dance Party',vendor:'I-Drive Entertainment',date:'Apr 18',category:'Club',price:'$25',desc:'Salsa and bachata DJs.',status:'pending'},
+  {id:'ae3',name:'Comedy Open Mic Night',vendor:'Orlando Events Co',date:'Apr 17',category:'Comedy',price:'$10',desc:'New comedians every Thursday.',status:'pending'},
+  {id:'ae4',name:'Craft Beer Festival',vendor:'Downtown Eats Group',date:'Apr 20',category:'Food & Drink',price:'$30',desc:'50+ local craft beers.',status:'approved'},
+  {id:'ae5',name:'Theme Park Photography Tour',vendor:'Theme Park Tours LLC',date:'Apr 25',category:'Arts & Culture',price:'$45',desc:'Professional photography session.',status:'rejected'},
+];
+const admNotifs = [
+  {title:'Weekend Events Alert',audience:'All Users',sent:'Apr 1, 2026',openRate:'34%'},
+  {title:'New Vendor Joined!',audience:'All Vendors',sent:'Mar 28, 2026',openRate:'61%'},
+  {title:'Spring Festival Guide',audience:'Users in Orlando',sent:'Mar 20, 2026',openRate:'42%'},
+];
+
+// ===== LOGIN =====
+function openAdminPanel(){
+  document.getElementById('adm-login-screen').style.display='flex';
+  document.getElementById('adm-main-screen').style.display='none';
+  document.getElementById('admin-overlay').classList.add('open');
+  document.getElementById('adm-help-btn').classList.add('visible');
+  document.getElementById('adm-username').value='';
+  document.getElementById('adm-password').value='';
+  document.getElementById('adm-login-err').style.display='none';
+}
+function adminLogin(){
+  const u=document.getElementById('adm-username').value.trim();
+  const p=document.getElementById('adm-password').value;
+  const found=adminAccounts.find(a=>a.username===u&&a.password===p);
+  if(!found){document.getElementById('adm-login-err').style.display='block';return;}
+  adminState.loggedIn=true;adminState.admin=found;
+  document.getElementById('adm-login-screen').style.display='none';
+  document.getElementById('adm-main-screen').style.display='flex';
+  document.getElementById('adm-role-pill').textContent=found.role;
+  showAdminSection('overview',document.querySelector('.adm-nav-item'));
+  logAdminAction('🔐','Admin logged in as '+found.name);
+}
+function adminLogout(){
+  adminState.loggedIn=false;adminState.admin=null;
+  document.getElementById('admin-overlay').classList.remove('open');
+  document.getElementById('adm-help-btn').classList.remove('visible');
+}
+function logAdminAction(icon,text){
+  adminState.activityLog.unshift({icon,text,time:'Just now'});
+  if(adminState.activityLog.length>20)adminState.activityLog.pop();
+}
+
+// ===== NAV =====
+function showAdminSection(name,navEl){
+  document.querySelectorAll('.adm-section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.adm-nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('adm-'+name).classList.add('active');
+  if(navEl)navEl.classList.add('active');
+  adminState.currentSection=name;
+  const renderers={overview:renderAdmOverview,users:renderAdmUsers,vendors:renderAdmVendors,listings:renderAdmListings,events:renderAdmEvents,reviews:renderAdmReviews,revenue:renderAdmRevenue,notifications:renderAdmNotifications,analytics:renderAdmAnalytics,settings:renderAdmSettings};
+  if(renderers[name])renderers[name]();
+}
+
+// ===== OVERVIEW =====
+function renderAdmOverview(){
+  const totalRev = admVendors.filter(v=>v.status==='active').reduce((s,v)=>s+v.revenue,0);
+  const pending = admEvents.filter(e=>e.status==='pending').length;
+  document.getElementById('adm-overview').innerHTML=`
+    <div style="background:linear-gradient(135deg,#1A1A2E,#16213e);border-radius:12px;padding:18px;margin-bottom:14px;color:white;">
+      <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:900;margin-bottom:4px;">🛡️ Admin Dashboard</div>
+      <div style="font-size:13px;opacity:0.7;">Welcome back, ${adminState.admin?.name||'Admin'} · ${adminState.admin?.role}</div>
+    </div>
+    <div class="adm-stat-grid">
+      <div class="adm-stat"><div class="adm-stat-val">${admUsers.length}</div><div class="adm-stat-lbl">Total Users</div></div>
+      <div class="adm-stat"><div class="adm-stat-val">${admVendors.length}</div><div class="adm-stat-lbl">Total Vendors</div></div>
+      <div class="adm-stat" style="--c:#2ECC71"><div class="adm-stat-val" style="color:#2ECC71">${attractions.length+restaurants.length+parks.length+hotels.length}</div><div class="adm-stat-lbl">Total Listings</div></div>
+      <div class="adm-stat"><div class="adm-stat-val">${admEvents.length}</div><div class="adm-stat-lbl">Total Events</div></div>
+      <div class="adm-stat" style=""><div class="adm-stat-val" style="color:#9C27B0">${admReviews.length}</div><div class="adm-stat-lbl">Total Reviews</div></div>
+      <div class="adm-stat"><div class="adm-stat-val" style="color:#2ECC71">$${totalRev}</div><div class="adm-stat-lbl">Monthly Revenue</div></div>
+      <div class="adm-stat"><div class="adm-stat-val" style="color:#0099CC">3</div><div class="adm-stat-lbl">Signups Today</div></div>
+      <div class="adm-stat"><div class="adm-stat-val" style="color:#FF9800">${pending}</div><div class="adm-stat-lbl">Pending Events</div></div>
+    </div>
+    <div class="adm-quick-actions">
+      <button class="adm-quick-btn" onclick="showAdminSection('listings',document.querySelectorAll('.adm-nav-item')[3])"><div class="adm-quick-icon">➕</div><div class="adm-quick-label">Add Listing</div></button>
+      <button class="adm-quick-btn" onclick="showAdminSection('events',document.querySelectorAll('.adm-nav-item')[4])"><div class="adm-quick-icon">✅</div><div class="adm-quick-label">Approve Events</div></button>
+      <button class="adm-quick-btn" onclick="showAdminSection('reviews',document.querySelectorAll('.adm-nav-item')[5])"><div class="adm-quick-icon">🛡️</div><div class="adm-quick-label">Moderate Reviews</div></button>
+      <button class="adm-quick-btn" onclick="showAdminSection('notifications',document.querySelectorAll('.adm-nav-item')[7])"><div class="adm-quick-icon">🔔</div><div class="adm-quick-label">Send Notification</div></button>
+    </div>
+    <div class="adm-card">
+      <div class="adm-card-title">🔥 Top Listings This Week</div>
+      ${[{e:'🚀',n:'Kennedy Space Center',v:1240},{e:'🏰',n:'Walt Disney World',v:980},{e:'🦕',n:'Universal Orlando',v:841}].map(l=>`
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #F5F5F5;">
+          <span style="font-size:22px;">${l.e}</span>
+          <span style="flex:1;font-size:13px;font-weight:600;">${l.n}</span>
+          <span style="font-size:12px;color:#FF6B35;font-weight:700;">👁️ ${l.v}</span>
+        </div>`).join('')}
+    </div>
+    <div class="adm-card">
+      <div class="adm-card-title">📋 Recent Activity</div>
+      ${adminState.activityLog.slice(0,5).map(a=>`
+        <div class="adm-activity-item"><div class="adm-activity-icon">${a.icon}</div><div class="adm-activity-text">${a.text}</div><div class="adm-activity-time">${a.time}</div></div>`).join('')}
+    </div>
+    <div class="adm-card">
+      <div class="adm-card-title">📈 User Growth (Last 6 Months)</div>
+      ${[['Nov',18],['Dec',32],['Jan',54],['Feb',41],['Mar',67],['Apr',38]].map(([m,v])=>`
+        <div class="adm-bar-row"><div class="adm-bar-label">${m}</div><div class="adm-bar-wrap"><div class="adm-bar-fill" style="width:${Math.round(v/67*100)}%"></div></div><div class="adm-bar-val">${v}</div></div>`).join('')}
+    </div>`;
+}
+</script>
+<script>
+// ===== USERS =====
+function renderAdmUsers(){
+  const u=adminState;
+  const filtered=admUsers.filter(usr=>{
+    const ms=u.userFilter==='all'||usr.status===u.userFilter;
+    const mq=!u.userSearch||usr.name.toLowerCase().includes(u.userSearch)||usr.email.toLowerCase().includes(u.userSearch);
+    return ms&&mq;
+  });
+  const newThisWeek=admUsers.filter(u=>u.joined.includes('2026')).length;
+  document.getElementById('adm-users').innerHTML=`
+    <div class="adm-section-hdr"><h2>👥 User Management</h2><span style="font-size:12px;color:#9E9E9E;">${admUsers.length} total · ${newThisWeek} new this week</span></div>
+    <div class="adm-search"><span>🔍</span><input placeholder="Search by name or email..." value="${u.userSearch}" oninput="adminState.userSearch=this.value;renderAdmUsers()"></div>
+    <div class="adm-filters">
+      ${['all','active','suspended','banned'].map(f=>`<button class="adm-filter ${u.userFilter===f?'active':''}" onclick="adminState.userFilter='${f}';renderAdmUsers()">${f.charAt(0).toUpperCase()+f.slice(1)}</button>`).join('')}
+    </div>
+    <div class="adm-card" style="padding:0;overflow:hidden;">
+      <table class="adm-table" style="width:100%;">
+        <thead><tr><th>User</th><th>Joined</th><th>💾/⭐</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>${filtered.map(usr=>`
+          <tr>
+            <td><div style="display:flex;align-items:center;gap:8px;"><span style="font-size:20px;">${usr.avatar}</span><div><div style="font-weight:600;font-size:12px;">${usr.name}</div><div style="font-size:10px;color:#9E9E9E;">${usr.email}</div></div></div></td>
+            <td style="font-size:11px;color:#9E9E9E;">${usr.joined}</td>
+            <td style="font-size:11px;">${usr.saves}/${usr.reviews}</td>
+            <td><span class="adm-badge ${usr.status==='active'?'green':usr.status==='suspended'?'orange':'red'}">${usr.status}</span></td>
+            <td><div style="display:flex;gap:4px;flex-wrap:wrap;">
+              <button class="adm-btn blue" onclick="showAdmUserDetail('${usr.id}')">View</button>
+              <button class="adm-btn orange" onclick="admUserAction('suspend','${usr.id}')">Suspend</button>
+              <button class="adm-btn red" onclick="admUserAction('ban','${usr.id}')">Ban</button>
+              <button class="adm-btn red" onclick="admUserAction('delete','${usr.id}')">Del</button>
+            </div></td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+    <div id="adm-user-detail-panel"></div>`;
+}
+function showAdmUserDetail(id){
+  const usr=admUsers.find(u=>u.id===id);
+  if(!usr)return;
+  document.getElementById('adm-user-detail-panel').innerHTML=`
+    <div class="adm-detail-panel">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+        <span style="font-size:40px;">${usr.avatar}</span>
+        <div><div style="font-weight:700;font-size:16px;">${usr.name}</div><div style="font-size:12px;color:#9E9E9E;">${usr.email}</div><span class="adm-badge ${usr.status==='active'?'green':usr.status==='suspended'?'orange':'red'}" style="margin-top:4px;">${usr.status}</span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+        <div class="adm-stat"><div class="adm-stat-val">${usr.saves}</div><div class="adm-stat-lbl">Saved Places</div></div>
+        <div class="adm-stat"><div class="adm-stat-val">${usr.reviews}</div><div class="adm-stat-lbl">Reviews</div></div>
+      </div>
+      <div style="font-size:12px;color:#9E9E9E;">Joined: ${usr.joined}</div>
+    </div>`;
+}
+function admUserAction(action,id){
+  const usr=admUsers.find(u=>u.id===id);
+  if(action==='ban'||action==='delete'){if(!confirm(`Are you sure you want to ${action} ${usr.name}?`))return;}
+  if(action==='suspend')usr.status='suspended';
+  else if(action==='ban')usr.status='banned';
+  else if(action==='delete'){const idx=admUsers.findIndex(u=>u.id===id);admUsers.splice(idx,1);}
+  logAdminAction('👤',`${action.charAt(0).toUpperCase()+action.slice(1)}ned user ${usr?.name||id}`);
+  showToast(`User ${action}ned`);renderAdmUsers();
+}
+
+// ===== VENDORS =====
+function renderAdmVendors(){
+  const filtered=admVendors.filter(v=>adminState.vendorFilter==='all'||v.plan.toLowerCase()===adminState.vendorFilter||v.status===adminState.vendorFilter);
+  const totalMRR=admVendors.filter(v=>v.status==='active').reduce((s,v)=>s+v.revenue,0);
+  const pending=admVendors.filter(v=>v.status==='pending').length;
+  document.getElementById('adm-vendors').innerHTML=`
+    <div class="adm-section-hdr"><h2>🏪 Vendor Management</h2><span style="font-size:12px;color:#9E9E9E;">MRR: $${totalMRR} · ${pending} pending</span></div>
+    <div class="adm-filters">
+      ${['all','basic','pro','premium','pending'].map(f=>`<button class="adm-filter ${adminState.vendorFilter===f?'active':''}" onclick="adminState.vendorFilter='${f}';renderAdmVendors()">${f.charAt(0).toUpperCase()+f.slice(1)}</button>`).join('')}
+    </div>
+    <div class="adm-card" style="padding:0;overflow:hidden;">
+      <table class="adm-table">
+        <thead><tr><th>Business</th><th>Plan</th><th>Listings</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>${filtered.map(v=>`
+          <tr>
+            <td style="font-weight:600;font-size:12px;">${v.name}</td>
+            <td><span class="adm-badge ${v.plan==='Premium'?'purple':v.plan==='Pro'?'blue':'gray'}">${v.plan}</span></td>
+            <td style="font-size:12px;">${v.listings}</td>
+            <td><span class="adm-badge ${v.status==='active'?'green':v.status==='pending'?'orange':'red'}">${v.status}</span></td>
+            <td><div style="display:flex;gap:4px;flex-wrap:wrap;">
+              ${v.status==='pending'?`<button class="adm-btn green" onclick="admVendorApprove('${v.id}')">✓ Approve</button><button class="adm-btn red" onclick="admVendorReject('${v.id}')">✕ Reject</button>`:`<button class="adm-btn blue" onclick="admChangePlan('${v.id}')">Plan</button><button class="adm-btn orange" onclick="admVendorSuspend('${v.id}')">Suspend</button><button class="adm-btn red" onclick="admVendorDelete('${v.id}')">Del</button>`}
+            </div></td>
+          </tr>
+          ${v.showReject?`<tr><td colspan="5"><div style="padding:8px;display:flex;gap:8px;"><input class="adm-form-input" id="reject-reason-${v.id}" placeholder="Rejection reason..." style="flex:1;"><button class="adm-btn red" onclick="admVendorRejectConfirm('${v.id}')">Send Rejection</button></div></td></tr>`:''}
+          `).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+function admVendorApprove(id){const v=admVendors.find(x=>x.id===id);v.status='active';logAdminAction('✅','Approved vendor '+v.name);showToast('Vendor approved ✅');renderAdmVendors();}
+function admVendorReject(id){const v=admVendors.find(x=>x.id===id);v.showReject=true;renderAdmVendors();}
+function admVendorRejectConfirm(id){const v=admVendors.find(x=>x.id===id);const reason=document.getElementById('reject-reason-'+id)?.value||'No reason given';v.status='suspended';v.showReject=false;logAdminAction('❌','Rejected vendor '+v.name+': '+reason);showToast('Vendor rejected');renderAdmVendors();}
+function admVendorSuspend(id){const v=admVendors.find(x=>x.id===id);v.status='suspended';logAdminAction('⏸️','Suspended vendor '+v.name);showToast('Vendor suspended');renderAdmVendors();}
+function admVendorDelete(id){const v=admVendors.find(x=>x.id===id);if(!confirm('Delete vendor '+v.name+'?'))return;admVendors.splice(admVendors.findIndex(x=>x.id===id),1);logAdminAction('🗑️','Deleted vendor '+v.name);showToast('Vendor deleted');renderAdmVendors();}
+function admChangePlan(id){const v=admVendors.find(x=>x.id===id);const plans=['Basic','Pro','Premium'];const cur=plans.indexOf(v.plan);const next=plans[(cur+1)%3];v.plan=next;v.revenue=next==='Basic'?19:next==='Pro'?49:99;logAdminAction('💳','Changed '+v.name+' plan to '+next);showToast('Plan changed to '+next);renderAdmVendors();}
+
+// ===== LISTINGS =====
+const admListingState={editId:null,showForm:false};
+function renderAdmListings(){
+  const allListings=[...attractions,...restaurants,...parks,...hotels,...events].map(l=>({...l,featured:l.featured||false,verified:l.verified||false}));
+  const tabMap={all:allListings,attractions,food:restaurants,parks,hotels,events};
+  const tab=adminState.listingFilter;
+  const search=adminState.listingSearch.toLowerCase();
+  const filtered=(tabMap[tab]||allListings).filter(l=>!search||l.name.toLowerCase().includes(search)||(l.area||'').toLowerCase().includes(search));
+  document.getElementById('adm-listings').innerHTML=`
+    <div class="adm-section-hdr"><h2>📍 Listings Management</h2><button class="adm-btn green" onclick="admOpenListingForm(null)" style="font-size:13px;padding:7px 14px;">+ Add New</button></div>
+    <div class="adm-search"><span>🔍</span><input placeholder="Search by name or area..." value="${adminState.listingSearch}" oninput="adminState.listingSearch=this.value;renderAdmListings()"></div>
+    <div class="adm-filters">
+      ${['all','attractions','food','parks','hotels','events'].map(f=>`<button class="adm-filter ${tab===f?'active':''}" onclick="adminState.listingFilter='${f}';renderAdmListings()">${f.charAt(0).toUpperCase()+f.slice(1)}</button>`).join('')}
+    </div>
+    ${admListingState.showForm?admListingFormHTML():''}
+    <div class="adm-card" style="padding:0;overflow:hidden;">
+      <table class="adm-table">
+        <thead><tr><th>Listing</th><th>Cat</th><th>Rating</th><th>Featured</th><th>Actions</th></tr></thead>
+        <tbody>${filtered.slice(0,20).map(l=>`
+          <tr>
+            <td><div style="display:flex;align-items:center;gap:6px;"><span>${l.emoji||'📍'}</span><div><div style="font-weight:600;font-size:12px;">${l.name}</div><div style="font-size:10px;color:#9E9E9E;">${l.area||''}</div></div></div></td>
+            <td><span class="adm-badge gray" style="font-size:9px;">${l.type||l.category||''}</span></td>
+            <td style="font-size:12px;color:#FF6B35;">★${l.rating}</td>
+            <td><label class="adm-toggle"><input type="checkbox" ${l.featured?'checked':''} onchange="l.featured=this.checked;showToast(l.name+' '+(l.featured?'featured':'unfeatured'))"><span class="adm-toggle-slider"></span></label></td>
+            <td><div style="display:flex;gap:4px;">
+              <button class="adm-btn blue" onclick="admOpenListingForm('${l.id}')">Edit</button>
+              <button class="adm-btn red" onclick="admDeleteListing('${l.id}','${l.type||''}')">Del</button>
+            </div></td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+function admListingFormHTML(){
+  const e=admListingState.editId?[...attractions,...restaurants,...parks,...hotels,...events].find(l=>l.id===admListingState.editId):null;
+  return `<div class="adm-card" style="border:2px solid #FF6B35;">
+    <div class="adm-card-title">${e?'Edit Listing':'Add New Listing'}</div>
+    <div class="adm-form-row">
+      <div class="adm-form-field"><label>Name</label><input class="adm-form-input" id="alf-name" value="${e?e.name:''}" placeholder="Listing name"></div>
+      <div class="adm-form-field"><label>Emoji</label><input class="adm-form-input" id="alf-emoji" value="${e?e.emoji||'':''}"> </div>
+    </div>
+    <div class="adm-form-row">
+      <div class="adm-form-field"><label>Category</label><select class="adm-form-select" id="alf-cat"><option>attraction</option><option>food</option><option>park</option><option>hotel</option><option>event</option></select></div>
+      <div class="adm-form-field"><label>Area</label><input class="adm-form-input" id="alf-area" value="${e?e.area||'':''}" placeholder="e.g. I-Drive"></div>
+    </div>
+    <div class="adm-form-field"><label>Description</label><textarea class="adm-form-textarea" id="alf-desc" placeholder="Description...">${e?e.desc:''}</textarea></div>
+    <div class="adm-form-row">
+      <div class="adm-form-field"><label>Rating (0-5)</label><input class="adm-form-input" id="alf-rating" type="number" step="0.1" min="0" max="5" value="${e?e.rating:4.5}"></div>
+      <div class="adm-form-field"><label>Price</label><input class="adm-form-input" id="alf-price" value="${e?e.price||'':''}" placeholder="$, $$, $$$"></div>
+    </div>
+    <div class="adm-form-row" style="margin-top:8px;">
+      <button class="adm-btn green" onclick="admSaveListing()" style="padding:10px;">Save Listing</button>
+      <button class="adm-btn gray" onclick="admListingState.showForm=false;renderAdmListings()" style="padding:10px;">Cancel</button>
+    </div>
+  </div>`;
+}
+function admOpenListingForm(id){admListingState.editId=id;admListingState.showForm=true;renderAdmListings();setTimeout(()=>{const el=document.querySelector('.adm-card[style*="border:2px"]');if(el)el.scrollIntoView({behavior:'smooth'});},100);}
+function admSaveListing(){showToast('Listing saved ✅');logAdminAction('📍','Saved listing');admListingState.showForm=false;renderAdmListings();}
+function admDeleteListing(id,type){if(!confirm('Delete this listing?'))return;const arrMap={attraction:attractions,food:restaurants,park:parks,hotel:hotels,event:events};const arr=arrMap[type]||attractions;const idx=arr.findIndex(l=>l.id===id);if(idx>-1)arr.splice(idx,1);logAdminAction('🗑️','Deleted listing '+id);showToast('Listing deleted');renderAdmListings();}
+</script>
+<script>
+// ===== EVENTS APPROVAL =====
+function renderAdmEvents(){
+  const f=adminState.eventFilter;
+  const filtered=f==='all'?admEvents:admEvents.filter(e=>e.status===f);
+  const pending=admEvents.filter(e=>e.status==='pending').length;
+  document.getElementById('events-badge').textContent=pending;
+  document.getElementById('adm-events').innerHTML=`
+    <div class="adm-section-hdr"><h2>🎟️ Events Queue</h2><span class="adm-badge orange">${pending} pending</span></div>
+    <div class="adm-filters">
+      ${['pending','approved','rejected','all'].map(f2=>`<button class="adm-filter ${f===f2?'active':''}" onclick="adminState.eventFilter='${f2}';renderAdmEvents()">${f2.charAt(0).toUpperCase()+f2.slice(1)}</button>`).join('')}
+    </div>
+    ${filtered.map(ev=>`
+      <div class="adm-card">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px;">
+          <div>
+            <div style="font-weight:700;font-size:14px;">${ev.name}</div>
+            <div style="font-size:12px;color:#9E9E9E;margin-top:2px;">by ${ev.vendor} · ${ev.date} · ${ev.category} · ${ev.price}</div>
+            <div style="font-size:12px;color:#616161;margin-top:4px;">${ev.desc}</div>
+          </div>
+          <span class="adm-badge ${ev.status==='approved'?'green':ev.status==='rejected'?'red':'orange'}">${ev.status}</span>
+        </div>
+        <div style="display:flex;gap:8px;">
+          ${ev.status==='pending'?`<button class="adm-btn green" onclick="admEventAction('approve','${ev.id}')">✓ Approve</button><button class="adm-btn red" onclick="admEventAction('reject','${ev.id}')">✕ Reject</button><button class="adm-btn blue" onclick="admEventAction('edit','${ev.id}')">✏️ Edit</button>`:''}
+          ${ev.status==='approved'?`<button class="adm-btn red" onclick="admEventAction('reject','${ev.id}')">Revoke</button>`:''}
+        </div>
+        ${ev.showReject?`<div style="margin-top:8px;display:flex;gap:8px;"><input class="adm-form-input" id="ev-reject-${ev.id}" placeholder="Rejection reason..." style="flex:1;"><button class="adm-btn red" onclick="admEventRejectSend('${ev.id}')">Send</button></div>`:''}
+      </div>`).join('')}`;
+}
+function admEventAction(action,id){
+  const ev=admEvents.find(e=>e.id===id);
+  if(action==='approve'){ev.status='approved';ev.showReject=false;logAdminAction('✅','Approved event: '+ev.name);showToast('Event approved ✅');}
+  else if(action==='reject'){ev.showReject=true;}
+  else if(action==='edit'){showToast('Opening event editor...');}
+  renderAdmEvents();
+}
+function admEventRejectSend(id){
+  const ev=admEvents.find(e=>e.id===id);
+  const reason=document.getElementById('ev-reject-'+id)?.value||'No reason';
+  ev.status='rejected';ev.showReject=false;
+  logAdminAction('❌','Rejected event: '+ev.name+' — '+reason);
+  showToast('Event rejected');renderAdmEvents();
+}
+
+// ===== REVIEWS =====
+function renderAdmReviews(){
+  const f=adminState.reviewFilter;const s=adminState.reviewSearch.toLowerCase();
+  const filtered=admReviews.filter(r=>{
+    const mf=f==='all'||(f==='flagged'&&r.flagged)||(f==='verified'&&r.verified);
+    const ms=!s||r.user.toLowerCase().includes(s)||r.text.toLowerCase().includes(s);
+    return mf&&ms;
+  });
+  const flagged=admReviews.filter(r=>r.flagged).length;
+  document.getElementById('adm-reviews').innerHTML=`
+    <div class="adm-section-hdr"><h2>⭐ Reviews Moderation</h2><span style="font-size:12px;color:#9E9E9E;">${admReviews.length} total · <span style="color:#E53935;">${flagged} flagged</span></span></div>
+    <div class="adm-search"><span>🔍</span><input placeholder="Search by user or keyword..." value="${adminState.reviewSearch}" oninput="adminState.reviewSearch=this.value;renderAdmReviews()"></div>
+    <div class="adm-filters">
+      ${['all','flagged','verified'].map(f2=>`<button class="adm-filter ${f===f2?'active':''}" onclick="adminState.reviewFilter='${f2}';renderAdmReviews()">${f2.charAt(0).toUpperCase()+f2.slice(1)}</button>`).join('')}
+    </div>
+    ${filtered.map(r=>`
+      <div class="adm-card" style="${r.flagged?'border-left:4px solid #E53935;':''}">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+          <span style="font-size:24px;">${r.avatar}</span>
+          <div style="flex:1;"><div style="font-weight:700;font-size:13px;">${r.user} ${r.verified?'<span class="adm-badge green">Verified</span>':''} ${r.flagged?'<span class="adm-badge red">Flagged</span>':''}</div>
+          <div style="font-size:11px;color:#9E9E9E;">${r.place} · ${r.date}</div></div>
+          <div style="color:#FFD166;font-size:13px;">${'★'.repeat(r.rating)}</div>
+        </div>
+        <div style="font-size:13px;color:#616161;margin-bottom:10px;">"${r.text}"</div>
+        <div style="display:flex;gap:6px;">
+          <button class="adm-btn red" onclick="admDeleteReview('${r.id}')">🗑️ Delete</button>
+          <button class="adm-btn orange" onclick="admFlagReview('${r.id}')">${r.flagged?'Unflag':'🚩 Flag'}</button>
+          <button class="adm-btn green" onclick="admVerifyReview('${r.id}')">✓ ${r.verified?'Unverify':'Verify'}</button>
+        </div>
+      </div>`).join('')}`;
+}
+function admDeleteReview(id){if(!confirm('Delete this review?'))return;const idx=admReviews.findIndex(r=>r.id===id);if(idx>-1)admReviews.splice(idx,1);logAdminAction('🗑️','Deleted review by '+id);showToast('Review deleted');renderAdmReviews();}
+function admFlagReview(id){const r=admReviews.find(x=>x.id===id);r.flagged=!r.flagged;showToast(r.flagged?'Review flagged 🚩':'Review unflagged');renderAdmReviews();}
+function admVerifyReview(id){const r=admReviews.find(x=>x.id===id);r.verified=!r.verified;showToast(r.verified?'Review verified ✓':'Verification removed');renderAdmReviews();}
+
+// ===== REVENUE =====
+function renderAdmRevenue(){
+  const subs=admVendors.filter(v=>v.status==='active');
+  const mrr=subs.reduce((s,v)=>s+v.revenue,0);
+  const byPlan={Basic:subs.filter(v=>v.plan==='Basic'),Pro:subs.filter(v=>v.plan==='Pro'),Premium:subs.filter(v=>v.plan==='Premium')};
+  const planRevs={Basic:byPlan.Basic.reduce((s,v)=>s+v.revenue,0),Pro:byPlan.Pro.reduce((s,v)=>s+v.revenue,0),Premium:byPlan.Premium.reduce((s,v)=>s+v.revenue,0)};
+  const f=adminState.subFilter;
+  const filteredSubs=f==='all'?subs:subs.filter(v=>v.plan.toLowerCase()===f);
+  document.getElementById('adm-revenue').innerHTML=`
+    <div class="adm-section-hdr"><h2>💰 Subscriptions & Revenue</h2><button class="adm-btn dark" onclick="showToast('Report downloaded as CSV 📊')" style="font-size:12px;">Export Report</button></div>
+    <div class="adm-stat-grid">
+      <div class="adm-stat"><div class="adm-stat-val" style="color:#2ECC71;">$${mrr}</div><div class="adm-stat-lbl">Monthly Recurring Revenue</div></div>
+      <div class="adm-stat"><div class="adm-stat-val">${subs.length}</div><div class="adm-stat-lbl">Active Subscriptions</div></div>
+      <div class="adm-stat"><div class="adm-stat-val" style="color:#0099CC;">2</div><div class="adm-stat-lbl">New This Month</div></div>
+      <div class="adm-stat"><div class="adm-stat-val" style="color:#E53935;">1</div><div class="adm-stat-lbl">Churned This Month</div></div>
+    </div>
+    <div class="adm-card">
+      <div class="adm-card-title">Revenue by Plan</div>
+      ${[['Basic','#4CAF50',planRevs.Basic],['Pro','#FF6B35',planRevs.Pro],['Premium','#9C27B0',planRevs.Premium]].map(([name,color,rev])=>`
+        <div class="adm-rev-row">
+          <div class="adm-rev-label">${name}</div>
+          <div class="adm-rev-bar" style="background:${color};width:${mrr?Math.round(rev/mrr*100):0}%;min-width:${rev>0?'40px':'0'};"><span>$${rev}</span></div>
+        </div>`).join('')}
+    </div>
+    <div class="adm-filters">
+      ${['all','basic','pro','premium'].map(f2=>`<button class="adm-filter ${f===f2?'active':''}" onclick="adminState.subFilter='${f2}';renderAdmRevenue()">${f2.charAt(0).toUpperCase()+f2.slice(1)}</button>`).join('')}
+    </div>
+    <div class="adm-card" style="padding:0;overflow:hidden;">
+      <table class="adm-table">
+        <thead><tr><th>Vendor</th><th>Plan</th><th>$/mo</th><th>Renewal</th><th>Actions</th></tr></thead>
+        <tbody>${filteredSubs.map(v=>`
+          <tr>
+            <td style="font-weight:600;font-size:12px;">${v.name}</td>
+            <td><span class="adm-badge ${v.plan==='Premium'?'purple':v.plan==='Pro'?'blue':'gray'}">${v.plan}</span></td>
+            <td style="font-weight:700;color:#2ECC71;font-size:12px;">$${v.revenue}</td>
+            <td style="font-size:11px;color:#9E9E9E;">May 1, 2026</td>
+            <td><div style="display:flex;gap:4px;flex-wrap:wrap;">
+              <button class="adm-btn green" onclick="admChangePlan('${v.id}')">Upgrade</button>
+              <button class="adm-btn orange" onclick="admChangePlan('${v.id}')">Downgrade</button>
+              <button class="adm-btn blue" onclick="showToast('Credit issued 💳')">Credit</button>
+              <button class="adm-btn red" onclick="showToast('Subscription cancelled')">Cancel</button>
+            </div></td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+// ===== NOTIFICATIONS =====
+function renderAdmNotifications(){
+  const colors=['#FF6B35','#0099CC','#2ECC71','#9C27B0','#FFD166','#E53935'];
+  document.getElementById('adm-notifications').innerHTML=`
+    <div class="adm-section-hdr"><h2>🔔 Notifications & Announcements</h2></div>
+    <div class="adm-card">
+      <div class="adm-card-title">📨 Compose Push Notification</div>
+      <div class="adm-form-field"><label>Title</label><input class="adm-form-input" id="notif-title" placeholder="e.g. Weekend Events Alert"></div>
+      <div class="adm-form-field"><label>Message</label><textarea class="adm-form-textarea" id="notif-msg" placeholder="Your notification message..."></textarea></div>
+      <div class="adm-form-field"><label>Audience</label><select class="adm-form-select" id="notif-audience"><option>All Users</option><option>All Vendors</option><option>Users in Orlando</option><option>Users by Interest</option></select></div>
+      <div class="toggle-row" style="padding:10px 0;">
+        <div class="toggle-info"><div class="toggle-info-label">Schedule for Later</div><div class="toggle-info-desc">Set a specific send date and time</div></div>
+        <label class="toggle-switch"><input type="checkbox" id="notif-schedule" onchange="toggleNotifSchedule(this.checked)"><span class="toggle-slider"></span></label>
+      </div>
+      <div id="notif-schedule-fields" style="display:none;">
+        <div class="adm-form-row"><div class="adm-form-field"><label>Date</label><input class="adm-form-input" type="date"></div><div class="adm-form-field"><label>Time</label><input class="adm-form-input" type="time"></div></div>
+      </div>
+      <button class="adm-btn dark" style="width:100%;padding:12px;font-size:14px;border-radius:10px;" onclick="admSendNotif()">🚀 Send Notification</button>
+    </div>
+    <div class="adm-card">
+      <div class="adm-card-title">📢 Create Announcement Banner</div>
+      <div class="adm-form-field"><label>Message</label><input class="adm-form-input" id="announce-msg" placeholder="e.g. 🎉 Spring Festival is happening this weekend!"></div>
+      <div class="adm-form-field"><label>Banner Color</label><div class="adm-color-swatches">${colors.map(c=>`<div class="adm-swatch ${adminState.notifColor===c?'selected':''}" style="background:${c}" onclick="adminState.notifColor='${c}';renderAdmNotifications()"></div>`).join('')}</div></div>
+      <div class="adm-announce-preview" style="background:${adminState.notifColor}" id="announce-preview">🎉 Tap to preview your announcement banner here</div>
+      <div class="adm-form-row" style="margin-top:10px;">
+        <button class="adm-btn green" style="padding:10px;" onclick="showToast('Banner published! 📢')">Publish Banner</button>
+        <button class="adm-btn gray" style="padding:10px;" onclick="showToast('Banner unpublished')">Unpublish</button>
+      </div>
+    </div>
+    <div class="adm-card">
+      <div class="adm-card-title">📬 Sent Notifications</div>
+      ${admNotifs.map(n=>`
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #F5F5F5;">
+          <div style="flex:1;"><div style="font-weight:600;font-size:13px;">${n.title}</div><div style="font-size:11px;color:#9E9E9E;">${n.audience} · ${n.sent}</div></div>
+          <span class="adm-badge blue">${n.openRate} open</span>
+        </div>`).join('')}
+    </div>`;
+  document.getElementById('announce-msg')?.addEventListener('input',function(){const p=document.getElementById('announce-preview');if(p)p.textContent=this.value||'Preview appears here';});
+}
+function toggleNotifSchedule(on){document.getElementById('notif-schedule-fields').style.display=on?'block':'none';}
+function admSendNotif(){const t=document.getElementById('notif-title')?.value;const m=document.getElementById('notif-msg')?.value;if(!t||!m){showToast('Please fill in title and message');return;}const aud=document.getElementById('notif-audience')?.value||'All Users';admNotifs.unshift({title:t,audience:aud,sent:'Just now',openRate:'—'});logAdminAction('🔔','Sent notification: '+t);showToast('Notification sent! 🚀');renderAdmNotifications();}
+
+// ===== ANALYTICS =====
+function renderAdmAnalytics(){
+  const topListings=[
+    {e:'🚀',n:'Kennedy Space Center',v:1240},{e:'🏰',n:'Walt Disney World',v:980},
+    {e:'🦕',n:'Universal Orlando',v:841},{e:'🌊',n:'Aquatica Water Park',v:723},
+    {e:'🎡',n:'ICON Park',v:618},{e:'🏨',n:'Four Seasons Orlando',v:541},
+    {e:'🥩',n:'The Boheme',v:498},{e:'🦁',n:'Busch Gardens Tampa',v:412},
+    {e:'🍣',n:'Dragonfly Robata',v:387},{e:'🌴',n:'Rosen Shingle Creek',v:351}
+  ];
+  const keywords=['orlando theme parks','disney world','universal tickets','best restaurants','hotels near disney','things to do','aquatica water park','kennedy space center','jazz music orlando','family activities'];
+  document.getElementById('adm-analytics').innerHTML=`
+    <div class="adm-section-hdr"><h2>📈 Analytics & Reports</h2><button class="adm-btn dark" onclick="showToast('Reports exported as CSV 📊')" style="font-size:12px;">Export All</button></div>
+    <div class="adm-card">
+      <div class="adm-card-title">👥 User Growth (Last 6 Months)</div>
+      ${[['Nov',18],['Dec',32],['Jan',54],['Feb',41],['Mar',67],['Apr',38]].map(([m,v])=>`
+        <div class="adm-bar-row"><div class="adm-bar-label">${m}</div><div class="adm-bar-wrap"><div class="adm-bar-fill" style="width:${Math.round(v/67*100)}%"></div></div><div class="adm-bar-val">${v}</div></div>`).join('')}
+    </div>
+    <div class="adm-card">
+      <div class="adm-card-title">🔥 Top 10 Listings by Views</div>
+      ${topListings.map((l,i)=>`
+        <div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #F5F5F5;">
+          <span style="font-size:11px;font-weight:700;color:#9E9E9E;width:16px;">#${i+1}</span>
+          <span style="font-size:18px;">${l.e}</span>
+          <span style="flex:1;font-size:12px;font-weight:600;">${l.n}</span>
+          <div style="width:80px;"><div class="adm-bar-wrap"><div class="adm-bar-fill" style="width:${Math.round(l.v/1240*100)}%"></div></div></div>
+          <span style="font-size:11px;font-weight:700;color:#FF6B35;width:36px;">${l.v}</span>
+        </div>`).join('')}
+    </div>
+    <div class="adm-card">
+      <div class="adm-card-title">🔍 Top Search Keywords</div>
+      ${keywords.map((k,i)=>`
+        <div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #F5F5F5;">
+          <span style="font-size:11px;color:#9E9E9E;width:16px;">#${i+1}</span>
+          <span style="flex:1;font-size:12px;">${k}</span>
+          <span class="adm-badge ${i<3?'orange':'gray'}">${Math.floor(Math.random()*900+100)}</span>
+        </div>`).join('')}
+    </div>
+    <div class="adm-card">
+      <div class="adm-card-title">🏪 Vendor Performance</div>
+      <table class="adm-table" style="width:100%;">
+        <thead><tr><th>#</th><th>Vendor</th><th>Views</th><th>Plan</th></tr></thead>
+        <tbody>${admVendors.filter(v=>v.status==='active').sort((a,b)=>b.listings-a.listings).map((v,i)=>`
+          <tr><td style="font-size:11px;color:#9E9E9E;">${i+1}</td><td style="font-size:12px;font-weight:600;">${v.name}</td><td style="font-size:12px;color:#FF6B35;font-weight:700;">${v.listings*120+Math.floor(Math.random()*200)}</td><td><span class="adm-badge ${v.plan==='Premium'?'purple':v.plan==='Pro'?'blue':'gray'}">${v.plan}</span></td></tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+// ===== SETTINGS =====
+function renderAdmSettings(){
+  const s=adminState.settings;
+  document.getElementById('adm-settings').innerHTML=`
+    <div class="adm-section-hdr"><h2>⚙️ App Settings</h2></div>
+    <div class="adm-card">
+      <div class="adm-card-title">🔧 Feature Toggles</div>
+      ${[['maintenance','🔴 Maintenance Mode','Disables app for all users'],['registrations','👤 New User Registrations','Allow new users to sign up'],['vendorApps','🏪 Vendor Applications','Accept new vendor sign-ups'],['guestBrowsing','👁️ Guest Browsing','Allow non-logged-in access']].map(([key,label,desc])=>`
+        <div class="toggle-row">
+          <div class="toggle-info"><div class="toggle-info-label">${label}</div><div class="toggle-info-desc">${desc}</div></div>
+          <label class="adm-toggle"><input type="checkbox" id="setting-${key}" ${s[key]?'checked':''} onchange="adminState.settings.${key}=this.checked"><span class="adm-toggle-slider"></span></label>
+        </div>`).join('')}
+    </div>
+    <div class="adm-card">
+      <div class="adm-card-title">📋 Plan Configuration</div>
+      <div class="adm-form-row">
+        <div class="adm-form-field"><label>Basic Max Listings</label><input class="adm-form-input" id="cfg-basicMax" type="number" value="${s.basicMax}"></div>
+        <div class="adm-form-field"><label>Pro Max Listings</label><input class="adm-form-input" id="cfg-proMax" type="number" value="${s.proMax}"></div>
+      </div>
+      <div class="adm-form-row">
+        <div class="adm-form-field"><label>Basic Price ($/mo)</label><input class="adm-form-input" id="cfg-basicPrice" type="number" value="${s.basicPrice}"></div>
+        <div class="adm-form-field"><label>Pro Price ($/mo)</label><input class="adm-form-input" id="cfg-proPrice" type="number" value="${s.proPrice}"></div>
+      </div>
+      <div class="adm-form-field"><label>Premium Price ($/mo)</label><input class="adm-form-input" id="cfg-premiumPrice" type="number" value="${s.premiumPrice}" style="max-width:50%;"></div>
+    </div>
+    <div class="adm-card">
+      <div class="adm-card-title">🔑 API Keys</div>
+      <div class="adm-form-field"><label>Google Maps API Key</label>
+        <div class="adm-masked-wrap"><input class="adm-form-input" id="maps-key" type="password" value="${s.mapsKey}"><button class="adm-masked-toggle" onclick="toggleMask('maps-key',this)">👁️</button></div>
+      </div>
+      <div class="adm-form-field"><label>Anthropic API Key</label>
+        <div class="adm-masked-wrap"><input class="adm-form-input" id="anth-key" type="password" value="${s.anthropicKey}"><button class="adm-masked-toggle" onclick="toggleMask('anth-key',this)">👁️</button></div>
+      </div>
+    </div>
+    <button class="adm-btn dark" style="width:100%;padding:14px;font-size:15px;border-radius:12px;margin-top:4px;" onclick="admSaveSettings()">💾 Save Settings</button>`;
+}
+function toggleMask(id,btn){const el=document.getElementById(id);el.type=el.type==='password'?'text':'password';btn.textContent=el.type==='password'?'👁️':'🙈';}
+function admSaveSettings(){
+  const keys=['basicMax','proMax','basicPrice','proPrice','premiumPrice'];
+  keys.forEach(k=>{const el=document.getElementById('cfg-'+k);if(el)adminState.settings[k]=parseInt(el.value)||adminState.settings[k];});
+  logAdminAction('⚙️','Updated app settings');showToast('Settings saved ✅');
+}
+function showAdminHelp(){
+  alert('⌨️ Admin Keyboard Shortcuts\n\nPress 1-9 to switch sections:\n1 = Overview\n2 = Users\n3 = Vendors\n4 = Listings\n5 = Events\n6 = Reviews\n7 = Revenue\n8 = Notifications\n9 = Analytics\n0 = Settings\n\nEsc = Close Admin Panel');
+}
+document.addEventListener('keydown',e=>{
+  if(!adminState.loggedIn)return;
+  const nav=document.querySelectorAll('.adm-nav-item');
+  const map={'1':'overview','2':'users','3':'vendors','4':'listings','5':'events','6':'reviews','7':'revenue','8':'notifications','9':'analytics','0':'settings','Escape':null};
+  if(e.key in map){if(map[e.key]===null)adminLogout();else showAdminSection(map[e.key],nav[Object.keys(map).indexOf(e.key)]);}
+});
 </script>
