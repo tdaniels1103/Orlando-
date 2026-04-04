@@ -4125,3 +4125,271 @@ setTimeout(()=>{
   }
 }, 200);
 </script>
+<script>
+// ===== FIX 1+2+3+6: FULL openUserProfile REPLACEMENT =====
+// Adds: Message btn, saved places grid, reviews list, Itineraries Shared stat, notifications
+openUserProfile = function(userId) {
+  const overlay = document.getElementById('user-profile-overlay');
+  const cover = document.getElementById('user-profile-cover');
+  const body = document.getElementById('user-profile-body');
+  const isSelf = appState.user && (userId === 'me' || userId === appState.user.id);
+  const isFollowing = socialState.following.includes(userId);
+
+  let user, level, isLocal, followers, following, checkins, reviews, badges, bio, xp, itinCount, savedPlaces, userReviews;
+
+  if(isSelf) {
+    const me = getCurrentUserProfile();
+    if(!me) { openAuthModal('view your profile'); return; }
+    user = me; level=me.level; isLocal=me.isLocal; followers=me.followers;
+    following=me.following; checkins=me.checkins; reviews=me.reviews;
+    badges=Object.values(gameState.badges).filter(b=>b.earned).length;
+    bio='Orlando Explorer'; xp=me.xp;
+    itinCount=socialState.sharedItineraries.length;
+    savedPlaces=Object.values(appState.savedItems).slice(0,6);
+    userReviews=Object.entries(appState.reviews).flatMap(([pid,revs])=>
+      revs.filter(r=>r.userId===appState.user.id).map(r=>({...r,placeId:pid}))
+    ).slice(0,4);
+  } else {
+    const mock = getMockUser(userId);
+    if(!mock) return;
+    user=mock; level=mock.level; isLocal=mock.isLocal; followers=mock.followers;
+    following=mock.following; checkins=mock.checkins; reviews=mock.reviews;
+    badges=mock.badges; bio=mock.bio; xp=mock.checkins*50+mock.reviews*30;
+    itinCount=Math.floor(Math.random()*5)+1;
+    // Simulate saved places for mock users
+    const allData=[...attractions,...restaurants,...parks,...hotels,...events];
+    savedPlaces=allData.slice(0,6).sort(()=>Math.random()-0.5).slice(0,4);
+    // Simulate reviews
+    userReviews=[
+      {rating:5,text:'Absolutely loved it! A must-visit in Orlando.',user:mock.username,avatar:mock.avatar,date:'2 days ago',placeId:'p1'},
+      {rating:4,text:'Great experience, would definitely go back again.',user:mock.username,avatar:mock.avatar,date:'1 week ago',placeId:'a1'},
+    ];
+  }
+
+  const cfg = LEVEL_CONFIG[level]||LEVEL_CONFIG.Tourist;
+  cover.style.background = cfg.grad || 'linear-gradient(135deg,#FF6B35,#FFD700)';
+  document.getElementById('user-profile-avatar').textContent = user.avatar||user.emoji||'😊';
+  const earnedBadges = isSelf ? BADGES.filter(b=>gameState.badges[b.id]?.earned) : BADGES.slice(0,badges);
+
+  // Saved places grid HTML
+  const savedGrid = savedPlaces.length ? `
+    <div style="padding:14px 16px 8px;font-weight:700;font-size:13px;">💾 Saved Places</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 16px 16px;">
+      ${savedPlaces.map(p=>`<div style="background:#FFF8F5;border-radius:12px;padding:12px 8px;text-align:center;cursor:pointer;" onclick="openDetail('${p.id}','${p.type}')">
+        <div style="font-size:28px;">${p.emoji}</div>
+        <div style="font-size:10px;font-weight:600;margin-top:4px;line-height:1.2;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">${p.name}</div>
+      </div>`).join('')}
+    </div>` : '';
+
+  // Recent reviews HTML
+  const reviewsHtml = userReviews.length ? `
+    <div style="padding:4px 16px 8px;font-weight:700;font-size:13px;">✍️ Recent Reviews</div>
+    ${userReviews.map(r=>`<div style="margin:0 16px 10px;background:white;border-radius:12px;padding:12px;box-shadow:0 2px 8px rgba(0,0,0,0.07);">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;">
+        <span style="font-size:14px;">${'⭐'.repeat(r.rating)}</span>
+        <span style="flex:1;font-size:10px;color:#9E9E9E;">${r.date}</span>
+      </div>
+      <div style="font-size:13px;color:#424242;line-height:1.4;">${r.text}</div>
+    </div>`).join('')}` : '';
+
+  body.innerHTML = `
+    <div class="profile-overlay-stats">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;">${user.username||user.name}</div>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:3px;flex-wrap:wrap;">
+            <span style="font-size:11px;font-weight:700;color:${cfg.color};background:${cfg.color}18;padding:2px 8px;border-radius:8px;">${cfg.emoji} ${level}</span>
+            ${isLocal?'<span style="font-size:11px;font-weight:700;color:#2E7D32;background:#E8F5E9;padding:2px 8px;border-radius:8px;">🌴 Local</span>':''}
+          </div>
+          ${bio?`<div style="font-size:12px;color:#9E9E9E;margin-top:5px;">${bio}</div>`:''}
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;margin-left:8px;">
+          ${isSelf
+            ? `<button style="background:#F5F5F5;border:none;border-radius:20px;padding:7px 14px;font-size:12px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;">✏️ Edit</button>`
+            : `<button class="follow-btn ${isFollowing?'following':'not-following'}" id="pfl-follow-${userId}" onclick="toggleFollow('${userId}',this)">${isFollowing?'✓ Following':'+ Follow'}</button>
+               <button onclick="showToast('Messaging coming soon! 💬')" style="background:#F0F4FF;border:none;border-radius:20px;padding:7px 14px;font-size:12px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;color:#2196F3;">💬 Message</button>`
+          }
+        </div>
+      </div>
+      <div class="social-stat-row" style="margin:0 -16px;border-radius:0;">
+        <div class="social-stat"><div class="social-stat-val">${following}</div><div class="social-stat-lbl">Friends</div></div>
+        <div class="social-stat"><div class="social-stat-val">${checkins}</div><div class="social-stat-lbl">Visited</div></div>
+        <div class="social-stat"><div class="social-stat-val">${reviews}</div><div class="social-stat-lbl">Reviews</div></div>
+        <div class="social-stat"><div class="social-stat-val">${itinCount}</div><div class="social-stat-lbl">Itineraries</div></div>
+      </div>
+    </div>
+    ${earnedBadges.length?`<div style="padding:14px 16px 4px;font-weight:700;font-size:13px;">🏅 Badges</div>
+    <div class="profile-badges-row">${earnedBadges.map(b=>`<div class="profile-badge-mini" style="background:${b.color}20;" title="${b.name}">${b.emoji}</div>`).join('')}</div>`:''}
+    <div style="padding:14px 16px 4px;font-weight:700;font-size:13px;">🗺️ Passport (${checkins} stamps)</div>
+    <div style="padding:0 16px 12px;font-size:26px;letter-spacing:3px;">${Array(Math.min(checkins,8)).fill('📍').join('')}${checkins>8?'<span style="font-size:13px;color:#9E9E9E;"> +${checkins-8} more</span>':''}</div>
+    ${savedGrid}
+    ${reviewsHtml}
+    <div style="height:20px;"></div>`;
+  overlay.classList.add('open');
+};
+</script>
+<script>
+// ===== FIX 4: Top photo becomes hero in place detail =====
+const _origBuildDetailHTML3 = buildDetailHTML;
+buildDetailHTML = function(item) {
+  let html = _origBuildDetailHTML3(item);
+  // If this place has uploaded photos, use the first one's emoji as hero
+  const photos = getPlacePhotos(item.id);
+  if(photos.length > 0) {
+    const topEmoji = photos[0].emoji;
+    // Replace the hero emoji (90px emoji inside detail-hero div)
+    html = html.replace(
+      `<div style="font-size:90px;">${item.emoji}</div>`,
+      `<div style="font-size:90px;">${topEmoji}</div><div style="position:absolute;bottom:8px;right:12px;background:rgba(0,0,0,0.45);color:white;border-radius:12px;padding:3px 10px;font-size:11px;font-weight:700;">📸 ${photos.length} photo${photos.length!==1?'s':''}</div>`
+    );
+    // Ensure detail-hero has position:relative for the badge
+    html = html.replace('<div class="detail-hero"', '<div class="detail-hero" style="position:relative;"');
+  }
+  return html;
+};
+
+// ===== FIX 5: Notifications for photo likes and itinerary saves =====
+if(!socialState.notifications) socialState.notifications = [];
+
+function addNotification(type, fromUserId, targetName, emoji) {
+  const fromUser = getMockUser(fromUserId);
+  if(!fromUser) return;
+  socialState.notifications.unshift({
+    id:'notif_'+Date.now(),
+    type, // 'photo_like' | 'itin_save' | 'new_follower'
+    from: fromUser.username,
+    fromAvatar: fromUser.avatar,
+    targetName,
+    emoji: emoji||'🔔',
+    time: 'just now',
+    read: false
+  });
+  // Keep max 20
+  if(socialState.notifications.length > 20) socialState.notifications.pop();
+  // Update notification badge if account screen is open
+  updateNotifBadge();
+}
+
+function updateNotifBadge() {
+  const unread = socialState.notifications.filter(n=>!n.read).length;
+  let badge = document.getElementById('notif-count-badge');
+  if(unread > 0) {
+    if(!badge) {
+      // Try to add badge to notifications menu item
+      const notifBtn = [...document.querySelectorAll('.account-menu-item')].find(el=>el.textContent.includes('Notifications'));
+      if(notifBtn) {
+        badge = document.createElement('span');
+        badge.id='notif-count-badge';
+        badge.style.cssText='background:#EF5350;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;margin-left:auto;';
+        badge.textContent=unread;
+        notifBtn.querySelector('.arrow')?.before(badge);
+      }
+    } else { badge.textContent=unread; badge.style.display=''; }
+  } else if(badge) { badge.style.display='none'; }
+}
+
+// Patch likePhoto to trigger notification
+const _origLikePhoto = likePhoto;
+likePhoto = function(photoId, placeId, btn) {
+  _origLikePhoto(photoId, placeId, btn);
+  // Find who uploaded this photo
+  const photos = getPlacePhotos(placeId);
+  const photo = photos.find(p=>p.id===photoId);
+  if(photo && photo.uploaderId !== appState.user?.id && socialState.likedPhotos[photoId]) {
+    // Simulate notification to the uploader (stored locally)
+    const allData=[...attractions,...restaurants,...parks,...hotels,...events];
+    const place = allData.find(i=>i.id===placeId);
+    socialState.notifications.unshift({
+      id:'notif_'+Date.now(), type:'photo_like',
+      from: appState.user?.name||'Someone', fromAvatar: appState.user?.avatar||'😊',
+      targetName: photo.caption, emoji:'📸❤️', time:'just now', read:false
+    });
+  }
+};
+
+// Patch saveItin to trigger notification
+const _origSaveItin = saveItin;
+saveItin = function(id) {
+  _origSaveItin(id);
+  if(!appState.user) return;
+  const itin = [...MOCK_ITINS,...socialState.sharedItineraries].find(i=>i.id===id);
+  if(itin && itin.authorId !== 'current_user') {
+    // Notify original author (simulated)
+    socialState.notifications.unshift({
+      id:'notif_'+Date.now(), type:'itin_save',
+      from: appState.user?.name||'Someone', fromAvatar: appState.user?.avatar||'😊',
+      targetName: itin.title, emoji:'🗺️💾', time:'just now', read:false
+    });
+  }
+};
+
+// Patch toggleFollow to add new_follower notification
+const _origToggleFollow = toggleFollow;
+toggleFollow = function(userId, btn) {
+  const wasFollowing = socialState.following.includes(userId);
+  _origToggleFollow(userId, btn);
+  if(!wasFollowing && socialState.following.includes(userId)) {
+    // Notify the followed user (simulated locally)
+    const mock = getMockUser(userId);
+    if(mock) {
+      socialState.notifications.unshift({
+        id:'notif_'+Date.now(), type:'new_follower',
+        from: appState.user?.name||'Someone', fromAvatar: appState.user?.avatar||'😊',
+        targetName: mock.username, emoji:'👤✨', time:'just now', read:false
+      });
+    }
+    updateNotifBadge();
+  }
+};
+
+// Show notifications panel when Notifications menu item tapped
+function openNotificationsPanel() {
+  const notifs = socialState.notifications;
+  notifs.forEach(n=>n.read=true);
+  updateNotifBadge();
+  const modal = document.createElement('div');
+  modal.className='gamify-overlay'; modal.style.zIndex='8500';
+  const typeLabel = {photo_like:'liked your photo',itin_save:'saved your itinerary',new_follower:'followed you'};
+  modal.innerHTML=`<div class="gamify-header" style="background:linear-gradient(135deg,#EF5350,#E53935);">
+    <button class="gamify-close" onclick="this.closest('.gamify-overlay').remove()">✕</button>
+    <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:white;">Notifications</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.85);margin-top:2px;">${notifs.length} notification${notifs.length!==1?'s':''}</div>
+  </div>
+  <div class="gamify-scroll">
+    ${notifs.length ? notifs.map(n=>`<div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid #F8F8F8;">
+      <div style="font-size:24px;">${n.fromAvatar}</div>
+      <div style="flex:1;">
+        <div style="font-size:13px;"><b>${n.from}</b> ${typeLabel[n.type]||'interacted with you'}</div>
+        <div style="font-size:11px;color:#9E9E9E;margin-top:2px;">${n.emoji} ${n.targetName} · ${n.time}</div>
+      </div>
+    </div>`).join('')
+    : '<div style="text-align:center;padding:40px 20px;color:#9E9E9E;"><div style="font-size:48px;margin-bottom:12px;">🔔</div><div>No notifications yet.<br>Follow friends and share content to get started!</div></div>'}
+    <div style="height:20px;"></div>
+  </div>`;
+  modal.classList.add('open');
+  document.body.appendChild(modal);
+}
+
+// Patch renderAccount to wire up Notifications button
+const _origRenderAcct4 = renderAccount;
+renderAccount = function() {
+  _origRenderAcct4();
+  // Wire Notifications menu item to open panel
+  setTimeout(()=>{
+    const notifBtn = [...document.querySelectorAll('#account-content .account-menu-item')].find(el=>el.textContent.trim().startsWith('🔔'));
+    if(notifBtn) notifBtn.onclick = openNotificationsPanel;
+    updateNotifBadge();
+  }, 50);
+};
+
+// Seed 2 starter notifications so panel isn't empty on first open
+setTimeout(()=>{
+  if(socialState.notifications.length===0) {
+    socialState.notifications.push(
+      {id:'n_seed1',type:'new_follower',from:'DisneyDave',fromAvatar:'🏰',targetName:'you',emoji:'👤✨',time:'1h ago',read:false},
+      {id:'n_seed2',type:'photo_like',from:'SarahExplores',fromAvatar:'🌺',targetName:'Your recent photo',emoji:'📸❤️',time:'2h ago',read:false}
+    );
+    updateNotifBadge();
+  }
+}, 300);
+</script>
