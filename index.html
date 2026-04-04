@@ -431,6 +431,160 @@
   .adm-account-btn .adm-tag{background:rgba(255,255,255,0.2);color:white;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;margin-left:4px;}
   .adm-account-btn .arrow{margin-left:auto;color:rgba(255,255,255,0.6);}
 
+  /* ===== GAMIFICATION ===== */
+  /* --- Overlays --- */
+  .gam-overlay{display:none;position:fixed;inset:0;z-index:170;max-width:430px;left:50%;transform:translateX(-50%);overflow-y:auto;background:var(--sand);}
+  .gam-overlay.open{display:block;}
+  .gam-header{background:linear-gradient(135deg,#1A1A2E 0%,#16213e 60%,#0f3460 100%);padding:20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:5;}
+  .gam-header h2{color:white;font-family:'Playfair Display',serif;font-size:18px;flex:1;}
+  .gam-back{background:rgba(255,255,255,0.15);border:none;color:white;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;flex-shrink:0;}
+
+  /* --- Passport --- */
+  .passport-cover{background:linear-gradient(145deg,#0a1628 0%,#1a2d4a 40%,#0d1f35 100%);border-radius:16px;margin:16px;padding:28px 24px;position:relative;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,0.4);}
+  .passport-cover::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(255,215,0,0.03) 0px,rgba(255,215,0,0.03) 1px,transparent 1px,transparent 8px);pointer-events:none;}
+  .passport-logo{font-family:'Playfair Display',serif;font-size:20px;font-weight:900;background:linear-gradient(135deg,#FFD700,#FFA500);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;margin-bottom:4px;}
+  .passport-subtitle{color:rgba(255,215,0,0.6);font-size:10px;text-align:center;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;}
+  .passport-avatar{width:60px;height:60px;border-radius:8px;background:linear-gradient(135deg,var(--sky),var(--sun));display:flex;align-items:center;justify-content:center;font-size:28px;border:2px solid rgba(255,215,0,0.4);margin:0 auto 12px;}
+  .passport-name{color:rgba(255,215,0,0.9);font-family:'Playfair Display',serif;font-size:16px;font-weight:700;text-align:center;}
+  .passport-number{color:rgba(255,255,255,0.4);font-size:10px;text-align:center;letter-spacing:1px;margin-top:4px;}
+  .passport-level-row{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px;}
+  .passport-level-badge{background:linear-gradient(135deg,#FFD700,#FFA500);color:#1A1A2E;padding:4px 14px;border-radius:20px;font-size:11px;font-weight:700;}
+  .passport-local-banner{background:linear-gradient(135deg,#2ECC71,#27AE60);color:white;text-align:center;padding:6px;font-size:12px;font-weight:700;border-radius:8px;margin-top:10px;}
+  .passport-progress-wrap{background:white;border-radius:12px;padding:14px 16px;margin:0 16px 16px;}
+  .passport-progress-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+  .passport-progress-bar{height:8px;background:#E0E0E0;border-radius:10px;overflow:hidden;}
+  .passport-progress-fill{height:100%;background:linear-gradient(90deg,#FFD700,#FF6B35);border-radius:10px;transition:width 0.8s ease;}
+  /* Stamps grid */
+  .stamps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:0 16px 16px;}
+  .stamp-slot{background:white;border-radius:12px;padding:12px 8px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.06);position:relative;min-height:90px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;}
+  .stamp-slot.earned{background:linear-gradient(135deg,#FFF8E8,#FFF0D0);}
+  .stamp-emoji{font-size:32px;line-height:1;margin-bottom:4px;}
+  .stamp-name{font-size:10px;font-weight:700;color:#616161;text-align:center;line-height:1.2;}
+  .stamp-date{font-size:9px;color:#9E9E9E;margin-top:2px;}
+  .stamp-slot.empty .stamp-emoji{opacity:0.2;filter:grayscale(1);}
+  .stamp-lock{position:absolute;top:6px;right:6px;font-size:14px;opacity:0.3;}
+  @keyframes stampIn{0%{transform:scale(0) rotate(-20deg);opacity:0}60%{transform:scale(1.2) rotate(5deg)}100%{transform:scale(1) rotate(0);opacity:1}}
+  .stamp-slot.just-earned .stamp-emoji{animation:stampIn 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards;}
+
+  /* --- Badges --- */
+  .badges-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:16px;}
+  .badge-card{background:white;border-radius:16px;padding:14px 8px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.06);cursor:pointer;transition:transform 0.2s;}
+  .badge-card:active{transform:scale(0.96);}
+  .badge-card.earned{background:linear-gradient(135deg,#FFF8E8,#FFF0D0);box-shadow:0 4px 16px rgba(255,165,0,0.2);}
+  .badge-card.locked{opacity:0.5;filter:grayscale(0.6);}
+  .badge-icon-wrap{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#E0E0E0,#BDBDBD);display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 8px;position:relative;}
+  .badge-card.earned .badge-icon-wrap{background:linear-gradient(135deg,#FFD700,#FFA500);box-shadow:0 4px 12px rgba(255,165,0,0.4);}
+  @keyframes badgeShimmer{0%{opacity:0.6}50%{opacity:1}100%{opacity:0.6}}
+  .badge-card.earned .badge-icon-wrap::after{content:'';position:absolute;inset:-2px;border-radius:50%;background:conic-gradient(from 0deg,#FFD700,#FFA500,#FFD700);z-index:-1;animation:badgeShimmer 2s infinite;}
+  .badge-name{font-size:11px;font-weight:700;color:#1A1A2E;margin-bottom:3px;}
+  .badge-desc{font-size:9px;color:#9E9E9E;line-height:1.3;}
+  .badge-lock-icon{position:absolute;top:-2px;right:-2px;font-size:14px;}
+
+  /* --- XP / Level --- */
+  .xp-bar-wrap{background:white;border-radius:12px;padding:14px 16px;margin:0 16px 12px;box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+  .xp-level-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+  .xp-level-name{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:#1A1A2E;}
+  .xp-total{font-size:13px;color:#FF6B35;font-weight:700;}
+  .xp-bar{height:10px;background:#E0E0E0;border-radius:10px;overflow:hidden;}
+  .xp-bar-fill{height:100%;background:linear-gradient(90deg,#FF6B35,#FFD166);border-radius:10px;transition:width 0.8s ease;}
+  .xp-next{font-size:11px;color:#9E9E9E;margin-top:5px;text-align:right;}
+  /* Floating XP */
+  @keyframes floatXP{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-60px) scale(1.3)}}
+  .xp-float{position:fixed;font-size:16px;font-weight:800;color:#FF6B35;pointer-events:none;z-index:9999;animation:floatXP 1s ease-out forwards;}
+
+  /* --- Leaderboard --- */
+  .lb-tabs{display:flex;gap:6px;padding:12px 16px 0;overflow-x:auto;scrollbar-width:none;}
+  .lb-tab{padding:7px 14px;border-radius:20px;border:1.5px solid #E0E0E0;background:white;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif;color:#616161;}
+  .lb-tab.active{border-color:var(--sun);background:var(--sun);color:white;}
+  .lb-timeframe{display:flex;gap:6px;padding:8px 16px;justify-content:flex-end;}
+  .lb-tf{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid #E0E0E0;background:white;color:#616161;font-family:'DM Sans',sans-serif;}
+  .lb-tf.active{background:var(--night);color:white;border-color:var(--night);}
+  .lb-list{padding:0 16px 16px;}
+  @keyframes slideInLB{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
+  .lb-entry{display:flex;align-items:center;gap:12px;padding:12px 14px;background:white;border-radius:12px;margin-bottom:8px;box-shadow:0 2px 8px rgba(0,0,0,0.05);animation:slideInLB 0.3s ease both;}
+  .lb-entry.me{background:linear-gradient(135deg,#FFF0E8,#FFF8F0);border:1.5px solid #FFD166;}
+  .lb-rank{font-size:16px;font-weight:800;width:28px;text-align:center;color:#9E9E9E;}
+  .lb-rank.gold{color:#FFD700;}
+  .lb-rank.silver{color:#C0C0C0;}
+  .lb-rank.bronze{color:#CD7F32;}
+  .lb-avatar{font-size:28px;}
+  .lb-name{font-weight:700;font-size:14px;flex:1;}
+  .lb-score{font-weight:700;font-size:14px;color:#FF6B35;}
+  .lb-level-badge{padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#FFF0E8;color:#FF6B35;}
+  .lb-myrank{background:linear-gradient(135deg,#1A1A2E,#16213e);border-radius:12px;margin:0 16px 16px;padding:14px;color:white;}
+  .lb-myrank-label{font-size:11px;opacity:0.6;margin-bottom:4px;}
+
+  /* --- Rewards --- */
+  .rewards-balance{background:linear-gradient(135deg,#1A1A2E,#16213e);border-radius:16px;margin:16px;padding:24px;text-align:center;color:white;}
+  .rewards-coin{font-size:48px;margin-bottom:8px;}
+  .rewards-balance-val{font-family:'Playfair Display',serif;font-size:36px;font-weight:900;color:#FFD700;}
+  .rewards-balance-label{font-size:13px;opacity:0.7;margin-top:4px;}
+  .rewards-tier-wrap{background:white;border-radius:12px;padding:14px;margin:0 16px 12px;box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+  .rewards-tier-bar{height:10px;background:#E0E0E0;border-radius:10px;overflow:hidden;margin:8px 0;}
+  .rewards-tier-fill{height:100%;border-radius:10px;transition:width 0.8s;}
+  .reward-card{background:white;border-radius:16px;margin:0 16px 12px;box-shadow:0 2px 8px rgba(0,0,0,0.06);overflow:hidden;}
+  .reward-card-body{padding:14px;}
+  .reward-icon{font-size:36px;margin-bottom:8px;}
+  .reward-name{font-weight:700;font-size:15px;margin-bottom:4px;}
+  .reward-desc{font-size:12px;color:#9E9E9E;margin-bottom:10px;line-height:1.4;}
+  .reward-footer{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#F9F9F9;border-top:1px solid #F0F0F0;}
+  .reward-cost{font-weight:700;font-size:14px;color:#FFD700;display:flex;align-items:center;gap:4px;}
+  .reward-redeem-btn{background:var(--sun);color:white;border:none;padding:8px 18px;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;}
+  .reward-redeem-btn:disabled{background:#E0E0E0;color:#9E9E9E;cursor:not-allowed;}
+  .points-history-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #F5F5F5;}
+  .points-history-icon{font-size:20px;width:32px;text-align:center;}
+  .points-history-text{flex:1;font-size:13px;}
+  .points-history-date{font-size:11px;color:#9E9E9E;}
+  .points-history-amount{font-weight:700;font-size:13px;color:#2ECC71;}
+
+  /* --- Celebrations --- */
+  .celebration-overlay{display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,0.85);align-items:center;justify-content:center;max-width:430px;left:50%;transform:translateX(-50%);}
+  .celebration-overlay.open{display:flex;}
+  .celebration-modal{background:white;border-radius:24px;padding:32px 24px;text-align:center;width:calc(100% - 48px);position:relative;overflow:hidden;}
+  .confetti-wrap{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
+  @keyframes confettiFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(300px) rotate(720deg);opacity:0}}
+  .confetti-piece{position:absolute;width:8px;height:8px;border-radius:2px;animation:confettiFall 2s ease-in infinite;}
+  .celebration-icon{font-size:72px;margin-bottom:16px;display:block;}
+  @keyframes celebPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+  .celebration-icon{animation:celebPulse 1s ease infinite;}
+  .celebration-title{font-family:'Playfair Display',serif;font-size:24px;font-weight:900;margin-bottom:8px;color:#1A1A2E;}
+  .celebration-msg{font-size:14px;color:#616161;margin-bottom:20px;line-height:1.5;}
+  .celebration-close{background:var(--sun);color:white;border:none;padding:14px 32px;border-radius:30px;font-size:16px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;width:100%;}
+
+  /* --- Orlando Local --- */
+  @keyframes localGlow{0%,100%{box-shadow:0 0 0 0 rgba(46,204,113,0.4)}50%{box-shadow:0 0 0 12px rgba(46,204,113,0)}}
+  .local-badge-glow{animation:localGlow 2s infinite;border-radius:50%;}
+  .local-badge-inline{display:inline-flex;align-items:center;gap:4px;background:linear-gradient(135deg,#2ECC71,#27AE60);color:white;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;vertical-align:middle;}
+
+  /* --- Check In Button --- */
+  .checkin-btn{width:100%;background:linear-gradient(135deg,#2ECC71,#27AE60);color:white;border:none;padding:14px;border-radius:30px;font-size:16px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px;}
+  .checkin-btn.checked{background:linear-gradient(135deg,#9E9E9E,#757575);}
+  @keyframes checkInBounce{0%,100%{transform:scale(1)}30%{transform:scale(1.2)}60%{transform:scale(0.95)}}
+  .checkin-emoji-anim{display:inline-block;animation:checkInBounce 0.6s ease;}
+
+  /* --- Account Gamification Section --- */
+  .gam-account-section{margin:0 0 10px;}
+  .gam-account-btn{display:flex;align-items:center;gap:14px;background:white;padding:16px 18px;border-radius:var(--radius-sm);margin-bottom:8px;box-shadow:var(--card-shadow);cursor:pointer;font-weight:600;font-size:15px;transition:all 0.2s;}
+  .gam-account-btn:active{transform:scale(0.98);}
+  .gam-account-btn .icon{font-size:22px;}
+  .gam-account-btn .arrow{margin-left:auto;color:var(--gray3);}
+  .gam-account-btn .gam-badge-count{background:var(--sun);color:white;border-radius:10px;font-size:11px;font-weight:700;padding:2px 7px;}
+
+  /* --- Streak --- */
+  .streak-banner{background:linear-gradient(135deg,#FF6B35,#FFD166);border-radius:12px;padding:12px 16px;margin:0 16px 12px;display:flex;align-items:center;gap:10px;color:white;}
+  .streak-flame{font-size:28px;}
+  .streak-text{font-size:14px;font-weight:700;}
+  .streak-sub{font-size:11px;opacity:0.8;}
+
+  /* --- Reward Promo Modal --- */
+  .promo-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:700;align-items:center;justify-content:center;max-width:430px;left:50%;transform:translateX(-50%);}
+  .promo-overlay.open{display:flex;}
+  .promo-modal{background:white;border-radius:20px;padding:28px 24px;width:calc(100%-48px);margin:24px;text-align:center;}
+  .promo-icon{font-size:56px;margin-bottom:12px;}
+  .promo-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:900;margin-bottom:8px;}
+  .promo-code{background:#1A1A2E;color:#FFD700;font-size:22px;font-weight:900;padding:14px 24px;border-radius:12px;letter-spacing:3px;margin:16px 0;font-family:monospace;}
+  .promo-close{background:var(--sun);color:white;border:none;padding:12px 28px;border-radius:30px;font-size:15px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;width:100%;}
+
 </style>
 </head>
 <body>
@@ -724,6 +878,80 @@
 </div>
 <!-- ADMIN HELP BTN -->
 <button class="adm-help-btn" id="adm-help-btn" onclick="showAdminHelp()" title="Keyboard Shortcuts">?</button>
+
+<!-- PASSPORT OVERLAY -->
+<div id="passport-overlay" class="gam-overlay">
+  <div class="gam-header">
+    <button class="gam-back" onclick="document.getElementById('passport-overlay').classList.remove('open')">←</button>
+    <h2>🗺️ My Passport</h2>
+    <button style="background:rgba(255,255,255,0.15);border:none;color:white;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;" onclick="openBadges()">Badges</button>
+  </div>
+  <div id="passport-content"></div>
+</div>
+
+<!-- BADGES OVERLAY -->
+<div id="badges-overlay" class="gam-overlay">
+  <div class="gam-header">
+    <button class="gam-back" onclick="document.getElementById('badges-overlay').classList.remove('open')">←</button>
+    <h2>🏅 Badges & Achievements</h2>
+  </div>
+  <div id="badges-content"></div>
+</div>
+
+<!-- LEADERBOARD OVERLAY -->
+<div id="leaderboard-overlay" class="gam-overlay">
+  <div class="gam-header">
+    <button class="gam-back" onclick="document.getElementById('leaderboard-overlay').classList.remove('open')">←</button>
+    <h2>🏆 Leaderboard</h2>
+  </div>
+  <div id="leaderboard-content"></div>
+</div>
+
+<!-- REWARDS OVERLAY -->
+<div id="rewards-overlay" class="gam-overlay">
+  <div class="gam-header">
+    <button class="gam-back" onclick="document.getElementById('rewards-overlay').classList.remove('open')">←</button>
+    <h2>🎁 Rewards</h2>
+  </div>
+  <div id="rewards-content"></div>
+</div>
+
+<!-- BADGE CELEBRATION MODAL -->
+<div class="celebration-overlay" id="badge-celebration">
+  <div class="celebration-modal">
+    <div class="confetti-wrap" id="badge-confetti"></div>
+    <span class="celebration-icon" id="badge-cel-icon">🏅</span>
+    <div class="celebration-title" id="badge-cel-title">Badge Earned!</div>
+    <div class="celebration-msg" id="badge-cel-msg">You unlocked a new achievement!</div>
+    <button class="celebration-close" onclick="document.getElementById('badge-celebration').classList.remove('open')">Awesome! 🎉</button>
+  </div>
+</div>
+
+<!-- ORLANDO LOCAL CELEBRATION -->
+<div class="celebration-overlay" id="local-celebration">
+  <div class="celebration-modal" style="background:linear-gradient(135deg,#0d3b0d,#1a5e1a);">
+    <div class="confetti-wrap" id="local-confetti"></div>
+    <span class="celebration-icon" style="animation:celebPulse 0.8s ease infinite;">🌴</span>
+    <div class="celebration-title" style="color:white;">You are now an Orlando Local!</div>
+    <div class="celebration-msg" style="color:rgba(255,255,255,0.8);">You've explored Orlando like a true local! Here are your exclusive perks:</div>
+    <div style="background:rgba(255,255,255,0.1);border-radius:12px;padding:14px;margin-bottom:16px;text-align:left;">
+      <div style="color:white;font-size:13px;line-height:2;">🌟 Early access to new listings<br>⭐ Special Local badge on all reviews<br>🚀 Bonus XP on all future actions<br>🗝️ Access to hidden local tips</div>
+    </div>
+    <button class="celebration-close" style="background:linear-gradient(135deg,#2ECC71,#27AE60);" onclick="document.getElementById('local-celebration').classList.remove('open')">Claim My Local Status 🌴</button>
+  </div>
+</div>
+
+<!-- PROMO CODE MODAL -->
+<div class="promo-overlay" id="promo-modal">
+  <div class="promo-modal">
+    <div class="promo-icon" id="promo-icon">🎟️</div>
+    <div class="promo-title" id="promo-title">Reward Redeemed!</div>
+    <div style="font-size:13px;color:#9E9E9E;margin-bottom:4px;">Your promo code:</div>
+    <div class="promo-code" id="promo-code">ORLANDO2025</div>
+    <div style="font-size:12px;color:#9E9E9E;margin-bottom:16px;">Screenshot this code and use it at checkout</div>
+    <button class="promo-close" onclick="document.getElementById('promo-modal').classList.remove('open')">Done!</button>
+  </div>
+</div>
 
 <nav class="bottom-nav">
   <div class="nav-item active" onclick="showScreen('home',this)"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></div>
@@ -1707,3 +1935,548 @@ document.addEventListener('keydown',e=>{
   if(e.key in map){if(map[e.key]===null)adminLogout();else showAdminSection(map[e.key],nav[Object.keys(map).indexOf(e.key)]);}
 });
 </script>
+<script>
+// ===== GAMIFICATION STATE =====
+const gameState = {
+  xp: 0,
+  points: 0,
+  checkIns: {}, // placeId -> {date, name, emoji}
+  badges: {},   // badgeId -> {earned, date}
+  pointsHistory: [],
+  streak: 0,
+  lastCheckInDate: null,
+  isOrlandoLocal: false,
+  joinDate: Date.now(),
+  lbTab: 'xp',
+  lbTimeframe: 'alltime',
+  rewardsTab: 'store'
+};
+
+// XP levels
+const XP_LEVELS = [
+  {name:'Tourist',min:0,next:200},
+  {name:'Explorer',min:200,next:500},
+  {name:'Adventurer',min:500,next:1000},
+  {name:'Enthusiast',min:1000,next:2000},
+  {name:'Local',min:2000,next:5000},
+  {name:'Legend',min:5000,next:Infinity}
+];
+function getLevel(xp){return XP_LEVELS.slice().reverse().find(l=>xp>=l.min)||XP_LEVELS[0];}
+function getPassportLevel(stamps){if(stamps>=15)return'Local Legend';if(stamps>=8)return'Adventurer';return'Explorer';}
+
+// Badges definition
+const BADGES = [
+  {id:'first_steps',emoji:'👣',name:'First Steps',desc:'Check in to your first location',color:'#4CAF50'},
+  {id:'foodie',emoji:'🍴',name:'Foodie',desc:'Save 5 restaurants',color:'#FF6B35'},
+  {id:'thrill_seeker',emoji:'🎢',name:'Thrill Seeker',desc:'Check in to 3 theme parks',color:'#E53935'},
+  {id:'night_owl',emoji:'🌙',name:'Night Owl',desc:'Save 3 nightlife events',color:'#1A1A2E'},
+  {id:'culture_vulture',emoji:'🎨',name:'Culture Vulture',desc:'Visit 2 museums',color:'#9C27B0'},
+  {id:'park_hopper',emoji:'🎫',name:'Park Hopper',desc:'Check in to all 5 theme parks',color:'#2196F3'},
+  {id:'review_master',emoji:'⭐',name:'Review Master',desc:'Write 10 reviews',color:'#FFD166'},
+  {id:'orlando_local',emoji:'🌴',name:'Orlando Local',desc:'10 total check-ins',color:'#2ECC71'},
+  {id:'explorer_elite',emoji:'🏆',name:'Explorer Elite',desc:'Earn all other badges',color:'#FF6B35'},
+  {id:'hidden',emoji:'❓',name:'???',desc:'Keep exploring to unlock',color:'#9E9E9E'}
+];
+
+// Stamp slots (subset of places for passport)
+const PASSPORT_STAMPS = [
+  {id:'p1',emoji:'🏰',name:'Walt Disney World'},
+  {id:'p2',emoji:'🦕',name:'Universal Orlando'},
+  {id:'p3',emoji:'🦈',name:'SeaWorld Orlando'},
+  {id:'a1',emoji:'🚀',name:'Kennedy Space Center'},
+  {id:'a5',emoji:'🛶',name:'Wekiwa Springs'},
+  {id:'a8',emoji:'🌊',name:'Aquatica Water Park'},
+  {id:'a2',emoji:'🐊',name:'Gatorland'},
+  {id:'a6',emoji:'🎡',name:'ICON Park'},
+  {id:'r1',emoji:'🥩',name:'The Boheme'},
+  {id:'r3',emoji:'🍣',name:'Dragonfly Robata'},
+  {id:'r2',emoji:'🌮',name:'Hunger Street Tacos'},
+  {id:'h5',emoji:'✨',name:'Four Seasons Orlando'},
+  {id:'a3',emoji:'🎨',name:'Dr. Phillips Center'},
+  {id:'a14',emoji:'🏄',name:'Nona Adventure Park'},
+  {id:'a11',emoji:'🏎️',name:'Andretti Karting'}
+];
+
+// Rewards store items
+const REWARDS_STORE = [
+  {id:'park_ticket',emoji:'🎟️',name:'Park Ticket Discount',desc:'Save 20% on your next theme park ticket purchase',cost:500,code:'PARK20OFF'},
+  {id:'restaurant',emoji:'🍴',name:'Restaurant Voucher',desc:'$15 off your next dining experience at select restaurants',cost:300,code:'EAT15ORL'},
+  {id:'hotel',emoji:'🛏️',name:'Hotel Upgrade',desc:'Free room upgrade at participating Orlando hotels',cost:800,code:'UPGRADE2025'},
+  {id:'premium_badge',emoji:'⭐',name:'Premium Badge',desc:'Exclusive golden badge shown on your profile and reviews',cost:200,code:'GOLDBADGE'},
+  {id:'featured',emoji:'🎙️',name:'Featured Reviewer',desc:'Your reviews get featured placement for 30 days',cost:400,code:'FEATURED30'}
+];
+
+// Mock leaderboard users
+const LB_USERS = [
+  {name:'Sarah M.',avatar:'🌸',xp:4820,checkins:47,reviews:31,level:'Legend'},
+  {name:'Jake T.',avatar:'🏄',xp:3560,checkins:38,reviews:22,level:'Local'},
+  {name:'Priya K.',avatar:'✨',xp:2940,checkins:29,reviews:18,level:'Local'},
+  {name:'Marcus R.',avatar:'🎸',xp:2100,checkins:24,reviews:15,level:'Local'},
+  {name:'Zoe W.',avatar:'🌺',xp:1820,checkins:19,reviews:12,level:'Enthusiast'},
+  {name:'Carlos V.',avatar:'🎯',xp:1340,checkins:15,reviews:9,level:'Enthusiast'},
+  {name:'Aisha D.',avatar:'💫',xp:980,checkins:11,reviews:7,level:'Adventurer'},
+  {name:'Ben H.',avatar:'🎪',xp:720,checkins:8,reviews:5,level:'Adventurer'},
+  {name:'Luna S.',avatar:'🌙',xp:450,checkins:5,reviews:3,level:'Explorer'},
+  {name:'Tom K.',avatar:'🏀',xp:180,checkins:2,reviews:1,level:'Tourist'}
+];
+
+// ===== XP & POINTS =====
+function addXP(amount, label, x, y) {
+  gameState.xp += amount;
+  gameState.points += amount;
+  if(label) {
+    gameState.pointsHistory.unshift({icon:'⭐',text:label,amount:amount,date:'Just now'});
+    if(gameState.pointsHistory.length > 20) gameState.pointsHistory.pop();
+  }
+  showXPFloat(amount, x, y);
+}
+function showXPFloat(amount, x, y) {
+  const el = document.createElement('div');
+  el.className = 'xp-float';
+  el.textContent = '+' + amount + ' XP';
+  el.style.left = (x || window.innerWidth/2) + 'px';
+  el.style.top = (y || window.innerHeight/2) + 'px';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1000);
+}
+function getXPBarPct() {
+  const lv = getLevel(gameState.xp);
+  if(lv.next === Infinity) return 100;
+  const range = lv.next - lv.min;
+  return Math.min(100, Math.round((gameState.xp - lv.min) / range * 100));
+}
+function getRewardTier(pts) {
+  if(pts >= 2000) return {name:'Platinum',color:'#9C27B0',next:Infinity};
+  if(pts >= 1000) return {name:'Gold',color:'#FFD700',next:2000};
+  if(pts >= 500) return {name:'Silver',color:'#C0C0C0',next:1000};
+  return {name:'Bronze',color:'#CD7F32',next:500};
+}
+
+// ===== CHECK IN =====
+function checkIn(placeId, placeName, placeEmoji, eventX, eventY) {
+  if(!appState.user) { openAuthModal('check in to places'); return; }
+  if(gameState.checkIns[placeId]) {
+    const d = gameState.checkIns[placeId].date;
+    showToast('Already checked in here on ' + d + ' 📍'); return;
+  }
+  const today = new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  // Streak
+  const yesterday = new Date(); yesterday.setDate(yesterday.getDate()-1);
+  const yStr = yesterday.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  if(gameState.lastCheckInDate === yStr) gameState.streak++;
+  else if(gameState.lastCheckInDate !== today) gameState.streak = 1;
+  gameState.lastCheckInDate = today;
+  gameState.checkIns[placeId] = {date:today, name:placeName, emoji:placeEmoji};
+  addXP(50, 'Check-in: ' + placeName, eventX, eventY);
+  showToast('📍 Stamp earned: ' + placeName + ' +50 XP');
+  // Update stamp in passport if open
+  const slot = document.getElementById('stamp-' + placeId);
+  if(slot) { slot.classList.remove('empty'); slot.classList.add('earned','just-earned'); renderPassportStamp(slot, placeId, today); }
+  checkBadges();
+  const totalCI = Object.keys(gameState.checkIns).length;
+  if(totalCI >= 10 && !gameState.isOrlandoLocal) triggerOrlandoLocal();
+  if(totalCI === 5) addXP(200, 'Halfway passport bonus!');
+  if(totalCI === PASSPORT_STAMPS.length) addXP(200, 'Complete passport bonus!');
+  renderAccountGamXP();
+}
+function renderPassportStamp(slot, id, date) {
+  const s = PASSPORT_STAMPS.find(x=>x.id===id);
+  if(!s) return;
+  slot.innerHTML = `<div class="stamp-emoji">${s.emoji}</div><div class="stamp-name">${s.name}</div><div class="stamp-date">${date}</div>`;
+}
+
+// ===== BADGE CHECKING =====
+function checkBadges() {
+  const ci = gameState.checkIns;
+  const ciCount = Object.keys(ci).length;
+  const allData = [...attractions,...restaurants,...parks,...hotels,...events];
+  const savedRestaurants = Object.values(appState.savedItems).filter(i=>i.type==='food').length;
+  const savedNightlife = Object.values(appState.savedItems).filter(i=>i.tags&&(i.tags.includes('nightlife')||i.tags.includes('clubs')||i.tags.includes('bars'))).length;
+  const parkIds = ['p1','p2','p3','p4','p5'];
+  const parkCheckIns = parkIds.filter(id=>ci[id]).length;
+  const museumIds = ['a3','a9','a10'];
+  const museumVisits = museumIds.filter(id=>ci[id]).length;
+  const reviewCount = Object.values(appState.reviews).flat().filter(r=>r.userId===appState.user?.id).length;
+  const daysActive = Math.floor((Date.now()-gameState.joinDate)/(86400000));
+
+  const conditions = {
+    first_steps: ciCount >= 1,
+    foodie: savedRestaurants >= 5,
+    thrill_seeker: parkCheckIns >= 3,
+    night_owl: savedNightlife >= 3,
+    culture_vulture: museumVisits >= 2,
+    park_hopper: parkCheckIns >= 5,
+    review_master: reviewCount >= 10,
+    orlando_local: ciCount >= 10,
+    hidden: daysActive >= 7
+  };
+  let allOthers = true;
+  Object.entries(conditions).forEach(([id,met])=>{
+    if(!met) allOthers = false;
+    if(met && !gameState.badges[id]) {
+      gameState.badges[id] = {earned:true, date: new Date().toLocaleDateString()};
+      const badge = BADGES.find(b=>b.id===id);
+      if(badge) setTimeout(()=>showBadgeCelebration(badge), 600);
+      addXP(100, 'Badge earned: '+(badge?.name||id));
+    }
+  });
+  if(allOthers && !gameState.badges['explorer_elite']) {
+    gameState.badges['explorer_elite'] = {earned:true, date:new Date().toLocaleDateString()};
+    setTimeout(()=>showBadgeCelebration(BADGES.find(b=>b.id==='explorer_elite')), 800);
+    addXP(100, 'Explorer Elite badge!');
+  }
+}
+
+// ===== CELEBRATIONS =====
+function showBadgeCelebration(badge) {
+  document.getElementById('badge-cel-icon').textContent = badge.emoji;
+  document.getElementById('badge-cel-title').textContent = badge.name + ' Badge Earned!';
+  document.getElementById('badge-cel-msg').textContent = badge.desc;
+  spawnConfetti('badge-confetti', badge.color);
+  document.getElementById('badge-celebration').classList.add('open');
+}
+function triggerOrlandoLocal() {
+  gameState.isOrlandoLocal = true;
+  gameState.badges['orlando_local'] = {earned:true, date:new Date().toLocaleDateString()};
+  spawnConfetti('local-confetti','#2ECC71');
+  setTimeout(()=>{ document.getElementById('local-celebration').classList.add('open'); }, 400);
+  addXP(200,'Orlando Local status unlocked!');
+}
+function spawnConfetti(containerId, mainColor) {
+  const container = document.getElementById(containerId);
+  if(!container) return;
+  container.innerHTML = '';
+  const colors = [mainColor,'#FFD700','#FF6B35','#0099CC','#2ECC71','#FF69B4'];
+  for(let i=0;i<24;i++){
+    const c=document.createElement('div');
+    c.className='confetti-piece';
+    c.style.cssText=`left:${Math.random()*100}%;top:${-10-Math.random()*20}px;background:${colors[i%colors.length]};animation-delay:${Math.random()*1}s;animation-duration:${1.5+Math.random()*1}s;transform:rotate(${Math.random()*360}deg);border-radius:${Math.random()>0.5?'50%':'2px'};`;
+    container.appendChild(c);
+  }
+}
+</script>
+<script>
+// ===== PASSPORT SCREEN =====
+function openPassport() {
+  if(!appState.user){openAuthModal('view your passport');return;}
+  renderPassport();
+  document.getElementById('passport-overlay').classList.add('open');
+}
+function renderPassport() {
+  const u = appState.user;
+  const ciCount = Object.keys(gameState.checkIns).length;
+  const total = PASSPORT_STAMPS.length;
+  const pct = Math.round(ciCount/total*100);
+  const passportNum = 'OE-' + (u.id||'G1').toUpperCase() + '-2026';
+  const lvName = getPassportLevel(ciCount);
+  document.getElementById('passport-content').innerHTML = `
+    <div class="passport-cover">
+      <div class="passport-logo">🌴 Orlando Explorer</div>
+      <div class="passport-subtitle">Official Travel Passport</div>
+      ${gameState.isOrlandoLocal?'<div class="passport-local-banner">🌴 Orlando Local Status Achieved!</div>':''}
+      <div style="margin-top:16px;display:flex;align-items:center;gap:16px;">
+        <div class="passport-avatar">${u.avatar||'😊'}</div>
+        <div><div class="passport-name">${u.name}</div><div class="passport-number">${passportNum}</div>
+        <div class="passport-level-row" style="margin-top:8px;justify-content:flex-start;"><span class="passport-level-badge">${lvName}</span></div></div>
+      </div>
+    </div>
+    <div class="passport-progress-wrap">
+      <div class="passport-progress-row">
+        <span style="font-weight:700;font-size:14px;">Stamps Collected</span>
+        <span style="font-weight:700;font-size:14px;color:#FF6B35;">${ciCount} / ${total}</span>
+      </div>
+      <div class="passport-progress-bar"><div class="passport-progress-fill" style="width:${pct}%"></div></div>
+      <div style="font-size:11px;color:#9E9E9E;margin-top:5px;">${pct}% of Orlando explored</div>
+    </div>
+    ${gameState.streak>1?`<div class="streak-banner"><div class="streak-flame">🔥</div><div><div class="streak-text">${gameState.streak}-Day Streak!</div><div class="streak-sub">Keep checking in every day to maintain your streak</div></div></div>`:''}
+    <div style="padding:0 16px 8px;"><div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;">📍 Location Stamps</div></div>
+    <div class="stamps-grid">
+      ${PASSPORT_STAMPS.map(s=>{
+        const ci = gameState.checkIns[s.id];
+        return `<div class="stamp-slot ${ci?'earned':'empty'}" id="stamp-${s.id}" onclick="openDetail('${s.id}','${s.id[0]==='p'?'park':s.id[0]==='r'?'food':'attraction'}')">
+          <div class="stamp-emoji">${s.emoji}</div>
+          <div class="stamp-name">${s.name}</div>
+          ${ci?`<div class="stamp-date">${ci.date}</div>`:'<div class="stamp-lock">🔒</div>'}
+        </div>`;
+      }).join('')}
+    </div>
+    <div style="padding:0 16px 8px;"><button style="width:100%;background:linear-gradient(135deg,#FF6B35,#FFD166);color:white;border:none;padding:14px;border-radius:30px;font-size:15px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;" onclick="openBadges()">🏅 View My Badges</button></div>
+    <div style="height:20px;"></div>`;
+}
+
+// ===== BADGES SCREEN =====
+function openBadges() {
+  if(!appState.user){openAuthModal('view your badges');return;}
+  renderBadges();
+  document.getElementById('badges-overlay').classList.add('open');
+}
+function renderBadges() {
+  const earned = Object.keys(gameState.badges).length;
+  document.getElementById('badges-content').innerHTML = `
+    <div class="xp-bar-wrap">
+      <div class="xp-level-row">
+        <span class="xp-level-name">${getLevel(gameState.xp).name}</span>
+        <span class="xp-total">🏅 ${earned}/${BADGES.length} Badges</span>
+      </div>
+    </div>
+    <div class="badges-grid">
+      ${BADGES.map(b=>{
+        const earned = !!gameState.badges[b.id];
+        return `<div class="badge-card ${earned?'earned':'locked'}" onclick="${earned?'showToast(\"'+b.name+' — earned on '+gameState.badges[b.id]?.date+'\")':"showToast('Keep exploring to unlock: "+b.name+"')"}">
+          <div class="badge-icon-wrap" style="${earned?'background:linear-gradient(135deg,'+b.color+','+b.color+'cc)':''}">
+            <span style="font-size:28px;">${earned?b.emoji:'🔒'}</span>
+          </div>
+          <div class="badge-name">${earned?b.name:'???'}</div>
+          <div class="badge-desc">${earned?b.desc:b.desc}</div>
+        </div>`;
+      }).join('')}
+    </div>`;
+}
+
+// ===== LEADERBOARD =====
+function openLeaderboard() {
+  renderLeaderboard();
+  document.getElementById('leaderboard-overlay').classList.add('open');
+}
+function renderLeaderboard() {
+  const tab = gameState.lbTab;
+  const tf = gameState.lbTimeframe;
+  // Insert current user into mock leaderboard
+  const me = appState.user;
+  const myEntry = me ? {name:me.name,avatar:me.avatar||'😊',xp:gameState.xp,checkins:Object.keys(gameState.checkIns).length,reviews:Object.values(appState.reviews).flat().filter(r=>r.userId===me.id).length,level:getLevel(gameState.xp).name,isMe:true} : null;
+  let allUsers = [...LB_USERS];
+  if(myEntry) allUsers.push(myEntry);
+  const sortKey = tab==='reviews'?'reviews':tab==='checkins'?'checkins':'xp';
+  allUsers.sort((a,b)=>b[sortKey]-a[sortKey]);
+  const myRank = myEntry ? allUsers.findIndex(u=>u.isMe)+1 : '–';
+  const medals = ['🥇','🥈','🥉'];
+
+  document.getElementById('leaderboard-content').innerHTML = `
+    <div class="lb-tabs">
+      ${[['xp','⭐ XP Leaders'],['checkins','📍 Most Check-ins'],['reviews','✍️ Top Reviewers']].map(([t,l])=>
+        `<button class="lb-tab ${tab===t?'active':''}" onclick="gameState.lbTab='${t}';renderLeaderboard()">${l}</button>`
+      ).join('')}
+    </div>
+    <div class="lb-timeframe">
+      ${[['alltime','All Time'],['weekly','This Week']].map(([t,l])=>
+        `<button class="lb-tf ${tf===t?'active':''}" onclick="gameState.lbTimeframe='${t}';renderLeaderboard()">${l}</button>`
+      ).join('')}
+    </div>
+    <div class="lb-list">
+      ${allUsers.slice(0,10).map((u,i)=>`
+        <div class="lb-entry ${u.isMe?'me':''}" style="animation-delay:${i*0.05}s">
+          <div class="lb-rank ${i===0?'gold':i===1?'silver':i===2?'bronze':''}">${i<3?medals[i]:i+1}</div>
+          <div class="lb-avatar">${u.avatar}</div>
+          <div style="flex:1"><div class="lb-name">${u.name}${u.isMe?' (You)':''}</div><span class="lb-level-badge">${u.level}</span></div>
+          <div class="lb-score">${u[sortKey].toLocaleString()}</div>
+        </div>`).join('')}
+    </div>
+    ${myEntry?`<div class="lb-myrank"><div class="lb-myrank-label">Your Ranking</div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="font-size:20px;font-weight:800;color:#FFD700;">#${myRank}</div>
+        <div style="font-size:24px;">${myEntry.avatar}</div>
+        <div style="flex:1;color:white;font-weight:700;">${myEntry.name}</div>
+        <div style="font-weight:700;color:#FFD700;">${myEntry[sortKey]}</div>
+      </div>
+    </div>`:''}
+    ${gameState.isOrlandoLocal?`<div class="adm-card" style="margin:0 16px 16px;"><div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">🌴 Orlando Locals</div>
+      ${LB_USERS.filter((_,i)=>i<3).map(u=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #F5F5F5;"><span style="font-size:20px;">${u.avatar}</span><span style="flex:1;font-size:13px;font-weight:600;">${u.name}</span><span class="local-badge-inline">🌴 Local</span></div>`).join('')}
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;"><span style="font-size:20px;">${myEntry.avatar}</span><span style="flex:1;font-size:13px;font-weight:600;">${myEntry.name} (You)</span><span class="local-badge-inline">🌴 Local</span></div>
+    </div>`:''}`;
+}
+
+// ===== REWARDS =====
+function openRewards() {
+  if(!appState.user){openAuthModal('view your rewards');return;}
+  renderRewards();
+  document.getElementById('rewards-overlay').classList.add('open');
+}
+function renderRewards() {
+  const pts = gameState.points;
+  const tier = getRewardTier(pts);
+  const tierPct = tier.next===Infinity?100:Math.min(100,Math.round(pts/tier.next*100));
+
+  document.getElementById('rewards-content').innerHTML = `
+    <div class="rewards-balance">
+      <div class="rewards-coin">🪙</div>
+      <div class="rewards-balance-val">${pts.toLocaleString()}</div>
+      <div class="rewards-balance-label">Total Points</div>
+    </div>
+    <div class="rewards-tier-wrap">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+        <span style="font-weight:700;font-size:14px;" style="color:${tier.color}">${tier.name} Tier</span>
+        ${tier.next!==Infinity?`<span style="font-size:12px;color:#9E9E9E;">${tier.next-pts} pts to ${['Silver','Gold','Platinum'].find(t=>t!==tier.name)||'max'}</span>`:'<span style="font-size:12px;color:#9C27B0;">MAX TIER 🎉</span>'}
+      </div>
+      <div class="rewards-tier-bar"><div class="rewards-tier-fill" style="width:${tierPct}%;background:${tier.color}"></div></div>
+      <div style="display:flex;justify-content:space-around;margin-top:10px;">
+        ${['Bronze','Silver','Gold','Platinum'].map(t=>`<div style="text-align:center;"><div style="font-size:18px;">${t==='Bronze'?'🥉':t==='Silver'?'🥈':t==='Gold'?'🥇':'💎'}</div><div style="font-size:9px;font-weight:700;color:${tier.name===t?'#FF6B35':'#9E9E9E'}">${t}</div></div>`).join('')}
+      </div>
+    </div>
+    <div style="padding:0 16px 8px;"><div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;">🛍️ Rewards Store</div></div>
+    ${REWARDS_STORE.map(r=>`
+      <div class="reward-card">
+        <div class="reward-card-body">
+          <div class="reward-icon">${r.emoji}</div>
+          <div class="reward-name">${r.name}</div>
+          <div class="reward-desc">${r.desc}</div>
+        </div>
+        <div class="reward-footer">
+          <div class="reward-cost">🪙 ${r.cost} pts</div>
+          <button class="reward-redeem-btn" ${pts<r.cost?'disabled':''} onclick="redeemReward('${r.id}')">${pts>=r.cost?'Redeem':'Need '+(r.cost-pts)+' more'}</button>
+        </div>
+      </div>`).join('')}
+    <div class="adm-card" style="margin:16px;">
+      <div class="adm-card-title">📋 Points History</div>
+      ${gameState.pointsHistory.length?gameState.pointsHistory.slice(0,8).map(h=>`
+        <div class="points-history-item"><div class="points-history-icon">${h.icon}</div><div class="points-history-text">${h.text}</div><div><div class="points-history-amount">+${h.amount}</div><div class="points-history-date">${h.date}</div></div></div>`).join(''):'<div style="text-align:center;padding:16px;color:#9E9E9E;font-size:13px;">Start exploring to earn points!</div>'}
+    </div>
+    <div class="adm-card" style="margin:0 16px 16px;">
+      <div class="adm-card-title">💡 How to Earn Points</div>
+      ${[['📍','Check in to a location','50 XP'],['✍️','Write a review','30 XP'],['💾','Save a place','10 XP'],['🏅','Earn a badge','100 XP bonus'],['🗺️','Complete passport set','200 XP bonus']].map(([i,l,v])=>`
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #F5F5F5;"><span>${i}</span><span style="flex:1;font-size:13px;">${l}</span><span style="font-weight:700;font-size:12px;color:#FF6B35;">${v}</span></div>`).join('')}
+    </div>
+    <div style="height:20px;"></div>`;
+}
+function redeemReward(id) {
+  const r = REWARDS_STORE.find(x=>x.id===id);
+  if(!r) return;
+  if(gameState.points < r.cost) { showToast('Need '+(r.cost-gameState.points)+' more points'); return; }
+  gameState.points -= r.cost;
+  document.getElementById('promo-icon').textContent = r.emoji;
+  document.getElementById('promo-title').textContent = r.name + ' Redeemed!';
+  document.getElementById('promo-code').textContent = r.code;
+  document.getElementById('promo-modal').classList.add('open');
+  gameState.pointsHistory.unshift({icon:'🎁',text:'Redeemed: '+r.name,amount:-r.cost,date:'Just now'});
+  logAdminAction && logAdminAction('🎁','User redeemed reward: '+r.name);
+  setTimeout(()=>renderRewards(), 100);
+}
+</script>
+<script>
+// ===== GAMIFICATION PART 3: ACCOUNT INTEGRATION =====
+
+function renderAccountGamXP() {
+  if(!appState.user) return;
+  const lvl = getXPLevel(gameState.xp);
+  const pct = lvl.next===Infinity?100:Math.min(100,Math.round((gameState.xp-lvl.min)/(lvl.next-lvl.min)*100));
+  // Update any existing XP bar
+  const bar = document.getElementById('acct-xp-fill');
+  if(bar) { bar.style.width = pct+'%'; }
+  const lvlEl = document.getElementById('acct-xp-level');
+  if(lvlEl) lvlEl.textContent = lvl.name + ' · ' + gameState.xp.toLocaleString() + ' XP';
+  const pctEl = document.getElementById('acct-xp-pct');
+  if(pctEl) pctEl.textContent = pct+'%';
+}
+
+// ===== OVERRIDE renderAccount WITH GAMIFICATION ELEMENTS =====
+const _origRenderAccount = renderAccount;
+renderAccount = function() {
+  _origRenderAccount();
+  if(!appState.user) return;
+
+  const lvl = getXPLevel(gameState.xp);
+  const pct = lvl.next===Infinity?100:Math.min(100,Math.round((gameState.xp-lvl.min)/(lvl.next-lvl.min)*100));
+  const ciCount = Object.keys(gameState.checkIns).length;
+  const earnedBadges = Object.values(gameState.badges).filter(b=>b.earned).length;
+
+  // Insert XP bar after profile header
+  const profileHeader = document.querySelector('#account-content .profile-header');
+  if(profileHeader && profileHeader.parentNode) {
+    const xpWrap = document.createElement('div');
+    xpWrap.style.cssText = 'background:linear-gradient(135deg,#FF6B35,#FFD700);border-radius:16px;padding:16px;margin-bottom:16px;color:white;';
+    xpWrap.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <div>
+          <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;" id="acct-xp-level">${lvl.name} · ${gameState.xp.toLocaleString()} XP</div>
+          <div style="font-size:12px;opacity:0.85;margin-top:2px;">${lvl.next===Infinity?'Max level reached! 🎉':`${(lvl.next-gameState.xp).toLocaleString()} XP to ${XP_LEVELS[XP_LEVELS.indexOf(lvl)+1]?.name||'Max'}`}</div>
+        </div>
+        <div style="font-size:28px;">${lvl.name==='Tourist'?'🌱':lvl.name==='Explorer'?'🧭':lvl.name==='Adventurer'?'⚡':lvl.name==='Enthusiast'?'🌟':lvl.name==='Local'?'🌴':'🏆'}</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.3);border-radius:8px;height:8px;overflow:hidden;">
+        <div id="acct-xp-fill" style="height:100%;background:white;border-radius:8px;width:${pct}%;transition:width 0.6s;"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:6px;">
+        <div style="font-size:11px;opacity:0.8;">Level Progress</div>
+        <div style="font-size:11px;font-weight:700;" id="acct-xp-pct">${pct}%</div>
+      </div>
+      <div style="display:flex;gap:16px;margin-top:12px;">
+        <div style="text-align:center;"><div style="font-size:18px;font-weight:800;">${ciCount}</div><div style="font-size:10px;opacity:0.8;">Check-ins</div></div>
+        <div style="text-align:center;"><div style="font-size:18px;font-weight:800;">${earnedBadges}</div><div style="font-size:10px;opacity:0.8;">Badges</div></div>
+        <div style="text-align:center;"><div style="font-size:18px;font-weight:800;">${gameState.points}</div><div style="font-size:10px;opacity:0.8;">Points</div></div>
+        <div style="text-align:center;"><div style="font-size:18px;font-weight:800;">${gameState.streak}</div><div style="font-size:10px;opacity:0.8;">Day Streak</div></div>
+      </div>`;
+    profileHeader.parentNode.insertBefore(xpWrap, profileHeader.nextSibling);
+  }
+
+  // Insert gamification menu section before logout button
+  const logoutBtn = document.querySelector('#account-content .account-menu-item.danger');
+  if(logoutBtn && logoutBtn.parentNode) {
+    const gamSection = document.createElement('div');
+    gamSection.innerHTML = `
+      <div style="font-size:12px;font-weight:700;color:#9E9E9E;letter-spacing:0.5px;padding:4px 4px 8px;text-transform:uppercase;">Adventure</div>
+      <div class="account-menu-item" onclick="openPassport()" style="border-left:3px solid #FF6B35;">
+        <span class="icon">🗺️</span><div style="flex:1"><div>My Passport</div><div style="font-size:11px;color:#9E9E9E;">${ciCount} stamp${ciCount!==1?'s':''} collected</div></div><span class="arrow">›</span>
+      </div>
+      <div class="account-menu-item" onclick="openBadges()" style="border-left:3px solid #FFD700;">
+        <span class="icon">🏅</span><div style="flex:1"><div>My Badges</div><div style="font-size:11px;color:#9E9E9E;">${earnedBadges} earned</div></div><span class="arrow">›</span>
+      </div>
+      <div class="account-menu-item" onclick="openLeaderboard()" style="border-left:3px solid #4CAF50;">
+        <span class="icon">🏆</span><div style="flex:1"><div>Leaderboard</div><div style="font-size:11px;color:#9E9E9E;">See top explorers</div></div><span class="arrow">›</span>
+      </div>
+      <div class="account-menu-item" onclick="openRewards()" style="border-left:3px solid #9C27B0;">
+        <span class="icon">🎁</span><div style="flex:1"><div>Rewards Store</div><div style="font-size:11px;color:#9E9E9E;">${gameState.points.toLocaleString()} points available</div></div><span class="arrow">›</span>
+      </div>
+      ${gameState.isOrlandoLocal?`<div style="background:linear-gradient(135deg,#2E7D32,#43A047);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px;margin-bottom:8px;"><span style="font-size:22px;">🌴</span><div style="color:white;"><div style="font-weight:700;font-size:14px;">Orlando Local</div><div style="font-size:11px;opacity:0.85;">You've unlocked exclusive local status!</div></div></div>`:''}`;
+    logoutBtn.parentNode.insertBefore(gamSection, logoutBtn);
+  }
+};
+
+// ===== OVERRIDE buildDetailHTML WITH CHECK-IN BUTTON =====
+const _origBuildDetailHTML = buildDetailHTML;
+buildDetailHTML = function(item) {
+  let html = _origBuildDetailHTML(item);
+  const alreadyCheckedIn = !!gameState.checkIns[item.id];
+  const checkInBtn = `<button class="checkin-cta-btn ${alreadyCheckedIn?'checked-in':''}" onclick="checkIn('${item.id}','${item.name.replace(/'/g,"\\'")}','${item.emoji}',window.event&&window.event.clientX,window.event&&window.event.clientY)">${alreadyCheckedIn?'✓ Checked In':'📍 Check In Here'}</button>`;
+  // Insert before save button
+  html = html.replace('<button class="save-btn ', checkInBtn + '<button class="save-btn ');
+  return html;
+};
+
+// ===== PATCH toggleSave — ADD XP =====
+const _origToggleSave = toggleSave;
+toggleSave = function(id) {
+  const wasSaved = !!appState.savedItems[id];
+  const item = findItem(id);
+  _origToggleSave(id);
+  if(!wasSaved && appState.savedItems[id] && item) {
+    addXP(10, 'Saved: ' + item.name);
+  }
+};
+
+// ===== PATCH submitReview — ADD XP =====
+const _origSubmitReview = submitReview;
+submitReview = function() {
+  const item = appState.reviewItem;
+  const prevCount = (appState.reviews[item]||[]).length;
+  _origSubmitReview();
+  if((appState.reviews[item]||[]).length > prevCount) {
+    addXP(30, 'Review written');
+  }
+};
+</script>
+<style>
+.checkin-cta-btn {
+  width:100%;display:flex;align-items:center;justify-content:center;gap:8px;
+  background:linear-gradient(135deg,#FF6B35,#FF8C42);
+  color:white;border:none;border-radius:30px;
+  padding:14px;font-size:15px;font-weight:700;
+  cursor:pointer;margin-bottom:10px;
+  font-family:'DM Sans',sans-serif;
+  box-shadow:0 4px 15px rgba(255,107,53,0.35);
+  transition:all 0.2s;
+}
+.checkin-cta-btn:active { transform:scale(0.97); }
+.checkin-cta-btn.checked-in {
+  background:linear-gradient(135deg,#4CAF50,#66BB6A);
+  box-shadow:0 4px 15px rgba(76,175,80,0.35);
+}
+</style>
