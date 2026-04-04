@@ -595,7 +595,7 @@
       <div class="hero-sub">Your ultimate Orlando travel companion</div>
       <div class="hero-search"><span>🔍</span><input type="text" placeholder="Search places, parks, food..." id="hero-search-input"></div>
     </div>
-    <div class="section-hdr" style="padding-bottom:4px;"><h3>Explore Orlando</h3></div>
+    <div id="home-xp-bar" style="display:none;padding:0 16px;margin-bottom:0;"></div><div id="home-missions-panel" style="display:none;"></div><div class="section-hdr" style="padding-bottom:4px;"><h3>Explore Orlando</h3></div>
     <div class="categories">
       <div class="cat-pill" onclick="goToExplore('attractions')"><div class="cat-icon">🎡</div><div class="cat-label">Attractions</div></div>
       <div class="cat-pill" onclick="goToExplore('food')"><div class="cat-icon">🍽️</div><div class="cat-label">Food</div></div>
@@ -953,7 +953,30 @@
   </div>
 </div>
 
-<nav class="bottom-nav">
+<div class="gamify-overlay" id="all-missions-overlay">
+  <div class="gamify-header" style="background:linear-gradient(135deg,#FF6B35,#FFD700);">
+    <button class="gamify-close" onclick="document.getElementById('all-missions-overlay').classList.remove('open')">✕</button>
+    <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:white;">All Missions</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.85);margin-top:2px;" id="missions-total-line">Complete missions to earn XP</div>
+  </div>
+  <div style="display:flex;border-bottom:2px solid #F5F5F5;">
+    <button class="mtab active" id="mtab-daily" onclick="setMissionsTab('daily')">🔥 Daily</button>
+    <button class="mtab" id="mtab-weekly" onclick="setMissionsTab('weekly')">📅 Weekly</button>
+    <button class="mtab" id="mtab-lifetime" onclick="setMissionsTab('lifetime')">♾️ Lifetime</button>
+  </div>
+  <div class="gamify-scroll" id="all-missions-content"></div>
+</div>
+<div class="modal-overlay" id="levelup-modal" style="display:none;z-index:9001;">
+  <div class="levelup-wrap">
+    <div id="levelup-stars" style="font-size:20px;letter-spacing:4px;margin-bottom:8px;">⭐⭐⭐⭐⭐</div>
+    <div class="levelup-lv-label">LEVEL UP!</div>
+    <div class="levelup-emoji" id="levelup-emoji">👑</div>
+    <div class="levelup-lv-name" id="levelup-lv-name">Legend</div>
+    <div class="levelup-sub" id="levelup-sub">You've reached a new level!</div>
+    <div class="levelup-perks" id="levelup-perks"></div>
+    <button class="levelup-ok" onclick="closeLevelUp()">Awesome! 🎉</button>
+  </div>
+</div><nav class="bottom-nav">
   <div class="nav-item active" onclick="showScreen('home',this)"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></div>
   <div class="nav-item" onclick="showScreen('explore',this)"><div class="nav-icon">🔍</div><div class="nav-label">Explore</div></div>
   <div class="nav-item" onclick="showScreen('mytrip',this)"><div class="nav-icon">🗺️</div><div class="nav-label">My Trip</div></div>
@@ -2480,3 +2503,510 @@ submitReview = function() {
   box-shadow:0 4px 15px rgba(76,175,80,0.35);
 }
 </style>
+<style>
+/* ===== XP BAR + MISSIONS SYSTEM ===== */
+.home-xp-wrap{background:white;border-radius:16px;padding:14px 16px;box-shadow:var(--card-shadow);margin-bottom:4px;position:relative;overflow:hidden;}
+.xp-top-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.xp-lv-left{display:flex;align-items:center;gap:8px;}
+.xp-lv-emoji{font-size:24px;}
+.xp-lv-name{font-family:'Playfair Display',serif;font-weight:700;font-size:16px;}
+.xp-lv-next{font-size:11px;color:#9E9E9E;margin-top:1px;}
+.xp-track{height:10px;background:#F0F0F0;border-radius:10px;overflow:hidden;position:relative;}
+.xp-fill{height:100%;border-radius:10px;transition:width 0.8s cubic-bezier(.34,1.56,.64,1);position:relative;overflow:hidden;}
+.xp-fill::after{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.6),transparent);animation:xp-shimmer-anim 2.2s ease-in-out infinite;}
+@keyframes xp-shimmer-anim{0%{left:-100%}100%{left:200%}}
+.xp-bot-row{display:flex;justify-content:space-between;margin-top:5px;align-items:center;}
+.xp-pts-lbl{font-size:11px;color:#9E9E9E;}
+.xp-pct-lbl{font-size:11px;font-weight:700;}
+.xp-hint{font-size:11px;color:#FF6B35;font-weight:600;animation:pulse 1.5s infinite;}
+.xp-stats-row{display:flex;gap:12px;margin-top:12px;padding-top:10px;border-top:1px solid #F5F5F5;}
+.xp-stat-item{flex:1;text-align:center;}
+.xp-stat-val{font-size:15px;font-weight:800;color:var(--sun);}
+.xp-stat-lbl{font-size:9px;color:#9E9E9E;margin-top:1px;}
+/* Mission panel */
+.miss-panel{padding:0 16px 8px;}
+.miss-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.miss-hdr-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;}
+.miss-reset{font-size:10px;color:#9E9E9E;}
+.miss-card{background:white;border-radius:14px;padding:13px;margin-bottom:10px;box-shadow:var(--card-shadow);display:flex;gap:10px;align-items:flex-start;border-left:4px solid #FF6B35;transition:opacity 0.4s;}
+.miss-card.done{opacity:0.65;border-left-color:#4CAF50;}
+.miss-card.wk{border-left-color:#9C27B0;}
+.miss-emoji{font-size:26px;min-width:34px;text-align:center;margin-top:2px;}
+.miss-body{flex:1;min-width:0;}
+.miss-name{font-weight:700;font-size:13px;margin-bottom:2px;}
+.miss-name.struck{text-decoration:line-through;color:#9E9E9E;}
+.miss-desc{font-size:11px;color:#9E9E9E;margin-bottom:7px;}
+.miss-ptrack{height:5px;background:#F0F0F0;border-radius:5px;overflow:hidden;margin-bottom:3px;}
+.miss-pfill{height:100%;background:#FF6B35;border-radius:5px;transition:width 0.5s;}
+.miss-pfill.done{background:#4CAF50;}
+.miss-pfill.wk{background:#9C27B0;}
+.miss-ptext{font-size:10px;color:#9E9E9E;}
+.miss-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;}
+.miss-xp{font-size:12px;font-weight:700;color:#FF6B35;white-space:nowrap;}
+.miss-xp.wk{color:#9C27B0;}
+.miss-claimed{font-size:9px;font-weight:700;color:white;background:#4CAF50;padding:2px 7px;border-radius:8px;}
+.miss-view-all-btn{width:100%;background:none;border:2px solid #FF6B35;color:#FF6B35;border-radius:24px;padding:10px;font-size:13px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;}
+.miss-wk-hdr{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin:16px 0 10px;display:flex;align-items:center;gap:6px;}
+/* Missions overlay tabs */
+.mtab{flex:1;padding:11px 0;background:none;border:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;color:#9E9E9E;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:color 0.2s;}
+.mtab.active{color:#FF6B35;border-bottom-color:#FF6B35;}
+.missions-total-badge{background:#FF6B35;color:white;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;display:inline-block;margin-top:6px;}
+/* Level up modal */
+.levelup-wrap{background:white;border-radius:24px;padding:28px 20px;text-align:center;width:88%;max-width:320px;position:relative;animation:levelup-pop 0.5s cubic-bezier(.34,1.56,.64,1);}
+@keyframes levelup-pop{0%{transform:scale(0.4);opacity:0}100%{transform:scale(1);opacity:1}}
+.levelup-lv-label{font-size:11px;font-weight:700;letter-spacing:3px;color:#FF6B35;margin-bottom:6px;}
+.levelup-emoji{font-size:58px;margin-bottom:6px;display:block;animation:bounce-in 0.7s cubic-bezier(.34,1.56,.64,1);}
+.levelup-lv-name{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;margin-bottom:6px;}
+.levelup-sub{font-size:13px;color:#9E9E9E;margin-bottom:14px;}
+.levelup-perks{background:#FFF8F5;border-radius:12px;padding:12px 14px;text-align:left;margin-bottom:18px;font-size:12px;line-height:1.9;}
+.levelup-ok{background:linear-gradient(135deg,#FF6B35,#FFD700);color:white;border:none;border-radius:24px;padding:13px 32px;font-size:15px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;}
+.lvlup-banner{position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:9999;background:linear-gradient(135deg,#FF6B35,#FFD700);color:white;padding:10px 24px;border-radius:0 0 16px 16px;font-weight:700;font-size:14px;text-align:center;pointer-events:none;}
+/* Floating XP - enhanced */
+.xp-float{color:#FF6B35;} .xp-float.md{color:#2196F3;} .xp-float.lg{color:#FFD700;font-size:17px;}
+</style>
+<script>
+// ===== getXPLevel alias fix =====
+function getXPLevel(xp){ return getLevel(xp); }
+
+// ===== LEVEL CONFIG (colors, emojis, perks) =====
+const LEVEL_CONFIG = {
+  Tourist:    {emoji:'🧳', color:'#9E9E9E', grad:'linear-gradient(90deg,#9E9E9E,#BDBDBD)', perks:['Access to all Orlando listings','Save places to My Trip','Write reviews']},
+  Explorer:   {emoji:'🧭', color:'#2196F3', grad:'linear-gradient(90deg,#2196F3,#64B5F6)', perks:['Unlock Passport stamps','Join the Leaderboard','Earn XP bonus on check-ins']},
+  Adventurer: {emoji:'🎒', color:'#4CAF50', grad:'linear-gradient(90deg,#4CAF50,#81C784)', perks:['Bonus XP on reviews','Priority listing in search','Unlock weekly missions']},
+  Enthusiast: {emoji:'🔭', color:'#FF6B35', grad:'linear-gradient(90deg,#FF6B35,#FFB300)', perks:['+10% XP on all actions','Enthusiast badge on reviews','Exclusive event early access']},
+  Local:      {emoji:'🏠', color:'#FFD700', grad:'linear-gradient(90deg,#FFD700,#FF8F00)', perks:['Orlando Local status','Local badge on all reviews','Hidden local tips unlocked']},
+  Legend:     {emoji:'👑', color:'#9C27B0', grad:'linear-gradient(90deg,#9C27B0,#E040FB)', perks:['Legend badge across the app','Top of the leaderboard','Lifetime VIP status 🎉']}
+};
+
+// ===== MISSION STATE =====
+const missionState = {
+  daily: [],
+  weekly: [],
+  lastDailyReset: null,
+  lastWeeklyReset: null,
+  dailyViews: 0,
+  weeklyCheckins: 0,
+  weeklyReviews: 0,
+  weeklySaves: 0,
+  weeklyParkViews: 0,
+  _levelAtLastCheck: 'Tourist'
+};
+
+// ===== DAILY MISSION POOL =====
+const DAILY_POOL = [
+  {id:'d_explore3', emoji:'🗺️', name:'Explore Orlando', desc:'Visit 3 place detail pages', xp:30, goal:3, track:'views'},
+  {id:'d_food2',    emoji:'🍽️', name:'Food Lover',      desc:'Save 2 restaurants',          xp:20, goal:2, track:'save_food'},
+  {id:'d_review1',  emoji:'✍️', name:'Review Hero',     desc:'Write 1 review today',         xp:30, goal:1, track:'reviews'},
+  {id:'d_night1',   emoji:'🌙', name:'Night Out',       desc:'Save 1 nightlife event',        xp:15, goal:1, track:'save_night'},
+  {id:'d_park1',    emoji:'🎢', name:'Park Scout',      desc:'View any theme park page',      xp:20, goal:1, track:'view_park'},
+  {id:'d_save3',    emoji:'💾', name:'Trip Builder',    desc:'Save 3 places to My Trip',      xp:25, goal:3, track:'saves'},
+  {id:'d_views5',   emoji:'👀', name:'Curious Explorer',desc:'View 5 place detail pages',     xp:40, goal:5, track:'views'},
+  {id:'d_save1',    emoji:'🗓️', name:'First Stop',      desc:'Save 1 place to My Trip',       xp:10, goal:1, track:'saves'},
+];
+
+// ===== WEEKLY MISSION POOL =====
+const WEEKLY_POOL = [
+  {id:'w_checkin5',  emoji:'📍', name:'Big Explorer',    desc:'Check in to 5 places this week',  xp:200, goal:5, track:'checkins', weekly:true},
+  {id:'w_review3',   emoji:'⭐', name:'Super Reviewer',  desc:'Write 3 reviews this week',        xp:150, goal:3, track:'reviews',  weekly:true},
+  {id:'w_save5',     emoji:'📋', name:'Trip Master',     desc:'Save 5 places this week',          xp:175, goal:5, track:'saves',    weekly:true},
+  {id:'w_park5',     emoji:'🎢', name:'Park Hopper',     desc:'View all 5 theme park pages',      xp:100, goal:5, track:'view_park',weekly:true},
+];
+
+// ===== LIFETIME MISSIONS =====
+const LIFETIME_POOL = [
+  {id:'lt_view1',    emoji:'👀', name:'First Look',      desc:'View your first place detail',     xp:10,  goal:1, track:'views'},
+  {id:'lt_save1',    emoji:'💾', name:'First Save',      desc:'Save your first place',             xp:10,  goal:1, track:'saves'},
+  {id:'lt_review1',  emoji:'✍️', name:'First Review',    desc:'Write your first review',           xp:15,  goal:1, track:'reviews'},
+  {id:'lt_checkin1', emoji:'📍', name:'First Check-in',  desc:'Check in to your first place',      xp:25,  goal:1, track:'checkins'},
+  {id:'lt_save5',    emoji:'💫', name:'Collector',       desc:'Save 5 places total',               xp:30,  goal:5, track:'saves'},
+  {id:'lt_review5',  emoji:'🌟', name:'Critic',          desc:'Write 5 reviews total',              xp:50,  goal:5, track:'reviews'},
+  {id:'lt_checkin5', emoji:'🗺️', name:'Stamp Collector', desc:'Check in to 5 places total',        xp:75,  goal:5, track:'checkins'},
+  {id:'lt_view20',   emoji:'🔍', name:'Deep Diver',      desc:'View 20 place detail pages',        xp:60,  goal:20,track:'views'},
+  {id:'lt_save10',   emoji:'📚', name:'Curator',         desc:'Save 10 places total',              xp:80,  goal:10,track:'saves'},
+];
+// Lifetime cumulative counters
+const ltCounters = {views:0, saves:0, reviews:0, checkins:0};
+const ltClaimed = {}; // id -> true
+</script>
+<script>
+// ===== MISSION INIT & RESET =====
+function getTodayStr() { return new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }
+function getMondayStr() {
+  const d = new Date(); const day = d.getDay(); const diff = d.getDate() - day + (day===0?-6:1);
+  const mon = new Date(d.setDate(diff));
+  return mon.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
+function pickRandom(arr, n) {
+  const s = [...arr]; const r = [];
+  while(r.length < n && s.length) { const i = Math.floor(Math.random()*s.length); r.push(s.splice(i,1)[0]); }
+  return r;
+}
+function initMissions() {
+  const today = getTodayStr(); const mon = getMondayStr();
+  if(missionState.lastDailyReset !== today) {
+    missionState.daily = pickRandom(DAILY_POOL, 3).map(m=>({...m, progress:0, claimed:false}));
+    missionState.lastDailyReset = today;
+    missionState.dailyViews = 0;
+  }
+  if(missionState.lastWeeklyReset !== mon) {
+    missionState.weekly = pickRandom(WEEKLY_POOL, 2).map(m=>({...m, progress:0, claimed:false}));
+    missionState.lastWeeklyReset = mon;
+    missionState.weeklyCheckins = 0; missionState.weeklyReviews = 0;
+    missionState.weeklySaves = 0; missionState.weeklyParkViews = 0;
+  }
+}
+function getTimeUntilReset() {
+  const now = new Date(); const tom = new Date(now); tom.setDate(tom.getDate()+1); tom.setHours(0,0,0,0);
+  const diff = tom - now;
+  const h = Math.floor(diff/3600000); const m = Math.floor((diff%3600000)/60000);
+  return h+'h '+(m<10?'0':'')+m+'m';
+}
+function trackMission(type, amount) {
+  if(!appState.user) return;
+  initMissions();
+  // Update daily
+  missionState.daily.forEach(m=>{
+    if(m.claimed) return;
+    if(m.track===type || (m.track==='saves'&&(type==='saves'||type==='save_food'||type==='save_night'))) {
+      m.progress = Math.min(m.goal, m.progress + (amount||1));
+      if(m.progress >= m.goal && !m.claimed) autoClaimMission(m, 'daily');
+    }
+    if(m.track==='view_park' && type==='view_park') {
+      m.progress = Math.min(m.goal, m.progress + 1);
+      if(m.progress >= m.goal && !m.claimed) autoClaimMission(m, 'daily');
+    }
+  });
+  // Update weekly
+  missionState.weekly.forEach(m=>{
+    if(m.claimed) return;
+    const wt = m.track;
+    let inc = 0;
+    if(wt===type) inc=1;
+    else if(wt==='saves'&&(type==='saves'||type==='save_food'||type==='save_night')) inc=1;
+    else if(wt==='view_park'&&type==='view_park') inc=1;
+    if(inc) { m.progress = Math.min(m.goal, m.progress+1); if(m.progress>=m.goal&&!m.claimed) autoClaimMission(m,'weekly'); }
+  });
+  // Lifetime
+  if(type in ltCounters) ltCounters[type] += (amount||1);
+  LIFETIME_POOL.forEach(m=>{
+    if(ltClaimed[m.id]) return;
+    const val = ltCounters[m.track]||0;
+    if(val >= m.goal) { ltClaimed[m.id]=true; addXP(m.xp, 'Lifetime: '+m.name); showToast('🏅 Mission done: '+m.name+' +'+m.xp+' XP'); }
+  });
+  // Re-render if on home screen
+  if(appState.currentScreen==='home') { renderHomeMissions(); }
+}
+function autoClaimMission(m, pool) {
+  m.claimed = true;
+  addXP(m.xp, 'Mission: '+m.name);
+  showToast('🎯 Mission complete: '+m.name+' +'+m.xp+' XP!');
+  if(appState.currentScreen==='home') renderHomeMissions();
+}
+initMissions();
+</script>
+<script>
+// ===== RENDER HOME XP BAR =====
+function renderHomeXPBar() {
+  const wrap = document.getElementById('home-xp-bar');
+  if(!wrap) return;
+  if(!appState.user) { wrap.style.display='none'; return; }
+  wrap.style.display='block';
+  const lv = getLevel(gameState.xp);
+  const cfg = LEVEL_CONFIG[lv.name]||LEVEL_CONFIG.Tourist;
+  const pct = lv.next===Infinity?100:Math.min(100,Math.round((gameState.xp-lv.min)/(lv.next-lv.min)*100));
+  const toNext = lv.next===Infinity ? 0 : lv.next - gameState.xp;
+  const isClose = toNext > 0 && toNext <= 50;
+  wrap.innerHTML = `<div class="home-xp-wrap">
+    <div class="xp-top-row">
+      <div class="xp-lv-left">
+        <span class="xp-lv-emoji">${cfg.emoji}</span>
+        <div><div class="xp-lv-name" style="color:${cfg.color}">${lv.name}</div>
+          <div class="xp-lv-next">${lv.next===Infinity?'Max Level 🎉':`${toNext.toLocaleString()} XP to ${XP_LEVELS[XP_LEVELS.indexOf(lv)+1]?.name||'Max'}`}</div>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:13px;font-weight:800;color:${cfg.color}">${gameState.xp.toLocaleString()} XP</div>
+        ${isClose?`<div class="xp-hint">▲ Almost there!</div>`:''}
+      </div>
+    </div>
+    <div class="xp-track"><div class="xp-fill" id="home-xp-fill" style="width:${pct}%;background:${cfg.grad};"></div></div>
+    <div class="xp-bot-row">
+      <div class="xp-pts-lbl">${gameState.streak>0?'🔥 '+gameState.streak+' day streak':''}</div>
+      <div class="xp-pct-lbl" style="color:${cfg.color}">${pct}%</div>
+    </div>
+    <div class="xp-stats-row">
+      <div class="xp-stat-item"><div class="xp-stat-val">${Object.keys(gameState.checkIns).length}</div><div class="xp-stat-lbl">Check-ins</div></div>
+      <div class="xp-stat-item"><div class="xp-stat-val">${Object.values(gameState.badges).filter(b=>b.earned).length}</div><div class="xp-stat-lbl">Badges</div></div>
+      <div class="xp-stat-item"><div class="xp-stat-val">${gameState.points}</div><div class="xp-stat-lbl">Points</div></div>
+      <div class="xp-stat-item"><div class="xp-stat-val">${Object.values(appState.savedItems).length}</div><div class="xp-stat-lbl">Saved</div></div>
+    </div>
+  </div>`;
+}
+
+// ===== RENDER HOME MISSIONS PANEL =====
+function renderHomeMissions() {
+  const wrap = document.getElementById('home-missions-panel');
+  if(!wrap) return;
+  if(!appState.user) { wrap.style.display='none'; return; }
+  wrap.style.display='block';
+  initMissions();
+  const dailyHtml = missionState.daily.map(m=>{
+    const pct = Math.min(100,Math.round(m.progress/m.goal*100));
+    const done = m.progress>=m.goal;
+    return `<div class="miss-card ${done?'done':''}">
+      <div class="miss-emoji">${m.emoji}</div>
+      <div class="miss-body">
+        <div class="miss-name ${done?'struck':''}">${m.name}</div>
+        <div class="miss-desc">${m.desc}</div>
+        <div class="miss-ptrack"><div class="miss-pfill ${done?'done':''}" style="width:${pct}%"></div></div>
+        <div class="miss-ptext">${m.progress} / ${m.goal}</div>
+      </div>
+      <div class="miss-right">
+        <div class="miss-xp">+${m.xp} XP</div>
+        ${m.claimed?'<div class="miss-claimed">✓ Done</div>':''}
+      </div>
+    </div>`;
+  }).join('');
+
+  const weeklyHtml = missionState.weekly.map(m=>{
+    const pct = Math.min(100,Math.round(m.progress/m.goal*100));
+    const done = m.progress>=m.goal;
+    return `<div class="miss-card wk ${done?'done':''}">
+      <div class="miss-emoji">${m.emoji}</div>
+      <div class="miss-body">
+        <div class="miss-name ${done?'struck':''}">${m.name}</div>
+        <div class="miss-desc">${m.desc}</div>
+        <div class="miss-ptrack"><div class="miss-pfill ${done?'done':'wk'}" style="width:${pct}%"></div></div>
+        <div class="miss-ptext">${m.progress} / ${m.goal}</div>
+      </div>
+      <div class="miss-right">
+        <div class="miss-xp wk">+${m.xp} XP</div>
+        ${m.claimed?'<div class="miss-claimed">✓ Done</div>':''}
+      </div>
+    </div>`;
+  }).join('');
+
+  const doneCnt = [...missionState.daily,...missionState.weekly].filter(m=>m.claimed).length;
+  wrap.innerHTML = `<div class="miss-panel">
+    <div class="miss-hdr">
+      <div class="miss-hdr-title">🔥 Daily Missions</div>
+      <div class="miss-reset">Resets in ${getTimeUntilReset()}</div>
+    </div>
+    ${dailyHtml}
+    <div class="miss-wk-hdr">📅 Weekly Missions</div>
+    ${weeklyHtml}
+    <button class="miss-view-all-btn" onclick="openAllMissions()">View All Missions →</button>
+  </div>`;
+}
+</script>
+<script>
+// ===== ALL MISSIONS SCREEN =====
+let _missionsTab = 'daily';
+function openAllMissions() {
+  if(!appState.user){openAuthModal('view missions');return;}
+  initMissions();
+  renderAllMissions('daily');
+  document.getElementById('all-missions-overlay').classList.add('open');
+}
+function setMissionsTab(tab) {
+  _missionsTab = tab;
+  ['daily','weekly','lifetime'].forEach(t=>{
+    const el = document.getElementById('mtab-'+t);
+    if(el) el.classList.toggle('active', t===tab);
+  });
+  renderAllMissions(tab);
+}
+function renderAllMissions(tab) {
+  const cont = document.getElementById('all-missions-content');
+  if(!cont) return;
+  const totalDone = [...missionState.daily,...missionState.weekly].filter(m=>m.claimed).length + Object.keys(ltClaimed).length;
+  const tl = document.getElementById('missions-total-line');
+  if(tl) tl.innerHTML = `<span class="missions-total-badge">${totalDone} missions completed</span>`;
+
+  if(tab==='daily') {
+    cont.innerHTML = `<div style="padding:16px 16px 0;font-size:12px;color:#9E9E9E;">Resets in ${getTimeUntilReset()}</div>`
+      + missionState.daily.map(m=>missionCardHTML(m,false)).join('')
+      + '<div style="height:20px;"></div>';
+  } else if(tab==='weekly') {
+    cont.innerHTML = `<div style="padding:16px 16px 0;font-size:12px;color:#9E9E9E;">Resets Monday</div>`
+      + missionState.weekly.map(m=>missionCardHTML(m,true)).join('')
+      + '<div style="height:20px;"></div>';
+  } else {
+    const lifetimeHtml = LIFETIME_POOL.map(m=>{
+      const val = ltCounters[m.track]||0;
+      const done = ltClaimed[m.id];
+      const pct = Math.min(100,Math.round(val/m.goal*100));
+      return `<div class="miss-card ${done?'done':''}" style="border-left-color:#2196F3;">
+        <div class="miss-emoji">${m.emoji}</div>
+        <div class="miss-body">
+          <div class="miss-name ${done?'struck':''}">${m.name}</div>
+          <div class="miss-desc">${m.desc}</div>
+          <div class="miss-ptrack"><div class="miss-pfill" style="background:#2196F3;width:${pct}%"></div></div>
+          <div class="miss-ptext">${Math.min(val,m.goal)} / ${m.goal}</div>
+        </div>
+        <div class="miss-right">
+          <div class="miss-xp" style="color:#2196F3;">+${m.xp} XP</div>
+          ${done?'<div class="miss-claimed">✓ Done</div>':''}
+        </div>
+      </div>`;
+    }).join('');
+    cont.innerHTML = `<div style="padding:16px 16px 0;font-size:12px;color:#9E9E9E;">One-time achievements — never reset</div>${lifetimeHtml}<div style="height:20px;"></div>`;
+  }
+}
+function missionCardHTML(m, isWeekly) {
+  const pct = Math.min(100,Math.round(m.progress/m.goal*100));
+  const done = m.progress>=m.goal;
+  const color = isWeekly?'#9C27B0':'#FF6B35';
+  return `<div class="miss-card ${done?'done':''} ${isWeekly?'wk':''}">
+    <div class="miss-emoji">${m.emoji}</div>
+    <div class="miss-body">
+      <div class="miss-name ${done?'struck':''}">${m.name}</div>
+      <div class="miss-desc">${m.desc}</div>
+      <div class="miss-ptrack"><div class="miss-pfill ${done?'done':isWeekly?'wk':''}" style="width:${pct}%"></div></div>
+      <div class="miss-ptext">${m.progress} / ${m.goal}</div>
+    </div>
+    <div class="miss-right">
+      <div class="miss-xp ${isWeekly?'wk':''}">+${m.xp} XP</div>
+      ${m.claimed?'<div class="miss-claimed">✓ Done</div>':''}
+    </div>
+  </div>`;
+}
+
+// ===== LEVEL UP =====
+function showLevelUpModal(newLevelName) {
+  const cfg = LEVEL_CONFIG[newLevelName] || LEVEL_CONFIG.Explorer;
+  document.getElementById('levelup-emoji').textContent = cfg.emoji;
+  document.getElementById('levelup-lv-name').textContent = newLevelName;
+  document.getElementById('levelup-sub').textContent = 'You are now an Orlando ' + newLevelName + '!';
+  document.getElementById('levelup-perks').innerHTML = '<div style="font-weight:700;font-size:12px;margin-bottom:6px;">🎁 Unlocked Perks</div>' + cfg.perks.map(p=>'✅ '+p).join('<br>');
+  document.getElementById('levelup-stars').style.color = cfg.color;
+  const modal = document.getElementById('levelup-modal');
+  modal.style.display = 'flex';
+  // Show banner after modal closes
+}
+function closeLevelUp() {
+  document.getElementById('levelup-modal').style.display='none';
+  // Show 10s banner
+  const banner = document.createElement('div');
+  banner.className = 'lvlup-banner';
+  const lv = getLevel(gameState.xp);
+  const cfg = LEVEL_CONFIG[lv.name]||LEVEL_CONFIG.Tourist;
+  banner.innerHTML = cfg.emoji + ' You are now a ' + lv.name + '!';
+  banner.style.background = cfg.grad || 'linear-gradient(135deg,#FF6B35,#FFD700)';
+  document.body.appendChild(banner);
+  setTimeout(()=>banner.remove(), 10000);
+}
+</script>
+<script>
+// ===== PATCH addXP — level-up check + colored float + XP bar refresh =====
+const _baseAddXP = addXP;
+addXP = function(amount, label, x, y) {
+  const oldLevel = getLevel(gameState.xp).name;
+  _baseAddXP(amount, label, x, y);
+  const newLevel = getLevel(gameState.xp).name;
+  // Colored floating XP
+  const el = document.querySelector('.xp-float:last-of-type');
+  if(el) { if(amount>=100) el.classList.add('lg'); else if(amount>=30) el.classList.add('md'); }
+  // Level up check
+  if(newLevel !== oldLevel && oldLevel !== missionState._levelAtLastCheck) {
+    missionState._levelAtLastCheck = newLevel;
+    setTimeout(()=>showLevelUpModal(newLevel), 400);
+    addXP(50, 'Level up bonus: '+newLevel);
+  }
+  // Refresh home bar
+  if(appState.currentScreen==='home') renderHomeXPBar();
+  // Refresh account bar
+  if(typeof renderAccountGamXP === 'function') renderAccountGamXP();
+};
+
+// ===== PATCH renderHome — inject XP bar and missions =====
+const _origRenderHomeBase = renderHome;
+renderHome = function() {
+  _origRenderHomeBase();
+  renderHomeXPBar();
+  renderHomeMissions();
+};
+
+// ===== PATCH openDetail — award 5 XP + track views =====
+const _origOpenDetail = openDetail;
+openDetail = function(id, type) {
+  _origOpenDetail(id, type);
+  if(!appState.user) return;
+  const item = findItem(id, type);
+  // 5 XP for viewing
+  addXP(5, 'Viewed: '+(item?item.name:'place'));
+  // Track view missions
+  missionState.dailyViews = (missionState.dailyViews||0) + 1;
+  ltCounters.views = (ltCounters.views||0) + 1;
+  trackMission('views', 1);
+  // Park view
+  if(item && item.type==='park') trackMission('view_park', 1);
+};
+
+// ===== PATCH toggleSave — track save missions =====
+const _missToggleSave = toggleSave;
+toggleSave = function(id) {
+  const wasSaved = !!appState.savedItems[id];
+  _missToggleSave(id);
+  if(!wasSaved && appState.savedItems[id] && appState.user) {
+    const item = findItem(id);
+    ltCounters.saves = (ltCounters.saves||0) + 1;
+    trackMission('saves', 1);
+    if(item && item.type==='food') trackMission('save_food', 1);
+    if(item && item.tags && (item.tags.includes('nightlife')||item.tags.includes('clubs')||item.tags.includes('bars'))) trackMission('save_night', 1);
+  }
+};
+
+// ===== PATCH submitReview — track review missions =====
+const _missSubmitReview = submitReview;
+submitReview = function() {
+  const item = appState.reviewItem;
+  const prevCount = (appState.reviews[item]||[]).length;
+  _missSubmitReview();
+  if((appState.reviews[item]||[]).length > prevCount && appState.user) {
+    ltCounters.reviews = (ltCounters.reviews||0) + 1;
+    trackMission('reviews', 1);
+  }
+};
+
+// ===== PATCH checkIn — track checkin missions =====
+const _origCheckInBase = checkIn;
+checkIn = function(placeId, placeName, placeEmoji, eventX, eventY) {
+  const hadCI = !!gameState.checkIns[placeId];
+  _origCheckInBase(placeId, placeName, placeEmoji, eventX, eventY);
+  if(!hadCI && gameState.checkIns[placeId]) {
+    ltCounters.checkins = (ltCounters.checkins||0) + 1;
+    trackMission('checkins', 1);
+  }
+};
+
+// ===== PATCH renderAccount — add Missions button =====
+const _origRenderAcct2 = renderAccount;
+renderAccount = function() {
+  _origRenderAcct2();
+  if(!appState.user) return;
+  // Add missions button after streak counter (inject before logout)
+  const logoutBtnEl = document.querySelector('#account-content .account-menu-item.danger');
+  if(logoutBtnEl && logoutBtnEl.parentNode) {
+    // Check missions button not already inserted
+    if(!document.getElementById('acct-missions-btn')) {
+      const missBtn = document.createElement('div');
+      missBtn.id = 'acct-missions-btn';
+      missBtn.className = 'account-menu-item';
+      missBtn.style.cssText = 'border-left:3px solid #FF6B35;';
+      const doneCnt = [...(missionState.daily||[]),...(missionState.weekly||[])].filter(m=>m.claimed).length;
+      missBtn.innerHTML = `<span class="icon">🎯</span><div style="flex:1"><div>Missions</div><div style="font-size:11px;color:#9E9E9E;">${doneCnt} completed today</div></div><span class="arrow">›</span>`;
+      missBtn.onclick = openAllMissions;
+      logoutBtnEl.parentNode.insertBefore(missBtn, logoutBtnEl);
+    }
+  }
+};
+
+// Init on load
+document.addEventListener('DOMContentLoaded', function() {
+  initMissions();
+  if(appState.currentScreen==='home') { renderHomeXPBar(); renderHomeMissions(); }
+});
+// Also run now in case DOM already ready
+setTimeout(()=>{ if(appState.currentScreen==='home'){ renderHomeXPBar(); renderHomeMissions(); } }, 100);
+</script>
