@@ -602,6 +602,7 @@
       <div class="hero-search"><span>🔍</span><input type="text" placeholder="Search places, parks, food..." id="hero-search-input"></div>
     </div>
     <div id="home-xp-bar" style="display:none;padding:0 16px;margin-bottom:0;"></div>
+<div id="home-user-dashboard" style="display:none;padding:0 16px;margin-bottom:4px;"></div>
 <div id="home-weather-widget" style="display:none;padding:0 16px 4px;"></div>
 <div id="home-friends-activity" style="display:none;"></div>
 <div id="home-recent-photos" style="display:none;"></div>
@@ -6484,4 +6485,146 @@ renderHome = function(){
 };
 
 console.log('[Orlando Explorer] All 6 feature blocks loaded ✅');
+</script>
+
+<script>
+// =====================================================
+// HOME SCREEN USER DASHBOARD
+// Mirrors account page: profile, stats, all quick links
+// =====================================================
+
+function renderHomeDashboard(){
+  const wrap = document.getElementById('home-user-dashboard');
+  if(!wrap) return;
+
+  if(!appState.user){
+    // Guest: show sign-in prompt card
+    wrap.style.display = 'block';
+    wrap.innerHTML = `<div style="background:linear-gradient(135deg,var(--sky),var(--sun));border-radius:var(--radius);padding:20px;color:white;margin-bottom:4px;">
+      <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:900;margin-bottom:4px;">Welcome to Orlando Explorer 🌴</div>
+      <div style="font-size:13px;opacity:0.85;margin-bottom:14px;">Sign in to unlock saved trips, reviews, and your personal dashboard.</div>
+      <div style="display:flex;gap:10px;">
+        <button onclick="loginWith('google')" style="flex:1;padding:10px;border-radius:24px;border:2px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.15);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;backdrop-filter:blur(4px);">Sign In</button>
+        <button onclick="goToExplore('attractions')" style="flex:1;padding:10px;border-radius:24px;border:none;background:white;color:var(--sun);font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">Explore</button>
+      </div>
+    </div>`;
+    return;
+  }
+
+  const u = appState.user;
+  const savedCount = Object.keys(appState.savedItems).length;
+  const myReviews = Object.entries(appState.reviews).flatMap(([itemId,revs])=>revs.filter(r=>r.userId===u.id));
+  const xp = typeof gameState!=='undefined' ? gameState.xp : 0;
+  const level = typeof getLevel!=='undefined' ? getLevel(xp) : 'Explorer';
+  const cfg = typeof LEVEL_CONFIG!=='undefined' ? LEVEL_CONFIG[level] : {emoji:'🧭',grad:'linear-gradient(90deg,#2196F3,#64B5F6)',color:'#2196F3'};
+  const totalDays = typeof tripPlanState!=='undefined' ? tripPlanState.days.length : 1;
+  const tripItems = typeof tripPlanState!=='undefined' ? tripPlanState.days.reduce((s,d)=>s+d.morning.length+d.afternoon.length+d.evening.length,0) : savedCount;
+
+  wrap.style.display = 'block';
+  wrap.innerHTML = `
+    <div style="background:var(--white);border-radius:var(--radius);box-shadow:var(--card-shadow);overflow:hidden;margin-bottom:4px;">
+
+      <!-- Profile header -->
+      <div style="background:linear-gradient(135deg,#1A1A2E,#0099CC);padding:16px 18px;display:flex;align-items:center;gap:14px;">
+        <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--sky),var(--sun));display:flex;align-items:center;justify-content:center;font-size:24px;color:white;font-weight:700;flex-shrink:0;border:2px solid rgba(255,255,255,0.3);">${u.avatar}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="color:white;font-weight:700;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${u.name}</div>
+          <div style="color:rgba(255,255,255,0.65);font-size:12px;margin-top:1px;">${u.email}</div>
+        </div>
+        <div style="background:${cfg.grad};padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;color:white;flex-shrink:0;">${cfg.emoji} ${level}</div>
+      </div>
+
+      <!-- Stats row -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;border-bottom:1px solid var(--gray2);">
+        ${[
+          {val:xp,label:'XP',color:'var(--sun)'},
+          {val:savedCount,label:'Saved',color:'var(--palm)'},
+          {val:myReviews.length,label:'Reviews',color:'var(--sky)'},
+          {val:totalDays,label:'Trip Days',color:'#9C27B0'}
+        ].map(s=>`<div style="padding:12px 8px;text-align:center;border-right:1px solid var(--gray2);">
+          <div style="font-size:18px;font-weight:700;color:${s.color};">${s.val}</div>
+          <div style="font-size:10px;color:var(--gray3);font-weight:600;margin-top:1px;">${s.label}</div>
+        </div>`).join('')}
+      </div>
+
+      <!-- Quick action grid -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--gray2);">
+        <button onclick="showScreen('mytrip',document.querySelectorAll('.nav-item')[2])" style="background:var(--white);border:none;padding:14px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background 0.15s;" onmousedown="this.style.background='var(--gray1)'" onmouseup="this.style.background='var(--white)'" ontouchstart="this.style.background='var(--gray1)'" ontouchend="this.style.background='var(--white)'">
+          <span style="font-size:22px;">🗺️</span>
+          <div style="text-align:left;">
+            <div style="font-weight:700;font-size:13px;">My Trip</div>
+            <div style="font-size:11px;color:var(--gray3);margin-top:1px;">${tripItems} place${tripItems!==1?'s':''} · ${totalDays} day${totalDays!==1?'s':''}</div>
+          </div>
+          <span style="margin-left:auto;color:var(--gray3);">›</span>
+        </button>
+        <button onclick="showScreen('account',document.querySelectorAll('.nav-item')[4]);setTimeout(showMyReviews,100)" style="background:var(--white);border:none;padding:14px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;font-family:'DM Sans',sans-serif;" onmousedown="this.style.background='var(--gray1)'" onmouseup="this.style.background='var(--white)'" ontouchstart="this.style.background='var(--gray1)'" ontouchend="this.style.background='var(--white)'">
+          <span style="font-size:22px;">⭐</span>
+          <div style="text-align:left;">
+            <div style="font-weight:700;font-size:13px;">My Reviews</div>
+            <div style="font-size:11px;color:var(--gray3);margin-top:1px;">${myReviews.length} written</div>
+          </div>
+          <span style="margin-left:auto;color:var(--gray3);">›</span>
+        </button>
+        <button onclick="openNotificationCenter()" style="background:var(--white);border:none;padding:14px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;font-family:'DM Sans',sans-serif;" onmousedown="this.style.background='var(--gray1)'" onmouseup="this.style.background='var(--white)'" ontouchstart="this.style.background='var(--gray1)'" ontouchend="this.style.background='var(--white)'">
+          <span style="font-size:22px;">🔔</span>
+          <div style="text-align:left;">
+            <div style="font-weight:700;font-size:13px;">Notifications</div>
+            <div style="font-size:11px;color:var(--gray3);margin-top:1px;">${(typeof notifState!=='undefined'&&notifState.notifications.filter(n=>!n.read).length>0)?notifState.notifications.filter(n=>!n.read).length+' unread':'All caught up'}</div>
+          </div>
+          <span style="margin-left:auto;color:var(--gray3);">›</span>
+        </button>
+        <button onclick="openDealsScreen()" style="background:var(--white);border:none;padding:14px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;font-family:'DM Sans',sans-serif;" onmousedown="this.style.background='var(--gray1)'" onmouseup="this.style.background='var(--white)'" ontouchstart="this.style.background='var(--gray1)'" ontouchend="this.style.background='var(--white)'">
+          <span style="font-size:22px;">🏷️</span>
+          <div style="text-align:left;">
+            <div style="font-weight:700;font-size:13px;">Hot Deals</div>
+            <div style="font-size:11px;color:var(--gray3);margin-top:1px;">${deals.length} active deals</div>
+          </div>
+          <span style="margin-left:auto;color:var(--gray3);">›</span>
+        </button>
+      </div>
+
+      <!-- Vendor Dashboard row -->
+      <div style="background:linear-gradient(135deg,#1A1A2E,#16213e);padding:13px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;border-top:1px solid rgba(255,255,255,0.05);" onclick="openVendorDashboard()">
+        <span style="font-size:22px;">🎟️</span>
+        <div style="flex:1;">
+          <div style="color:white;font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px;">Vendor Dashboard <span style="background:linear-gradient(135deg,#FFD166,#FF6B35);color:white;padding:1px 7px;border-radius:8px;font-size:10px;font-weight:700;">PRO</span></div>
+          <div style="color:rgba(255,255,255,0.5);font-size:11px;margin-top:1px;">Manage your events and listings</div>
+        </div>
+        <span style="color:rgba(255,255,255,0.4);font-size:18px;">›</span>
+      </div>
+
+      <!-- Admin Dashboard row -->
+      <div style="background:linear-gradient(135deg,#B71C1C,#E53935);padding:13px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="openAdminPanel()">
+        <span style="font-size:22px;">🛡️</span>
+        <div style="flex:1;">
+          <div style="color:white;font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px;">Admin Dashboard <span style="background:rgba(255,255,255,0.2);color:white;padding:1px 7px;border-radius:8px;font-size:10px;font-weight:700;">ADMIN</span></div>
+          <div style="color:rgba(255,255,255,0.6);font-size:11px;margin-top:1px;">Manage the Orlando Explorer app</div>
+        </div>
+        <span style="color:rgba(255,255,255,0.5);font-size:18px;">›</span>
+      </div>
+
+    </div>`;
+}
+
+// Patch renderHome to include user dashboard
+const _origRenderHomeDash = renderHome;
+renderHome = function(){
+  _origRenderHomeDash();
+  renderHomeDashboard();
+};
+
+// Also re-render when user logs in/out
+const _origLoginWithDash = loginWith;
+loginWith = function(provider){
+  _origLoginWithDash(provider);
+  setTimeout(renderHomeDashboard, 900);
+};
+const _origLogoutDash = logout;
+logout = function(){
+  _origLogoutDash();
+  setTimeout(renderHomeDashboard, 100);
+};
+
+// Initial render
+setTimeout(renderHomeDashboard, 200);
 </script>
