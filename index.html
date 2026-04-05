@@ -862,6 +862,7 @@
         <div class="adm-nav-item" onclick="showAdminSection('notifications',this)" title="Notifications"><div class="adm-nav-icon">🔔</div><div class="adm-nav-label">Notifs</div></div>
         <div class="adm-nav-item" onclick="showAdminSection('analytics',this)" title="Analytics"><div class="adm-nav-icon">📈</div><div class="adm-nav-label">Analytics</div></div>
         <div class="adm-nav-item" onclick="showAdminSection('settings',this)" title="Settings"><div class="adm-nav-icon">⚙️</div><div class="adm-nav-label">Settings</div></div>
+        <div class="adm-nav-item" onclick="showAdminSection('images',this)" title="Images"><div class="adm-nav-icon">🖼️</div><div class="adm-nav-label">Images</div></div>
       </div>
       <!-- CONTENT AREA -->
       <div class="adm-content">
@@ -875,6 +876,7 @@
         <div id="adm-notifications" class="adm-section"></div>
         <div id="adm-analytics" class="adm-section"></div>
         <div id="adm-settings" class="adm-section"></div>
+        <div id="adm-images" class="adm-section"></div>
       </div>
     </div>
   </div>
@@ -1105,6 +1107,30 @@
     <div style="display:flex;gap:8px;">
       <button onclick="document.getElementById('create-group-modal').style.display='none'" style="flex:1;background:none;border:2px solid #E0E0E0;border-radius:24px;padding:12px;font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;">Cancel</button>
       <button onclick="createGroupTrip()" style="flex:1;background:linear-gradient(135deg,#9C27B0,#E040FB);color:white;border:none;border-radius:24px;padding:12px;font-size:14px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;">Create</button>
+    </div>
+  </div>
+</div>
+<!-- ADMIN IMAGE UPLOAD: hidden file input (single, reused for all uploads) -->
+<input type="file" id="admin-img-input" accept="image/jpeg,image/jpg,image/png,image/webp,image/gif" style="display:none;" onchange="handleAdminImageFile(this)">
+
+<!-- IMAGE PREVIEW MODAL (bottom sheet) -->
+<div id="img-preview-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9500;align-items:flex-end;">
+  <div style="background:white;border-radius:24px 24px 0 0;padding:24px;width:100%;box-sizing:border-box;animation:slide-up 0.3s ease;">
+    <div style="text-align:center;margin-bottom:6px;">
+      <div style="width:36px;height:4px;background:#E0E0E0;border-radius:2px;margin:0 auto 16px;"></div>
+      <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;margin-bottom:2px;" id="img-preview-listing-name">Listing Name</div>
+      <div style="font-size:12px;color:#9E9E9E;">Preview before applying</div>
+    </div>
+    <div style="width:100%;height:200px;border-radius:16px;overflow:hidden;margin:14px 0;background:#F5F5F5;display:flex;align-items:center;justify-content:center;">
+      <img id="img-preview-img" src="" alt="preview" style="width:100%;height:100%;object-fit:cover;">
+    </div>
+    <div style="text-align:center;margin-bottom:16px;">
+      <div style="font-size:13px;font-weight:600;" id="img-preview-filename"></div>
+      <div style="font-size:12px;color:#9E9E9E;" id="img-preview-filesize"></div>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="cancelImgPreview()" style="flex:1;background:#F5F5F5;border:none;border-radius:24px;padding:13px;font-size:14px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;">Cancel</button>
+      <button onclick="confirmApplyImage()" style="flex:1;background:linear-gradient(135deg,#FF6B35,#FFD700);color:white;border:none;border-radius:24px;padding:13px;font-size:14px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;">✓ Confirm &amp; Apply</button>
     </div>
   </div>
 </div>
@@ -1612,7 +1638,7 @@ function showAdminSection(name,navEl){
   document.getElementById('adm-'+name).classList.add('active');
   if(navEl)navEl.classList.add('active');
   adminState.currentSection=name;
-  const renderers={overview:renderAdmOverview,users:renderAdmUsers,vendors:renderAdmVendors,listings:renderAdmListings,events:renderAdmEvents,reviews:renderAdmReviews,revenue:renderAdmRevenue,notifications:renderAdmNotifications,analytics:renderAdmAnalytics,settings:renderAdmSettings};
+  const renderers={overview:renderAdmOverview,users:renderAdmUsers,vendors:renderAdmVendors,listings:renderAdmListings,events:renderAdmEvents,reviews:renderAdmReviews,revenue:renderAdmRevenue,notifications:renderAdmNotifications,analytics:renderAdmAnalytics,settings:renderAdmSettings,images:renderAdmImages};
   if(renderers[name])renderers[name]();
 }
 
@@ -4392,4 +4418,357 @@ setTimeout(()=>{
     updateNotifBadge();
   }
 }, 300);
+</script>
+<style>
+/* ===== ADMIN IMAGE MANAGEMENT CSS ===== */
+.cam-btn{position:absolute;bottom:6px;right:6px;width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,0.55);border:none;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:20;transition:transform 0.15s;}
+.cam-btn:active{transform:scale(0.9);}
+.card-img{position:relative;}
+.hcard-img{position:relative;}
+.detail-hero{position:relative;}
+.img-spinner{position:absolute;inset:0;background:rgba(255,255,255,0.8);display:flex;align-items:center;justify-content:center;z-index:21;border-radius:inherit;}
+.img-spinner::after{content:'';width:28px;height:28px;border:3px solid #E0E0E0;border-top-color:#FF6B35;border-radius:50%;animation:spin 0.7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.img-custom-badge{position:absolute;top:6px;left:6px;background:#4CAF50;color:white;font-size:10px;font-weight:700;padding:2px 7px;border-radius:8px;z-index:20;}
+/* Admin images grid */
+.adm-img-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;}
+.adm-img-card{background:white;border-radius:14px;overflow:hidden;box-shadow:var(--card-shadow);position:relative;}
+.adm-img-card.selected{outline:3px solid #FF6B35;}
+.adm-img-thumb{height:90px;display:flex;align-items:center;justify-content:center;font-size:42px;position:relative;background:#F5F5F5;overflow:hidden;}
+.adm-img-thumb img{width:100%;height:100%;object-fit:cover;}
+.adm-img-info{padding:8px 10px;}
+.adm-img-name{font-weight:700;font-size:12px;margin-bottom:2px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+.adm-img-cat{font-size:10px;color:#9E9E9E;text-transform:capitalize;}
+.adm-img-actions{display:flex;gap:4px;padding:0 8px 8px;}
+.adm-img-edit-btn{flex:1;background:#FF6B35;color:white;border:none;border-radius:8px;padding:5px;font-size:11px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;}
+.adm-img-remove-btn{background:#FFEBEE;color:#EF5350;border:none;border-radius:8px;padding:5px 8px;font-size:11px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;}
+.adm-img-checkbox{position:absolute;top:6px;right:6px;width:20px;height:20px;cursor:pointer;z-index:20;display:none;}
+.select-mode .adm-img-checkbox{display:block;}
+.bulk-bar{position:sticky;bottom:0;background:white;border-top:2px solid #F5F5F5;padding:12px 16px;display:flex;align-items:center;gap:10px;z-index:50;}
+.bulk-bar-count{font-weight:700;font-size:13px;flex:1;}
+.persist-banner{background:#E3F2FD;border-left:4px solid #2196F3;border-radius:8px;padding:10px 12px;margin-bottom:14px;font-size:12px;color:#1565C0;display:flex;gap:8px;align-items:flex-start;}
+/* Hero change image button */
+.hero-change-btn{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.55);color:white;border:none;border-radius:20px;padding:7px 16px;font-size:12px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;white-space:nowrap;z-index:20;}
+@keyframes slide-up{from{transform:translateY(100%)}to{transform:translateY(0)}}
+</style>
+<script>
+// ===== ADMIN IMAGE MANAGEMENT =====
+// Replace this with Firebase Storage or AWS S3 calls in production
+const adminImages = {}; // { listingId: base64DataURL }
+const vendorImages = {}; // { eventId: base64DataURL } — vendor-uploaded, admin overrides
+let _imgTarget = null; // { id, name, isVendor }
+let _pendingDataURL = null;
+let _imgSelectMode = false;
+let _imgSelected = new Set();
+let _imgCatFilter = 'all';
+let _imgSearch = '';
+
+function isAdminActive() { return adminState && adminState.loggedIn; }
+
+// Get display image for an item (admin image takes priority)
+function getItemImage(itemId) { return adminImages[itemId] || null; }
+
+// ===== FILE INPUT HANDLING =====
+function triggerImageUpload(itemId, itemName, isVendor) {
+  _imgTarget = { id: itemId, name: itemName, isVendor: !!isVendor };
+  const inp = document.getElementById('admin-img-input');
+  if(inp) { inp.value = ''; inp.click(); }
+}
+
+function handleAdminImageFile(input) {
+  const file = input.files[0];
+  if(!file) return;
+  // Validate type
+  if(!file.type.startsWith('image/')) { showToast('Please upload a valid image file'); input.value=''; return; }
+  // Validate size (5MB)
+  if(file.size > 5 * 1024 * 1024) { showToast('Image too large. Maximum size is 5MB'); input.value=''; return; }
+
+  // Show loading spinner on target card
+  showImgSpinner(_imgTarget?.id);
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    hideImgSpinner(_imgTarget?.id);
+    _pendingDataURL = e.target.result;
+    showImgPreviewModal(_imgTarget?.name || 'Listing', file.name, file.size);
+    input.value = '';
+  };
+  reader.onerror = function() {
+    hideImgSpinner(_imgTarget?.id);
+    showToast('Upload failed. Please try again');
+    input.value = '';
+  };
+  reader.readAsDataURL(file);
+}
+
+function showImgSpinner(itemId) {
+  if(!itemId) return;
+  document.querySelectorAll(`[data-imgid="${itemId}"]`).forEach(el => {
+    let sp = el.querySelector('.img-spinner');
+    if(!sp) { sp = document.createElement('div'); sp.className='img-spinner'; el.appendChild(sp); }
+  });
+}
+function hideImgSpinner(itemId) {
+  if(!itemId) return;
+  document.querySelectorAll(`[data-imgid="${itemId}"] .img-spinner`).forEach(sp=>sp.remove());
+}
+
+// ===== PREVIEW MODAL =====
+function showImgPreviewModal(name, filename, filesize) {
+  const modal = document.getElementById('img-preview-modal');
+  const sizeStr = filesize < 1024*1024 ? (filesize/1024).toFixed(1)+' KB' : (filesize/(1024*1024)).toFixed(2)+' MB';
+  document.getElementById('img-preview-listing-name').textContent = name;
+  document.getElementById('img-preview-filename').textContent = filename;
+  document.getElementById('img-preview-filesize').textContent = sizeStr;
+  document.getElementById('img-preview-img').src = _pendingDataURL;
+  modal.style.display = 'flex';
+}
+function cancelImgPreview() {
+  document.getElementById('img-preview-modal').style.display = 'none';
+  _pendingDataURL = null; _imgTarget = null;
+}
+function confirmApplyImage() {
+  if(!_imgTarget || !_pendingDataURL) return;
+  const id = _imgTarget.id;
+  if(_imgTarget.isVendor) {
+    vendorImages[id] = _pendingDataURL;
+  } else {
+    adminImages[id] = _pendingDataURL;
+  }
+  document.getElementById('img-preview-modal').style.display = 'none';
+  showToast('Image updated successfully ✓');
+  refreshAllImagesFor(id);
+  _pendingDataURL = null; _imgTarget = null;
+  // Re-render admin images section if open
+  if(adminState.currentSection === 'images') renderAdmImages();
+}
+
+// Refresh every DOM element showing this item's image
+function refreshAllImagesFor(id) {
+  const src = adminImages[id] || vendorImages[id];
+  document.querySelectorAll(`[data-imgid="${id}"]`).forEach(el => {
+    let img = el.querySelector('img.custom-img');
+    if(src) {
+      if(!img) {
+        img = document.createElement('img');
+        img.className = 'custom-img';
+        img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:inherit;z-index:1;';
+        el.insertBefore(img, el.firstChild);
+      }
+      img.src = src;
+    } else if(img) { img.remove(); }
+  });
+  // Re-render cards that are currently visible
+  if(appState.currentScreen==='home') renderHome();
+  else if(appState.currentScreen==='explore') renderExploreList();
+}
+
+// Inject image if one exists when detail opens
+function applyStoredImage(itemId, containerSel) {
+  const src = adminImages[itemId];
+  if(!src) return;
+  const el = document.querySelector(containerSel);
+  if(!el) return;
+  let img = el.querySelector('img.custom-img');
+  if(!img) {
+    img = document.createElement('img');
+    img.className='custom-img';
+    img.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;border-radius:inherit;';
+    el.style.position='relative';
+    el.insertBefore(img, el.firstChild);
+  }
+  img.src = src;
+}
+</script>
+<script>
+// ===== ADMIN IMAGES DASHBOARD SECTION =====
+function renderAdmImages() {
+  const el = document.getElementById('adm-images');
+  if(!el) return;
+  const allData = [...attractions,...restaurants,...parks,...hotels,...events];
+  let filtered = allData;
+  if(_imgCatFilter !== 'all') filtered = filtered.filter(i=>i.type===_imgCatFilter||(i.type==='food'&&_imgCatFilter==='food'));
+  if(_imgSearch) filtered = filtered.filter(i=>i.name.toLowerCase().includes(_imgSearch)||i.type.toLowerCase().includes(_imgSearch));
+  const customCount = filtered.filter(i=>adminImages[i.id]).length;
+
+  el.innerHTML = `
+    <div class="adm-section-hdr"><h2>🖼️ Image Management</h2></div>
+    <div class="persist-banner"><span>ℹ️</span><span>Images are stored in browser memory and will reset on page refresh. Connect to Firebase Storage or AWS S3 for permanent storage.</span></div>
+    <div style="background:#E8F5E9;border-radius:10px;padding:10px 12px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-size:13px;font-weight:700;">📸 ${customCount} custom · ${filtered.length-customCount} using emoji</span>
+      <button onclick="toggleImgSelectMode()" id="img-select-mode-btn" style="background:${_imgSelectMode?'#FF6B35':'#F5F5F5'};color:${_imgSelectMode?'white':'#424242'};border:none;border-radius:10px;padding:6px 12px;font-size:12px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;">${_imgSelectMode?'✕ Cancel Select':'☑ Select'}</button>
+    </div>
+    <div class="adm-search" style="margin-bottom:10px;"><span>🔍</span><input placeholder="Search listings..." value="${_imgSearch}" oninput="_imgSearch=this.value.toLowerCase();renderAdmImages()"></div>
+    <div class="filters" style="margin-bottom:12px;overflow-x:auto;display:flex;gap:6px;">
+      ${['all','attractions','food','parks','hotels','events'].map(f=>`<button class="adm-filter ${_imgCatFilter===f?'active':''}" onclick="_imgCatFilter='${f}';renderAdmImages()">${f.charAt(0).toUpperCase()+f.slice(1)}</button>`).join('')}
+    </div>
+    <div class="adm-img-grid ${_imgSelectMode?'select-mode':''}" id="adm-img-grid">
+      ${filtered.map(item=>{
+        const src = adminImages[item.id];
+        const sel = _imgSelected.has(item.id);
+        return `<div class="adm-img-card ${sel?'selected':''}" id="imgcard-${item.id}">
+          <input type="checkbox" class="adm-img-checkbox" ${sel?'checked':''} onchange="toggleImgSelect('${item.id}',this.checked)">
+          ${src?'<div class="img-custom-badge">✓</div>':''}
+          <div class="adm-img-thumb" data-imgid="${item.id}">
+            ${src?`<img src="${src}" style="width:100%;height:100%;object-fit:cover;">`:`<span style="font-size:42px;">${item.emoji}</span>`}
+          </div>
+          <div class="adm-img-info">
+            <div class="adm-img-name" title="${item.name}">${item.name}</div>
+            <div class="adm-img-cat">${item.type}</div>
+          </div>
+          <div class="adm-img-actions">
+            <button class="adm-img-edit-btn" onclick="triggerImageUpload('${item.id}','${item.name.replace(/'/g,"\\'")}',false)">📷 Edit</button>
+            ${src?`<button class="adm-img-remove-btn" onclick="confirmRemoveImage('${item.id}','${item.name.replace(/'/g,"\\'")}')">✕</button>`:''}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+    ${_imgSelectMode && _imgSelected.size > 0 ? `
+    <div class="bulk-bar">
+      <div class="bulk-bar-count">${_imgSelected.size} selected</div>
+      <button onclick="bulkRemoveImages()" style="background:#FFEBEE;color:#EF5350;border:none;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;">Remove All</button>
+      <button onclick="selectAllImages()" style="background:#F5F5F5;border:none;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;">Select All</button>
+    </div>` : ''}
+    <div style="height:60px;"></div>`;
+}
+
+function toggleImgSelectMode() {
+  _imgSelectMode = !_imgSelectMode;
+  if(!_imgSelectMode) _imgSelected.clear();
+  renderAdmImages();
+}
+function toggleImgSelect(id, checked) {
+  if(checked) _imgSelected.add(id); else _imgSelected.delete(id);
+  const card = document.getElementById('imgcard-'+id);
+  if(card) card.classList.toggle('selected', checked);
+  // Update bulk bar
+  renderAdmImages();
+}
+function selectAllImages() {
+  const allData = [...attractions,...restaurants,...parks,...hotels,...events];
+  allData.forEach(i=>_imgSelected.add(i.id));
+  renderAdmImages();
+}
+function confirmRemoveImage(id, name) {
+  if(confirm(`Remove custom image for "${name}" and revert to emoji?`)) {
+    delete adminImages[id];
+    refreshAllImagesFor(id);
+    showToast('Image removed — reverted to default');
+    renderAdmImages();
+  }
+}
+function bulkRemoveImages() {
+  if(!_imgSelected.size) return;
+  if(confirm(`Remove custom images for ${_imgSelected.size} listing${_imgSelected.size!==1?'s':''}?`)) {
+    const count = _imgSelected.size;
+    _imgSelected.forEach(id=>{ delete adminImages[id]; refreshAllImagesFor(id); });
+    _imgSelected.clear(); _imgSelectMode = false;
+    showToast(`${count} image${count!==1?'s':''} removed and reset to default`);
+    renderAdmImages();
+  }
+}
+
+// Register in showAdminSection renderers by patching
+const _origShowAdminSection = showAdminSection;
+showAdminSection = function(name, navEl) {
+  _origShowAdminSection(name, navEl);
+  if(name === 'images') renderAdmImages();
+};
+</script>
+<script>
+// ===== PATCH hCardHTML — add camera overlay for admin =====
+const _origHCardHTML = hCardHTML;
+hCardHTML = function(item) {
+  let html = _origHCardHTML(item);
+  // Wrap hcard-img to add data-imgid and camera btn
+  const src = adminImages[item.id];
+  const imgTag = src ? `<img src="${src}" class="custom-img" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;">` : '';
+  const camBtn = `<button class="cam-btn" onclick="event.stopPropagation();triggerImageUpload('${item.id}','${item.name.replace(/'/g,"\\'")}',false)" style="display:${isAdminActive()?'flex':'none'};">📷</button>`;
+  html = html.replace(
+    `<div class="hcard-img" style="background:${cardGradient(item.type)}">${item.emoji}</div>`,
+    `<div class="hcard-img" style="background:${cardGradient(item.type)};position:relative;overflow:hidden;" data-imgid="${item.id}">${imgTag}${item.emoji}${camBtn}</div>`
+  );
+  return html;
+};
+
+// ===== PATCH cardHTML — add camera overlay for admin =====
+const _origCardHTML = cardHTML;
+cardHTML = function(item) {
+  let html = _origCardHTML(item);
+  const src = adminImages[item.id];
+  const imgTag = src ? `<img src="${src}" class="custom-img" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;">` : '';
+  const camBtn = `<button class="cam-btn" onclick="event.stopPropagation();triggerImageUpload('${item.id}','${item.name.replace(/'/g,"\\'")}',false)" style="display:${isAdminActive()?'flex':'none'};">📷</button>`;
+  html = html.replace(
+    `<div class="card-img" style="background:${cardGradient(item.type)}">${item.emoji}<div class="card-img-overlay"></div></div>`,
+    `<div class="card-img" style="background:${cardGradient(item.type)};position:relative;overflow:hidden;" data-imgid="${item.id}">${imgTag}${item.emoji}<div class="card-img-overlay"></div>${camBtn}</div>`
+  );
+  return html;
+};
+
+// ===== PATCH buildDetailHTML — hero image + change button =====
+const _origBuildDetailHTML4 = buildDetailHTML;
+buildDetailHTML = function(item) {
+  let html = _origBuildDetailHTML4(item);
+  const src = adminImages[item.id];
+  const heroImgTag = src ? `<img src="${src}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;">` : '';
+  const heroChangeBtn = isAdminActive()
+    ? `<button class="hero-change-btn" onclick="triggerImageUpload('${item.id}','${item.name.replace(/'/g,"\\'")}',false)">📷 Change Image</button>`
+    : '';
+  // Inject stored image + change button into detail-hero
+  html = html.replace(
+    '<div class="detail-hero"',
+    `<div class="detail-hero" data-imgid="${item.id}" style="position:relative;overflow:hidden;"`
+  );
+  // Insert after opening tag of detail-hero
+  html = html.replace(
+    `<div class="detail-hero" data-imgid="${item.id}" style="position:relative;overflow:hidden;"><button class="detail-back"`,
+    `<div class="detail-hero" data-imgid="${item.id}" style="position:relative;overflow:hidden;">${heroImgTag}<button class="detail-back"`
+  );
+  // Add change button before closing of detail-hero (before </div><div class="detail-body">)
+  if(heroChangeBtn) {
+    html = html.replace(
+      '</div><div class="detail-body">',
+      heroChangeBtn + '</div><div class="detail-body">'
+    );
+  }
+  return html;
+};
+
+// ===== PATCH openDetail — apply stored images after render =====
+const _origOpenDetail2 = openDetail;
+openDetail = function(id, type) {
+  _origOpenDetail2(id, type);
+  // Apply stored image to hero if exists
+  setTimeout(() => {
+    const src = adminImages[id];
+    if(src) {
+      const hero = document.querySelector(`[data-imgid="${id}"].detail-hero, .detail-hero[data-imgid="${id}"]`);
+      if(hero) {
+        let img = hero.querySelector('img.custom-img');
+        if(!img) {
+          img = document.createElement('img');
+          img.className = 'custom-img';
+          img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;';
+          hero.insertBefore(img, hero.firstChild);
+        }
+        img.src = src;
+      }
+    }
+  }, 50);
+};
+
+// ===== VENDOR CARD CAMERA BUTTON =====
+// Patches vendorState event card rendering — camera btn for vendors on their events
+const _origRenderVendorEvents = typeof renderVendorEvents !== 'undefined' ? renderVendorEvents : null;
+// Generic: intercept vendor event card clicks to allow vendor image edit
+function vendorEditEventImage(eventId, eventName) {
+  if(!adminState.loggedIn) {
+    // Vendor can only edit their own events
+    _imgTarget = { id: eventId, name: eventName, isVendor: true };
+    const inp = document.getElementById('admin-img-input');
+    if(inp) { inp.value=''; inp.click(); }
+  } else {
+    triggerImageUpload(eventId, eventName, false);
+  }
+}
 </script>
