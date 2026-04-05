@@ -591,7 +591,13 @@
 <div id="screen-home" class="screen active">
   <div class="scroll-content">
     <div class="hero">
-      <div class="hero-logo">Orlando <span>Explorer</span> 🌴</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div class="hero-logo">Orlando <span>Explorer</span> 🌴</div>
+        <button id="notif-bell-btn" onclick="openNotificationCenter()" style="display:none;background:rgba(255,255,255,0.15);border:none;border-radius:50%;width:40px;height:40px;font-size:20px;cursor:pointer;position:relative;flex-shrink:0;" aria-label="Notifications">
+          🔔
+          <span id="notif-bell-badge" style="display:none;position:absolute;top:2px;right:2px;background:#FF6B35;color:white;font-size:9px;font-weight:800;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 3px;line-height:1;"></span>
+        </button>
+      </div>
       <div class="hero-sub">Your ultimate Orlando travel companion</div>
       <div class="hero-search"><span>🔍</span><input type="text" placeholder="Search places, parks, food..." id="hero-search-input"></div>
     </div>
@@ -1134,6 +1140,36 @@
       <button onclick="cancelImgPreview()" style="flex:1;background:#F5F5F5;border:none;border-radius:24px;padding:13px;font-size:14px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;">Cancel</button>
       <button onclick="confirmApplyImage()" style="flex:1;background:linear-gradient(135deg,#FF6B35,#FFD700);color:white;border:none;border-radius:24px;padding:13px;font-size:14px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;">✓ Confirm &amp; Apply</button>
     </div>
+  </div>
+</div>
+<!-- NOTIFICATION CENTER OVERLAY -->
+<div class="gamify-overlay" id="notif-center-overlay">
+  <div style="background:white;padding:16px;border-bottom:1px solid #F5F5F5;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <button onclick="document.getElementById('notif-center-overlay').classList.remove('open')" style="background:none;border:none;font-size:20px;cursor:pointer;padding:4px;">←</button>
+      <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;">Notifications</div>
+    </div>
+    <button onclick="markAllNotifRead()" style="background:none;border:none;color:#FF6B35;font-size:13px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;">Mark All Read</button>
+  </div>
+  <div style="display:flex;border-bottom:2px solid #F5F5F5;">
+    <button class="ntab active" id="ntab-all" onclick="setNotifTab('all')">All</button>
+    <button class="ntab" id="ntab-unread" onclick="setNotifTab('unread')">Unread</button>
+  </div>
+  <div id="notif-center-list" class="gamify-scroll" style="padding-top:0;"></div>
+  <div style="padding:12px 16px;border-top:1px solid #F5F5F5;">
+    <button onclick="clearAllNotifs()" style="width:100%;background:none;border:2px solid #EF5350;color:#EF5350;border-radius:20px;padding:10px;font-size:13px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;">🗑 Clear All</button>
+  </div>
+</div>
+
+<!-- NOTIFICATION PREVIEW BANNER -->
+<div id="notif-preview-banner" style="display:none;position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:9800;width:100%;max-width:430px;pointer-events:none;">
+  <div onclick="openNotificationCenter()" style="background:white;margin:8px 12px 0;border-radius:0 0 16px 16px;padding:12px 16px;box-shadow:0 4px 20px rgba(0,0,0,0.18);display:flex;align-items:center;gap:12px;cursor:pointer;pointer-events:all;">
+    <div id="banner-emoji" style="font-size:24px;flex-shrink:0;">🔔</div>
+    <div style="flex:1;min-width:0;">
+      <div id="banner-title" style="font-weight:700;font-size:13px;margin-bottom:2px;"></div>
+      <div id="banner-msg" style="font-size:12px;color:#757575;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;"></div>
+    </div>
+    <div style="font-size:11px;color:#9E9E9E;flex-shrink:0;">now</div>
   </div>
 </div>
 <nav class="bottom-nav">
@@ -4848,4 +4884,513 @@ vendorEventCardHTML = function(e) {
   );
   return html;
 };
+</script>
+<style>
+/* ===== NOTIFICATIONS SYSTEM CSS ===== */
+@keyframes bell-shake {
+  0%,100%{transform:rotate(0)}
+  15%{transform:rotate(15deg)}
+  30%{transform:rotate(-12deg)}
+  45%{transform:rotate(10deg)}
+  60%{transform:rotate(-8deg)}
+  75%{transform:rotate(5deg)}
+}
+.bell-shaking { animation: bell-shake 0.6s ease; }
+.ntab{flex:1;padding:11px 0;background:none;border:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;color:#9E9E9E;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;}
+.ntab.active{color:#FF6B35;border-bottom-color:#FF6B35;}
+.notif-card{padding:14px 16px;border-bottom:1px solid #F8F8F8;display:flex;gap:12px;align-items:flex-start;transition:background 0.2s;cursor:pointer;position:relative;}
+.notif-card.unread{background:#FFF8F5;border-left:3px solid #FF6B35;}
+.notif-card.read{background:white;border-left:3px solid transparent;}
+.notif-icon{font-size:28px;min-width:40px;text-align:center;margin-top:2px;}
+.notif-body{flex:1;min-width:0;}
+.notif-title{font-weight:700;font-size:13px;margin-bottom:3px;}
+.notif-msg{font-size:12px;color:#616161;line-height:1.4;margin-bottom:6px;}
+.notif-time{font-size:10px;color:#9E9E9E;}
+.notif-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;}
+.notif-action-btn{background:#FFF3E0;color:#FF6B35;border:none;border-radius:14px;padding:5px 12px;font-size:11px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;}
+.notif-delete-btn{position:absolute;top:12px;right:12px;background:#FFEBEE;color:#EF5350;border:none;border-radius:8px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer;opacity:0;transition:opacity 0.2s;}
+.notif-card:hover .notif-delete-btn{opacity:1;}
+.notif-date-hdr{padding:8px 16px;font-size:11px;font-weight:700;color:#9E9E9E;letter-spacing:0.5px;text-transform:uppercase;background:#FAFAFA;}
+.notif-empty{text-align:center;padding:60px 20px;}
+.notif-settings-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid #F5F5F5;}
+.notif-toggle{width:44px;height:24px;border-radius:12px;border:none;cursor:pointer;position:relative;transition:background 0.3s;flex-shrink:0;}
+.notif-toggle.on{background:#4CAF50;}
+.notif-toggle.off{background:#E0E0E0;}
+.notif-toggle::after{content:'';position:absolute;top:2px;width:20px;height:20px;border-radius:50%;background:white;box-shadow:0 1px 4px rgba(0,0,0,0.2);transition:left 0.3s;}
+.notif-toggle.on::after{left:22px;}
+.notif-toggle.off::after{left:2px;}
+@keyframes banner-down{from{transform:translateY(-100%)}to{transform:translateY(0)}}
+@keyframes banner-up{from{transform:translateY(0)}to{transform:translateY(-120%)}}
+.banner-in{animation:banner-down 0.35s ease forwards;}
+.banner-out{animation:banner-up 0.3s ease forwards;}
+</style>
+<script>
+// Replace this with Firebase Cloud Messaging or OneSignal in production
+const notifState = {
+  notifications: [],
+  tab: 'all',
+  seenWelcome: false,
+  lastMissionNotif: null,
+  settings: {
+    master: true,
+    dailyMissions: true,
+    friendActivity: true,
+    eventReminders: true,
+    priceDrops: true,
+    newEvents: true,
+    reviewLikes: true,
+    newFollowers: true,
+    groupTrip: true,
+    vendorUpdates: true,
+  }
+};
+
+let _notifIdCounter = 1;
+function createNotif({type, emoji, title, message, targetScreen, targetId, quickActions, time}) {
+  return {
+    id: 'n' + (_notifIdCounter++),
+    type, emoji, title, message,
+    targetScreen: targetScreen || null,
+    targetId: targetId || null,
+    quickActions: quickActions || [],
+    read: false,
+    timestamp: Date.now(),
+    timeLabel: time || 'just now',
+  };
+}
+
+function pushNotif(notif) {
+  if(!appState.user) return;
+  if(!notifState.settings.master) return;
+  // Check per-type setting
+  const typeMap = {
+    welcome: true, dailyMissions: 'dailyMissions', friendActivity: 'friendActivity',
+    eventReminder: 'eventReminders', priceDrop: 'priceDrops', newEvent: 'newEvents',
+    reviewLike: 'reviewLikes', newFollower: 'newFollowers', groupTrip: 'groupTrip',
+    vendorApproved: 'vendorUpdates', vendorRejected: 'vendorUpdates',
+  };
+  const settingKey = typeMap[notif.type];
+  if(settingKey && settingKey !== true && !notifState.settings[settingKey]) return;
+
+  notifState.notifications.unshift(notif);
+  updateBellBadge();
+  shakeBell();
+  showPreviewBanner(notif);
+}
+
+function updateBellBadge() {
+  const btn = document.getElementById('notif-bell-btn');
+  const badge = document.getElementById('notif-bell-badge');
+  if(!btn || !badge) return;
+  const unread = notifState.notifications.filter(n=>!n.read).length;
+  if(!appState.user) { btn.style.display='none'; return; }
+  btn.style.display='flex';
+  if(unread > 0) {
+    badge.style.display='flex';
+    badge.textContent = unread > 99 ? '99+' : unread;
+  } else {
+    badge.style.display='none';
+  }
+}
+
+function shakeBell() {
+  const btn = document.getElementById('notif-bell-btn');
+  if(!btn) return;
+  btn.classList.remove('bell-shaking');
+  void btn.offsetWidth; // reflow
+  btn.classList.add('bell-shaking');
+  setTimeout(()=>btn.classList.remove('bell-shaking'), 700);
+}
+
+let _bannerTimer = null;
+function showPreviewBanner(notif) {
+  const banner = document.getElementById('notif-preview-banner');
+  if(!banner) return;
+  document.getElementById('banner-emoji').textContent = notif.emoji;
+  document.getElementById('banner-title').textContent = notif.title;
+  document.getElementById('banner-msg').textContent = notif.message;
+  banner.style.display='block';
+  banner.querySelector('div').className='banner-in';
+  if(_bannerTimer) clearTimeout(_bannerTimer);
+  _bannerTimer = setTimeout(()=>{
+    const inner = banner.querySelector('div');
+    if(inner) inner.className='banner-out';
+    setTimeout(()=>{ banner.style.display='none'; }, 320);
+  }, 3000);
+}
+</script>
+<script>
+// ===== NOTIFICATION CENTER =====
+let _notifTab = 'all';
+function openNotificationCenter() {
+  renderNotifCenter();
+  document.getElementById('notif-center-overlay').classList.add('open');
+}
+function setNotifTab(tab) {
+  _notifTab = tab;
+  document.getElementById('ntab-all').classList.toggle('active', tab==='all');
+  document.getElementById('ntab-unread').classList.toggle('active', tab==='unread');
+  renderNotifCenter();
+}
+function markAllNotifRead() {
+  notifState.notifications.forEach(n=>n.read=true);
+  updateBellBadge();
+  renderNotifCenter();
+}
+function clearAllNotifs() {
+  if(confirm('Clear all notifications?')) {
+    notifState.notifications = [];
+    updateBellBadge();
+    renderNotifCenter();
+  }
+}
+function deleteNotif(id) {
+  notifState.notifications = notifState.notifications.filter(n=>n.id!==id);
+  updateBellBadge();
+  renderNotifCenter();
+}
+function tapNotif(id) {
+  const n = notifState.notifications.find(x=>x.id===id);
+  if(!n) return;
+  n.read = true;
+  updateBellBadge();
+  document.getElementById('notif-center-overlay').classList.remove('open');
+  if(n.targetScreen) {
+    if(n.targetScreen==='missions') openAllMissions();
+    else if(n.targetScreen==='profile' && n.targetId) openUserProfile(n.targetId);
+    else if(n.targetScreen==='detail' && n.targetId) openDetail(n.targetId, null);
+    else if(n.targetScreen==='grouptrip') { if(socialState.activeGroupTrip) openGroupTrip(socialState.activeGroupTrip); }
+    else if(n.targetScreen==='vendor') openVendorDashboard();
+    else if(n.targetScreen==='home') showScreen('home', document.querySelectorAll('.nav-item')[0]);
+  }
+  renderNotifCenter();
+}
+
+function renderNotifCenter() {
+  const list = document.getElementById('notif-center-list');
+  if(!list) return;
+  let notifs = notifState.notifications;
+  if(_notifTab === 'unread') notifs = notifs.filter(n=>!n.read);
+  if(notifs.length === 0) {
+    list.innerHTML = `<div class="notif-empty"><div style="font-size:56px;margin-bottom:12px;">🔔</div><div style="font-weight:700;font-size:16px;margin-bottom:6px;">You're all caught up!</div><div style="font-size:13px;color:#9E9E9E;">No ${_notifTab==='unread'?'unread ':''}notifications right now.</div></div>`;
+    return;
+  }
+  // Group by date
+  const now = Date.now();
+  const DAY = 86400000;
+  function getGroup(ts) {
+    const diff = now - ts;
+    if(diff < DAY) return 'Today';
+    if(diff < 2*DAY) return 'Yesterday';
+    return 'Earlier This Week';
+  }
+  const groups = {};
+  notifs.forEach(n=>{ const g=getGroup(n.timestamp); if(!groups[g])groups[g]=[]; groups[g].push(n); });
+  const order = ['Today','Yesterday','Earlier This Week'];
+  let html = '';
+  order.forEach(g=>{
+    if(!groups[g]) return;
+    html += `<div class="notif-date-hdr">${g}</div>`;
+    html += groups[g].map(n=>`
+      <div class="notif-card ${n.read?'read':'unread'}" onclick="tapNotif('${n.id}')">
+        <div class="notif-icon">${n.emoji}</div>
+        <div class="notif-body">
+          <div class="notif-title">${n.title}</div>
+          <div class="notif-msg">${n.message}</div>
+          ${n.quickActions.length?`<div class="notif-actions">${n.quickActions.map(a=>`<button class="notif-action-btn" onclick="event.stopPropagation();tapNotif('${n.id}');${a.fn}">${a.label}</button>`).join('')}</div>`:''}
+          <div class="notif-time">${n.timeLabel}</div>
+        </div>
+        <button class="notif-delete-btn" onclick="event.stopPropagation();deleteNotif('${n.id}')">✕</button>
+      </div>`).join('');
+  });
+  html += '<div style="height:12px;"></div>';
+  list.innerHTML = html;
+}
+
+// ===== NOTIFICATION SETTINGS =====
+function openNotifSettings() {
+  const modal = document.createElement('div');
+  modal.className='gamify-overlay'; modal.style.zIndex='8600';
+  const s = notifState.settings;
+  const rows = [
+    ['master','🔔','All Notifications','Master toggle for all notifications'],
+    ['dailyMissions','🔥','Daily Mission Reminders','Get reminded when daily missions reset'],
+    ['friendActivity','👥','Friend Activity','When friends save places, check in, or share trips'],
+    ['eventReminders','📅','Event Reminders','Reminders for saved events'],
+    ['priceDrops','💰','Price Drop Alerts','When hotel prices drop for saved places'],
+    ['newEvents','📍','New Events Near Me','When new events are added in Orlando'],
+    ['reviewLikes','⭐','Review Likes','When someone likes your review'],
+    ['newFollowers','👤','New Followers','When someone follows you'],
+    ['groupTrip','👨‍👩‍👧','Group Trip Updates','When members add places or vote'],
+    ['vendorUpdates','✅','Vendor Updates','Event approval and rejection notifications'],
+  ];
+  modal.innerHTML=`<div class="gamify-header" style="background:linear-gradient(135deg,#FF6B35,#FFD700);">
+    <button class="gamify-close" onclick="this.closest('.gamify-overlay').remove()">✕</button>
+    <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:white;">Notification Settings</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.85);margin-top:2px;">Control what alerts you receive</div>
+  </div>
+  <div class="gamify-scroll">
+    <div style="padding:16px;">
+      ${rows.map((r,i)=>`<div class="notif-settings-row" ${i===0?'style="border-bottom:2px solid #FF6B35;margin-bottom:8px;"':''}>
+        <div style="display:flex;align-items:center;gap:10px;flex:1;">
+          <span style="font-size:20px;">${r[1]}</span>
+          <div><div style="font-weight:700;font-size:13px;">${r[2]}</div><div style="font-size:11px;color:#9E9E9E;">${r[3]}</div></div>
+        </div>
+        <button class="notif-toggle ${s[r[0]]?'on':'off'}" id="ntoggle-${r[0]}" onclick="toggleNotifSetting('${r[0]}',this)"></button>
+      </div>`).join('')}
+    </div>
+    <div style="height:20px;"></div>
+  </div>`;
+  modal.classList.add('open');
+  document.body.appendChild(modal);
+}
+function toggleNotifSetting(key, btn) {
+  notifState.settings[key] = !notifState.settings[key];
+  btn.className = 'notif-toggle ' + (notifState.settings[key]?'on':'off');
+  // If master toggled off, visually dim others
+  if(key==='master') {
+    document.querySelectorAll('[id^="ntoggle-"]').forEach(b=>{
+      if(b.id!=='ntoggle-master') b.style.opacity = notifState.settings.master?'1':'0.4';
+    });
+  }
+}
+</script>
+<script>
+// ===== TRIGGER FUNCTIONS FOR EACH NOTIFICATION TYPE =====
+
+function notifWelcome() {
+  if(notifState.seenWelcome) return;
+  notifState.seenWelcome = true;
+  pushNotif(createNotif({
+    type:'welcome', emoji:'🎉', title:'Welcome to Orlando Explorer!',
+    message:'Your Orlando adventure starts now. Explore top attractions, save your favorites, and start earning XP.',
+    targetScreen:'home', quickActions:[{label:'Start Exploring',fn:"showScreen('explore',document.querySelectorAll('.nav-item')[1])"}]
+  }));
+  // Welcome banner
+  const banner = document.createElement('div');
+  banner.style.cssText='position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:9700;width:100%;max-width:430px;pointer-events:none;animation:banner-down 0.4s ease forwards;';
+  banner.innerHTML='<div style="background:linear-gradient(135deg,#FF6B35,#FFD700);color:white;padding:12px 20px;text-align:center;font-weight:700;font-size:14px;border-radius:0 0 16px 16px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">🎉 Welcome to Orlando Explorer! Let\'s go!</div>';
+  document.body.appendChild(banner);
+  setTimeout(()=>{ banner.style.animation='banner-up 0.3s ease forwards'; setTimeout(()=>banner.remove(),300); }, 4000);
+}
+
+function notifDailyMissions() {
+  const today = new Date().toDateString();
+  if(notifState.lastMissionNotif===today) return;
+  notifState.lastMissionNotif = today;
+  pushNotif(createNotif({
+    type:'dailyMissions', emoji:'🔥', title:'Your Daily Missions Are Ready',
+    message:'You have 3 new missions today. Complete them to earn XP and unlock badges.',
+    targetScreen:'missions',
+    quickActions:[{label:'Start Missions',fn:'openAllMissions()'}]
+  }));
+}
+
+function notifFriendActivity(userId, action, placeName) {
+  const user = getMockUser(userId); if(!user) return;
+  const msgs = {
+    save:`${user.username} just saved ${placeName} to their trip`,
+    review:`${user.username} just reviewed ${placeName}`,
+    checkin:`${user.username} just checked in to ${placeName}`,
+    itinerary:`${user.username} shared a new itinerary: ${placeName}`,
+  };
+  pushNotif(createNotif({
+    type:'friendActivity', emoji:user.avatar, title:'Friend Activity',
+    message: msgs[action]||`${user.username} was active`,
+    targetScreen:'profile', targetId:userId,
+    quickActions:[{label:'View Profile',fn:`openUserProfile('${userId}')`}]
+  }));
+}
+
+function notifEventReminder(eventName, eventId) {
+  pushNotif(createNotif({
+    type:'eventReminder', emoji:'📅', title:'Event Starting Soon',
+    message:`${eventName} starts in 2 hours. Tap to view details and get directions.`,
+    targetScreen:'detail', targetId:eventId,
+    quickActions:[{label:'Get Directions',fn:`window.open('https://maps.google.com/?q='+encodeURIComponent('${eventName} Orlando FL'),'_blank')`},{label:'View Details',fn:`openDetail('${eventId}',null)`}]
+  }));
+}
+
+function notifPriceDrop(hotelName, hotelId, oldPrice, newPrice) {
+  pushNotif(createNotif({
+    type:'priceDrop', emoji:'💰', title:'Price Drop Alert',
+    message:`Good news! ${hotelName} dropped from ${oldPrice} to ${newPrice}. Book now before it goes back up!`,
+    targetScreen:'detail', targetId:hotelId,
+    quickActions:[{label:'View Hotel',fn:`openDetail('${hotelId}',null)`},{label:'Book Now',fn:`openDetail('${hotelId}',null)`}]
+  }));
+}
+
+function notifNewEvent(eventName, eventId, area, date) {
+  pushNotif(createNotif({
+    type:'newEvent', emoji:'📍', title:'New Event Near You',
+    message:`${eventName} just added in ${area}. Happening on ${date}.`,
+    targetScreen:'detail', targetId:eventId,
+    quickActions:[{label:'View Event',fn:`openDetail('${eventId}',null)`}]
+  }));
+}
+
+function notifReviewLike(likerName, likerAvatar, placeName, placeId) {
+  pushNotif(createNotif({
+    type:'reviewLike', emoji:likerAvatar||'⭐', title:'Someone Liked Your Review',
+    message:`${likerName} liked your review of ${placeName}.`,
+    targetScreen:'detail', targetId:placeId,
+    quickActions:[{label:'View Place',fn:`openDetail('${placeId}',null)`}]
+  }));
+}
+
+function notifNewFollower(userId) {
+  const user = getMockUser(userId); if(!user) return;
+  pushNotif(createNotif({
+    type:'newFollower', emoji:user.avatar, title:'New Follower',
+    message:`${user.username} is now following you. Check out their profile!`,
+    targetScreen:'profile', targetId:userId,
+    quickActions:[{label:'View Profile',fn:`openUserProfile('${userId}')`}]
+  }));
+}
+
+function notifGroupTripPlace(memberName, placeName, tripName) {
+  pushNotif(createNotif({
+    type:'groupTrip', emoji:'👥', title:'New Place Added to Your Group Trip',
+    message:`${memberName} added ${placeName} to ${tripName}.`,
+    targetScreen:'grouptrip',
+    quickActions:[{label:'Open Trip',fn:`if(socialState.activeGroupTrip)openGroupTrip(socialState.activeGroupTrip)`}]
+  }));
+}
+
+function notifVendorApproved(eventName) {
+  pushNotif(createNotif({
+    type:'vendorApproved', emoji:'✅', title:'Your Event Has Been Approved',
+    message:`${eventName} is now live on Orlando Explorer. Users can discover and save your event!`,
+    targetScreen:'vendor',
+    quickActions:[{label:'View Dashboard',fn:'openVendorDashboard()'}]
+  }));
+}
+
+function notifVendorRejected(eventName, reason) {
+  pushNotif(createNotif({
+    type:'vendorRejected', emoji:'⚠️', title:'Event Needs Revision',
+    message:`${eventName} was not approved. Reason: ${reason||'Please review and resubmit.'}`,
+    targetScreen:'vendor',
+    quickActions:[{label:'Edit Event',fn:'openVendorDashboard()'}]
+  }));
+}
+</script>
+<script>
+// ===== PATCH loginWith — trigger welcome + bell show =====
+const _origLoginWith = loginWith;
+loginWith = function(provider) {
+  _origLoginWith(provider);
+  setTimeout(()=>{
+    updateBellBadge();
+    notifWelcome();
+    notifDailyMissions();
+    // Simulate 2 friend activity notifications from pre-followed users
+    setTimeout(()=>notifFriendActivity('mock_alex','save','Disney World'), 1500);
+    setTimeout(()=>notifFriendActivity('mock_sarah','checkin','Universal Studios'), 3000);
+    // Simulate a follower after 5s
+    setTimeout(()=>notifNewFollower('mock_dave'), 5000);
+  }, 400);
+};
+
+// ===== PATCH toggleSave — event reminder + price drop for hotels =====
+const _origToggleSaveNotif = toggleSave;
+toggleSave = function(id) {
+  const wasSaved = !!appState.savedItems[id];
+  _origToggleSaveNotif(id);
+  if(!wasSaved && appState.savedItems[id] && appState.user) {
+    const item = findItem(id);
+    if(!item) return;
+    // Event reminder
+    if(item.type==='event'||item.type==='events') {
+      setTimeout(()=>notifEventReminder(item.name, item.id), 800);
+    }
+    // Price drop for hotels
+    if(item.type==='hotel'||item.type==='hotels') {
+      const prices=['$189/night','$159/night','$219/night','$249/night'];
+      const oldP = prices[Math.floor(Math.random()*prices.length)];
+      const newP = '$'+(parseInt(oldP.replace(/\D/g,''))-30)+'/night';
+      setTimeout(()=>notifPriceDrop(item.name, item.id, oldP, newP), 4000);
+    }
+    // After 3rd save: friend activity
+    const saveCount = Object.keys(appState.savedItems).length;
+    if(saveCount === 3) {
+      setTimeout(()=>notifFriendActivity('mock_jess','save', item.name), 2000);
+    }
+  }
+};
+
+// ===== PATCH submitReview — review like simulation =====
+const _origSubmitReviewNotif = submitReview;
+submitReview = function() {
+  const item = appState.reviewItem;
+  const prevCount = (appState.reviews[item]||[]).length;
+  _origSubmitReviewNotif();
+  if((appState.reviews[item]||[]).length > prevCount && appState.user) {
+    const allData=[...attractions,...restaurants,...parks,...hotels,...events];
+    const place = allData.find(i=>i.id===item);
+    const likers = [getMockUser('mock_sarah'),getMockUser('mock_alex'),getMockUser('mock_laura')];
+    const liker = likers[Math.floor(Math.random()*likers.length)];
+    if(liker && place) {
+      setTimeout(()=>notifReviewLike(liker.username, liker.avatar, place.name, place.id), 5000);
+    }
+  }
+};
+
+// ===== PATCH toggleFollow — follow-back simulation =====
+const _origToggleFollowNotif = toggleFollow;
+toggleFollow = function(userId, btn) {
+  const wasFollowing = socialState.following.includes(userId);
+  _origToggleFollowNotif(userId, btn);
+  if(!wasFollowing && socialState.following.includes(userId)) {
+    setTimeout(()=>notifNewFollower(userId), 3000);
+  }
+};
+
+// ===== PATCH renderAccount — add Notification Settings button =====
+const _origRenderAcctNotif = renderAccount;
+renderAccount = function() {
+  _origRenderAcctNotif();
+  updateBellBadge();
+  // Wire settings menu item
+  setTimeout(()=>{
+    const settingsBtn = [...document.querySelectorAll('#account-content .account-menu-item')].find(el=>el.textContent.trim().startsWith('⚙️'));
+    if(settingsBtn) settingsBtn.onclick = openNotifSettings;
+  }, 60);
+};
+
+// ===== PATCH renderHome — show bell =====
+const _origRenderHomeNotif = renderHome;
+renderHome = function() {
+  _origRenderHomeNotif();
+  updateBellBadge();
+};
+
+// ===== PATCH showScreen — update bell on screen change =====
+const _origShowScreenNotif = showScreen;
+showScreen = function(name, navEl) {
+  _origShowScreenNotif(name, navEl);
+  updateBellBadge();
+  // Show daily missions notif on repeat visits to home
+  if(name==='home' && appState.user) {
+    const today = new Date().toDateString();
+    if(notifState.lastMissionNotif !== today) setTimeout(notifDailyMissions, 2000);
+  }
+};
+
+// ===== Seed initial notifications so center isn't empty =====
+setTimeout(()=>{
+  if(appState.user && notifState.notifications.length === 0) {
+    // Pre-seed a few realistic ones with earlier timestamps
+    const older = (mins) => Date.now() - mins*60000;
+    notifState.notifications.push(
+      {...createNotif({type:'friendActivity',emoji:'🌺',title:'Friend Activity',message:'SarahExplores saved Magic Kingdom to their trip.',targetScreen:'profile',targetId:'mock_sarah',quickActions:[{label:'View Profile',fn:"openUserProfile('mock_sarah')"}]}), read:false, timestamp:older(25), timeLabel:'25m ago'},
+      {...createNotif({type:'newFollower',emoji:'🏰',title:'New Follower',message:'DisneyDave is now following you. Check out their profile!',targetScreen:'profile',targetId:'mock_dave',quickActions:[{label:'View Profile',fn:"openUserProfile('mock_dave')"}]}), read:true, timestamp:older(60), timeLabel:'1h ago'},
+      {...createNotif({type:'dailyMissions',emoji:'🔥',title:'Daily Missions Ready',message:'3 new missions available. Complete them to earn XP!',targetScreen:'missions',quickActions:[{label:'Start Missions',fn:'openAllMissions()'}]}), read:true, timestamp:older(120), timeLabel:'2h ago'}
+    );
+    updateBellBadge();
+  }
+}, 500);
+
+// Init bell on load
+setTimeout(updateBellBadge, 300);
 </script>
