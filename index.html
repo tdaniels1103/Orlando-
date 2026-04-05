@@ -6628,3 +6628,986 @@ logout = function(){
 // Initial render
 setTimeout(renderHomeDashboard, 200);
 </script>
+
+<style>
+/* ============================================================
+   EMOJI & MEDIA SYSTEM — CSS
+   ============================================================ */
+
+/* ----- Emoji Picker Bottom Sheet ----- */
+.ep-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:800;align-items:flex-end;justify-content:center;}
+.ep-overlay.open{display:flex;}
+.ep-sheet{background:var(--white);width:100%;max-width:430px;border-radius:24px 24px 0 0;max-height:400px;display:flex;flex-direction:column;animation:slideUp 0.25s cubic-bezier(0.22,1,0.36,1);}
+.ep-handle{width:36px;height:4px;background:var(--gray2);border-radius:2px;margin:10px auto 6px;flex-shrink:0;}
+.ep-header{display:flex;align-items:center;gap:8px;padding:4px 12px 8px;flex-shrink:0;}
+.ep-search{flex:1;border:1.5px solid var(--gray2);border-radius:20px;padding:7px 14px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;background:var(--gray1);color:var(--text);}
+.ep-search:focus{border-color:var(--sun);}
+.ep-backspace{width:36px;height:36px;border-radius:50%;background:var(--gray1);border:none;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--gray4);}
+.ep-backspace:active{background:var(--gray2);}
+.ep-tabs{display:flex;border-bottom:1.5px solid var(--gray2);overflow-x:auto;scrollbar-width:none;flex-shrink:0;padding:0 8px;}
+.ep-tabs::-webkit-scrollbar{display:none;}
+.ep-tab{padding:8px 11px;font-size:19px;cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-1.5px;transition:border-color 0.15s;flex-shrink:0;line-height:1;}
+.ep-tab.active{border-bottom-color:var(--sun);}
+.ep-tab:active{transform:scale(0.88);}
+.ep-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;overflow-y:auto;padding:6px;flex:1;-webkit-overflow-scrolling:touch;}
+.ep-emoji{width:100%;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:23px;border-radius:8px;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;}
+.ep-emoji:active{background:var(--gray1);transform:scale(0.85);}
+.ep-empty{grid-column:span 6;text-align:center;padding:24px;color:var(--gray3);font-size:13px;}
+.ep-cat-label{grid-column:span 6;font-size:10px;font-weight:700;color:var(--gray3);text-transform:uppercase;letter-spacing:0.5px;padding:6px 4px 2px;}
+
+/* ----- Emoji Trigger Button ----- */
+.emoji-trigger-btn{width:32px;height:32px;border-radius:50%;background:none;border:none;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--sun);transition:transform 0.15s,opacity 0.15s;opacity:0.9;}
+.emoji-trigger-btn:active{transform:scale(0.85);opacity:1;}
+
+/* ----- Reaction Bar ----- */
+.reaction-bar{display:flex;align-items:center;gap:4px;flex-wrap:wrap;padding:5px 0 1px;margin-top:2px;}
+.reaction-pill{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:20px;border:1.5px solid var(--gray2);background:var(--white);font-size:15px;cursor:pointer;transition:all 0.15s;font-family:'DM Sans',sans-serif;user-select:none;-webkit-tap-highlight-color:transparent;}
+.reaction-pill:active{transform:scale(0.92);}
+.reaction-pill.mine{border-color:var(--sun);background:#FFF0E8;}
+.reaction-count{font-size:11px;font-weight:700;color:var(--gray4);min-width:8px;}
+.reaction-pill.mine .reaction-count{color:var(--sun);}
+.reaction-add{width:28px;height:28px;border-radius:50%;background:var(--gray1);border:1.5px solid var(--gray2);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--gray3);}
+.reaction-add:active{transform:scale(0.9);}
+.hot-badge{background:linear-gradient(135deg,#FF6B35,#E91E63);color:white;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:700;margin-left:4px;}
+
+@keyframes reactionBounce{0%{transform:scale(1)}35%{transform:scale(1.55)}65%{transform:scale(0.88)}100%{transform:scale(1)}}
+@keyframes emojiFloat{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-56px) scale(1.4)}}
+.reaction-float-el{position:fixed;pointer-events:none;font-size:22px;z-index:9999;animation:emojiFloat 0.85s ease-out forwards;}
+
+/* ----- Photo Upload ----- */
+.photo-upload-btn{display:flex;align-items:center;gap:7px;padding:9px 14px;border-radius:20px;border:1.5px dashed var(--gray2);background:var(--gray1);font-size:13px;font-weight:600;color:var(--gray3);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;margin-top:8px;width:fit-content;}
+.photo-upload-btn:active{border-color:var(--sky);color:var(--sky);}
+.photo-previews{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+.photo-thumb-wrap{position:relative;display:inline-block;width:80px;height:80px;}
+.photo-thumb{width:80px;height:80px;object-fit:cover;border-radius:10px;border:2px solid var(--gray2);display:block;}
+.photo-thumb-rm{position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;background:#E53935;color:white;border:none;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700;z-index:2;line-height:1;}
+.photo-in-post{width:100%;max-height:240px;object-fit:cover;border-radius:var(--radius-sm);margin-top:8px;cursor:pointer;display:block;}
+.photo-in-review{width:80px;height:80px;object-fit:cover;border-radius:8px;cursor:pointer;flex-shrink:0;}
+.review-photos-row{display:flex;gap:8px;margin-top:8px;overflow-x:auto;scrollbar-width:none;}
+.review-photos-row::-webkit-scrollbar{display:none;}
+
+/* ----- Full Screen Image Viewer ----- */
+#iv-overlay{display:none;position:fixed;inset:0;background:#000;z-index:1000;flex-direction:column;touch-action:pan-y;}
+#iv-overlay.open{display:flex;}
+.iv-topbar{position:absolute;top:0;left:0;right:0;z-index:2;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:linear-gradient(rgba(0,0,0,0.6),transparent);}
+.iv-counter{color:rgba(255,255,255,0.8);font-size:13px;font-weight:600;}
+.iv-close-btn{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.15);border:none;color:white;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.iv-img-area{flex:1;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.iv-img{max-width:100%;max-height:100%;object-fit:contain;user-select:none;-webkit-user-drag:none;touch-action:pinch-zoom;}
+.iv-nav{position:absolute;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,0.15);border:none;color:white;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:3;}
+.iv-nav.left{left:10px;}.iv-nav.right{right:10px;}
+.iv-bottombar{position:absolute;bottom:0;left:0;right:0;z-index:2;padding:12px 16px 28px;background:linear-gradient(transparent,rgba(0,0,0,0.7));}
+.iv-caption{color:white;font-size:14px;font-weight:600;margin-bottom:3px;}
+.iv-meta{color:rgba(255,255,255,0.55);font-size:12px;}
+.iv-like{position:absolute;bottom:22px;right:16px;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,0.15);border:none;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.iv-dots{display:flex;justify-content:center;gap:6px;padding:6px 0;}
+.iv-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.3);cursor:pointer;transition:background 0.2s;}
+.iv-dot.on{background:white;}
+
+/* ----- Emoji-only big message ----- */
+.msg-emoji-big{font-size:32px;line-height:1.3;}
+
+/* ----- Emoji Status ----- */
+.user-status-line{display:flex;align-items:center;gap:5px;margin-top:3px;}
+.status-emoji-icon{font-size:15px;}
+.status-msg-text{font-size:12px;color:var(--gray3);font-style:italic;}
+.set-status-btn{font-size:11px;color:var(--sky);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;padding:0;margin-top:4px;}
+
+/* ----- Input row with emoji button ----- */
+.input-emoji-row{display:flex;align-items:flex-end;gap:4px;position:relative;}
+.input-emoji-row textarea,.input-emoji-row input{flex:1;}
+</style>
+
+<script>
+/* ============================================================
+   EMOJI & MEDIA SYSTEM — PART 1: EMOJI DATA + PICKER
+   ============================================================ */
+
+const EMOJI_DATA = {
+  smileys: ['😀','😃','😄','😁','😆','😅','🤣','😂','🙂','🙃','😉','😊','😇','🥰','😍','🤩','😘','😗','😚','😙','😋','😛','😜','🤪','😝','🤑','🤗','🤭','🤫','🤔','🤐','😐','😑','😶','😏','😒','🙄','😬','🤥','😌','😔','😪','🤤','😴','😷','🤒','🤕','🤢','🤮','🥵','🥶','🥴','😵','🤯','🤠','🥳','😎','🤓','🧐','😲','😳','🥺','😦','😧','😨','😰','😥','😢','😭','😱','😖','😣','😞','😓','😩','😫','🥱','😤','😡','😠','🤬','👿','💀','☠️','💩','🤡','👹','👺','👻','👽','👾','🤖','😺','😸','😹','😻','😼','😽','🙀','😿','😾'],
+  travel: ['🌍','🌎','🌏','🗺️','🧭','🏔️','⛰️','🗻','🌋','🏕️','🏖️','🏜️','🏝️','🏞️','🏟️','🏛️','🏗️','🏘️','🏠','🏡','🏢','🏣','🏤','🏥','🏦','🏨','🏩','🏪','🏫','🏬','🏭','🏰','🏯','⛩️','🗼','🗽','⛽','🚦','🚥','🚧','✈️','🚀','🛸','🚁','🛶','⛵','🚢','🛳️','🚂','🚆','🚇','🚈','🚉','🚊','🚋','🚌','🚍','🏎️','🚓','🚑','🚒','🚗','🚕','🚙','🛻','🚐','🚚','🚛','🚜','🏍️','🛵','🦽','🦼','🛺','🚲','🛴','🛹','🚏','🛣️','🗺️','🗾','🧳','⛺','🌁','🌃','🏙️','🌄','🌅','🌆','🌇','🌉','♨️','🌌','🌠','🎇','🎆'],
+  food: ['🍎','🍊','🍋','🍇','🍓','🫐','🍒','🍑','🥭','🍍','🥥','🥝','🍅','🥑','🍆','🌽','🌶️','🫑','🥦','🥬','🥒','🫛','🥗','🥙','🌯','🫔','🌮','🍔','🍟','🌭','🍕','🫓','🥪','🥨','🥐','🥖','🍞','🥞','🧇','🍳','🥚','🍱','🍣','🍤','🍜','🍝','🍛','🍲','🍥','🍦','🍧','🍨','🍩','🍪','🎂','🍰','🧁','🍫','🍬','🍭','🧋','☕','🍵','🫖','🥤','🧃','🍺','🍹','🍸','🍷','🥂','🫗','🧊','🍶','🥃','🫙','🥢','🍴','🥄','🔪','🫕','🥘','🧆','🧈','🥚','🫙','🧂','🧀','🥓','🥩','🍗','🍖','🦴','🌰','🍄','🫚'],
+  activities: ['⚽','🏀','🏈','⚾','🥎','🎾','🏐','🏉','🥏','🎱','🏓','🏸','🏒','🥅','⛳','🏹','🎣','🤿','🥊','🥋','🎽','🛹','🛼','⛸️','🎿','🏋️','🤼','🤸','🤺','⛹️','🤾','🏊','🚴','🏄','🤽','🚣','🧘','🧗','🤸','🏇','🎯','🎮','🕹️','🎲','🧩','♟️','🎭','🎨','🖼️','🎬','🎤','🎧','🎵','🎶','🎷','🎸','🎹','🎺','🎻','🪘','🥁','🎪','🎠','🎡','🎢','🎟️','🎫','🎖️','🏆','🥇','🥈','🥉','🏅','🎗️','🎑','🎃','🎄','🎆','🎇','🎉','🎊','🎋','🎍','🎎','🎏','🎐','🎀','🎁'],
+  nature: ['🌲','🌳','🌴','🌵','🌾','🌿','☘️','🍀','🍁','🍂','🍃','🌺','🌸','🌼','🌻','🌹','🥀','🌷','🌱','🪴','🌊','🌈','⛅','🌤️','🌥️','🌦️','🌧️','⛈️','🌩️','🌨️','❄️','🔥','🌬️','🌀','🌫️','🌞','🌝','🌛','🌜','🌚','🌕','🌖','🌗','🌘','🌑','🌒','🌓','🌔','🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯','🦁','🐮','🐷','🐸','🐵','🦉','🦋','🐝','🐛','🦗','🦟','🌸','🦜','🦚','🦩','🦢','🦆','🐧','🦅','🐦','🐤','🐓','🦃','🦞','🦀','🐡','🐠','🐟','🐬','🐳','🦈','🐊','🐢','🦎','🐍','🦕','🦖'],
+  objects: ['💡','🔦','🕯️','💰','💳','💎','⚖️','🔑','🗝️','🔒','🔓','⚙️','🔧','🔨','⛏️','🪛','🔩','🗡️','⚔️','🛡️','🧰','🪜','📱','💻','⌨️','🖥️','🖨️','🖱️','📷','📸','📹','🎥','📞','☎️','📺','📻','🎙️','🎚️','🎛️','🧭','⏱️','⌚','📡','🔋','🔌','💾','💿','📀','🧲','🔭','🔬','🪙','💊','🩺','🩻','🩹','🧴','🧹','🧺','🧻','🪣','🪥','🪒','🧽','🪤','🚿','🛁','🛏️','🚪','🪑','🚽','🪞','📦','📫','📮','📯','📰','🗞️','📚','📖','📝','✏️','🖊️','🖋️','🖍️','📐','📏','📌','📎','🗃️','🗂️','🗄️'],
+  symbols: ['❤️','🧡','💛','💚','💙','💜','🖤','🤍','🤎','💔','❤️‍🔥','❤️‍🩹','💕','💞','💓','💗','💖','💘','💝','💟','✨','⭐','🌟','💫','✅','❌','❎','🔴','🟠','🟡','🟢','🔵','🟣','⚫','⚪','🟤','🔺','🔶','🔷','🔸','🔹','▶️','◀️','⏫','⏬','🔀','🔁','🔂','🔔','🔕','📢','📣','☮️','✝️','☯️','♾️','🔅','🔆','📶','💯','❓','❗','‼️','⁉️','🆗','🆙','🆒','🆓','🔝','🈳','🔉','🔊','🔇','🎦','♻️','🚫','⛔','🚳','🚭','🚯','🚱','🚷','📵','🔞','☢️','☣️','🔱','⚜️','🏳️','🏴']
+};
+
+// Name hints for search (emoji -> [keywords])
+const EMOJI_NAMES = {
+  '😀':['happy','grin','smile'],'😂':['laugh','joy','cry'],'🥰':['love','heart','adore'],
+  '😍':['heart eyes','love','amazing'],'🤩':['star','excited','wow'],'😎':['cool','sunglasses'],
+  '😭':['cry','sad','sob'],'😡':['angry','mad','rage'],'🤔':['think','hmm','question'],
+  '👍':['thumbs up','like','good'],'👎':['thumbs down','bad','dislike'],'❤️':['heart','love','red'],
+  '🔥':['fire','hot','lit'],'💯':['100','perfect','complete'],'✨':['sparkle','star','magic'],
+  '🎉':['party','celebrate','confetti'],'🏆':['trophy','win','champion'],'🎯':['target','goal','bullseye'],
+  '🌴':['palm','tree','tropical','florida','orlando'],'🏰':['castle','disney','magic'],
+  '🎢':['coaster','ride','theme park','roller'],'🍕':['pizza','food','italian'],
+  '🍺':['beer','drink','bar'],'☕':['coffee','cafe','morning'],'🌊':['wave','ocean','beach'],
+  '✈️':['plane','travel','fly','flight'],'🗺️':['map','travel','adventure'],
+  '📷':['camera','photo','picture'],'🎵':['music','note','song'],'🎸':['guitar','rock','music']
+};
+
+// Picker state
+const emojiPickerState = {
+  open: false,
+  target: null,
+  onSelect: null,
+  category: 'smileys',
+  search: '',
+  recent: JSON.parse(localStorage.getItem('epRecent') || '[]')
+};
+
+const EP_CATS = [
+  {key:'recent',icon:'🕐',label:'Recent'},
+  {key:'smileys',icon:'😀',label:'Smileys'},
+  {key:'travel',icon:'🌍',label:'Travel'},
+  {key:'food',icon:'🍴',label:'Food'},
+  {key:'activities',icon:'🏆',label:'Activities'},
+  {key:'nature',icon:'🌿',label:'Nature'},
+  {key:'objects',icon:'💡',label:'Objects'},
+  {key:'symbols',icon:'❤️',label:'Symbols'}
+];
+
+function openEmojiPicker(inputEl, onSelectCallback) {
+  emojiPickerState.target = inputEl;
+  emojiPickerState.onSelect = onSelectCallback || null;
+  emojiPickerState.category = emojiPickerState.recent.length ? 'recent' : 'smileys';
+  emojiPickerState.search = '';
+
+  let overlay = document.getElementById('ep-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'ep-overlay';
+    overlay.className = 'ep-overlay';
+    overlay.innerHTML = `<div class="ep-sheet" id="ep-sheet">
+      <div class="ep-handle"></div>
+      <div class="ep-header">
+        <input type="text" class="ep-search" id="ep-search-input" placeholder="Search emoji..." autocomplete="off">
+        <button class="ep-backspace" onclick="epBackspace()" title="Backspace">⌫</button>
+      </div>
+      <div class="ep-tabs" id="ep-tabs"></div>
+      <div class="ep-grid" id="ep-grid"></div>
+    </div>`;
+    overlay.addEventListener('click', e => { if (e.target === overlay) closeEmojiPicker(); });
+    document.getElementById('ep-search-input', overlay);
+    document.body.appendChild(overlay);
+    document.getElementById('ep-search-input').addEventListener('input', function(){ epSearch(this.value); });
+  }
+
+  overlay.classList.add('open');
+  const si = document.getElementById('ep-search-input');
+  if (si) { si.value = ''; }
+  epRenderTabs();
+  epRenderGrid();
+}
+
+function closeEmojiPicker() {
+  const o = document.getElementById('ep-overlay');
+  if (o) o.classList.remove('open');
+  emojiPickerState.open = false;
+}
+
+function epRenderTabs() {
+  const el = document.getElementById('ep-tabs');
+  if (!el) return;
+  el.innerHTML = EP_CATS.map(c =>
+    `<div class="ep-tab${emojiPickerState.category===c.key?' active':''}" onclick="epSetCat('${c.key}')" title="${c.label}">${c.icon}</div>`
+  ).join('');
+}
+
+function epSetCat(cat) {
+  emojiPickerState.category = cat;
+  emojiPickerState.search = '';
+  const si = document.getElementById('ep-search-input');
+  if (si) si.value = '';
+  epRenderTabs();
+  epRenderGrid();
+}
+
+function epSearch(val) {
+  emojiPickerState.search = val.toLowerCase().trim();
+  epRenderGrid();
+}
+
+function epRenderGrid() {
+  const grid = document.getElementById('ep-grid');
+  if (!grid) return;
+  let emojis = [];
+  const q = emojiPickerState.search;
+
+  if (q) {
+    // Search by name
+    const allEmojis = Object.values(EMOJI_DATA).flat();
+    const byName = Object.entries(EMOJI_NAMES)
+      .filter(([e, names]) => names.some(n => n.includes(q))).map(([e]) => e);
+    const byEmoji = allEmojis.filter(e => e.includes(q));
+    emojis = [...new Set([...byName, ...byEmoji])];
+  } else if (emojiPickerState.category === 'recent') {
+    emojis = emojiPickerState.recent.length ? emojiPickerState.recent : EMOJI_DATA.smileys.slice(0, 24);
+  } else {
+    emojis = EMOJI_DATA[emojiPickerState.category] || [];
+  }
+
+  if (!emojis.length) {
+    grid.innerHTML = '<div class="ep-empty">No emojis found for \"' + q + '\"</div>';
+    return;
+  }
+  grid.innerHTML = emojis.map(e =>
+    `<div class="ep-emoji" onclick="epSelect('${e.replace(/'/g, '&#39;')}')">${e}</div>`
+  ).join('');
+}
+
+function epSelect(emoji) {
+  // Add to recent
+  emojiPickerState.recent = [emoji, ...emojiPickerState.recent.filter(e => e !== emoji)].slice(0, 16);
+  localStorage.setItem('epRecent', JSON.stringify(emojiPickerState.recent));
+
+  const target = emojiPickerState.target;
+  if (target && (target.tagName === 'TEXTAREA' || target.tagName === 'INPUT')) {
+    const s = target.selectionStart || 0;
+    const e2 = target.selectionEnd || s;
+    const v = target.value;
+    target.value = v.slice(0, s) + emoji + v.slice(e2);
+    const newPos = s + emoji.length;
+    target.selectionStart = target.selectionEnd = newPos;
+    target.dispatchEvent(new Event('input', { bubbles: true }));
+    setTimeout(() => target.focus(), 10);
+  }
+
+  if (emojiPickerState.onSelect) emojiPickerState.onSelect(emoji);
+  closeEmojiPicker();
+}
+
+function epBackspace() {
+  const target = emojiPickerState.target;
+  if (!target) return;
+  const s = target.selectionStart || 0;
+  const e2 = target.selectionEnd || s;
+  const v = target.value;
+  if (s !== e2) {
+    target.value = v.slice(0, s) + v.slice(e2);
+    target.selectionStart = target.selectionEnd = s;
+  } else if (s > 0) {
+    // Remove last grapheme cluster
+    let del = 1;
+    try {
+      const segs = [...new Intl.Segmenter().segment(v.slice(0, s))];
+      if (segs.length) del = segs[segs.length - 1].segment.length;
+    } catch(ex) {}
+    target.value = v.slice(0, s - del) + v.slice(s);
+    target.selectionStart = target.selectionEnd = s - del;
+  }
+  target.focus();
+}
+
+// Helper: create emoji trigger button bound to a textarea/input
+function makeEmojiBtn(inputEl) {
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'emoji-trigger-btn';
+  btn.title = 'Add emoji';
+  btn.textContent = '😊';
+  btn.addEventListener('click', e => { e.stopPropagation(); openEmojiPicker(inputEl); });
+  return btn;
+}
+
+// Close picker on screen navigation
+const _origShowScreenEP = showScreen;
+showScreen = function(name, navEl) {
+  closeEmojiPicker();
+  _origShowScreenEP(name, navEl);
+};
+</script>
+
+<script>
+/* ============================================================
+   EMOJI & MEDIA SYSTEM — PART 2: REACTIONS + PHOTO UPLOAD + VIEWER
+   ============================================================ */
+
+// ---- REACTION SYSTEM ----
+const emojiReactState = {}; // { contentId: { emoji: { count, mine } } }
+const DEFAULT_QUICK_REACTIONS = ['❤️','🔥','😂','😮','👍','👏'];
+
+function getReactions(cid) {
+  if (!emojiReactState[cid]) emojiReactState[cid] = {};
+  return emojiReactState[cid];
+}
+
+function reactionBarHTML(cid) {
+  const reactions = getReactions(cid);
+  const allEmojis = [...new Set([...DEFAULT_QUICK_REACTIONS, ...Object.keys(reactions)])];
+  const active = allEmojis.filter(e => (reactions[e]?.count || 0) > 0);
+  const totalCount = Object.values(reactions).reduce((s, r) => s + (r.count || 0), 0);
+  const hotBadge = totalCount >= 10 ? '<span class="hot-badge">🔥 Hot</span>' : '';
+
+  const pills = active.map(emoji => {
+    const r = reactions[emoji] || { count: 0, mine: false };
+    return `<div class="reaction-pill${r.mine ? ' mine' : ''}" 
+      onclick="toggleReaction('${cid}','${emoji}',event)"
+      ontouchstart="epLPStart('${cid}','${emoji}',this)"
+      ontouchend="epLPEnd()"
+      data-rkey="${cid}|${emoji}">
+      ${emoji}<span class="reaction-count">${r.count}</span>
+    </div>`;
+  }).join('');
+
+  // Quick-add row (default 6 reactions that aren't already active)
+  const quickAdd = DEFAULT_QUICK_REACTIONS
+    .filter(e => !(reactions[e]?.count > 0))
+    .slice(0, 3)
+    .map(e => `<div class="reaction-pill" onclick="toggleReaction('${cid}','${e}',event)" style="opacity:0.45;">${e}</div>`)
+    .join('');
+
+  return `<div class="reaction-bar" id="rbar-${cid}">
+    ${pills}
+    ${quickAdd}
+    <div class="reaction-add" onclick="openReactionPicker('${cid}',this)" title="More reactions">+</div>
+    ${hotBadge}
+  </div>`;
+}
+
+function toggleReaction(cid, emoji, event) {
+  if (!emojiReactState[cid]) emojiReactState[cid] = {};
+  if (!emojiReactState[cid][emoji]) emojiReactState[cid][emoji] = { count: 0, mine: false };
+  const r = emojiReactState[cid][emoji];
+  r.mine = !r.mine;
+  r.count = Math.max(0, r.count + (r.mine ? 1 : -1));
+
+  if (r.mine && event) {
+    floatEmoji(emoji, event.currentTarget || event.target);
+    const el = event.currentTarget;
+    if (el) {
+      el.style.animation = 'none';
+      void el.offsetWidth;
+      el.style.animation = 'reactionBounce 0.32s ease';
+      setTimeout(() => { if (el) el.style.animation = ''; }, 400);
+    }
+  }
+
+  // Re-render bar
+  const bar = document.getElementById('rbar-' + cid);
+  if (bar) {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = reactionBarHTML(cid);
+    bar.replaceWith(tmp.firstChild);
+  }
+}
+
+function openReactionPicker(cid, triggerEl) {
+  openEmojiPicker(null, emoji => {
+    if (!emojiReactState[cid]) emojiReactState[cid] = {};
+    if (!emojiReactState[cid][emoji]) emojiReactState[cid][emoji] = { count: 0, mine: false };
+    emojiReactState[cid][emoji].count++;
+    emojiReactState[cid][emoji].mine = true;
+    floatEmoji(emoji, triggerEl);
+    const bar = document.getElementById('rbar-' + cid);
+    if (bar) {
+      const tmp = document.createElement('div');
+      tmp.innerHTML = reactionBarHTML(cid);
+      bar.replaceWith(tmp.firstChild);
+    }
+  });
+}
+
+function floatEmoji(emoji, el) {
+  if (!el) return;
+  const rect = el.getBoundingClientRect ? el.getBoundingClientRect() : { left: 150, top: 300, width: 30 };
+  const node = document.createElement('div');
+  node.className = 'reaction-float-el';
+  node.textContent = emoji;
+  node.style.left = (rect.left + rect.width / 2 - 12) + 'px';
+  node.style.top = (rect.top - 4) + 'px';
+  document.body.appendChild(node);
+  setTimeout(() => node.remove(), 950);
+}
+
+let _lpTimer = null;
+function epLPStart(cid, emoji, el) {
+  _lpTimer = setTimeout(() => {
+    const r = emojiReactState[cid]?.[emoji];
+    if (r) showToast(emoji + ' ' + r.count + (r.mine ? ' (you reacted)' : ''));
+  }, 600);
+}
+function epLPEnd() { clearTimeout(_lpTimer); }
+
+
+// ---- PHOTO UPLOAD SYSTEM ----
+// Structure each upload context: { maxFiles, photos:[{dataURL,name}], onUpdate }
+const photoUploads = {}; // keyed by context id
+
+function initPhotoUpload(ctxId, maxFiles, onUpdate) {
+  photoUploads[ctxId] = { maxFiles: maxFiles || 1, photos: [], onUpdate };
+}
+
+function triggerPhotoUpload(ctxId) {
+  const ctx = photoUploads[ctxId];
+  if (!ctx) return;
+  if (ctx.photos.length >= ctx.maxFiles) {
+    showToast('Max ' + ctx.maxFiles + ' photo' + (ctx.maxFiles > 1 ? 's' : '') + ' allowed');
+    return;
+  }
+  // Create a temporary hidden file input
+  // TODO (production): Replace FileReader with cloud storage upload:
+  //   const storageRef = firebase.storage().ref(`uploads/${userId}/${Date.now()}`);
+  //   const snapshot = await storageRef.put(file);
+  //   const url = await snapshot.ref.getDownloadURL();
+  let inp = document.getElementById('ep-photo-inp-' + ctxId);
+  if (!inp) {
+    inp = document.createElement('input');
+    inp.type = 'file';
+    inp.id = 'ep-photo-inp-' + ctxId;
+    inp.accept = 'image/jpeg,image/png,image/webp,image/gif';
+    if (ctx.maxFiles > 1) inp.multiple = true;
+    inp.style.display = 'none';
+    inp.addEventListener('change', function() { handlePhotoFiles(ctxId, this.files); });
+    document.body.appendChild(inp);
+  }
+  inp.value = '';
+  inp.click();
+}
+
+function handlePhotoFiles(ctxId, files) {
+  const ctx = photoUploads[ctxId];
+  if (!ctx || !files) return;
+  const remaining = ctx.maxFiles - ctx.photos.length;
+  const toProcess = Array.from(files).slice(0, remaining);
+
+  toProcess.forEach(file => {
+    if (file.size > 5 * 1024 * 1024) {
+      showToast('Photo must be under 5MB');
+      return;
+    }
+    // TODO (production): Replace with cloud storage upload call here
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      ctx.photos.push({ dataURL: e.target.result, name: file.name, type: file.type });
+      if (ctx.onUpdate) ctx.onUpdate(ctx.photos);
+      renderPhotoPreviewsFor(ctxId);
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function renderPhotoPreviewsFor(ctxId) {
+  const ctx = photoUploads[ctxId];
+  if (!ctx) return;
+  const el = document.getElementById('ep-previews-' + ctxId);
+  if (!el) return;
+  el.innerHTML = ctx.photos.map((p, i) =>
+    `<div class="photo-thumb-wrap">
+      <img src="${p.dataURL}" class="photo-thumb" alt="photo">
+      <button class="photo-thumb-rm" onclick="removePhotoUpload('${ctxId}',${i})">×</button>
+    </div>`
+  ).join('');
+}
+
+function removePhotoUpload(ctxId, idx) {
+  const ctx = photoUploads[ctxId];
+  if (!ctx) return;
+  ctx.photos.splice(idx, 1);
+  renderPhotoPreviewsFor(ctxId);
+}
+
+function getUploadedPhotos(ctxId) {
+  return (photoUploads[ctxId]?.photos || []).map(p => p.dataURL);
+}
+
+function photoPreviewContainerHTML(ctxId) {
+  return `<div class="photo-previews" id="ep-previews-${ctxId}"></div>`;
+}
+
+function photoUploadBtnHTML(ctxId, label) {
+  return `<button type="button" class="photo-upload-btn" onclick="triggerPhotoUpload('${ctxId}')">📷 ${label || 'Add Photo'}</button>`;
+}
+
+
+// ---- FULL SCREEN IMAGE VIEWER ----
+const ivState = { images: [], idx: 0, likedImgs: {}, touchStartX: 0, scale: 1 };
+
+function openImageViewer(images, startIdx, captions, uploaders) {
+  // images: array of data URLs or strings
+  // captions/uploaders: optional parallel arrays
+  ivState.images = Array.isArray(images) ? images : [images];
+  ivState.idx = startIdx || 0;
+  ivState.captions = captions || [];
+  ivState.uploaders = uploaders || [];
+
+  let overlay = document.getElementById('iv-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'iv-overlay';
+    overlay.className = '';
+    overlay.style.cssText = 'display:none;position:fixed;inset:0;background:#000;z-index:1000;flex-direction:column;';
+    overlay.innerHTML = `
+      <div class="iv-topbar">
+        <span class="iv-counter" id="iv-counter"></span>
+        <button class="iv-close-btn" onclick="closeImageViewer()">×</button>
+      </div>
+      <div class="iv-img-area" id="iv-img-area">
+        <button class="iv-nav left" id="iv-nav-l" onclick="ivNavigate(-1)">‹</button>
+        <img id="iv-img" class="iv-img" src="" alt="">
+        <button class="iv-nav right" id="iv-nav-r" onclick="ivNavigate(1)">›</button>
+      </div>
+      <div class="iv-bottombar">
+        <div class="iv-dots" id="iv-dots"></div>
+        <div class="iv-caption" id="iv-caption"></div>
+        <div class="iv-meta" id="iv-meta"></div>
+      </div>
+      <button class="iv-like" id="iv-like" onclick="ivToggleLike()">🤍</button>`;
+
+    // Swipe support
+    overlay.addEventListener('touchstart', e => { ivState.touchStartX = e.touches[0].clientX; }, { passive: true });
+    overlay.addEventListener('touchend', e => {
+      const dx = e.changedTouches[0].clientX - ivState.touchStartX;
+      if (Math.abs(dx) > 50) ivNavigate(dx < 0 ? 1 : -1);
+    });
+    document.body.appendChild(overlay);
+  }
+
+  overlay.style.display = 'flex';
+  ivRender();
+}
+
+function ivRender() {
+  const imgs = ivState.images;
+  const i = ivState.idx;
+  if (!imgs.length) return;
+
+  const img = document.getElementById('iv-img');
+  const counter = document.getElementById('iv-counter');
+  const caption = document.getElementById('iv-caption');
+  const meta = document.getElementById('iv-meta');
+  const navL = document.getElementById('iv-nav-l');
+  const navR = document.getElementById('iv-nav-r');
+  const dots = document.getElementById('iv-dots');
+  const likeBtn = document.getElementById('iv-like');
+
+  if (img) { img.src = imgs[i]; img.style.transform = 'scale(1)'; ivState.scale = 1; }
+  if (counter) counter.textContent = imgs.length > 1 ? (i + 1) + ' / ' + imgs.length : '';
+  if (caption) caption.textContent = ivState.captions[i] || '';
+  if (meta) meta.textContent = ivState.uploaders[i] || '';
+  if (navL) navL.style.display = imgs.length > 1 ? 'flex' : 'none';
+  if (navR) navR.style.display = imgs.length > 1 ? 'flex' : 'none';
+  if (likeBtn) likeBtn.textContent = ivState.likedImgs[i] ? '❤️' : '🤍';
+  if (dots && imgs.length > 1) {
+    dots.innerHTML = imgs.map((_, di) =>
+      `<div class="iv-dot${di===i?' on':''}" onclick="ivGoTo(${di})"></div>`
+    ).join('');
+  } else if (dots) dots.innerHTML = '';
+}
+
+function ivNavigate(dir) {
+  const len = ivState.images.length;
+  ivState.idx = (ivState.idx + dir + len) % len;
+  ivRender();
+}
+
+function ivGoTo(idx) {
+  ivState.idx = idx;
+  ivRender();
+}
+
+function ivToggleLike() {
+  ivState.likedImgs[ivState.idx] = !ivState.likedImgs[ivState.idx];
+  const btn = document.getElementById('iv-like');
+  if (btn) btn.textContent = ivState.likedImgs[ivState.idx] ? '❤️' : '🤍';
+}
+
+function closeImageViewer() {
+  const o = document.getElementById('iv-overlay');
+  if (o) o.style.display = 'none';
+}
+
+// Close viewer on Escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeEmojiPicker(); closeImageViewer(); }
+});
+</script>
+
+<script>
+/* ============================================================
+   EMOJI & MEDIA SYSTEM — PART 3: EMOJI STATUS + WIRE-UPS
+   ============================================================ */
+
+// ---- EMOJI STATUS ----
+const userStatusData = {
+  emoji: '',
+  text: '',
+  // TODO (production): persist to Firestore: users/{userId}.status = { emoji, text, updatedAt }
+};
+
+function openStatusModal() {
+  if (!appState.user) { openAuthModal('set a status'); return; }
+  let modal = document.getElementById('status-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'status-modal';
+    modal.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:700;align-items:flex-end;justify-content:center;';
+    modal.innerHTML = `<div style="background:var(--white);width:100%;max-width:430px;border-radius:24px 24px 0 0;padding:24px 20px 32px;animation:slideUp 0.25s ease;">
+      <div style="font-family:'Playfair Display',serif;font-size:18px;margin-bottom:14px;">Set Your Status</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <div id="status-emoji-preview" style="font-size:36px;cursor:pointer;min-width:44px;text-align:center;" onclick="openEmojiPicker(null,e=>{document.getElementById('status-emoji-preview').textContent=e;_pendingStatusEmoji=e;})">
+          ${userStatusData.emoji || '😊'}
+        </div>
+        <input id="status-text-inp" type="text" maxlength="40" placeholder="What's on your mind?" 
+          value="${userStatusData.text}"
+          style="flex:1;border:1.5px solid var(--gray2);border-radius:var(--radius-sm);padding:10px 14px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;">
+      </div>
+      <div style="font-size:11px;color:var(--gray3);margin-bottom:14px;">Max 40 characters</div>
+      <div style="display:flex;gap:10px;">
+        <button onclick="clearUserStatus()" style="flex:1;padding:12px;border-radius:24px;border:2px solid var(--gray2);background:white;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--gray4);">Clear</button>
+        <button onclick="saveUserStatus()" style="flex:2;padding:12px;border-radius:24px;border:none;background:var(--sun);color:white;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">Save Status</button>
+      </div>
+      <button onclick="document.getElementById('status-modal').style.display='none'" style="display:block;width:100%;text-align:center;margin-top:12px;background:none;border:none;color:var(--gray3);font-size:13px;cursor:pointer;">Cancel</button>
+    </div>`;
+    modal.addEventListener('click', e => { if(e.target===modal) modal.style.display='none'; });
+    document.body.appendChild(modal);
+  }
+  document.getElementById('status-emoji-preview').textContent = userStatusData.emoji || '😊';
+  document.getElementById('status-text-inp').value = userStatusData.text;
+  window._pendingStatusEmoji = userStatusData.emoji || '😊';
+  modal.style.display = 'flex';
+}
+
+function saveUserStatus() {
+  userStatusData.emoji = window._pendingStatusEmoji || document.getElementById('status-emoji-preview').textContent;
+  userStatusData.text = document.getElementById('status-text-inp').value.trim().slice(0,40);
+  document.getElementById('status-modal').style.display = 'none';
+  showToast('Status updated! ' + userStatusData.emoji);
+  // Refresh home dashboard if visible
+  if(typeof renderHomeDashboard==='function') renderHomeDashboard();
+}
+
+function clearUserStatus() {
+  userStatusData.emoji = '';
+  userStatusData.text = '';
+  document.getElementById('status-modal').style.display = 'none';
+  showToast('Status cleared');
+}
+
+function statusLineHTML(small) {
+  if (!userStatusData.emoji && !userStatusData.text) return '';
+  return `<div class="user-status-line">
+    <span class="status-emoji-icon">${userStatusData.emoji}</span>
+    <span class="status-msg-text">${userStatusData.text}</span>
+  </div>`;
+}
+
+
+// ---- WIRE UP REVIEW MODAL ----
+// Inject emoji button + photo upload into review modal
+const _origOpenReviewModal = openReviewModal;
+openReviewModal = function(itemId) {
+  _origOpenReviewModal(itemId);
+  setTimeout(() => {
+    const modal = document.getElementById('review-modal');
+    if (!modal || document.getElementById('review-emoji-btn')) return;
+
+    const ta = document.getElementById('review-text');
+    if (!ta) return;
+
+    // Wrap textarea in flex row with emoji button
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'position:relative;margin-bottom:14px;';
+    ta.parentNode.insertBefore(wrap, ta);
+    wrap.appendChild(ta);
+    ta.style.marginBottom = '0';
+
+    const emojiBtn = document.createElement('button');
+    emojiBtn.id = 'review-emoji-btn';
+    emojiBtn.type = 'button';
+    emojiBtn.className = 'emoji-trigger-btn';
+    emojiBtn.title = 'Add emoji';
+    emojiBtn.textContent = '😊';
+    emojiBtn.style.cssText = 'position:absolute;bottom:8px;right:8px;z-index:2;';
+    emojiBtn.addEventListener('click', e => { e.stopPropagation(); openEmojiPicker(ta); });
+    wrap.appendChild(emojiBtn);
+
+    // Photo upload
+    initPhotoUpload('review', 3, null);
+    const photoRow = document.createElement('div');
+    photoRow.innerHTML = photoUploadBtnHTML('review','Add Photo to Review') + photoPreviewContainerHTML('review');
+    wrap.parentNode.insertBefore(photoRow, wrap.nextSibling);
+  }, 80);
+};
+
+// Patch submitReview to include photos
+const _origSubmitReview = submitReview;
+submitReview = function() {
+  const photos = getUploadedPhotos('review');
+  _origSubmitReview();
+  // Attach photos to the most recently added review
+  const itemId = appState.reviewItem;
+  if (photos.length && appState.reviews[itemId]?.length) {
+    appState.reviews[itemId][0].photos = photos;
+  }
+  // Reset photo upload
+  if (photoUploads['review']) photoUploads['review'].photos = [];
+  const prev = document.getElementById('ep-previews-review');
+  if (prev) prev.innerHTML = '';
+};
+
+// Patch reviewCardHTML to include photos + reactions
+const _origReviewCardHTML2 = reviewCardHTML;
+reviewCardHTML = function(r, itemId, idx) {
+  const baseHTML = _origReviewCardHTML2(r, itemId, idx);
+  const rid = 'rev_' + (itemId || 'x') + '_' + (idx !== undefined ? idx : r.user.replace(/\s/g,''));
+
+  // Photos
+  const photosHTML = (r.photos && r.photos.length) ?
+    `<div class="review-photos-row">${r.photos.map((p, pi) =>
+      `<img src="${p}" class="photo-in-review" onclick="openImageViewer(${JSON.stringify(r.photos)},${pi})" alt="review photo">`
+    ).join('')}</div>` : '';
+
+  // Reaction bar
+  const rBar = reactionBarHTML(rid);
+
+  // Insert photos + reaction bar before closing div
+  return baseHTML.replace('</div>', photosHTML + rBar + '</div>');
+};
+
+
+// ---- WIRE UP FORUM NEW POST ----
+const _origOpenNewPost = openNewPost;
+openNewPost = function() {
+  _origOpenNewPost();
+  setTimeout(() => {
+    const modal = document.getElementById('new-post-modal');
+    if (!modal || document.getElementById('npb-emoji-btn')) return;
+
+    const bodyTA = document.getElementById('new-post-body');
+    const titleInp = document.getElementById('new-post-title');
+    if (!bodyTA) return;
+
+    // Emoji button on title
+    if (titleInp && !titleInp._epWired) {
+      titleInp._epWired = true;
+      const tBtn = makeEmojiBtn(titleInp);
+      tBtn.style.cssText = 'position:absolute;right:8px;top:50%;transform:translateY(-50%);z-index:2;';
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'position:relative;';
+      titleInp.parentNode.insertBefore(wrap, titleInp);
+      wrap.appendChild(titleInp);
+      wrap.appendChild(tBtn);
+    }
+
+    // Emoji button on body
+    const bodyWrap = document.createElement('div');
+    bodyWrap.style.cssText = 'position:relative;margin-bottom:12px;';
+    bodyTA.parentNode.insertBefore(bodyWrap, bodyTA);
+    bodyWrap.appendChild(bodyTA);
+    bodyTA.style.marginBottom = '0';
+
+    const eBtn = document.createElement('button');
+    eBtn.id = 'npb-emoji-btn';
+    eBtn.type = 'button';
+    eBtn.className = 'emoji-trigger-btn';
+    eBtn.textContent = '😊';
+    eBtn.style.cssText = 'position:absolute;bottom:8px;right:8px;z-index:2;';
+    eBtn.addEventListener('click', e => { e.stopPropagation(); openEmojiPicker(bodyTA); });
+    bodyWrap.appendChild(eBtn);
+
+    // Photo upload
+    initPhotoUpload('newpost', 3, null);
+    const row = document.createElement('div');
+    row.innerHTML = photoUploadBtnHTML('newpost','Add Photo') + photoPreviewContainerHTML('newpost');
+    bodyWrap.parentNode.insertBefore(row, bodyWrap.nextSibling);
+  }, 80);
+};
+
+// Patch submitNewPost to include photos
+const _origSubmitNewPost = submitNewPost;
+submitNewPost = function() {
+  const photos = getUploadedPhotos('newpost');
+  _origSubmitNewPost();
+  // Attach photos to newest post
+  if (photos.length && typeof MOCK_POSTS !== 'undefined' && MOCK_POSTS.length) {
+    MOCK_POSTS[0].photos = photos;
+  }
+  if (photoUploads['newpost']) photoUploads['newpost'].photos = [];
+  const prev = document.getElementById('ep-previews-newpost');
+  if (prev) prev.innerHTML = '';
+};
+
+// Patch forumPostCardHTML to show photos + reactions
+const _origForumPostCardHTML = forumPostCardHTML;
+forumPostCardHTML = function(p) {
+  let html = _origForumPostCardHTML(p);
+  const photoHTML = (p.photos && p.photos.length) ?
+    `<img src="${p.photos[0]}" class="photo-in-post" onclick="event.stopPropagation();openImageViewer(${JSON.stringify(p.photos)},0)" alt="">` : '';
+  const rBar = reactionBarHTML('post_' + p.id);
+  // Insert before closing tag of the card
+  html = html.replace('</div>', photoHTML + rBar + '</div>');
+  return html;
+};
+
+
+// ---- WIRE UP POST DETAIL (REPLIES + EMOJI) ----
+const _origOpenPostDetail = openPostDetail;
+openPostDetail = function(postId) {
+  _origOpenPostDetail(postId);
+  setTimeout(() => {
+    const replyInp = document.getElementById('post-reply-input');
+    if (replyInp && !replyInp._epWired) {
+      replyInp._epWired = true;
+      const btn = makeEmojiBtn(replyInp);
+      btn.style.marginRight = '4px';
+      replyInp.parentNode.insertBefore(btn, replyInp);
+
+      // Photo upload for reply
+      initPhotoUpload('reply_' + postId, 1, null);
+      const camBtn = document.createElement('button');
+      camBtn.type = 'button';
+      camBtn.className = 'emoji-trigger-btn';
+      camBtn.textContent = '📷';
+      camBtn.title = 'Add photo';
+      camBtn.style.marginRight = '4px';
+      camBtn.addEventListener('click', e => { e.stopPropagation(); triggerPhotoUpload('reply_' + postId); });
+      replyInp.parentNode.insertBefore(camBtn, replyInp);
+    }
+
+    // Add reactions to post body
+    const detailBody = document.getElementById('post-detail-body');
+    if (detailBody && !detailBody.querySelector('[id^="rbar-post_"]')) {
+      const rbar = document.createElement('div');
+      rbar.innerHTML = reactionBarHTML('post_' + postId);
+      const likeDiv = detailBody.querySelector('div[style*="gap:10px"]');
+      if (likeDiv) likeDiv.parentNode.insertBefore(rbar.firstChild, likeDiv.nextSibling);
+    }
+  }, 100);
+};
+
+// Patch submitReplyPost to include photos
+const _origSubmitReplyPost = submitReplyPost;
+submitReplyPost = function() {
+  const ctxId = 'reply_' + _activePostId;
+  const photos = getUploadedPhotos(ctxId);
+  _origSubmitReplyPost();
+  // Attach photos to newest reply
+  const replies = socialState.postReplies[_activePostId];
+  if (photos.length && replies?.length) {
+    replies[replies.length - 1].photos = photos;
+  }
+  if (photoUploads[ctxId]) photoUploads[ctxId].photos = [];
+};
+
+
+// ---- WIRE UP GROUP CHAT EMOJI BUTTON ----
+// Use MutationObserver to detect group chat input and inject emoji button
+const _chatObserver = new MutationObserver(() => {
+  const chatInp = document.getElementById('group-chat-input');
+  if (chatInp && !chatInp._epWired) {
+    chatInp._epWired = true;
+    const btn = makeEmojiBtn(chatInp);
+    btn.style.flexShrink = '0';
+    chatInp.parentNode.insertBefore(btn, chatInp);
+
+    // Emoji-only big text: if message is only emoji(s), render large
+    // (handled in sendGroupMsg patch below)
+  }
+});
+_chatObserver.observe(document.body, { childList: true, subtree: true });
+
+// Patch sendGroupMsg to support emoji-only big messages + reactions
+const _origSendGroupMsg = sendGroupMsg;
+sendGroupMsg = function(tripId) {
+  const inp = document.getElementById('group-chat-input');
+  const text = inp?.value.trim() || '';
+  _origSendGroupMsg(tripId);
+  // Mark if emoji-only
+  const trip = socialState.groupTrips.find(t => t.id === tripId) || socialState.activeGroupTrip;
+  if (trip?.chat?.length) {
+    const last = trip.chat[trip.chat.length - 1];
+    // Simple emoji-only check: no ASCII letters/numbers
+    const isEmojiOnly = text.length > 0 && !/[a-zA-Z0-9]/.test(text);
+    last.emojiOnly = isEmojiOnly;
+  }
+};
+
+// Patch chat bubble renderer to support big emoji + reactions
+// (rendered via renderGroupTripBody which uses template literal)
+// We inject a post-render patcher
+const _origRenderGroupTripBody = typeof renderGroupTripBody !== 'undefined' ? renderGroupTripBody : null;
+if (_origRenderGroupTripBody) {
+  renderGroupTripBody = function(trip) {
+    _origRenderGroupTripBody(trip);
+    setTimeout(() => {
+      // Add emoji buttons to reaction bars on chat messages
+      const chatMsgs = document.querySelectorAll('#group-chat-messages .chat-bubble');
+      chatMsgs.forEach((bubble, idx) => {
+        const txt = bubble.textContent;
+        const isEmojiOnly = txt.length > 0 && !/[a-zA-Z0-9]/.test(txt);
+        if (isEmojiOnly) bubble.style.fontSize = '32px';
+      });
+    }, 50);
+  };
+}
+
+
+// ---- VENDOR FORM EMOJI BUTTON ----
+// Use MutationObserver to detect vendor form textarea and inject emoji button
+const _vfObserver = new MutationObserver(() => {
+  const vfTA = document.querySelector('.vf-overlay.open .vf-textarea');
+  if (vfTA && !vfTA._epWired) {
+    vfTA._epWired = true;
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'position:relative;margin-bottom:14px;';
+    vfTA.parentNode.insertBefore(wrap, vfTA);
+    wrap.appendChild(vfTA);
+    vfTA.style.marginBottom = '0';
+    const btn = makeEmojiBtn(vfTA);
+    btn.style.cssText = 'position:absolute;bottom:8px;right:8px;z-index:2;';
+    wrap.appendChild(btn);
+  }
+});
+_vfObserver.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
+
+
+// ---- EMOJI STATUS ON PROFILE PAGE ----
+// Patch renderAccount to inject status
+const _origRenderAccountStatus = renderAccount;
+renderAccount = function() {
+  _origRenderAccountStatus();
+  if (!appState.user) return;
+  setTimeout(() => {
+    const nameEl = document.querySelector('#account-content .profile-name');
+    if (nameEl && !nameEl.nextElementSibling?.classList?.contains('user-status-line')) {
+      const statusDiv = document.createElement('div');
+      statusDiv.innerHTML = statusLineHTML();
+      if (userStatusData.emoji || userStatusData.text) {
+        nameEl.parentNode.insertBefore(statusDiv.firstChild, nameEl.nextSibling);
+      }
+      // Add "Set Status" button
+      const emailEl = document.querySelector('#account-content .profile-email');
+      if (emailEl && !document.getElementById('set-status-btn')) {
+        const btn = document.createElement('button');
+        btn.id = 'set-status-btn';
+        btn.className = 'set-status-btn';
+        btn.textContent = userStatusData.text ? '✏️ Edit Status' : '+ Set Status';
+        btn.addEventListener('click', openStatusModal);
+        emailEl.parentNode.appendChild(btn);
+      }
+    }
+  }, 80);
+};
+
+
+// ---- EMOJI STATUS IN FORUM AUTHOR LINE ----
+// Show status emoji next to username in forum post cards
+const _origForumPostCardHTMLStatus = forumPostCardHTML;
+forumPostCardHTML = function(p) {
+  let html = _origForumPostCardHTMLStatus(p);
+  // If post is by current user, inject status emoji next to name
+  if (p.authorId === 'current_user' && (userStatusData.emoji || userStatusData.text)) {
+    html = html.replace(
+      appState.user?.name || 'You',
+      (appState.user?.name || 'You') + ' ' + (userStatusData.emoji || '')
+    );
+  }
+  return html;
+};
+
+
+console.log('[Orlando Explorer] Emoji & Media System loaded ✅');
+</script>
