@@ -19,7 +19,8 @@
   .screen { display: none; flex-direction: column; min-height: 100vh; padding-bottom: calc(var(--nav-h) + 16px); }
   .screen.active { display: flex; }
   .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; background: var(--white); display: flex; align-items: center; justify-content: space-around; height: var(--nav-h); border-top: 1px solid var(--gray2); z-index: 100; box-shadow: 0 -4px 20px rgba(0,0,0,0.08); }
-  .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 12px; cursor: pointer; border-radius: var(--radius-sm); transition: all 0.2s; flex: 1; }
+  .nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 4px; cursor: pointer; border-radius: var(--radius-sm); transition: all 0.2s; flex: 1; min-width:0; }
+  .nav-label { font-size:.62rem; }
   .nav-item .nav-icon { font-size: 22px; line-height: 1; }
   .nav-item .nav-label { font-size: 10px; font-weight: 600; color: var(--gray3); letter-spacing: 0.3px; }
   .nav-item.active .nav-label { color: var(--sun); }
@@ -1214,11 +1215,15 @@
   📡 You're offline. Some features may not work.
 </div>
 <nav class="bottom-nav">
-  <div class="nav-item active" onclick="showScreen('home',this)"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></div>
-  <div class="nav-item" onclick="showScreen('explore',this)"><div class="nav-icon">🔍</div><div class="nav-label">Explore</div></div>
-  <div class="nav-item" onclick="showScreen('mytrip',this)"><div class="nav-icon">🗺️</div><div class="nav-label">My Trip</div></div>
-  <div class="nav-item" onclick="showScreen('ai',this)"><div class="nav-icon">🤖</div><div class="nav-label">AI Planner</div></div>
-  <div class="nav-item" onclick="showScreen('account',this)"><div class="nav-icon">👤</div><div class="nav-label">Account</div></div>
+  <div class="nav-item active" id="nav-home" onclick="showScreen('home',this)"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></div>
+  <div class="nav-item" id="nav-explore" onclick="showScreen('explore',this)"><div class="nav-icon">🔍</div><div class="nav-label">Explore</div></div>
+  <div class="nav-item" id="nav-mytrip" onclick="showScreen('mytrip',this)"><div class="nav-icon">🗺️</div><div class="nav-label">My Trip</div></div>
+  <div class="nav-item wl-nav-item" id="nav-watchlist" onclick="showScreen('watchlist',this)" style="position:relative;">
+    <div class="nav-icon">⏱️</div>
+    <div class="nav-label">Watchlist</div>
+    <div class="wl-nav-badge" id="wl-nav-badge">0</div>
+  </div>
+  <div class="nav-item" id="nav-account" onclick="showScreen('account',this)"><div class="nav-icon">👤</div><div class="nav-label">Account</div></div>
 </nav>
 <div class="toast" id="toast"></div>
 <script>
@@ -10447,4 +10452,1742 @@ window.openMyDownloads = typeof openMyDownloads !== 'undefined' ? openMyDownload
 window.t = t;
 
 console.log('Orlando Explorer v' + APP_VERSION + ' fully loaded 🌴');
+</script>
+
+<style>
+/* ============================================================
+   WATCHLIST SYSTEM - CSS
+   ============================================================ */
+
+/* Nav badge */
+.wl-nav-badge {
+  position:absolute; top:2px; right:4px; background:#ef4444;
+  color:#fff; font-size:.6rem; font-weight:800; min-width:16px; height:16px;
+  border-radius:8px; display:none; align-items:center; justify-content:center;
+  padding:0 3px; line-height:1;
+}
+.wl-nav-badge.visible { display:flex; }
+.wl-nav-item { position:relative; }
+@keyframes wl-nav-bounce {
+  0%,100%{transform:translateY(0)} 25%{transform:translateY(-6px)} 75%{transform:translateY(-3px)}
+}
+.wl-nav-bounce { animation:wl-nav-bounce .6s ease; }
+
+/* Watchlist screen */
+#screen-watchlist { background:#0a0e1a; color:#fff; }
+.wl-header {
+  background:linear-gradient(160deg,#0d1433 0%,#070b1a 100%);
+  padding:1.2rem 1rem 1rem; border-bottom:1px solid rgba(255,255,255,.07);
+  position:sticky; top:0; z-index:10;
+}
+.wl-header-title {
+  font-family:'Playfair Display',Georgia,serif;
+  font-size:1.4rem; font-weight:700; color:#fff; margin:0;
+}
+.wl-stat-row { display:flex; gap:.6rem; margin-top:.9rem; }
+.wl-stat-bubble {
+  flex:1; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1);
+  border-radius:12px; padding:.6rem .4rem; text-align:center;
+}
+.wl-stat-num { font-size:1.3rem; font-weight:800; color:#fff; }
+.wl-stat-label { font-size:.65rem; color:rgba(255,255,255,.5); margin-top:.1rem; text-transform:uppercase; letter-spacing:.04em; }
+
+/* Filter chips */
+.wl-filter-row { display:flex; gap:.5rem; overflow-x:auto; padding:.7rem 1rem; scrollbar-width:none; }
+.wl-filter-row::-webkit-scrollbar { display:none; }
+.wl-chip {
+  flex-shrink:0; padding:.3rem .8rem; border-radius:20px; font-size:.78rem; font-weight:600;
+  background:rgba(255,255,255,.07); color:rgba(255,255,255,.6); border:1px solid rgba(255,255,255,.1);
+  cursor:pointer; white-space:nowrap;
+}
+.wl-chip.active { background:#f97316; color:#fff; border-color:#f97316; }
+.wl-chip .chip-count {
+  background:rgba(255,255,255,.2); border-radius:10px; padding:0 5px; margin-left:3px; font-size:.7rem;
+}
+.wl-chip.active .chip-count { background:rgba(255,255,255,.3); }
+
+/* Sort / search row */
+.wl-controls { padding:.4rem 1rem .6rem; display:flex; gap:.5rem; align-items:center; }
+.wl-sort-select {
+  background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12); color:#fff;
+  border-radius:8px; padding:.35rem .6rem; font-size:.8rem; cursor:pointer; flex-shrink:0;
+}
+.wl-sort-select option { background:#1a1f35; color:#fff; }
+.wl-search {
+  flex:1; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12);
+  color:#fff; border-radius:8px; padding:.35rem .7rem; font-size:.85rem; outline:none;
+}
+.wl-search::placeholder { color:rgba(255,255,255,.35); }
+
+/* Priority filter */
+.wl-prio-row { display:flex; gap:.4rem; padding:0 1rem .6rem; }
+.wl-prio-btn {
+  padding:.25rem .65rem; border-radius:6px; font-size:.75rem; font-weight:600; cursor:pointer;
+  border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.06); color:rgba(255,255,255,.6);
+}
+.wl-prio-btn.active { background:#f97316; color:#fff; border-color:#f97316; }
+
+/* Watchlist card */
+.wl-card {
+  margin:.5rem 1rem; border-radius:16px; overflow:hidden;
+  background:#111827; border:1px solid rgba(255,255,255,.07);
+  position:relative; transition:box-shadow .3s;
+}
+.wl-card .wl-urgency-bar { position:absolute; left:0; top:0; bottom:0; width:4px; }
+.wl-card.urgency-green .wl-urgency-bar { background:#22c55e; box-shadow:0 0 10px #22c55e88; }
+.wl-card.urgency-yellow .wl-urgency-bar { background:#f59e0b; box-shadow:0 0 10px #f59e0b88; }
+.wl-card.urgency-orange .wl-urgency-bar { background:#f97316; box-shadow:0 0 14px #f9731688; }
+.wl-card.urgency-red .wl-urgency-bar { background:#ef4444; box-shadow:0 0 16px #ef444488; }
+@keyframes wl-border-pulse { 0%,100%{box-shadow:0 0 16px #ef444488} 50%{box-shadow:0 0 28px #ef4444cc,0 0 8px #ef4444} }
+@keyframes wl-border-rapid { 0%,100%{box-shadow:0 0 16px #ef4444} 25%,75%{box-shadow:0 0 30px #ef4444ee} 50%{box-shadow:0 0 12px #ef4444} }
+.wl-card.urgency-red.pulse-slow { animation:wl-border-pulse 2s infinite; }
+.wl-card.urgency-red.pulse-rapid { animation:wl-border-rapid .8s infinite; }
+
+.wl-card-inner { padding:.9rem .9rem .9rem 1.1rem; }
+.wl-card-top-row { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:.7rem; }
+.wl-card-actions { display:flex; gap:.3rem; }
+.wl-card-action-btn {
+  width:28px; height:28px; border-radius:8px; border:1px solid rgba(255,255,255,.15);
+  background:rgba(255,255,255,.07); color:rgba(255,255,255,.7); display:flex; align-items:center;
+  justify-content:center; cursor:pointer; font-size:.85rem;
+}
+
+/* Flip clock countdown */
+.wl-countdown { display:flex; gap:.45rem; align-items:flex-end; margin-bottom:.8rem; }
+.wl-digit-box {
+  display:flex; flex-direction:column; align-items:center; gap:.15rem;
+}
+.wl-digit-num {
+  width:48px; height:52px; background:#0d1220;
+  border-radius:8px; display:flex; align-items:center; justify-content:center;
+  font-size:1.6rem; font-weight:900; color:#fff; font-variant-numeric:tabular-nums;
+  box-shadow:0 4px 12px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.08), inset 0 -2px 4px rgba(0,0,0,.4);
+  position:relative; overflow:hidden;
+  border:1px solid rgba(255,255,255,.08);
+}
+.wl-digit-num::after {
+  content:''; position:absolute; left:0; right:0; top:50%; height:1px;
+  background:rgba(0,0,0,.4);
+}
+.wl-digit-label { font-size:.6rem; font-weight:700; color:rgba(255,255,255,.4); text-transform:uppercase; letter-spacing:.06em; }
+.wl-digit-sep { font-size:1.4rem; font-weight:900; color:rgba(255,255,255,.3); margin-bottom:18px; }
+
+/* Flip animation */
+@keyframes wl-flip-out { 0%{transform:rotateX(0deg);opacity:1} 100%{transform:rotateX(-90deg);opacity:0} }
+@keyframes wl-flip-in  { 0%{transform:rotateX(90deg);opacity:0}  100%{transform:rotateX(0deg);opacity:1} }
+.wl-flipping { animation:wl-flip-out .15s ease-in forwards; }
+.wl-flip-enter { animation:wl-flip-in .15s ease-out forwards; }
+
+/* You Are Here / Ended banners */
+.wl-here-banner {
+  background:linear-gradient(90deg,#14532d,#166534); border-radius:12px;
+  padding:.8rem 1rem; text-align:center; margin-bottom:.8rem;
+}
+.wl-here-text { font-size:1.1rem; font-weight:800; color:#4ade80; }
+@keyframes wl-here-pulse { 0%,100%{opacity:1} 50%{opacity:.7} }
+.wl-here-banner { animation:wl-here-pulse 2s infinite; }
+.wl-ended-banner {
+  background:rgba(255,255,255,.05); border-radius:12px;
+  padding:.6rem 1rem; text-align:center; margin-bottom:.8rem;
+}
+.wl-ended-text { font-size:.9rem; color:rgba(255,255,255,.35); }
+
+/* Item info row */
+.wl-item-info { display:flex; align-items:center; gap:.6rem; }
+.wl-item-emoji { font-size:1.5rem; }
+.wl-item-name { font-size:.9rem; font-weight:700; color:#fff; }
+.wl-item-meta { font-size:.75rem; color:rgba(255,255,255,.45); margin-top:.1rem; }
+.wl-item-note { font-size:.75rem; color:rgba(255,255,255,.4); font-style:italic; margin-top:.3rem; background:rgba(255,255,255,.04); border-radius:6px; padding:.25rem .5rem; }
+.wl-priority-badge {
+  display:inline-flex; align-items:center; gap:.25rem;
+  font-size:.68rem; font-weight:700; padding:.15rem .5rem;
+  border-radius:5px; margin-left:.4rem; text-transform:uppercase;
+}
+.wl-prio-normal { background:rgba(59,130,246,.2); color:#60a5fa; }
+.wl-prio-high { background:rgba(249,115,22,.2); color:#fb923c; }
+.wl-prio-must { background:rgba(239,68,68,.2); color:#f87171; }
+
+/* Expiring Soon section */
+.wl-expiring-section { margin:.5rem 1rem .2rem; }
+.wl-expiring-header {
+  display:flex; align-items:center; gap:.5rem; margin-bottom:.6rem;
+  padding:.5rem .8rem; border-radius:10px; border:1px solid #ef4444;
+}
+@keyframes wl-exp-border { 0%,100%{box-shadow:0 0 8px #ef444466} 50%{box-shadow:0 0 20px #ef4444aa} }
+.wl-expiring-header { animation:wl-exp-border 1.5s infinite; }
+.wl-expiring-header-text { font-size:.85rem; font-weight:800; color:#ef4444; }
+.wl-expiring-scroll { display:flex; gap:.6rem; overflow-x:auto; padding-bottom:.4rem; scrollbar-width:none; }
+.wl-expiring-scroll::-webkit-scrollbar { display:none; }
+.wl-compact-card {
+  flex-shrink:0; width:120px; background:#1a0a0a; border:1px solid #ef444466;
+  border-radius:12px; padding:.7rem .6rem; text-align:center;
+}
+.wl-compact-emoji { font-size:1.4rem; margin-bottom:.2rem; }
+.wl-compact-name { font-size:.72rem; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:.3rem; }
+.wl-compact-time { font-size:1.1rem; font-weight:900; color:#ef4444; font-variant-numeric:tabular-nums; }
+.wl-compact-unit { font-size:.65rem; color:rgba(255,255,255,.4); }
+
+/* Empty state */
+.wl-empty {
+  display:flex; flex-direction:column; align-items:center;
+  padding:2.5rem 1.5rem 1.5rem; text-align:center;
+}
+@keyframes wl-clock-spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
+.wl-empty-clock { font-size:4rem; animation:wl-clock-spin 8s linear infinite; margin-bottom:1rem; display:inline-block; }
+.wl-empty-title { font-family:'Playfair Display',Georgia,serif; font-size:1.4rem; font-weight:700; color:#fff; margin-bottom:.5rem; }
+.wl-empty-sub { font-size:.9rem; color:rgba(255,255,255,.45); margin-bottom:1.5rem; line-height:1.5; }
+.wl-ghost-card {
+  width:100%; background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06);
+  border-radius:14px; padding:.9rem; margin-bottom:.6rem; position:relative;
+  filter:blur(1.5px); opacity:.35;
+}
+.wl-ghost-overlay { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:1.3rem; }
+
+/* Alert notification banner */
+.wl-alert-banner {
+  position:fixed; top:-100px; left:50%; transform:translateX(-50%);
+  width:calc(100% - 2rem); max-width:400px;
+  background:linear-gradient(135deg,#1a1f35,#0d1220);
+  border:1px solid rgba(255,255,255,.15); border-radius:16px;
+  padding:.9rem 1rem; z-index:9999;
+  box-shadow:0 8px 32px rgba(0,0,0,.6); transition:top .4s cubic-bezier(.34,1.56,.64,1);
+  display:flex; gap:.8rem; align-items:flex-start;
+}
+.wl-alert-banner.show { top:.8rem; }
+.wl-alert-banner-emoji { font-size:1.6rem; flex-shrink:0; }
+.wl-alert-banner-body { flex:1; min-width:0; }
+.wl-alert-banner-title { font-size:.85rem; font-weight:700; color:#fff; margin-bottom:.2rem; }
+.wl-alert-banner-msg { font-size:.8rem; color:rgba(255,255,255,.65); }
+.wl-alert-banner-btns { display:flex; gap:.4rem; margin-top:.5rem; }
+.wl-alert-btn {
+  padding:.25rem .6rem; border-radius:7px; font-size:.75rem; font-weight:600; cursor:pointer; border:none;
+}
+.wl-alert-btn.view { background:#f97316; color:#fff; }
+.wl-alert-btn.dismiss { background:rgba(255,255,255,.12); color:rgba(255,255,255,.7); }
+.wl-alert-btn.snooze { background:rgba(59,130,246,.2); color:#60a5fa; }
+
+/* Add to Watchlist modal */
+.wl-modal-sheet {
+  background:#111827; border-radius:20px 20px 0 0; padding:1.2rem 1rem 2rem;
+  max-height:90vh; overflow-y:auto;
+}
+.wl-modal-item-header {
+  background:linear-gradient(135deg,#1a2035,#0d1220);
+  border-radius:14px; padding:1rem; text-align:center;
+  border:1px solid rgba(255,255,255,.1); margin-bottom:1rem;
+}
+.wl-modal-emoji { font-size:2.5rem; margin-bottom:.3rem; }
+.wl-modal-name { font-size:1rem; font-weight:700; color:#fff; }
+.wl-modal-cat { font-size:.8rem; color:rgba(255,255,255,.5); }
+.wl-section-label {
+  font-size:.7rem; font-weight:700; color:rgba(255,255,255,.4);
+  text-transform:uppercase; letter-spacing:.07em; margin:.9rem 0 .45rem;
+}
+.wl-date-row { display:flex; gap:.5rem; }
+.wl-date-input, .wl-time-input {
+  flex:1; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12);
+  color:#fff; border-radius:10px; padding:.55rem .7rem; font-size:.85rem; outline:none;
+}
+.wl-date-input::-webkit-calendar-picker-indicator,
+.wl-time-input::-webkit-calendar-picker-indicator { filter:invert(1); opacity:.6; }
+.wl-toggle-row {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:.55rem 0; border-bottom:1px solid rgba(255,255,255,.06);
+}
+.wl-toggle-label { font-size:.88rem; color:rgba(255,255,255,.8); }
+.wl-toggle-switch input[type=checkbox]:checked + .wl-toggle-slider { background:#f97316; }
+.wl-toggle-slider { background:rgba(255,255,255,.15); }
+.wl-custom-row { display:flex; gap:.5rem; align-items:center; margin-top:.5rem; }
+.wl-custom-input {
+  width:70px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12);
+  color:#fff; border-radius:8px; padding:.5rem .6rem; font-size:.9rem; text-align:center; outline:none;
+}
+.wl-custom-select {
+  flex:1; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12);
+  color:#fff; border-radius:8px; padding:.5rem .6rem; font-size:.85rem; outline:none;
+}
+.wl-custom-select option { background:#1a1f35; }
+.wl-note-input {
+  width:100%; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12);
+  color:#fff; border-radius:10px; padding:.6rem .8rem; font-size:.85rem; outline:none;
+  resize:none; font-family:inherit; box-sizing:border-box;
+}
+.wl-note-input::placeholder { color:rgba(255,255,255,.3); }
+.wl-priority-row { display:flex; gap:.5rem; }
+.wl-prio-option {
+  flex:1; padding:.7rem .4rem; border-radius:12px; text-align:center; cursor:pointer;
+  border:2px solid rgba(255,255,255,.1); background:rgba(255,255,255,.05);
+  transition:border-color .2s, background .2s;
+}
+.wl-prio-option.selected-normal { border-color:#3b82f6; background:rgba(59,130,246,.12); }
+.wl-prio-option.selected-high { border-color:#f97316; background:rgba(249,115,22,.12); }
+.wl-prio-option.selected-must { border-color:#ef4444; background:rgba(239,68,68,.12); }
+.wl-prio-dot { width:18px; height:18px; border-radius:50%; margin:0 auto .3rem; }
+.wl-prio-dot-normal { background:#3b82f6; }
+.wl-prio-dot-high { background:#f97316; }
+.wl-prio-dot-must { background:#ef4444; }
+.wl-prio-opt-label { font-size:.78rem; font-weight:600; color:rgba(255,255,255,.7); }
+.wl-save-btn {
+  width:100%; margin-top:1.2rem; padding:.85rem;
+  background:linear-gradient(90deg,#f97316,#ea580c);
+  border:none; border-radius:14px; color:#fff; font-size:1rem; font-weight:700;
+  cursor:pointer; letter-spacing:.02em;
+}
+
+/* Confetti */
+@keyframes wl-confetti-fall {
+  0%{transform:translateY(-20px) rotate(0deg);opacity:1}
+  100%{transform:translateY(100vh) rotate(720deg);opacity:0}
+}
+.wl-confetti-piece {
+  position:fixed; top:-10px; width:8px; height:8px; z-index:9998;
+  animation:wl-confetti-fall linear forwards;
+  border-radius:2px;
+}
+
+/* Home screen expiring banner */
+.wl-home-banner {
+  background:linear-gradient(90deg,#7f1d1d,#c2410c);
+  margin:.5rem 1rem; border-radius:12px; padding:.7rem .9rem;
+  display:flex; align-items:center; gap:.6rem;
+}
+.wl-home-banner-text { flex:1; font-size:.82rem; color:#fff; }
+.wl-home-banner-countdown { font-size:.95rem; font-weight:800; color:#fca5a5; font-variant-numeric:tabular-nums; }
+.wl-home-banner-dismiss { background:rgba(255,255,255,.15); border:none; border-radius:6px; color:#fff; padding:.2rem .5rem; font-size:.75rem; cursor:pointer; }
+
+/* Widget preview */
+.wl-widget-section { padding:1rem; }
+.wl-widget-section-hdr { font-size:.9rem; font-weight:700; color:rgba(255,255,255,.7); margin-bottom:.8rem; display:flex; align-items:center; gap:.4rem; }
+.wl-size-btns { display:flex; gap:.5rem; margin-bottom:1rem; }
+.wl-size-btn {
+  flex:1; padding:.45rem; border-radius:8px; text-align:center; font-size:.85rem; font-weight:700; cursor:pointer;
+  background:rgba(255,255,255,.07); color:rgba(255,255,255,.5); border:1px solid rgba(255,255,255,.1);
+}
+.wl-size-btn.active { background:#f97316; color:#fff; border-color:#f97316; }
+.wl-phone-frame {
+  background:#1a1a1f; border-radius:36px; padding:10px;
+  box-shadow:0 0 0 3px #2a2a35, 0 0 0 5px #111, 0 20px 60px rgba(0,0,0,.7);
+  margin:0 auto; position:relative;
+}
+.wl-phone-notch {
+  width:90px; height:22px; background:#0f0f14; border-radius:0 0 16px 16px;
+  margin:0 auto 8px; position:relative; z-index:1;
+}
+.wl-widget-preview {
+  border-radius:20px; overflow:hidden;
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  position:relative; transition:background .3s;
+}
+.wl-widget-item { padding:.5rem .6rem; }
+.wl-widget-emoji { font-size:1.1rem; }
+.wl-widget-name { font-size:.72rem; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.wl-widget-time { font-size:1rem; font-weight:900; color:#fff; font-variant-numeric:tabular-nums; }
+.wl-widget-time-sm { font-size:1.4rem; font-weight:900; color:#fff; font-variant-numeric:tabular-nums; text-align:center; }
+.wl-widget-urgency-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+.wl-widget-logo { position:absolute; bottom:5px; right:7px; font-size:.55rem; color:rgba(255,255,255,.35); font-weight:700; display:flex; align-items:center; gap:2px; }
+.wl-progress-bar { height:3px; border-radius:2px; background:rgba(255,255,255,.12); margin-top:.3rem; overflow:hidden; }
+.wl-progress-fill { height:100%; border-radius:2px; background:linear-gradient(90deg,#f97316,#ef4444); transition:width .5s; }
+
+/* Customization */
+.wl-bg-presets { display:flex; gap:.5rem; margin-bottom:.8rem; }
+.wl-bg-swatch {
+  width:36px; height:36px; border-radius:8px; cursor:pointer;
+  border:2px solid transparent; transition:border-color .2s; flex-shrink:0;
+}
+.wl-bg-swatch.active { border-color:#f97316; }
+.wl-reorder-item {
+  display:flex; align-items:center; gap:.6rem; padding:.5rem 0;
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+.wl-reorder-btn {
+  width:28px; height:28px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.1);
+  border-radius:6px; color:rgba(255,255,255,.6); font-size:.9rem; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+}
+
+/* Add to Watchlist btn on detail pages */
+.btn-watchlist {
+  width:100%; padding:.75rem; border-radius:12px;
+  background:#0d1220; border:1px solid rgba(255,255,255,.15);
+  color:#fff; font-size:.95rem; font-weight:600; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; gap:.5rem;
+  margin-top:.4rem;
+}
+.btn-watchlist:active { background:#1a2035; }
+</style>
+
+<div id="screen-watchlist" class="screen" style="overflow-y:auto;padding-bottom:70px;"></div>
+<script>
+// ============================================================
+// WATCHLIST SYSTEM - STATE & CORE DATA
+// ============================================================
+
+// replace with Firestore collection 'watchlist' with real-time listener in production
+const watchlistState = {
+  // Data structure for each watchlist item:
+  // { id, itemId, itemType, itemName, itemEmoji, itemLocation, targetDate (timestamp),
+  //   priority ('normal'|'high'|'must'), note, alertSettings:{week,threeDay,oneDay,sixHour,oneHour,zero},
+  //   triggeredAlerts:[], addedAt (timestamp), isExpired:false, customAlert:{value,unit} }
+  items: JSON.parse(localStorage.getItem('wlItems') || '[]'),
+  intervals: [],        // all interval IDs — cleared on screen close
+  alertIntervalId: null,
+  filterCategory: 'all',
+  sortBy: 'soonest',
+  searchQuery: '',
+  priorityFilter: 'all',
+  widgetSize: 'M',
+  widgetBg: 'dark-glass',
+  widgetShowEmoji: true,
+  widgetShowLocation: false,
+  widgetShowProgress: true,
+  unreadAlerts: parseInt(localStorage.getItem('wlUnreadAlerts') || '0'),
+  homeBannerDismissed: false
+};
+
+const WL_WIDGET_BGS = {
+  'dark-glass':  { bg:'rgba(10,14,26,0.82)', label:'Dark Glass' },
+  'sunset':      { bg:'linear-gradient(135deg,rgba(251,146,60,.8),rgba(236,72,153,.8))', label:'Orlando Sunset' },
+  'ocean':       { bg:'linear-gradient(135deg,rgba(6,182,212,.8),rgba(20,184,166,.8))', label:'Ocean Blue' },
+  'midnight':    { bg:'rgba(0,0,0,.95)', label:'Midnight Black' },
+  'white':       { bg:'rgba(255,255,255,.92)', label:'White Card' }
+};
+
+function wlSave() {
+  localStorage.setItem('wlItems', JSON.stringify(watchlistState.items));
+}
+function wlSaveUnread(n) {
+  watchlistState.unreadAlerts = n;
+  localStorage.setItem('wlUnreadAlerts', n);
+  wlUpdateNavBadge();
+}
+
+// ---- NAV BADGE ----
+function wlUpdateNavBadge() {
+  const badge = document.getElementById('wl-nav-badge');
+  if (!badge) return;
+  const n = watchlistState.unreadAlerts;
+  badge.textContent = n > 9 ? '9+' : n;
+  badge.classList.toggle('visible', n > 0);
+}
+
+// ---- URGENCY LEVEL ----
+function wlUrgency(ms) {
+  if (ms <= 0) return 'ended';
+  if (ms <  6 * 3600000) return 'red';
+  if (ms < 48 * 3600000) return 'orange';
+  if (ms <  7 * 86400000) return 'yellow';
+  return 'green';
+}
+function wlUrgencyColor(level) {
+  return { green:'#22c55e', yellow:'#f59e0b', orange:'#f97316', red:'#ef4444', ended:'#6b7280' }[level] || '#fff';
+}
+
+// ---- FORMAT HELPERS ----
+function wlFmtNum(n) { return String(Math.max(0,Math.floor(n))).padStart(2,'0'); }
+function wlMsBreakdown(ms) {
+  if (ms <= 0) return { d:0, h:0, m:0, s:0 };
+  const s = Math.floor(ms / 1000);
+  return { d:Math.floor(s/86400), h:Math.floor((s%86400)/3600), m:Math.floor((s%3600)/60), s:s%60 };
+}
+function wlFmtCountdown(ms) {
+  const {d,h,m,s} = wlMsBreakdown(ms);
+  if (d > 0) return d+'d '+h+'h';
+  if (h > 0) return h+'h '+wlFmtNum(m)+'m';
+  return wlFmtNum(m)+'m '+wlFmtNum(s)+'s';
+}
+
+// ---- SHOW SCREEN ----
+function showWatchlistScreen() {
+  // Clear nav badge
+  wlSaveUnread(0);
+  // Render
+  const scr = document.getElementById('screen-watchlist');
+  if (!scr) return;
+  // Stop previous intervals
+  wlStopIntervals();
+  scr.innerHTML = wlBuildScreenHTML();
+  // Nav
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  scr.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const navWl = document.getElementById('nav-watchlist');
+  if (navWl) navWl.classList.add('active');
+  appState.currentScreen = 'watchlist';
+  // Start all timers
+  wlStartAllTimers();
+  wlStartAlertChecker();
+  wlUpdateNavBadge();
+}
+
+function wlStopIntervals() {
+  watchlistState.intervals.forEach(id => clearInterval(id));
+  watchlistState.intervals = [];
+  if (watchlistState.alertIntervalId) {
+    clearInterval(watchlistState.alertIntervalId);
+    watchlistState.alertIntervalId = null;
+  }
+}
+
+// ---- FILTER / SORT items ----
+function wlFilteredItems() {
+  let items = [...watchlistState.items];
+  // Filter by category
+  if (watchlistState.filterCategory !== 'all') {
+    items = items.filter(it => it.itemType === watchlistState.filterCategory);
+  }
+  // Priority filter
+  if (watchlistState.priorityFilter === 'must') items = items.filter(it => it.priority === 'must');
+  else if (watchlistState.priorityFilter === 'high') items = items.filter(it => it.priority === 'high' || it.priority === 'must');
+  // Search
+  if (watchlistState.searchQuery) {
+    const q = watchlistState.searchQuery.toLowerCase();
+    items = items.filter(it => it.itemName.toLowerCase().includes(q));
+  }
+  // Sort
+  if (watchlistState.sortBy === 'soonest') {
+    items.sort((a,b) => (a.targetDate - Date.now()) - (b.targetDate - Date.now()));
+  } else if (watchlistState.sortBy === 'added') {
+    items.sort((a,b) => b.addedAt - a.addedAt);
+  } else if (watchlistState.sortBy === 'priority') {
+    const pOrd = { must:0, high:1, normal:2 };
+    items.sort((a,b) => (pOrd[a.priority]||2) - (pOrd[b.priority]||2));
+  } else if (watchlistState.sortBy === 'alpha') {
+    items.sort((a,b) => a.itemName.localeCompare(b.itemName));
+  }
+  return items;
+}
+
+// ---- COUNT HELPERS ----
+function wlStats() {
+  const items = watchlistState.items;
+  const total = items.length;
+  const alertsActive = items.filter(it => {
+    const s = it.alertSettings || {};
+    return Object.values(s).some(Boolean);
+  }).length;
+  const expiringSoon = items.filter(it => {
+    const ms = it.targetDate - Date.now();
+    return ms > 0 && ms < 48 * 3600000;
+  }).length;
+  return { total, alertsActive, expiringSoon };
+}
+
+function wlCategoryCount(cat) {
+  if (cat === 'all') return watchlistState.items.length;
+  return watchlistState.items.filter(it => it.itemType === cat).length;
+}
+
+// ---- BUILD SCREEN HTML ----
+function wlBuildScreenHTML() {
+  const stats = wlStats();
+  const filtered = wlFilteredItems();
+  const expiring = watchlistState.items.filter(it => {
+    const ms = it.targetDate - Date.now(); return ms > 0 && ms < 48*3600000;
+  });
+  const cats = ['events','hotels','deals','attractions','parks'];
+
+  return `
+    <div class="wl-header">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <h1 class="wl-header-title">⏱️ My Watchlist</h1>
+        <button onclick="wlShareWatchlist()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);color:#fff;border-radius:10px;padding:.35rem .7rem;font-size:.8rem;cursor:pointer;font-weight:600;">Share 🔗</button>
+      </div>
+      <div class="wl-stat-row">
+        <div class="wl-stat-bubble"><div class="wl-stat-num">${stats.total}</div><div class="wl-stat-label">Watched</div></div>
+        <div class="wl-stat-bubble"><div class="wl-stat-num">${stats.alertsActive}</div><div class="wl-stat-label">Alerts Active</div></div>
+        <div class="wl-stat-bubble" style="${stats.expiringSoon>0?'border-color:#ef4444;':''}">
+          <div class="wl-stat-num" style="${stats.expiringSoon>0?'color:#ef4444;':''}">${stats.expiringSoon}</div>
+          <div class="wl-stat-label">Expiring Soon</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wl-filter-row">
+      ${['all',...cats].map(cat => {
+        const cnt = wlCategoryCount(cat);
+        const lbl = cat==='all'?'All':cat.charAt(0).toUpperCase()+cat.slice(1);
+        return `<div class="wl-chip ${watchlistState.filterCategory===cat?'active':''}" onclick="wlSetFilter('${cat}')">${lbl}<span class="chip-count">${cnt}</span></div>`;
+      }).join('')}
+    </div>
+
+    <div class="wl-controls">
+      <select class="wl-sort-select" onchange="watchlistState.sortBy=this.value;wlRerender()">
+        <option value="soonest" ${watchlistState.sortBy==='soonest'?'selected':''}>Soonest First</option>
+        <option value="added"   ${watchlistState.sortBy==='added'?'selected':''}>Recently Added</option>
+        <option value="priority"${watchlistState.sortBy==='priority'?'selected':''}>Priority: High→Low</option>
+        <option value="alpha"   ${watchlistState.sortBy==='alpha'?'selected':''}>Alphabetical A–Z</option>
+      </select>
+      <input class="wl-search" placeholder="Search watchlist..." value="${watchlistState.searchQuery}"
+             oninput="watchlistState.searchQuery=this.value;wlRerender()" />
+    </div>
+
+    <div class="wl-prio-row">
+      ${[['all','All Priorities'],['must','🔥 Must See'],['high','High Priority']].map(([v,l]) =>
+        `<div class="wl-prio-btn ${watchlistState.priorityFilter===v?'active':''}" onclick="wlSetPrioFilter('${v}')">${l}</div>`
+      ).join('')}
+    </div>
+
+    <div id="wl-list-container">
+      ${expiring.length > 0 ? wlBuildExpiringSoon(expiring) : ''}
+      ${filtered.length === 0 ? wlBuildEmpty() : filtered.map(it => wlCardHTML(it)).join('')}
+    </div>
+
+    ${wlBuildWidgetSection()}
+  `;
+}
+
+function wlRerender() {
+  wlStopIntervals();
+  const scr = document.getElementById('screen-watchlist');
+  if (!scr || appState.currentScreen !== 'watchlist') return;
+  scr.innerHTML = wlBuildScreenHTML();
+  wlStartAllTimers();
+  wlStartAlertChecker();
+}
+
+function wlSetFilter(cat) { watchlistState.filterCategory = cat; wlRerender(); }
+function wlSetPrioFilter(v) { watchlistState.priorityFilter = v; wlRerender(); }
+
+// ---- EXPIRING SOON ----
+function wlBuildExpiringSoon(items) {
+  return `<div class="wl-expiring-section">
+    <div class="wl-expiring-header">
+      <span style="font-size:1.1rem;">🚨</span>
+      <span class="wl-expiring-header-text">Expiring Soon</span>
+    </div>
+    <div class="wl-expiring-scroll">
+      ${items.map(it => {
+        const ms = it.targetDate - Date.now();
+        return `<div class="wl-compact-card">
+          <div class="wl-compact-emoji">${it.itemEmoji}</div>
+          <div class="wl-compact-name">${it.itemName}</div>
+          <div class="wl-compact-time" id="wl-compact-${it.id}">--:--</div>
+          <div class="wl-compact-unit">remaining</div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
+// ---- EMPTY STATE ----
+function wlBuildEmpty() {
+  return `<div class="wl-empty">
+    <span class="wl-empty-clock">⏱️</span>
+    <div class="wl-empty-title">Your Watchlist is Empty</div>
+    <p class="wl-empty-sub">Add events, deals & attractions to track countdowns and get personalized alerts</p>
+    <button class="btn-primary" onclick="showScreen('explore',document.querySelector('[onclick*=\"explore\"]'));setTimeout(()=>switchExploreTab('events'),200);" style="margin-bottom:1.5rem;">Browse Events</button>
+    ${[1,2,3].map(i=>`
+      <div class="wl-ghost-card">
+        <div style="height:52px;background:rgba(255,255,255,.05);border-radius:8px;margin-bottom:.5rem;"></div>
+        <div style="height:16px;width:60%;background:rgba(255,255,255,.04);border-radius:4px;margin-bottom:.3rem;"></div>
+        <div style="height:12px;width:40%;background:rgba(255,255,255,.03);border-radius:4px;"></div>
+        <div class="wl-ghost-overlay">🔒</div>
+      </div>`).join('')}
+  </div>`;
+}
+
+// ---- CARD HTML (static, timer fills digits) ----
+function wlCardHTML(item) {
+  const ms = item.targetDate - Date.now();
+  const urgency = wlUrgency(ms);
+  const pulseClass = ms > 0 && ms < 5*60000 ? 'pulse-rapid' : ms > 0 && ms < 3600000 ? 'pulse-slow' : '';
+  const prioClass = { normal:'wl-prio-normal', high:'wl-prio-high', must:'wl-prio-must' }[item.priority] || 'wl-prio-normal';
+  const prioLabel = { normal:'Normal', high:'🔥 High', must:'🔥 Must See' }[item.priority] || 'Normal';
+
+  const {d,h,m,s} = wlMsBreakdown(Math.max(0,ms));
+  const innerContent = ms <= 0
+    ? (ms > -86400000*7
+        ? `<div class="wl-ended-banner"><div class="wl-ended-text">⏳ Ended ${wlFmtCountdown(-ms)} ago</div></div>`
+        : `<div class="wl-ended-banner"><div class="wl-ended-text">⏳ Event Ended</div></div>`)
+    : `<div class="wl-countdown" id="wl-cd-${item.id}">
+        <div class="wl-digit-box">
+          <div class="wl-digit-num" id="wl-d-${item.id}-d">${wlFmtNum(d)}</div>
+          <div class="wl-digit-label">D</div>
+        </div>
+        <div class="wl-digit-sep">:</div>
+        <div class="wl-digit-box">
+          <div class="wl-digit-num" id="wl-d-${item.id}-h">${wlFmtNum(h)}</div>
+          <div class="wl-digit-label">H</div>
+        </div>
+        <div class="wl-digit-sep">:</div>
+        <div class="wl-digit-box">
+          <div class="wl-digit-num" id="wl-d-${item.id}-m">${wlFmtNum(m)}</div>
+          <div class="wl-digit-label">M</div>
+        </div>
+        <div class="wl-digit-sep">:</div>
+        <div class="wl-digit-box">
+          <div class="wl-digit-num" id="wl-d-${item.id}-s">${wlFmtNum(s)}</div>
+          <div class="wl-digit-label">S</div>
+        </div>
+      </div>`;
+
+  return `
+    <div class="wl-card urgency-${urgency} ${pulseClass}" id="wl-card-${item.id}">
+      <div class="wl-urgency-bar"></div>
+      <div class="wl-card-inner">
+        <div class="wl-card-top-row">
+          <span class="wl-priority-badge ${prioClass}">${prioLabel}</span>
+          <div class="wl-card-actions">
+            <div class="wl-card-action-btn" onclick="wlShareItem('${item.id}')" title="Share">📤</div>
+            <div class="wl-card-action-btn" onclick="wlOpenAlertEditor('${item.id}')" title="Alert Settings">🔔</div>
+            <div class="wl-card-action-btn" onclick="wlConfirmRemove('${item.id}')" title="Remove" style="color:#ef4444;">✕</div>
+          </div>
+        </div>
+        ${innerContent}
+        <div class="wl-item-info">
+          <span class="wl-item-emoji">${item.itemEmoji}</span>
+          <div>
+            <div class="wl-item-name">${item.itemName}</div>
+            <div class="wl-item-meta">${item.itemType ? item.itemType.charAt(0).toUpperCase()+item.itemType.slice(1) : ''}${item.itemLocation ? ' • ' + item.itemLocation : ''}</div>
+            ${item.note ? `<div class="wl-item-note">📝 ${item.note}</div>` : ''}
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+</script>
+
+<script>
+// ============================================================
+// BLOCK K: Live Countdown Timers + Alert System + Home Banner
+// ============================================================
+
+// ---- FLIP DIGIT ANIMATION ----
+function wlFlipDigit(el, newVal) {
+  if (!el) return;
+  const cur = el.textContent;
+  if (cur === newVal) return;
+  el.classList.add('wl-flipping');
+  setTimeout(() => {
+    el.textContent = newVal;
+    el.classList.remove('wl-flipping');
+    el.classList.add('wl-flip-enter');
+    setTimeout(() => el.classList.remove('wl-flip-enter'), 200);
+  }, 150);
+}
+
+// ---- LIVE TIMER FOR ONE ITEM ----
+function wlStartItemTimer(item) {
+  let prev = { d:'--', h:'--', m:'--', s:'--' };
+
+  const tick = () => {
+    const ms = item.targetDate - Date.now();
+    if (ms <= 0) {
+      // Check if just hit zero
+      const wasCounting = prev.s !== '--' && prev.d !== '--';
+      if (wasCounting) wlOnReachZero(item);
+      return;
+    }
+    const {d,h,m,s} = wlMsBreakdown(ms);
+    const nd = wlFmtNum(d), nh = wlFmtNum(h), nm = wlFmtNum(m), ns = wlFmtNum(s);
+
+    const dEl = document.getElementById('wl-d-'+item.id+'-d');
+    const hEl = document.getElementById('wl-d-'+item.id+'-h');
+    const mEl = document.getElementById('wl-d-'+item.id+'-m');
+    const sEl = document.getElementById('wl-d-'+item.id+'-s');
+
+    if (!sEl) return; // element gone, stop
+
+    // Flip seconds every tick
+    wlFlipDigit(sEl, ns);
+    // Flip minutes on change
+    if (nm !== prev.m) wlFlipDigit(mEl, nm);
+    if (nh !== prev.h) wlFlipDigit(hEl, nh);
+    if (nd !== prev.d) wlFlipDigit(dEl, nd);
+
+    if (dEl) dEl.textContent = nd;
+    if (hEl) hEl.textContent = nh;
+    if (mEl) mEl.textContent = nm;
+
+    // Update compact card if exists
+    const compact = document.getElementById('wl-compact-'+item.id);
+    if (compact) compact.textContent = wlFmtCountdown(ms);
+
+    // Update urgency class dynamically
+    const card = document.getElementById('wl-card-'+item.id);
+    if (card) {
+      const newUrgency = wlUrgency(ms);
+      ['green','yellow','orange','red'].forEach(u => card.classList.remove('urgency-'+u));
+      card.classList.add('urgency-'+newUrgency);
+      card.classList.toggle('pulse-slow', ms < 3600000 && ms >= 5*60000);
+      card.classList.toggle('pulse-rapid', ms < 5*60000);
+    }
+
+    prev = { d:nd, h:nh, m:nm, s:ns };
+  };
+
+  tick(); // run immediately
+  const id = setInterval(tick, 1000);
+  watchlistState.intervals.push(id);
+  return id;
+}
+
+// ---- START ALL TIMERS ----
+function wlStartAllTimers() {
+  watchlistState.items.forEach(item => {
+    if (item.targetDate > Date.now()) {
+      wlStartItemTimer(item);
+    }
+  });
+  // Widget timer
+  wlStartWidgetTimer();
+}
+
+// ---- ZERO CELEBRATION ----
+function wlOnReachZero(item) {
+  // Replace countdown with YOU ARE HERE banner
+  const cd = document.getElementById('wl-cd-'+item.id);
+  if (cd) {
+    cd.outerHTML = `<div class="wl-here-banner">
+      <div class="wl-here-text">🎉 YOU ARE HERE!</div>
+    </div>`;
+  }
+  // Confetti
+  wlLaunchConfetti();
+  // Big toast
+  showToast('🎉 Your countdown is here — ' + item.itemName + '!');
+  // Bounce nav badge
+  const navWl = document.getElementById('nav-watchlist');
+  if (navWl) {
+    navWl.classList.add('wl-nav-bounce');
+    setTimeout(() => navWl.classList.remove('wl-nav-bounce'), 700);
+  }
+}
+
+// ---- CONFETTI ----
+function wlLaunchConfetti() {
+  const colors = ['#f97316','#ef4444','#22c55e','#3b82f6','#a855f7','#f59e0b','#ec4899'];
+  for (let i = 0; i < 60; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'wl-confetti-piece';
+      el.style.left = (Math.random() * 100) + 'vw';
+      el.style.background = colors[Math.floor(Math.random()*colors.length)];
+      el.style.animationDuration = (1.5 + Math.random()*2) + 's';
+      el.style.animationDelay = '0s';
+      el.style.width = (6 + Math.random()*8) + 'px';
+      el.style.height = (6 + Math.random()*8) + 'px';
+      el.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 4000);
+    }, i * 40);
+  }
+}
+
+// ============================================================
+// ALERT NOTIFICATION SYSTEM
+// replace setInterval with Firebase Cloud Messaging or OneSignal
+// scheduled push notifications in production
+// ============================================================
+const WL_ALERT_THRESHOLDS = {
+  week:    { ms: 7 * 86400000, key: 'week' },
+  threeDay:{ ms: 3 * 86400000, key: 'threeDay' },
+  oneDay:  { ms: 1 * 86400000, key: 'oneDay' },
+  sixHour: { ms: 6 * 3600000,  key: 'sixHour' },
+  oneHour: { ms: 1 * 3600000,  key: 'oneHour' },
+  zero:    { ms: 0,             key: 'zero' }
+};
+
+function wlAlertMessage(key, name) {
+  const msgs = {
+    week:     `One week until ${name}. Time to start planning your visit! 📅`,
+    threeDay: `Only 3 days until ${name}. Have you got everything ready? 🎒`,
+    oneDay:   `Tomorrow is ${name}. Get excited! 🌟`,
+    sixHour:  `Just 6 hours until ${name}. Almost time to head out! 🚗`,
+    oneHour:  `One hour to go until ${name}. Start getting ready now! ⏰`,
+    zero:     `The time is now for ${name}. Enjoy every moment! 🎉`
+  };
+  return msgs[key] || `Reminder: ${name}`;
+}
+
+function wlStartAlertChecker() {
+  if (watchlistState.alertIntervalId) clearInterval(watchlistState.alertIntervalId);
+  const check = () => {
+    watchlistState.items.forEach(item => {
+      if (!item.alertSettings) return;
+      const ms = item.targetDate - Date.now();
+      if (!item.triggeredAlerts) item.triggeredAlerts = [];
+      Object.entries(WL_ALERT_THRESHOLDS).forEach(([key, thresh]) => {
+        const enabled = item.alertSettings[key];
+        if (!enabled) return;
+        if (item.triggeredAlerts.includes(key)) return;
+        const crossed = key === 'zero' ? ms <= 0 : ms <= thresh.ms;
+        if (crossed) {
+          item.triggeredAlerts.push(key);
+          wlSave();
+          wlFireAlert(item, key);
+        }
+      });
+      // Custom alert
+      if (item.customAlert && item.customAlert.value && !item.triggeredAlerts.includes('custom')) {
+        let customMs = 0;
+        const v = parseFloat(item.customAlert.value);
+        if (item.customAlert.unit === 'Minutes') customMs = v * 60000;
+        else if (item.customAlert.unit === 'Hours') customMs = v * 3600000;
+        else if (item.customAlert.unit === 'Days') customMs = v * 86400000;
+        if (ms <= customMs) {
+          item.triggeredAlerts.push('custom');
+          wlSave();
+          wlFireAlert(item, 'custom', `Custom reminder for ${item.itemName} — ${wlFmtCountdown(ms)} remaining!`);
+        }
+      }
+    });
+  };
+  check(); // immediate check
+  watchlistState.alertIntervalId = setInterval(check, 30000);
+}
+
+function wlFireAlert(item, key, customMsg) {
+  const msg = customMsg || wlAlertMessage(key, item.itemName);
+  wlShowAlertBanner(item.itemEmoji, item.itemName, msg, item.id);
+  // Add to notification center
+  if (typeof notifState !== 'undefined') {
+    notifState.items.unshift({
+      id: 'wl-alert-' + Date.now(),
+      type: 'watchlist',
+      icon: '⏰',
+      title: 'Watchlist Alert: ' + item.itemName,
+      body: msg,
+      time: Date.now(),
+      read: false
+    });
+  }
+  // Increment unread badge
+  wlSaveUnread(watchlistState.unreadAlerts + 1);
+}
+
+let _wlBannerTimer = null;
+let _wlSnoozeTimeout = null;
+
+function wlShowAlertBanner(emoji, title, msg, itemId) {
+  // Remove existing
+  const existing = document.querySelector('.wl-alert-banner');
+  if (existing) existing.remove();
+  if (_wlBannerTimer) clearTimeout(_wlBannerTimer);
+
+  const banner = document.createElement('div');
+  banner.className = 'wl-alert-banner';
+  banner.innerHTML = `
+    <div class="wl-alert-banner-emoji">${emoji}</div>
+    <div class="wl-alert-banner-body">
+      <div class="wl-alert-banner-title">${title}</div>
+      <div class="wl-alert-banner-msg">${msg}</div>
+      <div class="wl-alert-banner-btns">
+        <button class="wl-alert-btn view" onclick="showWatchlistScreen();this.closest('.wl-alert-banner').remove();">View Details</button>
+        <button class="wl-alert-btn snooze" onclick="wlSnoozeAlert(this,${JSON.stringify(emoji)},${JSON.stringify(title)},${JSON.stringify(msg)},${JSON.stringify(itemId)})">Snooze 30m</button>
+        <button class="wl-alert-btn dismiss" onclick="this.closest('.wl-alert-banner').remove()">Dismiss</button>
+      </div>
+    </div>`;
+  document.body.appendChild(banner);
+  // Slide in
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => banner.classList.add('show'));
+  });
+  // Auto dismiss after 8s
+  _wlBannerTimer = setTimeout(() => {
+    banner.classList.remove('show');
+    setTimeout(() => { if (banner.parentNode) banner.remove(); }, 500);
+  }, 8000);
+}
+
+function wlSnoozeAlert(btn, emoji, title, msg, itemId) {
+  const banner = btn.closest('.wl-alert-banner');
+  if (banner) banner.remove();
+  if (_wlSnoozeTimeout) clearTimeout(_wlSnoozeTimeout);
+  showToast('Alert snoozed for 30 minutes ⏰');
+  _wlSnoozeTimeout = setTimeout(() => {
+    wlShowAlertBanner(emoji, title, msg, itemId);
+  }, 30 * 60000);
+}
+
+// ---- HOME SCREEN EXPIRING BANNER ----
+function wlUpdateHomeBanner() {
+  if (watchlistState.homeBannerDismissed) return;
+  const soonItem = watchlistState.items.find(it => {
+    const ms = it.targetDate - Date.now();
+    return ms > 0 && ms < 6 * 3600000;
+  });
+  const existing = document.getElementById('wl-home-banner');
+  if (!soonItem) {
+    if (existing) existing.remove();
+    return;
+  }
+  if (!existing) {
+    const hero = document.querySelector('#screen-home .hero-section, #screen-home [class*="hero"]');
+    if (!hero) return;
+    const banner = document.createElement('div');
+    banner.id = 'wl-home-banner';
+    banner.className = 'wl-home-banner';
+    banner.innerHTML = `
+      <span style="font-size:1.2rem;">🚨</span>
+      <div class="wl-home-banner-text">
+        <strong>Happening Soon!</strong> ${soonItem.itemEmoji} ${soonItem.itemName}
+        <span class="wl-home-banner-countdown" id="wl-home-cd">--</span>
+      </div>
+      <button class="wl-home-banner-dismiss" onclick="watchlistState.homeBannerDismissed=true;document.getElementById('wl-home-banner').remove();">Dismiss</button>`;
+    hero.insertAdjacentElement('afterend', banner);
+  }
+  const cdEl = document.getElementById('wl-home-cd');
+  if (cdEl) cdEl.textContent = wlFmtCountdown(soonItem.targetDate - Date.now());
+}
+
+// Run home banner check periodically
+setInterval(() => {
+  if (appState.currentScreen === 'home') wlUpdateHomeBanner();
+}, 30000);
+
+// Patch renderHome to show banner
+const _origRenderHome_wl = renderHome;
+renderHome = function() {
+  _origRenderHome_wl();
+  setTimeout(wlUpdateHomeBanner, 300);
+};
+</script>
+
+<script>
+// ============================================================
+// BLOCK L: Widget Preview + Customization Panel
+// ============================================================
+
+// replace with real Progressive Web App widget using the Web App Manifest
+// and service worker in production
+const WL_WIDGET_SIZES = {
+  S: { label:'Small', w:'140px', h:'140px', desc:'2×2' },
+  M: { label:'Medium', w:'280px', h:'140px', desc:'4×2' },
+  L: { label:'Large', w:'280px', h:'280px', desc:'4×4' }
+};
+
+function wlBuildWidgetSection() {
+  return `
+    <div class="wl-widget-section">
+      <div class="wl-widget-section-hdr">📱 Phone Widget Preview</div>
+
+      <div class="wl-size-btns">
+        ${['S','M','L'].map(s => `
+          <div class="wl-size-btn ${watchlistState.widgetSize===s?'active':''}" onclick="wlSetWidgetSize('${s}')">${s}</div>`).join('')}
+      </div>
+
+      <div style="display:flex;justify-content:center;margin-bottom:1.2rem;">
+        <div class="wl-phone-frame" id="wl-phone-frame" style="width:${watchlistState.widgetSize==='S'?'200px':watchlistState.widgetSize==='M'?'320px':'320px'};">
+          <div class="wl-phone-notch"></div>
+          <div style="background:#0f0f14;border-radius:20px;padding:12px;display:flex;flex-direction:column;gap:8px;align-items:center;">
+            <!-- Home screen icons simulation -->
+            <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:4px;opacity:.3;">
+              ${['📱','📷','🗺️','🎵','💬','📧','🔧','📅'].map(e=>`<div style="width:${watchlistState.widgetSize==='S'?'32':'36'}px;height:${watchlistState.widgetSize==='S'?'32':'36'}px;background:#1a1f2e;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:${watchlistState.widgetSize==='S'?'14':'16'}px;">${e}</div>`).join('')}
+            </div>
+            <!-- Widget -->
+            ${wlBuildWidgetPreviewInner()}
+            <!-- More icons -->
+            <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:4px;opacity:.3;">
+              ${['⚙️','🛒','📰','🎮','🏃','📊','🌤️','🔍'].map(e=>`<div style="width:${watchlistState.widgetSize==='S'?'32':'36'}px;height:${watchlistState.widgetSize==='S'?'32':'36'}px;background:#1a1f2e;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:${watchlistState.widgetSize==='S'?'14':'16'}px;">${e}</div>`).join('')}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="wlShowAddToHomeScreen()" style="width:100%;padding:.75rem;background:#1a1f35;border:1px solid rgba(255,255,255,.15);color:#fff;border-radius:12px;font-size:.9rem;font-weight:600;cursor:pointer;margin-bottom:1.2rem;">
+        📲 Add Widget to Home Screen
+      </button>
+
+      <!-- Customization -->
+      <div style="margin-bottom:.8rem;">
+        <div class="wl-widget-section-hdr" style="font-size:.8rem;">🎨 Customize Widget</div>
+
+        <div style="font-size:.72rem;color:rgba(255,255,255,.4);margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.05em;">Background</div>
+        <div class="wl-bg-presets">
+          ${Object.entries(WL_WIDGET_BGS).map(([key,val]) => {
+            const swatchStyle = key==='white'?'background:#fff;':'background:'+val.bg+';';
+            return `<div class="wl-bg-swatch ${watchlistState.widgetBg===key?'active':''}"
+              style="${swatchStyle}" onclick="wlSetWidgetBg('${key}')" title="${val.label}"></div>`;
+          }).join('')}
+        </div>
+
+        <div style="font-size:.72rem;color:rgba(255,255,255,.4);margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.05em;margin-top:.7rem;">Display Options</div>
+        ${[
+          ['widgetShowEmoji','Show Item Emoji'],
+          ['widgetShowLocation','Show Location'],
+          ['widgetShowProgress','Show Progress Bar']
+        ].map(([key,label]) => `
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid rgba(255,255,255,.06);">
+            <span style="font-size:.85rem;color:rgba(255,255,255,.7);">${label}</span>
+            <label class="toggle-switch" style="transform:scale(.85);transform-origin:right center;">
+              <input type="checkbox" ${watchlistState[key]?'checked':''}
+                onchange="watchlistState.${key}=this.checked;wlUpdateWidgetPreview()">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>`).join('')}
+
+        <div style="font-size:.72rem;color:rgba(255,255,255,.4);margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.05em;margin-top:.7rem;">Reorder Items</div>
+        <div id="wl-reorder-list">
+          ${watchlistState.items.slice(0,5).map((it,i) => `
+            <div class="wl-reorder-item">
+              <span style="font-size:1rem;">${it.itemEmoji}</span>
+              <span style="font-size:.82rem;color:rgba(255,255,255,.7);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${it.itemName}</span>
+              <div class="wl-reorder-btn" onclick="wlReorderItem(${i},-1)">↑</div>
+              <div class="wl-reorder-btn" onclick="wlReorderItem(${i},+1)">↓</div>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+}
+
+function wlBuildWidgetPreviewInner() {
+  const bgInfo = WL_WIDGET_BGS[watchlistState.widgetBg] || WL_WIDGET_BGS['dark-glass'];
+  const isWhite = watchlistState.widgetBg === 'white';
+  const textColor = isWhite ? '#111' : '#fff';
+  const size = watchlistState.widgetSize;
+  const dims = WL_WIDGET_SIZES[size];
+  const items = watchlistState.items.slice(0,3);
+  const showEmoji = watchlistState.widgetShowEmoji;
+  const showLoc = watchlistState.widgetShowLocation;
+  const showProg = watchlistState.widgetShowProgress;
+
+  let content = '';
+  if (size === 'S') {
+    const it = items[0];
+    if (!it) {
+      content = `<div style="text-align:center;padding:1rem;color:rgba(255,255,255,.4);font-size:.75rem;">Add items<br>to watchlist</div>`;
+    } else {
+      const ms = Math.max(0, it.targetDate - Date.now());
+      const {d,h,m} = wlMsBreakdown(ms);
+      content = `
+        <div style="text-align:center;padding:.6rem .4rem;color:${textColor};">
+          ${showEmoji?`<div style="font-size:1.3rem;">${it.itemEmoji}</div>`:''}
+          <div class="wl-widget-time-sm" id="wl-widget-s-time" style="color:${textColor};font-size:1.3rem;">${d>0?d+'d '+h+'h':h+'h '+wlFmtNum(m)+'m'}</div>
+          <div style="font-size:.6rem;color:${isWhite?'#666':'rgba(255,255,255,.45)'};margin-top:.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;">${it.itemName.substring(0,16)}</div>
+        </div>`;
+    }
+  } else if (size === 'M') {
+    content = `<div style="padding:.5rem .6rem;display:flex;flex-direction:column;gap:.4rem;width:100%;">
+      ${(items.slice(0,2)).map((it,i) => {
+        if (!it) return '';
+        const ms = Math.max(0, it.targetDate - Date.now());
+        const {d,h,m} = wlMsBreakdown(ms);
+        const urgColor = wlUrgencyColor(wlUrgency(ms));
+        return `<div style="display:flex;align-items:center;gap:.4rem;" id="wl-widget-m-${i}">
+          <div style="width:4px;height:30px;border-radius:2px;background:${urgColor};flex-shrink:0;"></div>
+          ${showEmoji?`<span style="font-size:.9rem;">${it.itemEmoji}</span>`:''}
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:.65rem;font-weight:700;color:${textColor};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${it.itemName.substring(0,18)}</div>
+            ${showLoc&&it.itemLocation?`<div style="font-size:.58rem;color:${isWhite?'#888':'rgba(255,255,255,.4)'};">${it.itemLocation.substring(0,16)}</div>`:''}
+          </div>
+          <div style="font-size:.85rem;font-weight:900;color:${urgColor};font-variant-numeric:tabular-nums;" id="wl-widget-m-cd-${i}">${d>0?d+'d '+h+'h':h+'h '+wlFmtNum(m)+'m'}</div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  } else { // L
+    content = `<div style="padding:.6rem;display:flex;flex-direction:column;gap:.4rem;width:100%;">
+      ${(items.slice(0,3)).map((it,i) => {
+        if (!it) return '';
+        const ms = Math.max(0, it.targetDate - Date.now());
+        const {d,h,m,s} = wlMsBreakdown(ms);
+        const urgColor = wlUrgencyColor(wlUrgency(ms));
+        const totalMs = it.targetDate - it.addedAt;
+        const elapsed = Math.max(0, Date.now() - it.addedAt);
+        const pct = Math.min(100, Math.round((elapsed / totalMs)*100)) || 0;
+        return `<div style="border-bottom:1px solid rgba(255,255,255,.07);padding-bottom:.4rem;" id="wl-widget-l-${i}">
+          <div style="display:flex;align-items:center;gap:.3rem;margin-bottom:.1rem;">
+            ${showEmoji?`<span style="font-size:.85rem;">${it.itemEmoji}</span>`:''}
+            <span style="font-size:.68rem;font-weight:700;color:${textColor};flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${it.itemName.substring(0,20)}</span>
+            <span style="font-size:.75rem;font-weight:900;color:${urgColor};font-variant-numeric:tabular-nums;" id="wl-widget-l-cd-${i}">${d}d ${wlFmtNum(h)}h ${wlFmtNum(m)}m ${wlFmtNum(s)}s</span>
+          </div>
+          ${showProg?`<div class="wl-progress-bar"><div class="wl-progress-fill" style="width:${pct}%;background:${urgColor};"></div></div>`:''}
+        </div>`;
+      }).join('')}
+    </div>`;
+  }
+
+  return `<div class="wl-widget-preview" style="width:${dims.w};background:${bgInfo.bg};position:relative;min-height:${dims.h};">
+    ${content}
+    <div class="wl-widget-logo">🌴 OE</div>
+  </div>`;
+}
+
+function wlUpdateWidgetPreview() {
+  const container = document.querySelector('#screen-watchlist .wl-widget-section');
+  if (!container) return;
+  const previewEl = container.querySelector('.wl-widget-preview');
+  if (previewEl) {
+    const newWidget = document.createElement('div');
+    newWidget.innerHTML = wlBuildWidgetPreviewInner();
+    const newEl = newWidget.firstElementChild;
+    previewEl.replaceWith(newEl);
+  }
+}
+
+function wlSetWidgetSize(s) {
+  watchlistState.widgetSize = s;
+  wlRerender();
+}
+
+function wlSetWidgetBg(key) {
+  watchlistState.widgetBg = key;
+  document.querySelectorAll('.wl-bg-swatch').forEach(el => el.classList.remove('active'));
+  const btns = document.querySelectorAll('.wl-bg-swatch');
+  const keys = Object.keys(WL_WIDGET_BGS);
+  const idx = keys.indexOf(key);
+  if (btns[idx]) btns[idx].classList.add('active');
+  wlUpdateWidgetPreview();
+}
+
+function wlReorderItem(idx, dir) {
+  const newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= watchlistState.items.length) return;
+  const arr = watchlistState.items;
+  [arr[idx], arr[newIdx]] = [arr[newIdx], arr[idx]];
+  wlSave();
+  wlRerender();
+}
+
+// ---- WIDGET LIVE TIMER ----
+function wlStartWidgetTimer() {
+  const tick = () => {
+    const size = watchlistState.widgetSize;
+    const items = watchlistState.items.slice(0,3);
+    if (size === 'S' && items[0]) {
+      const el = document.getElementById('wl-widget-s-time');
+      if (el) {
+        const ms = Math.max(0, items[0].targetDate - Date.now());
+        const {d,h,m} = wlMsBreakdown(ms);
+        el.textContent = d>0 ? d+'d '+h+'h' : h+'h '+wlFmtNum(m)+'m';
+      }
+    } else if (size === 'M') {
+      items.slice(0,2).forEach((it,i) => {
+        const el = document.getElementById('wl-widget-m-cd-'+i);
+        if (el && it) {
+          const ms = Math.max(0, it.targetDate - Date.now());
+          const {d,h,m} = wlMsBreakdown(ms);
+          el.textContent = d>0 ? d+'d '+h+'h' : h+'h '+wlFmtNum(m)+'m';
+          el.style.color = wlUrgencyColor(wlUrgency(ms));
+        }
+      });
+    } else if (size === 'L') {
+      items.forEach((it,i) => {
+        const el = document.getElementById('wl-widget-l-cd-'+i);
+        if (el && it) {
+          const ms = Math.max(0, it.targetDate - Date.now());
+          const {d,h,m,s} = wlMsBreakdown(ms);
+          el.textContent = `${d}d ${wlFmtNum(h)}h ${wlFmtNum(m)}m ${wlFmtNum(s)}s`;
+          el.style.color = wlUrgencyColor(wlUrgency(ms));
+        }
+      });
+    }
+  };
+  const id = setInterval(tick, 1000);
+  watchlistState.intervals.push(id);
+}
+
+// ---- ADD TO HOME SCREEN INSTRUCTIONS ----
+function wlShowAddToHomeScreen() {
+  let activeTab = 'ios';
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay active';
+  overlay.style.cssText = 'z-index:3500;background:#0a0e1a;';
+  overlay.innerHTML = `
+    <div style="width:100%;max-width:430px;height:100%;display:flex;flex-direction:column;overflow-y:auto;">
+      <div style="padding:1rem;display:flex;align-items:center;gap:.7rem;border-bottom:1px solid rgba(255,255,255,.1);position:sticky;top:0;background:#0a0e1a;z-index:1;">
+        <button class="icon-btn" style="color:#fff;" onclick="this.closest('.overlay').remove()">←</button>
+        <span style="font-size:1rem;font-weight:700;color:#fff;">📲 Add to Home Screen</span>
+      </div>
+      <div style="display:flex;border-bottom:1px solid rgba(255,255,255,.1);">
+        <button id="wl-tab-ios" onclick="wlSwitchHomeTab('ios')" style="flex:1;padding:.7rem;background:#f97316;border:none;color:#fff;font-weight:700;font-size:.9rem;cursor:pointer;border-radius:0;">🍎 iOS</button>
+        <button id="wl-tab-android" onclick="wlSwitchHomeTab('android')" style="flex:1;padding:.7rem;background:rgba(255,255,255,.07);border:none;color:rgba(255,255,255,.6);font-weight:600;font-size:.9rem;cursor:pointer;border-radius:0;">🤖 Android</button>
+      </div>
+      <div id="wl-home-steps" style="padding:1.2rem;flex:1;"></div>
+      <div style="padding:1rem;border-top:1px solid rgba(255,255,255,.1);">
+        <button onclick="navigator.clipboard&&navigator.clipboard.writeText('https://orlandoexplorer.com/widget').then(()=>showToast('Widget link copied. Open in Safari or Chrome to add to your home screen! 📲'));this.closest('.overlay').remove();"
+                style="width:100%;padding:.8rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#fff;border-radius:12px;font-size:.9rem;font-weight:600;cursor:pointer;">
+          🔗 Copy Widget Link
+        </button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  wlSwitchHomeTab('ios');
+}
+
+function wlSwitchHomeTab(tab) {
+  const container = document.getElementById('wl-home-steps');
+  if (!container) return;
+  document.getElementById('wl-tab-ios').style.background = tab==='ios' ? '#f97316' : 'rgba(255,255,255,.07)';
+  document.getElementById('wl-tab-ios').style.color = tab==='ios' ? '#fff' : 'rgba(255,255,255,.6)';
+  document.getElementById('wl-tab-android').style.background = tab==='android' ? '#f97316' : 'rgba(255,255,255,.07)';
+  document.getElementById('wl-tab-android').style.color = tab==='android' ? '#fff' : 'rgba(255,255,255,.6)';
+
+  const iosSteps = [
+    ['1️⃣','Open Safari and navigate to the app','safari.png'],
+    ['2️⃣','Tap the Share button (□↑) at the bottom of Safari',''],
+    ['3️⃣','Scroll down and tap "Add to Home Screen"',''],
+    ['4️⃣','Tap "Add" in the top right corner',''],
+    ['5️⃣','Long press the home screen and tap Edit',''],
+    ['6️⃣','Tap the ＋ button to find and add the Orlando Explorer widget','']
+  ];
+  const androidSteps = [
+    ['1️⃣','Open Chrome and navigate to the app',''],
+    ['2️⃣','Tap the three-dot menu ⋮ in the top right corner',''],
+    ['3️⃣','Tap "Add to Home Screen"',''],
+    ['4️⃣','Tap "Add" when prompted',''],
+    ['5️⃣','Long press an empty area of your home screen',''],
+    ['6️⃣','Tap Widgets and find Orlando Explorer to position it','']
+  ];
+  const steps = tab==='ios' ? iosSteps : androidSteps;
+  container.innerHTML = steps.map(([num,text]) => `
+    <div style="display:flex;gap:.8rem;padding:.7rem 0;border-bottom:1px solid rgba(255,255,255,.06);">
+      <span style="font-size:1.1rem;flex-shrink:0;">${num}</span>
+      <span style="font-size:.88rem;color:rgba(255,255,255,.8);line-height:1.4;">${text}</span>
+    </div>`).join('');
+}
+</script>
+
+<script>
+// ============================================================
+// BLOCK M: Add to Watchlist Modal + Sharing + Nav Integration
+// ============================================================
+
+// ---- ADD TO WATCHLIST MODAL ----
+function openAddToWatchlist(item) {
+  if (!appState.user) {
+    showToast('Please sign in to use Watchlist');
+    if (typeof showAuthPrompt !== 'undefined') showAuthPrompt();
+    return;
+  }
+
+  // Pre-fill target date based on item type
+  let prefillDate = '', prefillTime = '12:00';
+  const now = new Date();
+  if (item.type === 'event' && item.date) {
+    prefillDate = item.date;
+    prefillTime = item.time || '12:00';
+  } else if ((item.type === 'hotel' || item.category === 'hotels') && typeof bookingState !== 'undefined' && bookingState.current.checkIn) {
+    prefillDate = bookingState.current.checkIn;
+  } else if (item.expiry) {
+    prefillDate = item.expiry;
+  }
+  if (!prefillDate) {
+    const d = new Date(now.getTime() + 7*86400000);
+    prefillDate = d.toISOString().split('T')[0];
+  }
+
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay active';
+  overlay.style.cssText = 'z-index:3200;align-items:flex-end;display:flex;';
+  overlay.innerHTML = `
+    <div class="wl-modal-sheet" style="width:100%;max-width:430px;margin:0 auto;">
+      <div style="width:40px;height:4px;background:rgba(255,255,255,.2);border-radius:2px;margin:0 auto .8rem;"></div>
+      <div class="wl-modal-item-header">
+        <div class="wl-modal-emoji">${item.emoji||'📍'}</div>
+        <div class="wl-modal-name">${item.name||item.title||'Item'}</div>
+        <div class="wl-modal-cat">${item.type||item.category||'Attraction'}</div>
+      </div>
+
+      <div class="wl-section-label">Target Date & Time</div>
+      <div class="wl-date-row">
+        <input type="date" class="wl-date-input" id="wl-target-date" value="${prefillDate}" min="${now.toISOString().split('T')[0]}">
+        <input type="time" class="wl-time-input" id="wl-target-time" value="${prefillTime}">
+      </div>
+
+      <div class="wl-section-label">Alert Settings</div>
+      ${[
+        ['week','Alert me 1 week before'],
+        ['threeDay','Alert me 3 days before'],
+        ['oneDay','Alert me 1 day before'],
+        ['sixHour','Alert me 6 hours before'],
+        ['oneHour','Alert me 1 hour before'],
+        ['zero','Alert me when countdown reaches zero']
+      ].map(([key,label]) => `
+        <div class="wl-toggle-row">
+          <span class="wl-toggle-label">${label}</span>
+          <label class="toggle-switch wl-toggle-switch" style="transform:scale(.9);transform-origin:right;">
+            <input type="checkbox" id="wl-alert-${key}" checked>
+            <span class="toggle-slider wl-toggle-slider"></span>
+          </label>
+        </div>`).join('')}
+
+      <div class="wl-section-label">Custom Alert</div>
+      <div class="wl-custom-row">
+        <input type="number" class="wl-custom-input" id="wl-custom-val" placeholder="3" min="1" max="999">
+        <select class="wl-custom-select" id="wl-custom-unit">
+          <option>Minutes</option>
+          <option selected>Hours</option>
+          <option>Days</option>
+        </select>
+        <span style="font-size:.8rem;color:rgba(255,255,255,.5);">before</span>
+      </div>
+
+      <div class="wl-section-label">Personal Note</div>
+      <textarea class="wl-note-input" id="wl-note" rows="2" placeholder="e.g. Need to buy tickets first, check weather before going..."></textarea>
+
+      <div class="wl-section-label">Priority</div>
+      <div class="wl-priority-row" id="wl-prio-row">
+        <div class="wl-prio-option selected-normal" data-prio="normal" onclick="wlSelectPriority(this)">
+          <div class="wl-prio-dot wl-prio-dot-normal"></div>
+          <div class="wl-prio-opt-label">Normal</div>
+        </div>
+        <div class="wl-prio-option" data-prio="high" onclick="wlSelectPriority(this)">
+          <div class="wl-prio-dot wl-prio-dot-high"></div>
+          <div class="wl-prio-opt-label">🔥 High</div>
+        </div>
+        <div class="wl-prio-option" data-prio="must" onclick="wlSelectPriority(this)">
+          <div class="wl-prio-dot wl-prio-dot-must"></div>
+          <div class="wl-prio-opt-label">🔥 Must See</div>
+        </div>
+      </div>
+
+      <button class="wl-save-btn" onclick="wlSaveItem(${JSON.stringify(JSON.stringify({id:item.id||item.itemId||'',name:item.name||item.title||item.itemName||'Item',emoji:item.emoji||item.itemEmoji||'📍',type:item.type||item.category||item.itemType||'attraction',location:item.area||item.location||item.itemLocation||''}))},this.closest('.overlay'))">
+        ⏱️ Save to Watchlist
+      </button>
+    </div>`;
+  document.body.appendChild(overlay);
+  if (typeof addSwipeDownToClose !== 'undefined') addSwipeDownToClose(overlay, () => overlay.remove());
+}
+
+function wlSelectPriority(el) {
+  el.closest('#wl-prio-row').querySelectorAll('.wl-prio-option').forEach(opt => {
+    opt.className = 'wl-prio-option';
+  });
+  const prio = el.dataset.prio;
+  el.className = `wl-prio-option selected-${prio}`;
+}
+
+function wlSaveItem(itemJsonStr, overlayEl) {
+  const meta = JSON.parse(itemJsonStr);
+  const dateVal = document.getElementById('wl-target-date').value;
+  const timeVal = document.getElementById('wl-target-time').value || '12:00';
+  if (!dateVal) { showToast('Please set a target date'); return; }
+  const targetDate = new Date(dateVal + 'T' + timeVal).getTime();
+
+  const alertSettings = {};
+  ['week','threeDay','oneDay','sixHour','oneHour','zero'].forEach(k => {
+    const el = document.getElementById('wl-alert-'+k);
+    alertSettings[k] = el ? el.checked : true;
+  });
+  const customVal = document.getElementById('wl-custom-val').value;
+  const customUnit = document.getElementById('wl-custom-unit').value;
+  const note = document.getElementById('wl-note').value.trim();
+  const prioEl = document.querySelector('#wl-prio-row .wl-prio-option[class*="selected"]');
+  const priority = prioEl ? prioEl.dataset.prio : 'normal';
+
+  const existing = watchlistState.items.findIndex(it => it.itemId === meta.id);
+  if (existing >= 0) {
+    watchlistState.items[existing].targetDate = targetDate;
+    watchlistState.items[existing].alertSettings = alertSettings;
+    watchlistState.items[existing].note = note;
+    watchlistState.items[existing].priority = priority;
+    watchlistState.items[existing].triggeredAlerts = [];
+  } else {
+    watchlistState.items.unshift({
+      id: 'wl-' + Date.now(),
+      itemId: meta.id,
+      itemType: meta.type,
+      itemName: meta.name,
+      itemEmoji: meta.emoji,
+      itemLocation: meta.location,
+      targetDate,
+      priority,
+      note,
+      alertSettings,
+      customAlert: customVal ? { value: customVal, unit: customUnit } : null,
+      triggeredAlerts: [],
+      addedAt: Date.now(),
+      isExpired: false
+    });
+  }
+  wlSave();
+  overlayEl.remove();
+  showToast('Added to Watchlist! ⏱️');
+  // Bounce nav icon
+  const navWl = document.getElementById('nav-watchlist');
+  if (navWl) {
+    navWl.classList.add('wl-nav-bounce');
+    setTimeout(() => navWl.classList.remove('wl-nav-bounce'), 700);
+  }
+  // Restart alert checker
+  wlStartAlertChecker();
+  // Re-render if watchlist is open
+  if (appState.currentScreen === 'watchlist') wlRerender();
+}
+
+// ---- REMOVE ITEM ----
+function wlConfirmRemove(id) {
+  const item = watchlistState.items.find(it => it.id === id);
+  if (!item) return;
+  if (confirm(`Remove "${item.itemName}" from your watchlist?`)) {
+    watchlistState.items = watchlistState.items.filter(it => it.id !== id);
+    wlSave();
+    wlRerender();
+  }
+}
+
+// ---- SHARE ITEM ----
+function wlShareItem(id) {
+  const item = watchlistState.items.find(it => it.id === id);
+  if (!item) return;
+  const ms = Math.max(0, item.targetDate - Date.now());
+  const {d,h} = wlMsBreakdown(ms);
+  const msg = `I'm counting down ${d} days, ${h} hours until ${item.itemName} on Orlando Explorer. Join me at orlandoexplorer.com`;
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay active';
+  overlay.style.cssText = 'z-index:3300;align-items:flex-end;display:flex;';
+  overlay.innerHTML = `
+    <div class="wl-modal-sheet" style="width:100%;max-width:430px;margin:0 auto;">
+      <div style="width:40px;height:4px;background:rgba(255,255,255,.2);border-radius:2px;margin:0 auto .8rem;"></div>
+      <div style="font-size:.95rem;font-weight:700;color:#fff;margin-bottom:.8rem;">📤 Share Countdown</div>
+      <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:.9rem;font-size:.88rem;color:rgba(255,255,255,.8);line-height:1.5;margin-bottom:.9rem;">${msg}</div>
+      <button onclick="if(navigator.clipboard){navigator.clipboard.writeText(${JSON.stringify(msg)}).then(()=>{showToast('Countdown copied! 📋');this.closest('.overlay').remove();});}else{showToast('Copy: '+${JSON.stringify(msg)});}" 
+              style="width:100%;padding:.75rem;background:#f97316;border:none;border-radius:12px;color:#fff;font-weight:700;cursor:pointer;font-size:.9rem;margin-bottom:.6rem;">
+        📋 Copy Message
+      </button>
+      <div style="display:flex;gap:.5rem;">
+        ${[['💬','Messages'],['📸','Instagram'],['📱','WhatsApp']].map(([e,name]) => `
+          <button onclick="showToast('Shared to ${name} successfully! ${e}');this.closest('.overlay').remove();"
+                  style="flex:1;padding:.6rem;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#fff;font-size:.8rem;cursor:pointer;font-weight:600;">
+            ${e} ${name}
+          </button>`).join('')}
+      </div>
+      <button onclick="this.closest('.overlay').remove()" style="width:100%;margin-top:.7rem;padding:.6rem;background:none;border:none;color:rgba(255,255,255,.4);font-size:.85rem;cursor:pointer;">Cancel</button>
+    </div>`;
+  document.body.appendChild(overlay);
+  if (typeof addSwipeDownToClose !== 'undefined') addSwipeDownToClose(overlay, () => overlay.remove());
+}
+
+// ---- SHARE FULL WATCHLIST ----
+function wlShareWatchlist() {
+  const top5 = watchlistState.items.slice(0,5);
+  if (!top5.length) { showToast('Add items to your watchlist first!'); return; }
+  const lines = top5.map((it,i) => {
+    const ms = Math.max(0, it.targetDate - Date.now());
+    const {d,h} = wlMsBreakdown(ms);
+    return `${i+1}. ${it.itemName} in ${d > 0 ? d+'d '+h+'h' : h+'h'}`;
+  });
+  const msg = `My Orlando Watchlist on Orlando Explorer:\n${lines.join('\n')}\n\nPlan your trip at orlandoexplorer.com`;
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay active';
+  overlay.style.cssText = 'z-index:3300;align-items:flex-end;display:flex;';
+  overlay.innerHTML = `
+    <div class="wl-modal-sheet" style="width:100%;max-width:430px;margin:0 auto;">
+      <div style="width:40px;height:4px;background:rgba(255,255,255,.2);border-radius:2px;margin:0 auto .8rem;"></div>
+      <div style="font-size:.95rem;font-weight:700;color:#fff;margin-bottom:.8rem;">🔗 Share My Watchlist</div>
+      <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:.9rem;font-size:.82rem;color:rgba(255,255,255,.75);line-height:1.6;white-space:pre-line;margin-bottom:.9rem;">${msg}</div>
+      <button onclick="if(navigator.clipboard){navigator.clipboard.writeText(${JSON.stringify(msg)}).then(()=>showToast('Watchlist copied to clipboard! 📋'));}" 
+              style="width:100%;padding:.75rem;background:#f97316;border:none;border-radius:12px;color:#fff;font-weight:700;cursor:pointer;font-size:.9rem;margin-bottom:.6rem;">
+        📋 Copy to Clipboard
+      </button>
+      <div style="display:flex;gap:.5rem;">
+        ${[['💬','Messages'],['📸','Instagram Stories'],['📱','WhatsApp']].map(([e,name]) => `
+          <button onclick="showToast('Shared to ${name} successfully! ${e}');this.closest('.overlay').remove();"
+                  style="flex:1;padding:.5rem .3rem;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#fff;font-size:.72rem;cursor:pointer;font-weight:600;">
+            ${e}<br><span style="font-size:.65rem;">${name}</span>
+          </button>`).join('')}
+      </div>
+      <button onclick="this.closest('.overlay').remove()" style="width:100%;margin-top:.7rem;padding:.6rem;background:none;border:none;color:rgba(255,255,255,.4);font-size:.85rem;cursor:pointer;">Close</button>
+    </div>`;
+  document.body.appendChild(overlay);
+  if (typeof addSwipeDownToClose !== 'undefined') addSwipeDownToClose(overlay, () => overlay.remove());
+}
+
+// ---- ALERT SETTINGS EDITOR ----
+function wlOpenAlertEditor(id) {
+  const item = watchlistState.items.find(it => it.id === id);
+  if (!item) return;
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay active';
+  overlay.style.cssText = 'z-index:3300;align-items:flex-end;display:flex;';
+  overlay.innerHTML = `
+    <div class="wl-modal-sheet" style="width:100%;max-width:430px;margin:0 auto;">
+      <div style="width:40px;height:4px;background:rgba(255,255,255,.2);border-radius:2px;margin:0 auto .8rem;"></div>
+      <div style="font-size:.95rem;font-weight:700;color:#fff;margin-bottom:.3rem;">🔔 Alert Settings</div>
+      <div style="font-size:.82rem;color:rgba(255,255,255,.45);margin-bottom:.9rem;">${item.itemEmoji} ${item.itemName}</div>
+      ${[
+        ['week','1 week before'],['threeDay','3 days before'],['oneDay','1 day before'],
+        ['sixHour','6 hours before'],['oneHour','1 hour before'],['zero','At countdown zero']
+      ].map(([key,label]) => `
+        <div class="wl-toggle-row">
+          <span class="wl-toggle-label">${label}</span>
+          <label class="toggle-switch wl-toggle-switch" style="transform:scale(.9);transform-origin:right;">
+            <input type="checkbox" id="wled-${key}" ${(item.alertSettings&&item.alertSettings[key])?'checked':''}>
+            <span class="toggle-slider wl-toggle-slider"></span>
+          </label>
+        </div>`).join('')}
+      <button onclick="wlSaveAlertSettings('${id}',this.closest('.overlay'))"
+              style="width:100%;margin-top:1rem;padding:.75rem;background:#f97316;border:none;border-radius:12px;color:#fff;font-weight:700;cursor:pointer;font-size:.9rem;">
+        Save Alert Settings
+      </button>
+    </div>`;
+  document.body.appendChild(overlay);
+  if (typeof addSwipeDownToClose !== 'undefined') addSwipeDownToClose(overlay, () => overlay.remove());
+}
+
+function wlSaveAlertSettings(id, overlayEl) {
+  const item = watchlistState.items.find(it => it.id === id);
+  if (!item) return;
+  item.alertSettings = {};
+  ['week','threeDay','oneDay','sixHour','oneHour','zero'].forEach(k => {
+    const el = document.getElementById('wled-'+k);
+    item.alertSettings[k] = el ? el.checked : false;
+  });
+  // Reset triggered alerts so they can fire again
+  item.triggeredAlerts = [];
+  wlSave();
+  overlayEl.remove();
+  showToast('Alert settings saved! 🔔');
+}
+
+// ============================================================
+// WIRE INTO APP: Nav tab, detail page button, account screen
+// ============================================================
+
+// 1. Add Watchlist screen placeholder (already added as <div id="screen-watchlist">)
+// 2. Patch showScreen to handle watchlist
+const _origShowScreen_wl = showScreen;
+showScreen = function(name, navEl) {
+  if (name === 'watchlist') {
+    showWatchlistScreen();
+    return;
+  }
+  // Stop watchlist intervals when leaving
+  if (appState.currentScreen === 'watchlist') {
+    wlStopIntervals();
+  }
+  _origShowScreen_wl(name, navEl);
+};
+
+// 3. Override buildDetailHTML to inject "Add to Watchlist" button
+const _origBuildDetailHTML_wl = buildDetailHTML;
+buildDetailHTML = function(item) {
+  let html = _origBuildDetailHTML_wl(item);
+  const wlMeta = { id:item.id||'', name:item.name||item.title||'Item', emoji:item.emoji||'📍', type:item.type||item.category||'attraction', location:item.area||item.location||'', date:item.date||'', time:item.time||'' };
+  const wlBtn = `<button class="btn-watchlist" onclick='openAddToWatchlist(${JSON.stringify(wlMeta).replace(/'/g,"&#39;")})'>
+    ⏱️ Add to Watchlist
+  </button>`;
+  // Try to insert after "Save to Trip" button pattern; fallback append
+  if (html.includes('btn-secondary') || html.includes('Add to Trip') || html.includes('Book Now')) {
+    // Insert before last </div></div></div>
+    const lastClose = html.lastIndexOf('</div>');
+    html = html.substring(0, lastClose) + wlBtn + html.substring(lastClose);
+  } else {
+    html += wlBtn;
+  }
+  return html;
+};
+
+// 4. Patch openDetail to pass full item
+const _origOpenDetailWl = openDetail;
+openDetail = function(id, type) {
+  _origOpenDetailWl(id, type);
+};
+
+// 5. Patch renderAccount to add Watchlist menu item
+const _origRenderAccount_wl = renderAccount;
+renderAccount = function() {
+  _origRenderAccount_wl();
+  setTimeout(() => {
+    if (document.querySelector('#account-screen [data-wl-menu]')) return;
+    const menuItems = document.querySelectorAll('#account-screen .menu-item, #account-screen [style*="cursor:pointer"]');
+    if (menuItems.length > 0) {
+      const first = menuItems[0];
+      const wlItem = document.createElement('div');
+      wlItem.className = first.className;
+      wlItem.setAttribute('data-wl-menu','1');
+      wlItem.innerHTML = '<span>⏱️</span><span>My Watchlist</span><span>›</span>';
+      wlItem.onclick = showWatchlistScreen;
+      wlItem.style.cssText = first.style.cssText || '';
+      if (first.parentNode) first.parentNode.insertBefore(wlItem, first);
+    }
+  }, 80);
+};
+
+// 6. Patch renderHome to add "My Watchlist" quick action
+const _origRenderHome_wl2 = renderHome;
+renderHome = function() {
+  _origRenderHome_wl2();
+  setTimeout(() => {
+    // Add a Watchlist shortcut card if there are watchlist items
+    if (watchlistState.items.length > 0) {
+      const next = watchlistState.items[0];
+      const ms = Math.max(0, next.targetDate - Date.now());
+      const {d,h} = wlMsBreakdown(ms);
+      const existing = document.getElementById('wl-home-shortcut');
+      if (!existing) {
+        const homeScr = document.getElementById('screen-home');
+        if (homeScr) {
+          const shortcut = document.createElement('div');
+          shortcut.id = 'wl-home-shortcut';
+          shortcut.style.cssText = 'margin:.3rem 1rem;background:linear-gradient(135deg,#0d1433,#1a2035);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:.8rem 1rem;display:flex;align-items:center;gap:.7rem;cursor:pointer;';
+          shortcut.onclick = showWatchlistScreen;
+          shortcut.innerHTML = `
+            <span style="font-size:1.4rem;">⏱️</span>
+            <div style="flex:1;">
+              <div style="font-size:.82rem;font-weight:700;color:#fff;">Next on Watchlist</div>
+              <div style="font-size:.75rem;color:rgba(255,255,255,.5);">${next.itemEmoji} ${next.itemName}</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:.9rem;font-weight:800;color:#f97316;font-variant-numeric:tabular-nums;" id="wl-home-shortcut-cd">${d}d ${h}h</div>
+              <div style="font-size:.65rem;color:rgba(255,255,255,.35);">remaining</div>
+            </div>`;
+          // Insert near top after hero
+          const firstSection = homeScr.querySelector('.section-hdr, .card, .hcard');
+          if (firstSection && firstSection.parentNode) {
+            firstSection.parentNode.insertBefore(shortcut, firstSection);
+          }
+          // Tick shortcut countdown
+          setInterval(() => {
+            const el = document.getElementById('wl-home-shortcut-cd');
+            if (el && appState.currentScreen === 'home') {
+              const ms2 = Math.max(0, next.targetDate - Date.now());
+              const b = wlMsBreakdown(ms2);
+              el.textContent = b.d > 0 ? b.d+'d '+b.h+'h' : b.h+'h '+wlFmtNum(b.m)+'m';
+            }
+          }, 10000);
+        }
+      }
+    }
+  }, 400);
+};
+
+// Initialize on load
+document.addEventListener('DOMContentLoaded', () => {
+  wlUpdateNavBadge();
+  // Start alert checker even on non-watchlist screens
+  wlStartAlertChecker();
+});
+// Also start immediately
+setTimeout(() => {
+  wlUpdateNavBadge();
+  wlStartAlertChecker();
+}, 1500);
+</script>
+<script>
+// ---- SEED DEMO WATCHLIST ITEMS (only if empty) ----
+(function() {
+  if (watchlistState.items.length === 0) {
+    const now = Date.now();
+    watchlistState.items = [
+      {
+        id: 'wl-demo-1', itemId: 'e1', itemType: 'events',
+        itemName: 'Orlando Food & Wine Festival', itemEmoji: '🍷', itemLocation: 'Downtown Orlando',
+        targetDate: now + 3 * 86400000 + 4 * 3600000,
+        priority: 'must', note: 'Buy tickets in advance — sells out fast!',
+        alertSettings: { week:true, threeDay:true, oneDay:true, sixHour:true, oneHour:true, zero:true },
+        triggeredAlerts: [], addedAt: now - 86400000 * 5, isExpired: false
+      },
+      {
+        id: 'wl-demo-2', itemId: 'a6', itemType: 'attractions',
+        itemName: 'ICON Park Observation Wheel', itemEmoji: '🎡', itemLocation: 'International Drive',
+        targetDate: now + 7 * 86400000 + 2 * 3600000,
+        priority: 'high', note: 'Go at sunset for the best views',
+        alertSettings: { week:false, threeDay:true, oneDay:true, sixHour:true, oneHour:true, zero:true },
+        triggeredAlerts: [], addedAt: now - 86400000 * 2, isExpired: false
+      },
+      {
+        id: 'wl-demo-3', itemId: 'h1', itemType: 'hotels',
+        itemName: 'Walt Disney World Swan Resort', itemEmoji: '🦢', itemLocation: 'Disney Springs Area',
+        targetDate: now + 14 * 86400000,
+        priority: 'normal', note: 'Check in by 3pm, early check-in requested',
+        alertSettings: { week:true, threeDay:true, oneDay:true, sixHour:false, oneHour:false, zero:false },
+        triggeredAlerts: [], addedAt: now - 86400000 * 10, isExpired: false
+      }
+    ];
+    wlSave();
+  }
+})();
 </script>
