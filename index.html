@@ -619,6 +619,8 @@
     <div class="hscroll" id="home-trending"></div>
     <div class="section-hdr"><h3>🎉 Events Tonight</h3><span class="see-all" onclick="goToExplore('events')">See all</span></div>
     <div class="hscroll" id="home-events"></div>
+    <div class="section-hdr" id="home-deals-hdr"><h3>🏷️ Hot Deals</h3><span class="see-all" onclick="openDealsScreen()">See all</span></div>
+    <div class="hscroll" id="home-deals"></div>
     <div id="home-community-btn-section" style="display:none;"></div>
     <div class="section-hdr"><h3>💡 Travel Tips</h3></div>
     <div class="tip-card"><strong>Pro Tip:</strong> Purchase park tickets online to save up to 20% and skip the ticket counter lines at Walt Disney World and Universal!</div>
@@ -636,6 +638,8 @@
     <button class="filter-btn" onclick="switchExploreTab('parks',this)">🎢 Theme Parks</button>
     <button class="filter-btn" onclick="switchExploreTab('hotels',this)">🏨 Hotels</button>
     <button class="filter-btn" onclick="switchExploreTab('events',this)">🎶 Events</button>
+    <button class="filter-btn" onclick="switchExploreTab('tours',this)">🧭 Tours</button>
+    <button class="filter-btn" onclick="switchExploreTab('shopping',this)">🛍️ Shopping</button>
   </div>
   <div class="search-bar" style="margin-top:4px;"><span>🔍</span><input type="text" placeholder="Search..." id="explore-search" oninput="filterCards()"></div>
   <div class="filters" id="sub-filters"></div>
@@ -1297,21 +1301,21 @@ const seedReviews = {
 appState.reviews = JSON.parse(JSON.stringify(seedReviews));
 function showScreen(name,navEl){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+name).classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));if(navEl)navEl.classList.add('active');appState.currentScreen=name;if(name==='mytrip')renderMyTrip();if(name==='ai')renderAI();if(name==='account')renderAccount();if(name==='explore')renderExploreList();if(name==='home')renderHome();}
 function goToExplore(tab){const navItems=document.querySelectorAll('.nav-item');navItems.forEach(n=>n.classList.remove('active'));navItems[1].classList.add('active');switchExploreTab(tab);showScreen('explore');}
-function switchExploreTab(tab,btn){appState.currentTab=tab;if(btn){document.querySelectorAll('#explore-tabs .filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}else{const btns=document.querySelectorAll('#explore-tabs .filter-btn');btns.forEach((b,i)=>{const map=['attractions','food','parks','hotels','events'];b.classList.toggle('active',map[i]===tab);});}renderSubFilters();renderExploreList();document.getElementById('explore-search').value='';}
+function switchExploreTab(tab,btn){appState.currentTab=tab;if(btn){document.querySelectorAll('#explore-tabs .filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}else{const btns=document.querySelectorAll('#explore-tabs .filter-btn');btns.forEach((b,i)=>{const map=['attractions','food','parks','hotels','events','tours','shopping'];b.classList.toggle('active',map[i]===tab);});}renderSubFilters();renderExploreList();document.getElementById('explore-search').value='';}
 function renderHome(){const featured=document.getElementById('home-featured');featured.innerHTML=[attractions[0],attractions[4],attractions[7]].map(a=>hCardHTML(a)).join('');const trending=document.getElementById('home-trending');trending.innerHTML=[restaurants[1],restaurants[2],restaurants[4]].map(r=>hCardHTML(r)).join('');const evts=document.getElementById('home-events');evts.innerHTML=[events[6],events[1],events[4]].map(e=>hCardHTML(e)).join('');}
 function hCardHTML(item){const stars='⭐'.repeat(Math.round(item.rating));return '<div class="hcard" onclick="openDetail(\''+item.id+'\',\''+item.type+'\')"><div class="hcard-img" style="background:'+cardGradient(item.type)+'">'+item.emoji+'</div><div class="hcard-body"><div class="hcard-title">'+item.name+'</div><div class="hcard-meta">'+stars+' '+item.rating+' · '+item.area+'</div></div></div>';}
-function cardGradient(type){const g={attraction:'linear-gradient(135deg,#0099CC,#2ECC71)',food:'linear-gradient(135deg,#FF6B35,#FFD166)',park:'linear-gradient(135deg,#1A1A2E,#0099CC)',hotel:'linear-gradient(135deg,#FFD166,#FF8A65)',event:'linear-gradient(135deg,#FF6B35,#1A1A2E)'};return g[type]||g.attraction;}
-const subFilterMap={attractions:['All','Family','Thrill','Indoor','Outdoor','Budget'],food:['All','Cheap Eats','Fine Dining','Family-Friendly','Open Late','Near Parks'],parks:['All','Family','Thrill','Water'],hotels:['All','Budget','Luxury','Family-Friendly','Near Parks','Pool','Shuttle'],events:['All','Tonight','Live Music','Clubs','Family Events','Festivals','Bars']};
+function cardGradient(type){const g={attraction:'linear-gradient(135deg,#0099CC,#2ECC71)',food:'linear-gradient(135deg,#FF6B35,#FFD166)',park:'linear-gradient(135deg,#1A1A2E,#0099CC)',hotel:'linear-gradient(135deg,#FFD166,#FF8A65)',event:'linear-gradient(135deg,#FF6B35,#1A1A2E)',tour:'linear-gradient(135deg,#9C27B0,#FF6B35)',shopping:'linear-gradient(135deg,#E91E63,#FF8A65)'};return g[type]||g.attraction;}
+const subFilterMap={attractions:['All','Family','Thrill','Indoor','Outdoor','Budget'],food:['All','Cheap Eats','Fine Dining','Family-Friendly','Open Late','Near Parks'],parks:['All','Family','Thrill','Water'],hotels:['All','Budget','Luxury','Family-Friendly','Near Parks','Pool','Shuttle'],events:['All','Tonight','Live Music','Clubs','Family Events','Festivals','Bars'],tours:['All','Nature','Food','Cultural','Sport','Luxury'],shopping:['All','Mall','Boutique','Outlet','Market','Entertainment']};
 let activeSubFilter='All';
 function renderSubFilters(){activeSubFilter='All';const container=document.getElementById('sub-filters');const filters=subFilterMap[appState.currentTab]||[];container.innerHTML=filters.map(f=>'<button class="filter-btn '+(f==='All'?'active':'')+'" onclick="setSubFilter(\''+f+'\',this)">'+f+'</button>').join('');}
 function setSubFilter(f,btn){activeSubFilter=f;document.querySelectorAll('#sub-filters .filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderExploreList();}
 function filterCards(){renderExploreList();}
-function getDataForTab(){const map={attractions,food:restaurants,parks,hotels,events};return map[appState.currentTab]||[];}
+function getDataForTab(){const map={attractions,food:restaurants,parks,hotels,events,tours:(typeof tours!=='undefined'?tours:[]),shopping:(typeof shopping!=='undefined'?shopping:[])};return map[appState.currentTab]||[];}
 function renderExploreList(){const container=document.getElementById('explore-list');const data=getDataForTab();const search=(document.getElementById('explore-search')?.value||'').toLowerCase();const filterLow=activeSubFilter.toLowerCase();const filtered=data.filter(item=>{const matchSearch=!search||item.name.toLowerCase().includes(search)||item.desc.toLowerCase().includes(search)||item.area.toLowerCase().includes(search);const matchFilter=filterLow==='all'||(item.tags&&item.tags.some(t=>t.toLowerCase().includes(filterLow)))||(item.amenities&&item.amenities.some(a=>a.toLowerCase().includes(filterLow)))||(item.category&&item.category.toLowerCase().includes(filterLow));return matchSearch&&matchFilter;});if(filtered.length===0){container.innerHTML='<div style="text-align:center;padding:40px 20px;color:var(--gray3);"><div style="font-size:48px;margin-bottom:12px;">🔍</div><div style="font-weight:600;">No results found</div><div style="font-size:13px;margin-top:6px;">Try different keywords or filters</div></div>';return;}container.innerHTML=filtered.map(item=>cardHTML(item)).join('');}
 function cardHTML(item){const isSaved=!!appState.savedItems[item.id];const stars=renderStars(item.rating);const priceHtml=item.price?'<span class="price">'+item.price+'</span>':'';const tagsHtml=(item.tags||[]).slice(0,3).map(t=>'<span class="tag">'+t+'</span>').join('');let extraMeta='';if(item.datetime)extraMeta='<div style="font-size:12px;color:var(--sky);margin-bottom:6px;">📅 '+item.datetime+'</div>';if(item.hours)extraMeta='<div style="font-size:12px;color:var(--palm);margin-bottom:6px;">🕐 '+item.hours+'</div>';return '<div class="card" onclick="openDetail(\''+item.id+'\',\''+item.type+'\')"><div class="card-img" style="background:'+cardGradient(item.type)+'">'+item.emoji+'<div class="card-img-overlay"></div></div><div class="card-body"><div class="card-title">'+item.name+'</div><div class="card-meta"><span class="stars">'+stars+'</span><span class="rating-text">'+item.rating+'</span>'+priceHtml+'<span class="rating-text">· '+item.area+'</span></div>'+extraMeta+'<div class="card-desc">'+item.desc.substring(0,100)+'...</div><div style="margin-bottom:10px;">'+tagsHtml+'</div><button class="save-btn '+(isSaved?'saved':'')+'" onclick="event.stopPropagation();toggleSave(\''+item.id+'\')">'+(isSaved?'✓ Saved':'+ Save to Trip')+'</button></div></div>';}
 function openDetail(id,type){const item=findItem(id,type);if(!item)return;appState.currentDetailId=id;appState.currentDetailType=type;const detail=document.getElementById('screen-detail');detail.style.display='block';document.getElementById('detail-content').innerHTML=buildDetailHTML(item);detail.scrollTop=0;}
 function closeDetail(){document.getElementById('screen-detail').style.display='none';}
-function findItem(id,type){const allData=[...attractions,...restaurants,...parks,...hotels,...events];return allData.find(i=>i.id===id);}
+function findItem(id,type){const allData=[...attractions,...restaurants,...parks,...hotels,...events,...(typeof tours!=='undefined'?tours:[]),...(typeof shopping!=='undefined'?shopping:[])];return allData.find(i=>i.id===id);}
 function buildDetailHTML(item){const isSaved=!!appState.savedItems[item.id];const reviews=appState.reviews[item.id]||[];const avgRating=reviews.length?(reviews.reduce((s,r)=>s+r.rating,0)/reviews.length).toFixed(1):item.rating;let extras='';if(item.hours)extras+='<div class="detail-info-row"><span class="detail-info-label">Hours</span><span class="detail-info-val">🕐 '+item.hours+'</span></div>';if(item.tips)extras+='<div class="tip-card" style="margin:12px 0;"><strong>💡 Park Tips:</strong> '+item.tips+'</div>';if(item.datetime)extras+='<div class="detail-info-row"><span class="detail-info-label">Date/Time</span><span class="detail-info-val">📅 '+item.datetime+'</span></div>';if(item.distParks)extras+='<div class="detail-info-row"><span class="detail-info-label">To Parks</span><span class="detail-info-val">📍 '+item.distParks+'</span></div>';if(item.amenities){extras+='<div style="margin-top:12px;"><div style="font-weight:700;font-size:14px;margin-bottom:8px;">Amenities</div><div style="display:flex;flex-wrap:wrap;gap:6px;">'+item.amenities.map(a=>'<span class="amenity-tag">'+amenityEmoji(a)+' '+a+'</span>').join('')+'</div></div>';}const tagsHtml=(item.tags||[]).map(t=>'<span class="tag sun">'+t+'</span>').join('');const reviewsHTML=reviews.map(r=>reviewCardHTML(r)).join('')||'<div style="color:var(--gray3);font-size:13px;text-align:center;padding:16px;">No reviews yet. Be the first!</div>';return '<div class="detail-hero" style="background:'+cardGradient(item.type)+'"><button class="detail-back" onclick="closeDetail()">←</button><div style="font-size:90px;">'+item.emoji+'</div></div><div class="detail-body"><div class="detail-title">'+item.name+'</div><div class="detail-rating"><span class="stars" style="font-size:18px;">'+renderStars(parseFloat(avgRating))+'</span><span style="font-weight:700;font-size:16px;">'+avgRating+'</span><span style="color:var(--gray3);font-size:13px;">('+reviews.length+' review'+(reviews.length!==1?'s':'')+')</span></div><div class="detail-info-row"><span class="detail-info-label">Location</span><span class="detail-info-val">📍 '+item.area+'</span></div>'+(item.price?'<div class="detail-info-row"><span class="detail-info-label">Price</span><span class="detail-info-val price">'+item.price+'</span></div>':'')+extras+'<div class="detail-desc" style="margin-top:12px;">'+item.desc+'</div><div class="detail-tags">'+tagsHtml+'</div><button class="save-btn '+(isSaved?'saved':'')+'" style="width:100%;justify-content:center;padding:14px;" onclick="toggleSave(\''+item.id+'\');this.className=\'save-btn \'+(appState.savedItems[\''+item.id+'\']?\'saved\':\'\');this.textContent=appState.savedItems[\''+item.id+'\']?\'✓ Saved\':\'+ Save to Trip\'">'+(isSaved?'✓ Saved':'+ Save to Trip')+'</button></div><div class="divider" style="margin:0 20px;"></div><div class="reviews-section"><div class="reviews-hdr"><h3>Reviews</h3><button class="write-review-btn" onclick="openReviewModal(\''+item.id+'\')">✏️ Write a Review</button></div><div id="reviews-list-'+item.id+'">'+reviewsHTML+'</div></div><div style="height:20px;"></div>';}
 function amenityEmoji(a){const map={pool:'🏊',shuttle:'🚌',breakfast:'🍳',spa:'💆',golf:'⛳','fine dining':'🍷','family-friendly':'👨‍👩‍👧',bar:'🍺',parking:'🅿️',kitchen:'🍳','art gallery':'🎨',budget:'💰'};return map[a.toLowerCase()]||'✓';}
 function openReviewModal(itemId){if(!appState.user){openAuthModal('write a review');return;}appState.reviewItem=itemId;appState.reviewStars=0;document.getElementById('review-text').value='';document.querySelectorAll('#star-selector span').forEach(s=>s.classList.remove('active'));document.getElementById('review-modal').classList.add('open');}
@@ -5796,4 +5800,688 @@ toggleDarkMode = function() {
   const sh = document.getElementById('search-overlay-header');
   if(sh) sh.style.background = _isDark() ? '#1E1E2E' : 'white';
 };
+</script>
+
+<script>
+// =====================================================
+// FEATURE BLOCK: TOURS & SHOPPING DATA
+// =====================================================
+const tours = [
+  {id:'to1',type:'tour',emoji:'🚁',name:'Helicopter Tour of Orlando',category:'aerial',area:'Kissimmee',rating:4.9,desc:'Soar above theme parks, lakes, and the city skyline in a private helicopter. Unmatched aerial views of the Happiest Place on Earth.',tags:['luxury','thrill','aerial'],price:'$$$$',duration:'30–60 min',groupSize:'1–3 people'},
+  {id:'to2',type:'tour',emoji:'🚣',name:'Airboat Everglades Tour',category:'nature',area:'Kissimmee',rating:4.7,desc:'Glide across sawgrass prairies and spot alligators, turtles, and birds on a thrilling airboat adventure through the Everglades.',tags:['outdoor','thrill','family'],price:'$$',duration:'1–2 hours',groupSize:'Up to 12'},
+  {id:'to3',type:'tour',emoji:'🍴',name:'Orlando Food Tour',category:'food',area:'Downtown Orlando',rating:4.8,desc:'Walk and eat your way through downtown Orlando\'s best culinary hotspots with a knowledgeable local guide. 7–8 tastings included.',tags:['food','casual','family'],price:'$$',duration:'3 hours',groupSize:'Up to 15'},
+  {id:'to4',type:'tour',emoji:'🎭',name:'Haunted Orlando Ghost Tour',category:'history',area:'Downtown Orlando',rating:4.6,desc:'Explore the dark history of Orlando on a lantern-lit walking tour of haunted locations, forgotten cemeteries, and eerie alleyways.',tags:['nightlife','history','thrill'],price:'$',duration:'90 min',groupSize:'Up to 20'},
+  {id:'to5',type:'tour',emoji:'🏊',name:'Crystal River Manatee Tour',category:'nature',area:'Crystal River (1hr away)',rating:4.9,desc:'Swim alongside gentle manatees in the crystal-clear springs of Crystal River. A once-in-a-lifetime wildlife encounter.',tags:['outdoor','family','nature'],price:'$$',duration:'Half day',groupSize:'Up to 10'},
+  {id:'to6',type:'tour',emoji:'🍷',name:'Wine & Art Gallery Crawl',category:'cultural',area:'Winter Park',rating:4.5,desc:'Visit Winter Park\'s finest galleries and wine bars on this elegant evening tour curated by local art enthusiasts.',tags:['date night','culture','casual'],price:'$$',duration:'3 hours',groupSize:'Up to 16'},
+  {id:'to7',type:'tour',emoji:'🚢',name:'Winter Park Scenic Boat Tour',category:'nature',area:'Winter Park',rating:4.8,desc:'The famous 1-hour pontoon boat tour through Winter Park\'s chain of lakes and canals — a beloved Orlando tradition since 1938.',tags:['family','outdoor','relaxing'],price:'$',duration:'1 hour',groupSize:'Up to 18'},
+  {id:'to8',type:'tour',emoji:'🏄',name:'Surf Lesson at Disney',category:'sport',area:'Walt Disney World',rating:4.7,desc:'Learn to surf on Disney\'s massive wave pool with professional instructors. All ages and skill levels welcome.',tags:['thrill','family','sport'],price:'$$$',duration:'2 hours',groupSize:'Up to 12'},
+  {id:'to9',type:'tour',emoji:'🌿',name:'Brewery & Winery Hop Tour',category:'food',area:'Multiple Areas',rating:4.5,desc:'Visit local craft breweries and wineries with samples, behind-the-scenes access, and round-trip transport included.',tags:['casual','open late','food'],price:'$$',duration:'4 hours',groupSize:'Up to 14'},
+  {id:'to10',type:'tour',emoji:'🎨',name:'Street Art & Murals Walk',category:'cultural',area:'Mills 50 District',rating:4.6,desc:'Discover Orlando\'s thriving street art scene with a local artist as your guide through the vibrant Mills 50 District.',tags:['culture','casual','budget'],price:'$',duration:'2 hours',groupSize:'Up to 20'},
+  {id:'to11',type:'tour',emoji:'🌅',name:'Sunrise Kayak Tour',category:'nature',area:'Lake Toho',rating:4.8,desc:'Paddle through misty morning waters as the sun rises over Lake Tohopekaliga. Wildlife sightings nearly guaranteed.',tags:['outdoor','nature','relaxing'],price:'$$',duration:'2.5 hours',groupSize:'Up to 8'},
+  {id:'to12',type:'tour',emoji:'🏰',name:'Theme Park Insider Tour',category:'cultural',area:'International Drive',rating:4.7,desc:'Expert-guided park experience with insider tips, skip-the-line strategies, and little-known secrets from a 20-year Orlando veteran.',tags:['family','near parks','luxury'],price:'$$$',duration:'Full day',groupSize:'Up to 10'}
+];
+
+const shopping = [
+  {id:'sh1',type:'shopping',emoji:'👜',name:'The Mall at Millenia',category:'mall',area:'Sand Lake Road',rating:4.6,desc:'Luxury shopping destination with Louis Vuitton, Tiffany, Gucci, Apple, and 150+ premium retailers in an elegant two-story setting.',tags:['luxury','indoor','family'],price:'$$$$'},
+  {id:'sh2',type:'shopping',emoji:'🎡',name:'Disney Springs',category:'entertainment',area:'Walt Disney World',rating:4.7,desc:'Massive outdoor shopping, dining, and entertainment complex with 100+ shops, Disney exclusives, and no park admission required.',tags:['family','near parks','outdoor'],price:'$$$'},
+  {id:'sh3',type:'shopping',emoji:'🏪',name:'Florida Mall',category:'mall',area:'Sand Lake Road',rating:4.4,desc:'One of Florida\'s largest malls with 300+ stores, a food court, and major department stores including Macy\'s and JC Penney.',tags:['family','budget','indoor'],price:'$$'},
+  {id:'sh4',type:'shopping',emoji:'🌿',name:'East End Market',category:'market',area:'Audubon Park',rating:4.7,desc:'Artisan food market celebrating Florida flavors. Local vendors, rooftop garden, specialty coffee, and unique gift shops.',tags:['food','local','casual'],price:'$$'},
+  {id:'sh5',type:'shopping',emoji:'🎪',name:'Flea World',category:'flea market',area:'Sanford',rating:4.3,desc:'America\'s largest flea market with 1,700 dealers selling antiques, collectibles, clothing, produce, and everything imaginable.',tags:['budget','family','outdoor'],price:'$'},
+  {id:'sh6',type:'shopping',emoji:'🏬',name:'Premium Outlets Orlando',category:'outlets',area:'Vineland Ave',rating:4.5,desc:'Two premier outlet malls with 180+ designer brands at up to 65% off — Coach, Kate Spade, Michael Kors, and more.',tags:['budget','luxury','indoor'],price:'$$'},
+  {id:'sh7',type:'shopping',emoji:'🌳',name:'Park Avenue, Winter Park',category:'boutique',area:'Winter Park',rating:4.8,desc:'Charming tree-lined street with independent boutiques, galleries, and cafes. The most walkable, sophisticated shopping in Orlando.',tags:['local','casual','outdoor'],price:'$$$'},
+  {id:'sh8',type:'shopping',emoji:'🎮',name:'Pointe Orlando',category:'entertainment',area:'International Drive',rating:4.4,desc:'Outdoor entertainment hub on I-Drive with unique shops, restaurants, live entertainment, and easy access from all major hotels.',tags:['family','near parks','outdoor'],price:'$$'},
+  {id:'sh9',type:'shopping',emoji:'🎨',name:'Ivanhoe Village Antiques',category:'boutique',area:'Ivanhoe Village',rating:4.6,desc:'Eclectic neighborhood packed with vintage stores, indie boutiques, galleries, and the best antique shops in Central Florida.',tags:['local','casual','culture'],price:'$$'},
+  {id:'sh10',type:'shopping',emoji:'🌺',name:'Universal CityWalk',category:'entertainment',area:'Universal Studios',rating:4.5,desc:'Vibrant outdoor entertainment district with unique shops, dining, nightclubs, and movie theaters — no park ticket needed.',tags:['family','near parks','nightlife'],price:'$$'}
+];
+</script>
+
+<script>
+// =====================================================
+// FEATURE BLOCK: DEALS & DISCOUNTS
+// =====================================================
+const deals = [
+  {id:'d1',emoji:'🎢',title:'Universal Express Pass',subtitle:'Skip the lines at Universal',discount:20,original:89,sale:71,category:'parks',expires:'Apr 30',code:'EXPLORE20',badge:'Best Seller'},
+  {id:'d2',emoji:'🐊',title:'Gatorland Family Pack',subtitle:'4 tickets bundled',discount:25,original:100,sale:75,category:'attractions',expires:'May 15',code:'GATOR25',badge:'Family Deal'},
+  {id:'d3',emoji:'🍣',title:'Dragonfly Robata',subtitle:'2 can dine for less',discount:30,original:120,sale:84,category:'food',expires:'Apr 20',code:'DRAGON30',badge:'Date Night'},
+  {id:'d4',emoji:'🏨',title:'Rosen Inn — Summer Stay',subtitle:'Book 2 nights, save big',discount:35,original:200,sale:130,category:'hotels',expires:'Jun 30',code:'ROSEN35',badge:'Summer'},
+  {id:'d5',emoji:'🚢',title:'Winter Park Boat Tour',subtitle:'Group of 4 deal',discount:15,original:80,sale:68,category:'tours',expires:'May 31',code:'BOAT15',badge:'Popular'},
+  {id:'d6',emoji:'🌊',title:'Aquatica Water Park',subtitle:'Weekday admission',discount:40,original:75,sale:45,category:'parks',expires:'Apr 28',code:'AQUA40',badge:'Hot Deal'},
+  {id:'d7',emoji:'🍺',title:'Hawkers Asian Street Fare',subtitle:'Happy hour extended',discount:20,original:60,sale:48,category:'food',expires:'Ongoing',code:'HAWKERS20',badge:'Daily'},
+  {id:'d8',emoji:'🚁',title:'Helicopter Tour',subtitle:'Solo flight special',discount:15,original:199,sale:169,category:'tours',expires:'May 10',code:'HELI15',badge:'Luxury'},
+  {id:'d9',emoji:'🛍️',title:'Premium Outlets',subtitle:'VIP coupon book',discount:null,original:null,sale:null,category:'shopping',expires:'Jun 30',code:'VIPCOUPONS',badge:'Free',isFree:true,freeDesc:'Free coupon book — $500+ savings'},
+  {id:'d10',emoji:'🎭',title:'Ghost Tour Orlando',subtitle:'Buy 1 get 1 free',discount:50,original:30,sale:15,category:'tours',expires:'Apr 25',code:'GHOST50',badge:'BOGO'}
+];
+
+const dealState = { claimed:{} };
+
+function dealCardHTML(d){
+  const isClaimed = !!dealState.claimed[d.id];
+  const discBadge = d.isFree ? `<span style="background:#4CAF50;color:white;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;">FREE</span>` : `<span style="background:#E53935;color:white;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;">${d.discount}% OFF</span>`;
+  const priceHTML = d.isFree ? `<div style="font-size:13px;color:#4CAF50;font-weight:700;">${d.freeDesc}</div>` : `<div style="display:flex;align-items:baseline;gap:6px;"><span style="font-size:18px;font-weight:700;color:var(--sun);">$${d.sale}</span><span style="font-size:12px;color:var(--gray3);text-decoration:line-through;">$${d.original}</span></div>`;
+  return `<div style="background:var(--white);border-radius:var(--radius);box-shadow:var(--card-shadow);padding:14px 16px;min-width:220px;max-width:220px;flex-shrink:0;position:relative;overflow:hidden;">
+    <div style="position:absolute;top:10px;right:10px;background:#FFF0E8;color:var(--sun);padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;">${d.badge}</div>
+    <div style="font-size:32px;margin-bottom:8px;">${d.emoji}</div>
+    <div style="font-weight:700;font-size:14px;margin-bottom:2px;">${d.title}</div>
+    <div style="font-size:12px;color:var(--gray3);margin-bottom:8px;">${d.subtitle}</div>
+    ${priceHTML}
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;">
+      <div style="font-size:11px;color:var(--gray3);">Expires ${d.expires}</div>
+      ${discBadge}
+    </div>
+    <button onclick="claimDeal('${d.id}')" style="width:100%;margin-top:10px;padding:9px;border-radius:20px;border:none;background:${isClaimed?'var(--gray2)':'var(--sun)'};color:${isClaimed?'var(--gray4)':'white'};font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">${isClaimed?'✓ Claimed':'Claim Deal'}</button>
+  </div>`;
+}
+
+function claimDeal(id){
+  if(dealState.claimed[id]){showToast('Already claimed!');return;}
+  dealState.claimed[id]=true;
+  const d=deals.find(x=>x.id===id);
+  if(!d)return;
+  showToast(`Code copied: ${d.code} 🎉`);
+  try{navigator.clipboard.writeText(d.code);}catch(e){}
+  // Refresh deal cards wherever they're shown
+  document.querySelectorAll('[data-deal-id="'+id+'"]').forEach(btn=>{
+    btn.style.background='var(--gray2)';btn.style.color='var(--gray4)';btn.textContent='✓ Claimed';
+  });
+  renderHomeDeals();
+  if(document.getElementById('deals-screen-list')) renderDealsScreen();
+}
+
+function renderHomeDeals(){
+  const el = document.getElementById('home-deals');
+  if(!el) return;
+  el.style.cssText='display:flex;gap:14px;padding:0 16px 4px;overflow-x:auto;scrollbar-width:none;';
+  el.innerHTML = deals.slice(0,6).map(d=>dealCardHTML(d)).join('');
+}
+
+// =====================================================
+// DEALS SCREEN (OVERLAY)
+// =====================================================
+function openDealsScreen(){
+  let overlay = document.getElementById('deals-overlay');
+  if(!overlay){
+    overlay = document.createElement('div');
+    overlay.id = 'deals-overlay';
+    overlay.style.cssText = 'display:none;position:fixed;inset:0;z-index:150;background:var(--sand);max-width:430px;left:50%;transform:translateX(-50%);overflow-y:auto;font-family:\'DM Sans\',sans-serif;';
+    overlay.innerHTML = `
+      <div style="background:linear-gradient(135deg,#E91E63,#FF6B35);padding:24px 20px 32px;position:sticky;top:0;z-index:5;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px;">
+          <button onclick="closeDealsScreen()" style="background:rgba(255,255,255,0.2);border:none;color:white;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">←</button>
+          <div style="color:white;font-family:'Playfair Display',serif;font-size:22px;font-weight:900;">Hot Deals 🏷️</div>
+        </div>
+        <div style="color:rgba(255,255,255,0.85);font-size:13px;">Exclusive discounts for Orlando Explorer users</div>
+        <div style="display:flex;gap:8px;margin-top:14px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;" id="deals-cat-filters">
+          ${['All','Parks','Food','Hotels','Tours','Shopping','Attractions'].map((c,i)=>`<button onclick="filterDeals('${c.toLowerCase()}',this)" style="white-space:nowrap;padding:7px 16px;border-radius:20px;border:2px solid rgba(255,255,255,0.4);background:${i===0?'white':'transparent'};color:${i===0?'#E91E63':'white'};font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">${c}</button>`).join('')}
+        </div>
+      </div>
+      <div style="padding:16px;" id="deals-screen-list"></div>`;
+    document.body.appendChild(overlay);
+  }
+  overlay.style.display='block';
+  renderDealsScreen();
+}
+function closeDealsScreen(){const o=document.getElementById('deals-overlay');if(o)o.style.display='none';}
+
+let _dealsFilter='all';
+function filterDeals(cat,btn){
+  _dealsFilter=cat;
+  document.querySelectorAll('#deals-cat-filters button').forEach(b=>{b.style.background='transparent';b.style.color='white';});
+  btn.style.background='white';btn.style.color='#E91E63';
+  renderDealsScreen();
+}
+
+function renderDealsScreen(){
+  const el=document.getElementById('deals-screen-list');
+  if(!el)return;
+  const filtered = _dealsFilter==='all' ? deals : deals.filter(d=>d.category===_dealsFilter);
+  if(!filtered.length){el.innerHTML='<div style="text-align:center;padding:40px 20px;color:var(--gray3);"><div style="font-size:48px;">🏷️</div><div style="font-weight:600;margin-top:12px;">No deals in this category</div></div>';return;}
+  el.innerHTML = filtered.map(d=>{
+    const isClaimed=!!dealState.claimed[d.id];
+    const discBadge=d.isFree?`<span style="background:#4CAF50;color:white;padding:3px 10px;border-radius:10px;font-size:12px;font-weight:700;">FREE</span>`:`<span style="background:#E53935;color:white;padding:3px 10px;border-radius:10px;font-size:12px;font-weight:700;">${d.discount}% OFF</span>`;
+    return `<div style="background:var(--white);border-radius:var(--radius);box-shadow:var(--card-shadow);padding:16px;margin-bottom:14px;display:flex;gap:14px;align-items:center;">
+      <div style="font-size:40px;flex-shrink:0;">${d.emoji}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px;">
+          <div style="font-weight:700;font-size:15px;">${d.title}</div>
+          <span style="background:#FFF0E8;color:var(--sun);padding:1px 7px;border-radius:8px;font-size:10px;font-weight:700;flex-shrink:0;">${d.badge}</span>
+        </div>
+        <div style="font-size:12px;color:var(--gray3);margin-bottom:6px;">${d.subtitle}</div>
+        ${d.isFree?`<div style="font-size:13px;color:#4CAF50;font-weight:600;">${d.freeDesc}</div>`:`<div style="display:flex;align-items:baseline;gap:6px;"><span style="font-size:18px;font-weight:700;color:var(--sun);">$${d.sale}</span><span style="font-size:12px;color:var(--gray3);text-decoration:line-through;">$${d.original}</span>${discBadge}</div>`}
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
+          <div style="font-size:11px;color:var(--gray3);">Expires: ${d.expires} · Code: <strong>${d.code}</strong></div>
+          <button data-deal-id="${d.id}" onclick="claimDeal('${d.id}')" style="padding:7px 14px;border-radius:20px;border:none;background:${isClaimed?'var(--gray2)':'var(--sun)'};color:${isClaimed?'var(--gray4)':'white'};font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;">${isClaimed?'✓ Claimed':'Claim'}</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// Patch renderHome to include deals
+const _origRenderHomeDeals = renderHome;
+renderHome = function(){
+  _origRenderHomeDeals();
+  renderHomeDeals();
+};
+// Render on load
+setTimeout(renderHomeDeals, 300);
+</script>
+
+<script>
+// =====================================================
+// FEATURE BLOCK: MAP / DIRECTIONS + NEARBY PLACES
+// =====================================================
+function getDirections(name, area){
+  const query = encodeURIComponent(name + ' ' + area + ' Florida');
+  window.open('https://maps.google.com/?q=' + query, '_blank');
+}
+
+function getNearbyItems(item){
+  const allData=[...attractions,...restaurants,...parks,...hotels,...events,...tours,...shopping];
+  return allData.filter(i => i.id !== item.id && i.area === item.area).slice(0,4);
+}
+
+// Override buildDetailHTML to inject map/directions + nearby
+const _origBuildDetailHTML = buildDetailHTML;
+buildDetailHTML = function(item){
+  const html = _origBuildDetailHTML(item);
+
+  // Inject Get Directions + Nearby after detail-body
+  const nearbyItems = getNearbyItems(item);
+  const nearbyHTML = nearbyItems.length ? `
+    <div style="padding:0 20px 20px;">
+      <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:12px;">📍 Nearby Places</div>
+      ${nearbyItems.map(n=>`<div onclick="openDetail('${n.id}','${n.type}')" style="display:flex;align-items:center;gap:12px;background:var(--white);padding:12px 14px;border-radius:var(--radius-sm);margin-bottom:8px;box-shadow:var(--card-shadow);cursor:pointer;transition:all 0.2s;">
+        <div style="font-size:28px;width:44px;height:44px;background:${cardGradient(n.type)};border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${n.emoji}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${n.name}</div>
+          <div style="font-size:12px;color:var(--gray3);margin-top:2px;">⭐ ${n.rating} · ${n.type}</div>
+        </div>
+        <div style="color:var(--gray3);font-size:18px;">›</div>
+      </div>`).join('')}
+    </div>` : '';
+
+  const directionsBtn = `<div style="padding:0 20px 4px;">
+    <button onclick="getDirections('${item.name.replace(/'/g,"\\'")}','${item.area.replace(/'/g,"\\'")}');" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--sky);color:white;border:none;padding:13px;border-radius:30px;font-size:15px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;margin-bottom:12px;">
+      🗺️ Get Directions
+    </button>
+  </div>`;
+
+  // Insert directions button before reviews section, nearby after reviews
+  const reviewsIdx = html.indexOf('<div class="reviews-section">');
+  if(reviewsIdx === -1) return html + directionsBtn + nearbyHTML;
+
+  return html.substring(0,reviewsIdx) + directionsBtn + html.substring(reviewsIdx) + nearbyHTML;
+};
+</script>
+
+<script>
+// =====================================================
+// FEATURE BLOCK: TRIP PLANNER UPGRADE (MULTI-DAY)
+// =====================================================
+// Extended trip state
+const tripPlanState = {
+  tripName: 'My Orlando Trip',
+  startDate: null,
+  days: [], // [{label, date, morning:[], afternoon:[], evening:[]}]
+  notes: {}, // { itemId: noteText }
+};
+
+function initTripDays(){
+  if(tripPlanState.days.length === 0){
+    // Migrate existing appState.tripDays into day 0
+    tripPlanState.days.push({
+      label:'Day 1', date:null,
+      morning:[...appState.tripDays.morning],
+      afternoon:[...appState.tripDays.afternoon],
+      evening:[...appState.tripDays.evening]
+    });
+  }
+}
+
+function addTripDay(){
+  initTripDays();
+  const n = tripPlanState.days.length + 1;
+  tripPlanState.days.push({label:'Day '+n, date:null, morning:[], afternoon:[], evening:[]});
+  renderMyTrip();
+}
+
+function removeTripDay(dayIdx){
+  if(tripPlanState.days.length <= 1){showToast('Cannot remove last day');return;}
+  const day = tripPlanState.days[dayIdx];
+  // Remove saved items that are in this day
+  [...day.morning,...day.afternoon,...day.evening].forEach(i=>{
+    // Move to day 0 if not already there
+    const d0 = tripPlanState.days[0];
+    if(!d0.morning.find(x=>x.id===i.id) && !d0.afternoon.find(x=>x.id===i.id) && !d0.evening.find(x=>x.id===i.id)){
+      d0.morning.push(i);
+    }
+  });
+  tripPlanState.days.splice(dayIdx,1);
+  // Relabel days
+  tripPlanState.days.forEach((d,i)=>{ d.label='Day '+(i+1); });
+  renderMyTrip();
+}
+
+function removeTripItem(itemId, dayIdx, slot){
+  if(dayIdx !== undefined){
+    tripPlanState.days[dayIdx][slot] = tripPlanState.days[dayIdx][slot].filter(i=>i.id!==itemId);
+  } else {
+    // Legacy: remove from appState
+    appState.tripDays[slot] = appState.tripDays[slot].filter(i=>i.id!==itemId);
+  }
+  delete appState.savedItems[itemId];
+  showToast('Removed from trip');
+  renderMyTrip();
+}
+
+function moveItemToDay(itemId, fromDay, fromSlot, toDay){
+  const item = tripPlanState.days[fromDay][fromSlot].find(i=>i.id===itemId);
+  if(!item) return;
+  tripPlanState.days[fromDay][fromSlot] = tripPlanState.days[fromDay][fromSlot].filter(i=>i.id!==itemId);
+  tripPlanState.days[toDay].morning.push(item);
+  renderMyTrip();
+}
+
+function exportTrip(){
+  initTripDays();
+  let text = `🌴 ${tripPlanState.tripName}\n`;
+  if(tripPlanState.startDate) text += `📅 Starting: ${tripPlanState.startDate}\n`;
+  text += '\n';
+  tripPlanState.days.forEach(day=>{
+    const all=[...day.morning,...day.afternoon,...day.evening];
+    if(!all.length) return;
+    text += `${day.label}${day.date?' ('+day.date+')':''}\n`;
+    if(day.morning.length) text += '  🌅 Morning: '+day.morning.map(i=>i.name).join(', ')+'\n';
+    if(day.afternoon.length) text += '  ☀️ Afternoon: '+day.afternoon.map(i=>i.name).join(', ')+'\n';
+    if(day.evening.length) text += '  🌙 Evening: '+day.evening.map(i=>i.name).join(', ')+'\n';
+    text += '\n';
+  });
+  text += 'Generated by Orlando Explorer 🌴';
+  try{navigator.clipboard.writeText(text); showToast('Trip copied to clipboard! 📋');}
+  catch(e){showToast('Trip ready to share! 🌴');}
+}
+
+// Override renderMyTrip with upgraded multi-day version
+const _origRenderMyTrip = renderMyTrip;
+renderMyTrip = function(){
+  const container = document.getElementById('my-trip-content');
+  if(!container) return;
+
+  if(!appState.user){
+    container.innerHTML = `<div style="padding:32px 24px;text-align:center;">
+      <div style="font-size:56px;margin-bottom:16px;">🗺️</div>
+      <h3 style="font-family:'Playfair Display',serif;font-size:22px;margin-bottom:8px;">Plan Your Orlando Trip</h3>
+      <p style="color:var(--gray4);font-size:14px;margin-bottom:24px;line-height:1.6;">Sign in to save places and build your personalized multi-day itinerary.</p>
+      <button class="google-btn" style="max-width:280px;margin:0 auto 10px;" onclick="loginWith('google')">Continue with Google</button>
+    </div>`;
+    return;
+  }
+
+  initTripDays();
+
+  // Sync appState.savedItems into days (any unsorted saved items → day 0 morning)
+  const allSlotted = tripPlanState.days.flatMap(d=>[...d.morning,...d.afternoon,...d.evening]).map(i=>i.id);
+  Object.values(appState.savedItems).forEach(item=>{
+    if(!allSlotted.includes(item.id)) tripPlanState.days[0].morning.push(item);
+  });
+
+  const totalItems = tripPlanState.days.reduce((s,d)=>s+d.morning.length+d.afternoon.length+d.evening.length,0);
+
+  if(totalItems === 0){
+    container.innerHTML = `<div class="empty-trip">
+      <div class="icon">🗺️</div>
+      <div style="font-weight:700;font-size:16px;margin-bottom:8px;">Your trip is empty</div>
+      <div style="font-size:13px;">Explore and save places to build your itinerary!</div>
+      <button onclick="goToExplore('attractions')" style="margin-top:20px;background:var(--sun);color:white;border:none;padding:12px 24px;border-radius:24px;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">Explore Orlando</button>
+    </div>`;
+    return;
+  }
+
+  const daysHTML = tripPlanState.days.map((day, dayIdx)=>{
+    const slots = [
+      {key:'morning',label:'🌅 Morning'},
+      {key:'afternoon',label:'☀️ Afternoon'},
+      {key:'evening',label:'🌙 Evening'}
+    ];
+    const slotsHTML = slots.map(slot=>{
+      if(!day[slot.key].length) return '';
+      const itemsHTML = day[slot.key].map(item=>`
+        <div style="display:flex;align-items:center;gap:10px;background:var(--gray1);padding:10px 12px;border-radius:var(--radius-sm);margin-bottom:6px;">
+          <div style="font-size:22px;">${item.emoji||'📍'}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.name}</div>
+            <div style="font-size:11px;color:var(--gray3);margin-top:1px;">${item.area||''}</div>
+          </div>
+          ${tripPlanState.days.length>1?`<select onchange="if(this.value!=='')moveItemToDay('${item.id}',${dayIdx},'${slot.key}',parseInt(this.value))" style="font-size:11px;border:1px solid var(--gray2);border-radius:6px;padding:2px 4px;background:white;color:var(--gray4);cursor:pointer;">
+            <option value="">Move...</option>
+            ${tripPlanState.days.map((d,di)=>di!==dayIdx?`<option value="${di}">${d.label}</option>`:'').join('')}
+          </select>`:''}
+          <button onclick="removeTripItem('${item.id}',${dayIdx},'${slot.key}')" style="background:none;border:none;font-size:16px;cursor:pointer;color:var(--gray3);padding:4px;flex-shrink:0;">✕</button>
+        </div>`).join('');
+      return `<div style="margin-bottom:8px;"><div style="font-size:12px;font-weight:700;color:var(--gray3);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">${slot.label}</div>${itemsHTML}</div>`;
+    }).join('');
+
+    const dayTotal = day.morning.length + day.afternoon.length + day.evening.length;
+    return `<div style="margin:0 16px 16px;background:var(--white);border-radius:var(--radius);box-shadow:var(--card-shadow);overflow:hidden;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:linear-gradient(135deg,var(--sky),var(--palm));color:white;">
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;">${day.label}</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:11px;opacity:0.85;">${dayTotal} place${dayTotal!==1?'s':''}</span>
+          ${tripPlanState.days.length>1?`<button onclick="removeTripDay(${dayIdx})" style="background:rgba(255,255,255,0.2);border:none;color:white;width:24px;height:24px;border-radius:50%;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;">×</button>`:''}
+        </div>
+      </div>
+      <div style="padding:12px 14px;">${dayTotal?slotsHTML:'<div style="text-align:center;padding:20px;color:var(--gray3);font-size:13px;">No places added yet</div>'}</div>
+    </div>`;
+  }).join('');
+
+  container.innerHTML = `<div style="padding:16px 0 0;">
+    <div style="padding:0 16px 14px;">
+      <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:900;margin-bottom:4px;">${tripPlanState.tripName}</div>
+      <div style="display:flex;gap:8px;">
+        <span style="background:var(--sun);color:white;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:700;">${totalItems} Places</span>
+        <span style="background:var(--sky);color:white;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:700;">${tripPlanState.days.length} Day${tripPlanState.days.length!==1?'s':''}</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;padding:0 16px 16px;overflow-x:auto;scrollbar-width:none;">
+      <button onclick="addTripDay()" style="white-space:nowrap;padding:9px 16px;border-radius:20px;border:2px solid var(--sun);background:white;color:var(--sun);font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">+ Add Day</button>
+      <button onclick="exportTrip()" style="white-space:nowrap;padding:9px 16px;border-radius:20px;border:2px solid var(--sky);background:white;color:var(--sky);font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">📋 Export Trip</button>
+      <button onclick="goToExplore('attractions')" style="white-space:nowrap;padding:9px 16px;border-radius:20px;border:2px solid var(--palm);background:white;color:var(--palm);font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">🔍 Find More</button>
+    </div>
+    ${daysHTML}
+    <div style="height:16px;"></div>
+  </div>`;
+};
+</script>
+
+<script>
+// =====================================================
+// FEATURE BLOCK: REVIEW SYSTEM IMPROVEMENTS
+// =====================================================
+
+// More seed reviews
+const extraSeedReviews = {
+  'a2':[{user:'GatorFan',avatar:'🐊',rating:5,text:'My kids were absolutely terrified and loved every minute. The zip line over the gator pond is not for the faint-hearted!',date:'3 days ago'},{user:'NatureLover',avatar:'🌿',rating:4,text:'Surprisingly educational too! The feeding shows were amazing. Skip the snake exhibit if you\'re squeamish.',date:'1 week ago'}],
+  'a5':[{user:'OutdoorEnthusiast',avatar:'🏕️',rating:5,text:'Crystal clear water, manatee sightings, and gorgeous nature trails. This is hidden gem Orlando.',date:'5 days ago'}],
+  'r2':[{user:'TacoObsessed',avatar:'🌮',rating:5,text:'The birria tacos are life-changing. I drove 45 minutes and would do it again tomorrow.',date:'2 days ago'},{user:'FoodieFL',avatar:'🍴',rating:5,text:'Best tacos I\'ve had outside of Mexico. The homemade salsa verde is phenomenal.',date:'4 days ago'}],
+  'r3':[{user:'SushiSnob',avatar:'🍣',rating:5,text:'The hamachi jalapeño and wagyu robata skewers are worth every penny. Reserve weeks ahead.',date:'1 week ago'}],
+  'r5':[{user:'BrunchQueen',avatar:'☕',rating:5,text:'The James Beard nomination is well deserved. Duck carnitas hash at brunch is unreal.',date:'3 days ago'}],
+  'h1':[{user:'DisneyDreamer',avatar:'🏰',rating:5,text:'Woke up to monorail sounds and Magic Kingdom views from our balcony. Pure magic.',date:'2 days ago'}],
+  'h3':[{user:'BusinessTraveler',avatar:'💼',rating:5,text:'Best pool complex in Orlando. The lazy river winds through lush Florida landscape.',date:'6 days ago'}],
+  'to7':[{user:'WinterParkFan',avatar:'⛵',rating:5,text:'Running since 1938 and still the best tour in Central Florida. Captain was hilarious.',date:'4 days ago'}],
+  'to3':[{user:'Foodie2024',avatar:'🍴',rating:5,text:'8 different spots, each uniquely Orlando. The highlight was definitely the Cuban sandwich stop.',date:'1 week ago'}],
+  'sh7':[{user:'ShopperSusan',avatar:'🛍️',rating:5,text:'Park Avenue is what every city wishes it had. Saturday morning here is perfection.',date:'5 days ago'}],
+  'p2':[{user:'HarryPotterFan',avatar:'⚡',rating:5,text:'Hagrid\'s ride is the best ride I\'ve ever been on. Period. Get there 30 min before open.',date:'3 days ago'}],
+  'e3':[{user:'FoodWineLover',avatar:'🍷',rating:5,text:'40+ food booths around EPCOT, live concerts every night. This is peak Orlando.',date:'1 week ago'}]
+};
+Object.entries(extraSeedReviews).forEach(([id,revs])=>{
+  if(!appState.reviews[id]) appState.reviews[id]=[];
+  appState.reviews[id]=[...appState.reviews[id],...revs];
+});
+
+// Enhanced reviewCardHTML with helpful votes
+const _reviewHelpfulVotes = {}; // { reviewKey: count }
+const _reviewHelpfulMine = {}; // { reviewKey: true }
+
+function reviewCardHTML(r, itemId, idx){
+  const key = (itemId||'')+'_'+(idx||r.user);
+  const votes = _reviewHelpfulVotes[key] || 0;
+  const voted = !!_reviewHelpfulMine[key];
+  const helpfulBtn = `<button onclick="markHelpful('${key}',this)" style="background:none;border:1px solid ${voted?'var(--sky)':'var(--gray2)'};color:${voted?'var(--sky)':'var(--gray3)'};padding:3px 10px;border-radius:12px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:8px;display:inline-flex;align-items:center;gap:4px;">👍 Helpful${votes>0?' ('+votes+')':''}</button>`;
+  return `<div class="review-card">
+    <div class="review-user">
+      <div class="review-avatar">${r.avatar||r.user[0]}</div>
+      <div>
+        <div class="review-username">${r.user}</div>
+        <div class="review-date">${r.date}</div>
+      </div>
+      <div class="stars" style="margin-left:auto;">
+        ${'★'.repeat(r.rating)}<span style="color:var(--gray2);">${'★'.repeat(5-r.rating)}</span>
+      </div>
+    </div>
+    <div class="review-text">${r.text}</div>
+    ${helpfulBtn}
+  </div>`;
+}
+
+function markHelpful(key, btn){
+  if(_reviewHelpfulMine[key]){showToast('Already marked helpful');return;}
+  _reviewHelpfulMine[key]=true;
+  _reviewHelpfulVotes[key]=(_reviewHelpfulVotes[key]||0)+1;
+  btn.style.borderColor='var(--sky)';btn.style.color='var(--sky)';
+  const v=_reviewHelpfulVotes[key];
+  btn.innerHTML='👍 Helpful'+(v>0?' ('+v+')':'');
+  showToast('Thanks for your feedback!');
+}
+
+// Enhanced reviews section in buildDetailHTML
+const _origBuildDetailHTMLReviews = buildDetailHTML;
+buildDetailHTML = function(item){
+  const html = _origBuildDetailHTMLReviews(item);
+  // Replace old reviews-hdr with improved version including star breakdown + sort
+  const reviews = appState.reviews[item.id]||[];
+  const avgRating = reviews.length?(reviews.reduce((s,r)=>s+r.rating,0)/reviews.length):item.rating;
+
+  // Build star breakdown
+  const breakdown = [5,4,3,2,1].map(s=>{
+    const cnt = reviews.filter(r=>r.rating===s).length;
+    const pct = reviews.length ? Math.round(cnt/reviews.length*100) : 0;
+    return `<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+      <span style="font-size:11px;color:var(--gray3);width:12px;">${s}</span>
+      <span style="color:#FFD166;font-size:11px;">★</span>
+      <div style="flex:1;height:6px;background:var(--gray2);border-radius:3px;overflow:hidden;">
+        <div style="height:100%;width:${pct}%;background:#FFD166;border-radius:3px;"></div>
+      </div>
+      <span style="font-size:11px;color:var(--gray3);width:28px;">${pct}%</span>
+    </div>`;
+  }).join('');
+
+  const ratingSummary = reviews.length ? `<div style="display:flex;gap:16px;align-items:center;margin-bottom:14px;padding:14px;background:var(--gray1);border-radius:var(--radius-sm);">
+    <div style="text-align:center;flex-shrink:0;">
+      <div style="font-family:'Playfair Display',serif;font-size:36px;font-weight:900;color:var(--sun);">${avgRating.toFixed(1)}</div>
+      <div style="color:#FFD166;font-size:16px;">${'★'.repeat(Math.round(avgRating))}</div>
+      <div style="font-size:11px;color:var(--gray3);margin-top:2px;">${reviews.length} review${reviews.length!==1?'s':''}</div>
+    </div>
+    <div style="flex:1;">${breakdown}</div>
+  </div>` : '';
+
+  const sortBar = reviews.length > 1 ? `<div style="display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;scrollbar-width:none;">
+    ${['Newest','Highest','Lowest'].map((s,i)=>`<button onclick="sortReviews('${item.id}','${s.toLowerCase()}',this)" style="padding:5px 14px;border-radius:20px;border:1.5px solid ${i===0?'var(--sky)':'var(--gray2)'};background:${i===0?'var(--sky)':'white'};color:${i===0?'white':'var(--gray4)'};font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;">${s}</button>`).join('')}
+  </div>` : '';
+
+  // Inject rating summary + sort bar into reviews section
+  return html.replace(
+    `<div class="reviews-hdr"><h3>Reviews</h3><button class="write-review-btn" onclick="openReviewModal('${item.id}')">✏️ Write a Review</button></div><div id="reviews-list-${item.id}">`,
+    `<div class="reviews-hdr"><h3>Reviews</h3><button class="write-review-btn" onclick="openReviewModal('${item.id}')">✏️ Write a Review</button></div>${ratingSummary}${sortBar}<div id="reviews-list-${item.id}">`
+  );
+};
+
+function sortReviews(itemId, mode, btn){
+  const reviews = [...(appState.reviews[itemId]||[])];
+  if(mode==='highest') reviews.sort((a,b)=>b.rating-a.rating);
+  else if(mode==='lowest') reviews.sort((a,b)=>a.rating-b.rating);
+  // newest = as-is (unshifted on submit)
+  const el = document.getElementById('reviews-list-'+itemId);
+  if(el) el.innerHTML = reviews.length ? reviews.map((r,i)=>reviewCardHTML(r,itemId,i)).join('') : '<div style="color:var(--gray3);font-size:13px;text-align:center;padding:16px;">No reviews yet. Be the first!</div>';
+  // Update sort button styles
+  const btns = btn.parentNode.querySelectorAll('button');
+  btns.forEach(b=>{b.style.background='white';b.style.color='var(--gray4)';b.style.borderColor='var(--gray2)';});
+  btn.style.background='var(--sky)';btn.style.color='white';btn.style.borderColor='var(--sky)';
+}
+</script>
+
+<script>
+// =====================================================
+// FEATURE BLOCK: PERFORMANCE & BUG FIXES
+// =====================================================
+
+// 1. Debounce search input
+(function debounceExploreSearch(){
+  const input = document.getElementById('explore-search');
+  if(!input) return;
+  let timer;
+  input.oninput = function(){
+    clearTimeout(timer);
+    timer = setTimeout(()=>filterCards(), 220);
+  };
+})();
+
+// 2. Paginated explore list (show 10, load more)
+const _EXPLORE_PAGE_SIZE = 10;
+let _explorePage = 1;
+
+const _origRenderExploreList = renderExploreList;
+renderExploreList = function(){
+  _explorePage = 1;
+  const container = document.getElementById('explore-list');
+  const data = getDataForTab();
+  const search = (document.getElementById('explore-search')?.value||'').toLowerCase();
+  const filterLow = activeSubFilter.toLowerCase();
+  const filtered = data.filter(item=>{
+    const matchSearch = !search || item.name.toLowerCase().includes(search) || item.desc.toLowerCase().includes(search) || item.area.toLowerCase().includes(search);
+    const matchFilter = filterLow==='all' || (item.tags&&item.tags.some(t=>t.toLowerCase().includes(filterLow))) || (item.amenities&&item.amenities.some(a=>a.toLowerCase().includes(filterLow))) || (item.category&&item.category.toLowerCase().includes(filterLow));
+    return matchSearch && matchFilter;
+  });
+  if(filtered.length===0){
+    container.innerHTML='<div style="text-align:center;padding:40px 20px;color:var(--gray3);"><div style="font-size:48px;margin-bottom:12px;">🔍</div><div style="font-weight:600;">No results found</div><div style="font-size:13px;margin-top:6px;">Try different keywords or filters</div></div>';
+    return;
+  }
+  // Store filtered for load-more
+  container._filteredData = filtered;
+  const page = filtered.slice(0, _EXPLORE_PAGE_SIZE);
+  container.innerHTML = page.map(item=>cardHTML(item)).join('');
+  if(filtered.length > _EXPLORE_PAGE_SIZE){
+    container.innerHTML += `<div id="load-more-wrap" style="text-align:center;padding:16px 0 8px;">
+      <button onclick="loadMoreExplore()" style="background:white;border:2px solid var(--gray2);color:var(--gray4);padding:10px 24px;border-radius:24px;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">Load More (${filtered.length - _EXPLORE_PAGE_SIZE} more)</button>
+    </div>`;
+  }
+};
+
+function loadMoreExplore(){
+  _explorePage++;
+  const container = document.getElementById('explore-list');
+  const filtered = container._filteredData || [];
+  const start = (_explorePage-1)*_EXPLORE_PAGE_SIZE;
+  const end = _explorePage*_EXPLORE_PAGE_SIZE;
+  const newItems = filtered.slice(start,end);
+  const wrap = document.getElementById('load-more-wrap');
+  if(wrap) wrap.remove();
+  newItems.forEach(item=>{
+    container.insertAdjacentHTML('beforeend', cardHTML(item));
+  });
+  if(end < filtered.length){
+    container.insertAdjacentHTML('beforeend', `<div id="load-more-wrap" style="text-align:center;padding:16px 0 8px;">
+      <button onclick="loadMoreExplore()" style="background:white;border:2px solid var(--gray2);color:var(--gray4);padding:10px 24px;border-radius:24px;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">Load More (${filtered.length-end} more)</button>
+    </div>`);
+  }
+}
+
+// 3. Improve save button UX — sync multi-day trip on save
+const _origToggleSaveFinal = toggleSave;
+toggleSave = function(id){
+  const wassaved = !!appState.savedItems[id];
+  _origToggleSaveFinal(id);
+  const isSaved = !!appState.savedItems[id];
+  // When newly saved, add to trip day 0 morning
+  if(!wassaved && isSaved){
+    initTripDays();
+    const item = findItem(id);
+    if(item){
+      const alreadyInDay = tripPlanState.days.some(d=>[...d.morning,...d.afternoon,...d.evening].some(i=>i.id===id));
+      if(!alreadyInDay) tripPlanState.days[0].morning.push(item);
+    }
+  }
+  // When unsaved, remove from all days
+  if(wassaved && !isSaved){
+    tripPlanState.days.forEach(d=>{
+      d.morning=d.morning.filter(i=>i.id!==id);
+      d.afternoon=d.afternoon.filter(i=>i.id!==id);
+      d.evening=d.evening.filter(i=>i.id!==id);
+    });
+  }
+};
+
+// 4. CSS fixes for new features
+const _perfStyleEl = document.createElement('style');
+_perfStyleEl.textContent = `
+  /* Smooth hscroll for deals */
+  #home-deals::-webkit-scrollbar { display:none; }
+  #home-deals { scrollbar-width:none; }
+
+  /* Tour/shopping card extra info */
+  .tour-meta { font-size:12px;color:var(--gray3);display:flex;gap:12px;margin-top:4px; }
+
+  /* Deal card hover */
+  #home-deals > div:active { transform:scale(0.97); }
+
+  /* Deals overlay scrollbar */
+  #deals-overlay::-webkit-scrollbar { width:4px; }
+  #deals-overlay::-webkit-scrollbar-thumb { background:var(--gray2);border-radius:2px; }
+
+  /* Trip planner day select */
+  .trip-day-move select { background:var(--white); }
+
+  /* Load more button */
+  #load-more-wrap button:active { transform:scale(0.97); }
+
+  /* Review sort buttons scrollbar */
+  .review-sort-bar::-webkit-scrollbar { display:none; }
+
+  /* Directions button */
+  .directions-btn:active { opacity:0.85;transform:scale(0.98); }
+
+  /* Nearby places hover */
+  .nearby-item:active { background:var(--gray1) !important; }
+`;
+document.head.appendChild(_perfStyleEl);
+
+// 5. Add tour/shopping card extra metadata (duration/groupSize) to hCardHTML
+const _origHCardHTML = hCardHTML;
+hCardHTML = function(item){
+  let html = _origHCardHTML(item);
+  // For tours/shopping, inject extra meta below the rating in hcard-body
+  if((item.type==='tour'||item.type==='shopping') && (item.duration||item.category)){
+    const extra = item.duration ? `<div style="font-size:11px;color:var(--gray3);margin-top:2px;">⏱️ ${item.duration}${item.groupSize?' · 👥 '+item.groupSize:''}</div>` : '';
+    html = html.replace('<div class="hcard-meta">','<div class="hcard-meta">').replace('</div></div></div>','</div>'+extra+'</div></div>');
+  }
+  return html;
+};
+
+// 6. Extra detail info for tours & shopping
+const _origBuildDetailFinal = buildDetailHTML;
+buildDetailHTML = function(item){
+  let html = _origBuildDetailFinal(item);
+  if(item.type==='tour'){
+    const extraInfo = `<div class="detail-info-row"><span class="detail-info-label">Duration</span><span class="detail-info-val">⏱️ ${item.duration||'Varies'}</span></div><div class="detail-info-row"><span class="detail-info-label">Group Size</span><span class="detail-info-val">👥 ${item.groupSize||'Varies'}</span></div>`;
+    html = html.replace('<div class="detail-desc"', extraInfo+'<div class="detail-desc"');
+  }
+  return html;
+};
+
+// 7. Fix: re-apply debounce on explore tab switch
+const _origSwitchExploreTab = switchExploreTab;
+switchExploreTab = function(tab, btn){
+  _origSwitchExploreTab(tab, btn);
+  // Re-wire debounce (input re-rendered)
+  setTimeout(()=>{
+    const input = document.getElementById('explore-search');
+    if(input && !input._debounced){
+      input._debounced = true;
+      let timer;
+      input.oninput = function(){ clearTimeout(timer); timer=setTimeout(()=>filterCards(),220); };
+    }
+  }, 50);
+};
+
+// 8. Home tour & shopping section
+const _origRenderHomeTours = renderHome;
+renderHome = function(){
+  _origRenderHomeTours();
+  // Add Tours section to home if div exists
+  const toursEl = document.getElementById('home-tours');
+  if(toursEl) toursEl.innerHTML = (typeof tours!=='undefined'?tours:[]).slice(0,4).map(t=>hCardHTML(t)).join('');
+  const shoppingEl = document.getElementById('home-shopping');
+  if(shoppingEl) shoppingEl.innerHTML = (typeof shopping!=='undefined'?shopping:[]).slice(0,4).map(s=>hCardHTML(s)).join('');
+};
+
+console.log('[Orlando Explorer] All 6 feature blocks loaded ✅');
 </script>
