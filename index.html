@@ -602,6 +602,7 @@
       <div class="hero-search"><span>🔍</span><input type="text" placeholder="Search places, parks, food..." id="hero-search-input"></div>
     </div>
     <div id="home-xp-bar" style="display:none;padding:0 16px;margin-bottom:0;"></div>
+<div id="home-weather-widget" style="display:none;padding:0 16px 4px;"></div>
 <div id="home-friends-activity" style="display:none;"></div>
 <div id="home-recent-photos" style="display:none;"></div>
 <div class="section-hdr" style="padding-bottom:4px;"><h3>Explore Orlando</h3></div>
@@ -1171,6 +1172,41 @@
     </div>
     <div style="font-size:11px;color:#9E9E9E;flex-shrink:0;">now</div>
   </div>
+</div>
+
+<!-- GLOBAL SEARCH OVERLAY -->
+<div class="gamify-overlay" id="global-search-overlay" style="z-index:8900;">
+  <div style="background:white;padding:12px 16px;position:sticky;top:0;z-index:10;border-bottom:1px solid #F5F5F5;" id="search-overlay-header">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <button onclick="document.getElementById('global-search-overlay').classList.remove('open')" style="background:none;border:none;font-size:20px;cursor:pointer;">←</button>
+      <div style="flex:1;display:flex;align-items:center;gap:8px;background:#F5F5F5;border-radius:24px;padding:10px 14px;">
+        <span>🔍</span>
+        <input type="text" id="global-search-input" placeholder="Search Orlando..." autofocus
+          style="flex:1;border:none;outline:none;font-size:14px;font-family:'DM Sans',sans-serif;background:transparent;"
+          oninput="renderSearchResults(this.value)">
+        <button id="search-clear-btn" onclick="clearGlobalSearch()" style="background:none;border:none;font-size:16px;cursor:pointer;color:#9E9E9E;display:none;">✕</button>
+      </div>
+    </div>
+    <div class="hscroll" id="search-cat-filters" style="gap:6px;padding:10px 0 2px;"></div>
+  </div>
+  <div class="gamify-scroll" id="search-results-pane" style="padding-top:0;"></div>
+</div>
+
+<!-- ONBOARDING OVERLAY -->
+<div id="onboarding-overlay" style="display:none;position:fixed;inset:0;z-index:9900;background:#1A1A2E;overflow:hidden;">
+  <div id="onboarding-slides" style="display:flex;transition:transform 0.4s cubic-bezier(.4,0,.2,1);height:100%;"></div>
+  <div style="position:absolute;bottom:40px;left:0;right:0;text-align:center;">
+    <div id="onboarding-dots" style="display:flex;justify-content:center;gap:8px;margin-bottom:20px;"></div>
+    <div style="display:flex;gap:12px;justify-content:center;padding:0 32px;">
+      <button id="onboard-skip" onclick="skipOnboarding()" style="flex:1;max-width:120px;background:rgba(255,255,255,0.15);color:white;border:none;border-radius:24px;padding:13px;font-size:14px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;">Skip</button>
+      <button id="onboard-next" onclick="nextOnboardSlide()" style="flex:1;max-width:200px;background:linear-gradient(135deg,#FF6B35,#FFD700);color:white;border:none;border-radius:24px;padding:13px;font-size:15px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;">Next →</button>
+    </div>
+  </div>
+</div>
+
+<!-- OFFLINE BANNER -->
+<div id="offline-banner" style="display:none;position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;z-index:9999;background:#EF5350;color:white;text-align:center;padding:10px;font-size:13px;font-weight:700;font-family:'DM Sans',sans-serif;">
+  📡 You're offline. Some features may not work.
 </div>
 <nav class="bottom-nav">
   <div class="nav-item active" onclick="showScreen('home',this)"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></div>
@@ -5393,4 +5429,310 @@ setTimeout(()=>{
 
 // Init bell on load
 setTimeout(updateBellBadge, 300);
+</script>
+<style>
+/* ===== WEATHER WIDGET ===== */
+.weather-card{background:linear-gradient(135deg,#0099CC,#00C9E0);border-radius:16px;padding:14px 16px;color:white;display:flex;align-items:center;gap:12px;margin-bottom:4px;}
+.weather-icon{font-size:40px;}
+.weather-info{flex:1;}
+.weather-temp{font-size:28px;font-weight:800;font-family:'Playfair Display',serif;}
+.weather-desc{font-size:13px;opacity:0.9;margin-top:1px;}
+.weather-extras{display:flex;gap:14px;margin-top:6px;}
+.weather-extra{font-size:11px;opacity:0.85;}
+.weather-location{font-size:11px;opacity:0.7;margin-top:2px;}
+/* ===== SEARCH ===== */
+.search-cat-chip{padding:6px 14px;border-radius:20px;border:1.5px solid #E0E0E0;background:white;font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;white-space:nowrap;transition:all 0.2s;flex-shrink:0;}
+.search-cat-chip.active{background:#FF6B35;color:white;border-color:#FF6B35;}
+.search-result-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid #F8F8F8;cursor:pointer;}
+.search-result-emoji{font-size:28px;min-width:40px;text-align:center;}
+.search-result-info{flex:1;}
+.search-result-name{font-weight:700;font-size:14px;margin-bottom:2px;}
+.search-result-meta{font-size:12px;color:#9E9E9E;}
+.search-result-type{font-size:10px;font-weight:700;padding:2px 8px;border-radius:8px;background:#FFF3E0;color:#FF6B35;}
+.recent-search-item{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid #F8F8F8;cursor:pointer;}
+/* ===== ONBOARDING ===== */
+.onboard-slide{min-width:100vw;max-width:430px;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px 120px;text-align:center;box-sizing:border-box;}
+.onboard-emoji{font-size:80px;margin-bottom:24px;animation:bounce-in 0.6s cubic-bezier(.34,1.56,.64,1);}
+.onboard-title{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:white;margin-bottom:12px;line-height:1.2;}
+.onboard-desc{font-size:15px;color:rgba(255,255,255,0.8);line-height:1.6;max-width:300px;}
+.onboard-features{margin-top:20px;display:flex;flex-direction:column;gap:10px;width:100%;max-width:300px;}
+.onboard-feature{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.1);border-radius:12px;padding:10px 14px;text-align:left;}
+.onboard-feature-text{font-size:13px;color:rgba(255,255,255,0.9);}
+.onboard-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.3);transition:all 0.3s;}
+.onboard-dot.active{background:white;width:20px;border-radius:4px;}
+</style>
+<script>
+// ===== DARK MODE =====
+const _isDark = () => document.body.classList.contains('dark');
+function toggleDarkMode() {
+  document.body.classList.toggle('dark');
+  localStorage.setItem('darkMode', _isDark() ? '1' : '0');
+  // Update toggle buttons
+  document.querySelectorAll('.dark-toggle-btn').forEach(b => {
+    b.classList.toggle('dark', _isDark());
+    b.classList.toggle('light', !_isDark());
+  });
+  // Update search overlay header in dark mode
+  const sh = document.getElementById('search-overlay-header');
+  if(sh) sh.style.background = _isDark() ? '#1E1E2E' : 'white';
+}
+// Apply saved preference on load
+if(localStorage.getItem('darkMode') === '1') {
+  document.body.classList.add('dark');
+}
+
+// ===== WEATHER WIDGET =====
+const WEATHER_CODES = {
+  0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',
+  51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',
+  71:'🌨️',73:'❄️',75:'❄️',80:'🌦️',81:'🌧️',82:'⛈️',
+  95:'⛈️',96:'⛈️',99:'⛈️'
+};
+const WEATHER_DESCS = {
+  0:'Clear skies',1:'Mainly clear',2:'Partly cloudy',3:'Overcast',45:'Foggy',
+  51:'Light drizzle',53:'Drizzle',55:'Heavy drizzle',61:'Light rain',63:'Rain',
+  65:'Heavy rain',71:'Light snow',73:'Snow',75:'Heavy snow',80:'Rain showers',
+  81:'Heavy showers',82:'Violent showers',95:'Thunderstorm',99:'Hail storm'
+};
+
+async function fetchOrlandoWeather() {
+  const widget = document.getElementById('home-weather-widget');
+  if(!widget) return;
+  try {
+    const url = 'https://api.open-meteo.com/v1/forecast?latitude=28.5383&longitude=-81.3792&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,apparent_temperature&temperature_unit=fahrenheit&wind_speed_unit=mph';
+    const res = await fetch(url);
+    const data = await res.json();
+    const c = data.current;
+    const code = c.weather_code;
+    const emoji = WEATHER_CODES[code] || '🌤️';
+    const desc = WEATHER_DESCS[code] || 'Partly cloudy';
+    const temp = Math.round(c.temperature_2m);
+    const feels = Math.round(c.apparent_temperature);
+    const humidity = c.relative_humidity_2m;
+    const wind = Math.round(c.wind_speed_10m);
+    renderWeatherWidget(emoji, temp, feels, desc, humidity, wind, false);
+  } catch(e) {
+    // Fallback simulated data for Orlando
+    const temps = [82,85,79,88,76,91,84];
+    const t = temps[new Date().getDay()];
+    renderWeatherWidget('☀️', t, t-3, 'Mostly sunny', 65, 8, true);
+  }
+}
+
+function renderWeatherWidget(emoji, temp, feels, desc, humidity, wind, simulated) {
+  const widget = document.getElementById('home-weather-widget');
+  if(!widget) return;
+  widget.style.display = 'block';
+  const grad = temp >= 90 ? 'linear-gradient(135deg,#FF6B35,#FF8C42)'
+              : temp >= 80 ? 'linear-gradient(135deg,#0099CC,#00C9E0)'
+              : temp >= 70 ? 'linear-gradient(135deg,#4CAF50,#81C784)'
+              : 'linear-gradient(135deg,#2196F3,#64B5F6)';
+  widget.innerHTML = `<div class="weather-card" style="background:${grad};">
+    <div class="weather-icon">${emoji}</div>
+    <div class="weather-info">
+      <div class="weather-temp">${temp}°F</div>
+      <div class="weather-desc">${desc}</div>
+      <div class="weather-extras">
+        <span class="weather-extra">💧 ${humidity}%</span>
+        <span class="weather-extra">💨 ${wind}mph</span>
+        <span class="weather-extra">Feels ${feels}°F</span>
+      </div>
+      <div class="weather-location">📍 Orlando, FL${simulated?' · Updated':'  · Live'}</div>
+    </div>
+    <button onclick="fetchOrlandoWeather()" style="background:rgba(255,255,255,0.2);border:none;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer;color:white;" title="Refresh">↻</button>
+  </div>`;
+}
+</script>
+<script>
+// ===== GLOBAL SEARCH =====
+const recentSearches = JSON.parse(localStorage.getItem('recentSearches')||'[]');
+let _searchCat = 'all';
+
+function openGlobalSearch() {
+  document.getElementById('global-search-overlay').classList.add('open');
+  setTimeout(()=>document.getElementById('global-search-input')?.focus(), 200);
+  renderSearchCatFilters();
+  renderSearchResults('');
+}
+function clearGlobalSearch() {
+  const inp = document.getElementById('global-search-input');
+  if(inp) { inp.value=''; inp.focus(); }
+  document.getElementById('search-clear-btn').style.display='none';
+  renderSearchResults('');
+}
+function renderSearchCatFilters() {
+  const el = document.getElementById('search-cat-filters');
+  if(!el) return;
+  const cats = [['all','🔍 All'],['attractions','🎡 Attractions'],['food','🍽️ Food'],['parks','🎢 Parks'],['hotels','🏨 Hotels'],['events','🎶 Events']];
+  el.innerHTML = cats.map(([v,l])=>`<button class="search-cat-chip ${_searchCat===v?'active':''}" onclick="_searchCat='${v}';renderSearchCatFilters();renderSearchResults(document.getElementById('global-search-input').value)">${l}</button>`).join('');
+}
+function renderSearchResults(q) {
+  const pane = document.getElementById('search-results-pane');
+  if(!pane) return;
+  const clearBtn = document.getElementById('search-clear-btn');
+  if(clearBtn) clearBtn.style.display = q ? 'block' : 'none';
+
+  if(!q.trim()) {
+    // Show recent searches
+    const recent = recentSearches.slice(0,6);
+    pane.innerHTML = (recent.length ? `
+      <div style="padding:12px 16px 4px;font-size:12px;font-weight:700;color:#9E9E9E;text-transform:uppercase;letter-spacing:0.5px;">Recent Searches</div>
+      ${recent.map(r=>`<div class="recent-search-item" onclick="document.getElementById('global-search-input').value='${r}';renderSearchResults('${r}')">
+        <span style="font-size:18px;color:#9E9E9E;">🕐</span>
+        <span style="flex:1;font-size:14px;">${r}</span>
+        <button onclick="event.stopPropagation();removeRecentSearch('${r}')" style="background:none;border:none;color:#9E9E9E;font-size:14px;cursor:pointer;">✕</button>
+      </div>`).join('')}
+      <button onclick="clearRecentSearches()" style="margin:8px 16px;background:none;border:none;color:#9E9E9E;font-size:12px;cursor:pointer;">Clear recent searches</button>` : '') +
+      `<div style="padding:16px 16px 4px;font-size:12px;font-weight:700;color:#9E9E9E;text-transform:uppercase;letter-spacing:0.5px;">Popular</div>
+      ${[...attractions.slice(0,2),...parks.slice(0,2),...restaurants.slice(0,2)].map(item=>searchResultHTML(item)).join('')}
+      <div style="height:20px;"></div>`;
+    return;
+  }
+
+  const allData = [...attractions,...restaurants,...parks,...hotels,...events];
+  const ql = q.toLowerCase();
+  let results = allData.filter(i => {
+    const matchText = i.name.toLowerCase().includes(ql) || (i.desc||'').toLowerCase().includes(ql) || (i.area||'').toLowerCase().includes(ql) || (i.tags||[]).some(t=>t.toLowerCase().includes(ql));
+    const matchCat = _searchCat==='all' || i.type===_searchCat || (i.type==='food'&&_searchCat==='food');
+    return matchText && matchCat;
+  });
+
+  // Save to recent
+  if(q.length > 2 && !recentSearches.includes(q)) {
+    recentSearches.unshift(q);
+    if(recentSearches.length > 10) recentSearches.pop();
+    localStorage.setItem('recentSearches', JSON.stringify(recentSearches));
+  }
+
+  pane.innerHTML = results.length
+    ? `<div style="padding:10px 16px 4px;font-size:12px;color:#9E9E9E;">${results.length} result${results.length!==1?'s':''} for "${q}"</div>` + results.map(i=>searchResultHTML(i)).join('') + '<div style="height:20px;"></div>'
+    : `<div style="text-align:center;padding:48px 20px;"><div style="font-size:48px;margin-bottom:12px;">🔍</div><div style="font-weight:700;font-size:16px;margin-bottom:6px;">No results</div><div style="font-size:13px;color:#9E9E9E;">Try different keywords or browse categories</div></div>`;
+}
+function searchResultHTML(item) {
+  const typeLabel = {attractions:'Attraction',food:'Restaurant',parks:'Theme Park',hotels:'Hotel',events:'Event'}[item.type]||item.type;
+  const typeColor = {attractions:'#FF6B35',food:'#4CAF50',parks:'#9C27B0',hotels:'#2196F3',events:'#FFD700'}[item.type]||'#9E9E9E';
+  return `<div class="search-result-item" onclick="document.getElementById('global-search-overlay').classList.remove('open');openDetail('${item.id}','${item.type}')">
+    <div class="search-result-emoji">${item.emoji}</div>
+    <div class="search-result-info">
+      <div class="search-result-name">${item.name}</div>
+      <div class="search-result-meta">📍 ${item.area||''} · ⭐ ${item.rating}</div>
+    </div>
+    <span class="search-result-type" style="background:${typeColor}18;color:${typeColor};">${typeLabel}</span>
+  </div>`;
+}
+function removeRecentSearch(q) {
+  const idx = recentSearches.indexOf(q);
+  if(idx>=0) recentSearches.splice(idx,1);
+  localStorage.setItem('recentSearches', JSON.stringify(recentSearches));
+  renderSearchResults('');
+}
+function clearRecentSearches() {
+  recentSearches.length=0;
+  localStorage.setItem('recentSearches','[]');
+  renderSearchResults('');
+}
+
+// Wire hero search bar to open global search
+document.addEventListener('DOMContentLoaded', ()=>{
+  const heroInput = document.getElementById('hero-search-input');
+  if(heroInput) {
+    heroInput.addEventListener('focus', ()=>{ heroInput.blur(); openGlobalSearch(); });
+  }
+});
+</script>
+<script>
+// ===== ONBOARDING FLOW =====
+const ONBOARD_SLIDES = [
+  { emoji:'🌴', title:'Welcome to Orlando Explorer', desc:'Your ultimate guide to the City Beautiful. Discover attractions, restaurants, theme parks, and hidden gems.', features:['🎢 Browse 50+ top Orlando locations','🗺️ Build your perfect itinerary','⭐ Read and write real reviews'] },
+  { emoji:'🎯', title:'Earn XP & Level Up', desc:'Every action earns experience points. Check in, write reviews, save places, and climb from Tourist to Legend!', features:['📍 Check in to earn stamps & XP','🏅 Unlock badges for achievements','🏆 Compete on the leaderboard'] },
+  { emoji:'👥', title:'Connect with Explorers', desc:'Follow other Orlando adventurers, share itineraries, join group trips, and discuss tips in the community forum.', features:['👤 Follow friends & see their activity','🗺️ Share your trip itinerary','💬 Join the community forum'] },
+  { emoji:'🔔', title:'Never Miss a Thing', desc:'Get notified about events, price drops, friend activity, and your daily missions. Stay in the loop!', features:['💰 Price drop alerts on saved hotels','🎉 Friend activity updates','🔥 Daily mission reminders'] },
+  { emoji:'🚀', title:'Ready to Explore?', desc:'Sign in to save places, earn XP, and get the full Orlando Explorer experience. Or browse as a guest first!', features:null },
+];
+let _onboardSlide = 0;
+const _onboardSeen = localStorage.getItem('onboardingSeen');
+
+function showOnboarding() {
+  if(_onboardSeen) return;
+  _onboardSlide = 0;
+  const overlay = document.getElementById('onboarding-overlay');
+  const slidesEl = document.getElementById('onboarding-slides');
+  slidesEl.innerHTML = ONBOARD_SLIDES.map((s,i)=>`
+    <div class="onboard-slide" style="background:${['#1A1A2E','#1E1240','#0D2137','#1A1A2E','#0A1628'][i]};">
+      <div class="onboard-emoji">${s.emoji}</div>
+      <div class="onboard-title">${s.title}</div>
+      <div class="onboard-desc">${s.desc}</div>
+      ${s.features?`<div class="onboard-features">${s.features.map(f=>`<div class="onboard-feature"><span style="font-size:18px;">${f.slice(0,2)}</span><span class="onboard-feature-text">${f.slice(2)}</span></div>`).join('')}</div>`:''}
+      ${i===ONBOARD_SLIDES.length-1?`<div style="display:flex;flex-direction:column;gap:10px;margin-top:24px;width:100%;max-width:280px;">
+        <button onclick="skipOnboarding();loginWith('google')" style="background:white;color:#1A1A2E;border:none;border-radius:24px;padding:14px;font-size:14px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">🚀 Get Started — Sign In</button>
+        <button onclick="skipOnboarding();continueGuest()" style="background:rgba(255,255,255,0.15);color:white;border:none;border-radius:24px;padding:12px;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;">Browse as Guest</button>
+      </div>`:''}
+    </div>`).join('');
+  renderOnboardDots();
+  overlay.style.display='block';
+}
+function renderOnboardDots() {
+  const dots = document.getElementById('onboarding-dots');
+  if(!dots) return;
+  dots.innerHTML = ONBOARD_SLIDES.map((_,i)=>`<div class="onboard-dot ${i===_onboardSlide?'active':''}"></div>`).join('');
+  const nextBtn = document.getElementById('onboard-next');
+  if(nextBtn) nextBtn.textContent = _onboardSlide===ONBOARD_SLIDES.length-1 ? '' : 'Next →';
+  const skipBtn = document.getElementById('onboard-skip');
+  if(skipBtn) skipBtn.style.display = _onboardSlide===ONBOARD_SLIDES.length-1 ? 'none' : 'block';
+}
+function nextOnboardSlide() {
+  if(_onboardSlide >= ONBOARD_SLIDES.length-1) return;
+  _onboardSlide++;
+  const slides = document.getElementById('onboarding-slides');
+  if(slides) slides.style.transform=`translateX(-${_onboardSlide * 100}vw)`;
+  renderOnboardDots();
+}
+function skipOnboarding() {
+  document.getElementById('onboarding-overlay').style.display='none';
+  localStorage.setItem('onboardingSeen','1');
+}
+
+// Show onboarding on first load
+setTimeout(()=>{ if(!localStorage.getItem('onboardingSeen')) showOnboarding(); }, 600);
+
+// ===== OFFLINE MODE =====
+window.addEventListener('online',  ()=>{ document.getElementById('offline-banner').style.display='none'; });
+window.addEventListener('offline', ()=>{ document.getElementById('offline-banner').style.display='block'; });
+if(!navigator.onLine) document.getElementById('offline-banner').style.display='block';
+
+// Register service worker
+if('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch(()=>{});
+}
+
+// ===== PATCH renderHome — weather + dark mode toggle wiring =====
+const _origRenderHomeFinal = renderHome;
+renderHome = function() {
+  _origRenderHomeFinal();
+  // Load weather
+  const w = document.getElementById('home-weather-widget');
+  if(w && w.innerHTML.trim()==='') fetchOrlandoWeather();
+};
+
+// ===== PATCH renderAccount — dark mode toggle + notification settings =====
+const _origRenderAcctFinal = renderAccount;
+renderAccount = function() {
+  _origRenderAcctFinal();
+  if(!appState.user) return;
+  // Add dark mode toggle row in settings area
+  setTimeout(()=>{
+    const settingsBtn = [...document.querySelectorAll('#account-content .account-menu-item')].find(el=>el.textContent.trim().startsWith('⚙️'));
+    if(settingsBtn && !document.getElementById('dark-mode-row')) {
+      const row = document.createElement('div');
+      row.id='dark-mode-row';
+      row.className='account-menu-item';
+      row.style.cssText='display:flex;align-items:center;justify-content:space-between;';
+      row.innerHTML=`<span class="icon">🌙</span><span style="flex:1;">Dark Mode</span><button class="dark-toggle-btn ${_isDark()?'dark':'light'}" onclick="toggleDarkMode()"></button>`;
+      settingsBtn.parentNode.insertBefore(row, settingsBtn);
+    }
+  }, 60);
+};
+
+// Trigger weather on initial load
+setTimeout(fetchOrlandoWeather, 400);
 </script>
