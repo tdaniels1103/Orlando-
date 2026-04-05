@@ -7611,3 +7611,2840 @@ forumPostCardHTML = function(p) {
 
 console.log('[Orlando Explorer] Emoji & Media System loaded ✅');
 </script>
+
+<style>
+/* ====================================================
+   MEGA RELEASE — SHARED STYLES
+   ==================================================== */
+
+/* Splash Screen */
+#splash-screen{position:fixed;inset:0;z-index:10000;background:linear-gradient(135deg,#1A1A2E 0%,#0099CC 50%,#FF6B35 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.7s ease;}
+.splash-logo{font-family:'Playfair Display',serif;color:white;font-size:32px;font-weight:900;text-align:center;margin-top:16px;}
+.splash-logo span{color:#FFD166;}
+.splash-sub{color:rgba(255,255,255,0.7);font-size:14px;margin-top:6px;}
+.splash-loader{width:40px;height:4px;background:rgba(255,255,255,0.2);border-radius:2px;margin-top:32px;overflow:hidden;}
+.splash-loader-bar{height:100%;background:white;border-radius:2px;animation:splashLoad 2s ease-in-out forwards;}
+@keyframes splashLoad{0%{width:0}80%{width:90%}100%{width:100%}}
+@keyframes palmSway{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+.splash-palm{font-size:80px;animation:palmSway 2s ease-in-out infinite;}
+
+/* Enhanced Onboarding */
+#ob-overlay{position:fixed;inset:0;z-index:9900;background:#1A1A2E;overflow:hidden;display:none;flex-direction:column;}
+.ob-skip{position:absolute;top:20px;right:20px;background:rgba(255,255,255,0.15);border:none;color:white;padding:7px 14px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;z-index:5;}
+.ob-slides-wrap{flex:1;display:flex;overflow:hidden;}
+.ob-track{display:flex;transition:transform 0.4s cubic-bezier(.4,0,.2,1);height:100%;will-change:transform;}
+.ob-slide{min-width:100vw;max-width:430px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px 20px;text-align:center;}
+.ob-emoji{font-size:80px;margin-bottom:24px;line-height:1;}
+.ob-title{font-family:'Playfair Display',serif;color:white;font-size:26px;font-weight:900;margin-bottom:12px;}
+.ob-desc{color:rgba(255,255,255,0.75);font-size:15px;line-height:1.7;max-width:300px;}
+.ob-interest-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;margin-top:20px;}
+.ob-interest-card{background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.2);border-radius:16px;padding:16px 12px;cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:8px;}
+.ob-interest-card.selected{background:rgba(255,107,53,0.3);border-color:#FF6B35;}
+.ob-interest-card:active{transform:scale(0.95);}
+.ob-interest-emoji{font-size:28px;}
+.ob-interest-label{color:white;font-size:13px;font-weight:600;}
+.ob-perm-card{background:rgba(255,255,255,0.1);border-radius:20px;padding:24px;width:100%;max-width:320px;margin-top:20px;}
+.ob-perm-emoji{font-size:48px;margin-bottom:12px;}
+.ob-dots-row{display:flex;justify-content:center;gap:7px;padding:16px 0 8px;}
+.ob-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.3);transition:all 0.2s;}
+.ob-dot.on{background:var(--sun);width:20px;border-radius:4px;}
+.ob-nav-row{display:flex;gap:12px;padding:8px 24px 20px;width:100%;}
+.ob-btn{flex:1;padding:14px;border-radius:30px;font-size:15px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;border:none;}
+.ob-btn-back{background:rgba(255,255,255,0.15);color:white;}
+.ob-btn-next{background:var(--sun);color:white;}
+.ob-btn-full{width:100%;margin-top:12px;padding:14px;border-radius:30px;font-size:15px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;border:none;}
+.ob-btn-prim{background:white;color:#1A1A2E;}
+.ob-btn-sec{background:rgba(255,255,255,0.15);color:white;margin-top:8px;}
+/* Personalized welcome banner */
+#home-personalized-banner{display:none;margin:0 16px 4px;border-radius:var(--radius-sm);padding:12px 14px;background:linear-gradient(135deg,#FFF0E8,#FFF8F0);border-left:4px solid var(--sun);}
+.home-welcome-text{font-size:14px;font-weight:600;color:var(--text);}
+.home-welcome-sub{font-size:12px;color:var(--gray4);margin-top:2px;}
+</style>
+<script>
+/* ====================================================
+   SPLASH SCREEN + ENHANCED ONBOARDING
+   ==================================================== */
+const obState = {
+  slide: 0,
+  interests: [],
+  totalSlides: 7 // 5 info + location + notification
+};
+
+const OB_INTERESTS = [
+  {key:'family',emoji:'👨‍👩‍👧',label:'Family Fun'},
+  {key:'thrill',emoji:'🎢',label:'Thrill Seeker'},
+  {key:'foodie',emoji:'🍴',label:'Foodie'},
+  {key:'culture',emoji:'🎨',label:'Culture Lover'},
+  {key:'budget',emoji:'💰',label:'Budget Traveler'},
+  {key:'nightlife',emoji:'🌙',label:'Nightlife'}
+];
+
+// ----- Splash Screen -----
+function showSplashScreen() {
+  const el = document.createElement('div');
+  el.id = 'splash-screen';
+  el.innerHTML = `<div class="splash-palm">🌴</div>
+    <div class="splash-logo">Orlando <span>Explorer</span></div>
+    <div class="splash-sub">Your Ultimate Orlando Adventure</div>
+    <div class="splash-loader"><div class="splash-loader-bar"></div></div>`;
+  document.body.appendChild(el);
+  setTimeout(() => {
+    el.style.opacity = '0';
+    setTimeout(() => {
+      el.remove();
+      if (!localStorage.getItem('hasSeenOnboarding')) showEnhancedOnboarding();
+    }, 700);
+  }, 2200);
+}
+
+// ----- Enhanced Onboarding -----
+function showEnhancedOnboarding() {
+  // Remove any existing onboarding overlay
+  const old = document.getElementById('onboarding-overlay');
+  if (old) old.style.display = 'none';
+  const stored = localStorage.getItem('hasSeenOnboarding');
+  if (stored) return;
+
+  obState.slide = 0;
+  obState.interests = [];
+
+  let overlay = document.getElementById('ob-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'ob-overlay';
+    document.body.appendChild(overlay);
+  }
+  overlay.style.display = 'flex';
+  overlay.style.flexDirection = 'column';
+  obRenderSlide();
+}
+
+function obRenderSlide() {
+  const overlay = document.getElementById('ob-overlay');
+  if (!overlay) return;
+  const s = obState.slide;
+  const total = obState.totalSlides;
+
+  const bgColors = ['#1A1A2E','#0D2137','#1E1240','#1A1A2E','#0A1628','#112233','#0D1F2D'];
+  overlay.style.background = bgColors[s] || '#1A1A2E';
+
+  let slideContent = '';
+
+  if (s === 0) {
+    slideContent = `<div class="ob-emoji">🌴</div>
+      <div class="ob-title">Orlando Explorer</div>
+      <div class="ob-desc">Your Ultimate Orlando Adventure Guide — everything you need, all in one place.</div>
+      <button class="ob-btn-full ob-btn-prim" onclick="obNext()" style="margin-top:28px;width:260px;padding:15px;border-radius:30px;font-size:16px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;border:none;background:white;color:#1A1A2E;">Get Started →</button>`;
+  } else if (s === 1) {
+    slideContent = `<div class="ob-emoji">🧭</div>
+      <div class="ob-title">Discover Orlando</div>
+      <div class="ob-desc">Explore hundreds of attractions, restaurants, hotels, theme parks, and events — all in one place.</div>`;
+  } else if (s === 2) {
+    slideContent = `<div class="ob-emoji">🗺️</div>
+      <div class="ob-title">Plan Your Perfect Trip</div>
+      <div class="ob-desc">Save your favorites, build day-by-day itineraries, and get directions to everywhere you want to go.</div>`;
+  } else if (s === 3) {
+    slideContent = `<div class="ob-emoji">🏆</div>
+      <div class="ob-title">Earn Rewards</div>
+      <div class="ob-desc">Check in to places, earn XP, unlock badges, and climb the leaderboard to become an Orlando Local.</div>`;
+  } else if (s === 4) {
+    const interestHTML = OB_INTERESTS.map(i =>
+      `<div class="ob-interest-card ${obState.interests.includes(i.key)?'selected':''}" onclick="obToggleInterest('${i.key}',this)">
+        <span class="ob-interest-emoji">${i.emoji}</span>
+        <span class="ob-interest-label">${i.label}</span>
+      </div>`
+    ).join('');
+    slideContent = `<div style="font-size:48px;margin-bottom:16px;">🎯</div>
+      <div class="ob-title" style="font-size:22px;">What kind of traveler are you?</div>
+      <div class="ob-desc" style="margin-bottom:0;">Select all that apply</div>
+      <div class="ob-interest-grid">${interestHTML}</div>`;
+  } else if (s === 5) {
+    slideContent = `<div class="ob-perm-card">
+        <div class="ob-perm-emoji">📍</div>
+        <div style="color:white;font-size:18px;font-weight:700;margin-bottom:8px;">Allow Location?</div>
+        <div style="color:rgba(255,255,255,0.7);font-size:13px;line-height:1.6;">We use your location to show nearby places and distances.</div>
+        <button class="ob-btn-full ob-btn-prim" onclick="obGrantLocation()" style="margin-top:16px;">Allow Location</button>
+        <button class="ob-btn-full ob-btn-sec" onclick="obNext()" style="margin-top:8px;">Maybe Later</button>
+      </div>`;
+  } else if (s === 6) {
+    slideContent = `<div class="ob-perm-card">
+        <div class="ob-perm-emoji">🔔</div>
+        <div style="color:white;font-size:18px;font-weight:700;margin-bottom:8px;">Stay in the Loop?</div>
+        <div style="color:rgba(255,255,255,0.7);font-size:13px;line-height:1.6;">Get reminders for saved events, daily missions, and friend activity.</div>
+        <button class="ob-btn-full ob-btn-prim" onclick="obGrantNotif()" style="margin-top:16px;">Allow Notifications</button>
+        <button class="ob-btn-full ob-btn-sec" onclick="obComplete()" style="margin-top:8px;">Maybe Later</button>
+      </div>`;
+  }
+
+  const showBack = s > 0 && s < 5;
+  const showNext = s > 0 && s < 5;
+  const isLastInfo = s === 4;
+  const isPermSlide = s >= 5;
+
+  overlay.innerHTML = `<button class="ob-skip" onclick="obSkip()">Skip</button>
+    <div class="ob-slides-wrap"><div class="ob-slide">${slideContent}</div></div>
+    <div class="ob-dots-row">${Array.from({length:total},(_,i)=>`<div class="ob-dot${i===s?' on':''}"></div>`).join('')}</div>
+    <div class="ob-nav-row">
+      ${showBack ? `<button class="ob-btn ob-btn-back" onclick="obBack()">← Back</button>` : '<div style="flex:1"></div>'}
+      ${showNext ? `<button class="ob-btn ob-btn-next" onclick="obNext()">${isLastInfo ? "Let me Explore 🌴" : "Next →"}</button>` : ''}
+      ${!showNext && !isPermSlide && s===0 ? '<div style="flex:1"></div>' : ''}
+    </div>`;
+}
+
+function obToggleInterest(key, el) {
+  const idx = obState.interests.indexOf(key);
+  if (idx === -1) obState.interests.push(key);
+  else obState.interests.splice(idx, 1);
+  el.classList.toggle('selected');
+}
+
+function obNext() {
+  if (obState.slide < obState.totalSlides - 1) {
+    obState.slide++;
+    obRenderSlide();
+  }
+}
+
+function obBack() {
+  if (obState.slide > 0) {
+    obState.slide--;
+    obRenderSlide();
+  }
+}
+
+function obSkip() { obComplete(); }
+
+function obGrantLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(() => {
+      appState.locationGranted = true;
+      showToast('Location enabled 📍');
+    }, () => {});
+  }
+  obNext();
+}
+
+function obGrantNotif() {
+  if ('Notification' in window) Notification.requestPermission();
+  obComplete();
+}
+
+function obComplete() {
+  const overlay = document.getElementById('ob-overlay');
+  if (overlay) { overlay.style.opacity='0'; overlay.style.transition='opacity 0.4s'; setTimeout(()=>overlay.remove(),400); }
+  localStorage.setItem('hasSeenOnboarding','1');
+  // Store interests in appState
+  appState.interests = obState.interests;
+  localStorage.setItem('userInterests', JSON.stringify(obState.interests));
+  // Show personalized welcome
+  setTimeout(renderPersonalizedBanner, 500);
+}
+
+function renderPersonalizedBanner() {
+  const el = document.getElementById('home-personalized-banner');
+  if (!el) return;
+  const interests = appState.interests || JSON.parse(localStorage.getItem('userInterests') || '[]');
+  if (!interests.length) return;
+  const messages = {
+    family: {text:'Best family spots in Orlando 👨‍👩‍👧', sub:'Picked just for you and the kids'},
+    thrill: {text:'Top thrill experiences 🎢', sub:'Heart-pounding Orlando adventures'},
+    foodie: {text:'Top foodie picks just for you 🍴', sub:'Orlando\'s best bites and sips'},
+    culture: {text:'Arts & culture highlights 🎨', sub:'The creative side of Orlando'},
+    budget: {text:'Best value picks in Orlando 💰', sub:'Amazing experiences for less'},
+    nightlife: {text:'Tonight\'s hottest spots 🌙', sub:'Orlando after dark'}
+  };
+  const first = interests[0];
+  const msg = messages[first] || {text:'Welcome to Orlando! 🌴', sub:'Let\'s explore together'};
+  el.style.display = 'block';
+  el.innerHTML = `<div class="home-welcome-text">Here are the ${msg.text}</div><div class="home-welcome-sub">${msg.sub}</div>`;
+}
+
+// Add banner div to home screen
+(function injectPersonalizedBanner() {
+  const xpBar = document.getElementById('home-xp-bar');
+  if (xpBar && !document.getElementById('home-personalized-banner')) {
+    const div = document.createElement('div');
+    div.id = 'home-personalized-banner';
+    xpBar.parentNode.insertBefore(div, xpBar.nextSibling);
+  }
+})();
+
+// Override old showOnboarding to use new version
+showOnboarding = showEnhancedOnboarding;
+skipOnboarding = obComplete;
+
+// App update notification banner
+function showUpdateBanner() {
+  const banner = document.createElement('div');
+  banner.id = 'update-banner';
+  banner.style.cssText = 'background:linear-gradient(135deg,var(--sky),var(--palm));color:white;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:600;';
+  banner.innerHTML = `<span>✨ A new version is available!</span>
+    <div style="display:flex;gap:8px;">
+      <button onclick="showToast('App is up to date!')" style="background:white;color:var(--sky);border:none;border-radius:12px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;">Update</button>
+      <button onclick="this.closest('#update-banner').remove()" style="background:none;border:none;color:white;font-size:18px;cursor:pointer;">×</button>
+    </div>`;
+  const home = document.getElementById('screen-home');
+  if (home) home.prepend(banner);
+}
+
+// App rating prompt (after 5 saves)
+let _ratingPromptShown = false;
+function checkRatingPrompt() {
+  if (_ratingPromptShown) return;
+  const count = Object.keys(appState.savedItems || {}).length;
+  if (count >= 5) {
+    _ratingPromptShown = true;
+    setTimeout(showRatingPrompt, 1000);
+  }
+}
+function showRatingPrompt() {
+  const modal = document.createElement('div');
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:500;display:flex;align-items:center;justify-content:center;';
+  let _selectedStars = 0;
+  modal.innerHTML = `<div style="background:var(--white);border-radius:20px;padding:24px;margin:20px;max-width:340px;width:100%;text-align:center;">
+    <div style="font-size:48px;margin-bottom:12px;">⭐</div>
+    <div style="font-family:'Playfair Display',serif;font-size:20px;margin-bottom:8px;">Loving Orlando Explorer?</div>
+    <div style="font-size:13px;color:var(--gray4);margin-bottom:16px;">Your feedback helps us improve!</div>
+    <div id="rating-stars" style="font-size:36px;display:flex;justify-content:center;gap:8px;margin-bottom:20px;">
+      ${[1,2,3,4,5].map(n=>`<span style="cursor:pointer;opacity:0.3;" onclick="selectRatingStar(${n})">${'★'}</span>`).join('')}
+    </div>
+    <div id="rating-feedback" style="display:none;margin-bottom:16px;">
+      <textarea placeholder="What can we improve?" style="width:100%;border:1.5px solid var(--gray2);border-radius:10px;padding:10px;font-family:'DM Sans',sans-serif;font-size:13px;resize:none;min-height:80px;outline:none;"></textarea>
+    </div>
+    <button onclick="submitRating(this)" style="width:100%;background:var(--sun);color:white;border:none;border-radius:24px;padding:13px;font-size:15px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">Rate Now</button>
+    <button onclick="this.closest('div[style*=\"position:fixed\"]').remove()" style="background:none;border:none;color:var(--gray3);font-size:13px;cursor:pointer;margin-top:10px;display:block;width:100%;">Maybe Later</button>
+  </div>`;
+  document.body.appendChild(modal);
+  window._ratingModal = modal;
+}
+function selectRatingStar(n) {
+  window._selectedStars = n;
+  const stars = document.querySelectorAll('#rating-stars span');
+  stars.forEach((s,i) => s.style.opacity = i < n ? '1' : '0.3');
+  const fb = document.getElementById('rating-feedback');
+  if (n <= 3 && fb) fb.style.display = 'block';
+}
+function submitRating(btn) {
+  const stars = window._selectedStars || 0;
+  const modal = window._ratingModal;
+  if (stars >= 4) { showToast('Thank you for the ★★★★★ rating! 🎉'); }
+  else { showToast('Thanks for your feedback! We\'ll keep improving 💪'); }
+  if (modal) modal.remove();
+}
+
+// Splash screen on load
+if (!localStorage.getItem('_splashShown')) {
+  localStorage.setItem('_splashShown','1');
+  showSplashScreen();
+} else if (!localStorage.getItem('hasSeenOnboarding')) {
+  setTimeout(showEnhancedOnboarding, 400);
+}
+
+// Load interests on startup
+appState.interests = JSON.parse(localStorage.getItem('userInterests') || '[]');
+setTimeout(renderPersonalizedBanner, 800);
+</script>
+
+<style>
+/* ====================================================
+   SETTINGS SCREEN
+   ==================================================== */
+#settings-overlay{display:none;position:fixed;inset:0;z-index:400;background:var(--sand);max-width:430px;left:50%;transform:translateX(-50%);overflow-y:auto;font-family:'DM Sans',sans-serif;}
+#settings-overlay.open{display:block;}
+.settings-section-hdr{font-size:11px;font-weight:700;color:var(--gray3);text-transform:uppercase;letter-spacing:0.7px;padding:18px 20px 6px;}
+.settings-row{display:flex;align-items:center;background:var(--white);padding:14px 20px;border-bottom:1px solid var(--gray2);cursor:pointer;}
+.settings-row:last-child{border-bottom:none;}
+.settings-row-icon{font-size:20px;width:32px;flex-shrink:0;}
+.settings-row-label{flex:1;font-size:15px;font-weight:500;}
+.settings-row-val{font-size:13px;color:var(--gray3);margin-right:6px;}
+.settings-row-arrow{color:var(--gray3);}
+.settings-card{background:var(--white);border-radius:var(--radius);overflow:hidden;margin:0 16px 8px;box-shadow:var(--card-shadow);}
+/* Text size chips */
+.text-size-chips{display:flex;gap:8px;padding:12px 20px 14px;background:var(--white);}
+.ts-chip{flex:1;padding:9px;text-align:center;border-radius:10px;border:2px solid var(--gray2);font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:600;transition:all 0.15s;}
+.ts-chip.on{border-color:var(--sun);background:#FFF0E8;color:var(--sun);}
+/* Toggle switch reuse */
+.s-toggle{position:relative;width:46px;height:26px;flex-shrink:0;}
+.s-toggle input{opacity:0;width:0;height:0;}
+.s-toggle-slider{position:absolute;inset:0;background:var(--gray2);border-radius:20px;cursor:pointer;transition:0.3s;}
+.s-toggle-slider:before{content:'';position:absolute;width:20px;height:20px;left:3px;bottom:3px;background:white;border-radius:50%;transition:0.3s;box-shadow:0 1px 4px rgba(0,0,0,0.2);}
+.s-toggle input:checked+.s-toggle-slider{background:var(--sun);}
+.s-toggle input:checked+.s-toggle-slider:before{transform:translateX(20px);}
+/* High contrast */
+body.hc{--white:#000;--gray1:#111;--gray2:#333;--gray3:#bbb;--gray4:#ddd;--text:#fff;--sand:#000;--card-shadow:0 4px 20px rgba(0,0,0,0.8);}
+body.hc .bottom-nav{border-top:2px solid #333;}
+/* Reduce motion */
+body.no-motion *{animation:none!important;transition:none!important;}
+/* Language selector */
+.lang-select{width:100%;border:none;outline:none;font-family:'DM Sans',sans-serif;font-size:14px;background:transparent;color:var(--text);padding:0;}
+/* Support form */
+.support-field{width:100%;border:1.5px solid var(--gray2);border-radius:var(--radius-sm);padding:10px 14px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;background:var(--white);color:var(--text);margin-bottom:10px;}
+.support-field:focus{border-color:var(--sky);}
+/* What's New */
+.wn-version-block{padding:0 20px 20px;}
+.wn-version-tag{display:inline-block;background:var(--sun);color:white;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:700;margin-bottom:8px;}
+.wn-feature-item{display:flex;gap:10px;margin-bottom:8px;font-size:13px;color:var(--gray4);line-height:1.5;}
+.wn-dot{width:6px;height:6px;border-radius:50%;background:var(--sun);flex-shrink:0;margin-top:6px;}
+/* Cookie banner */
+#cookie-banner{display:none;position:fixed;bottom:calc(var(--nav-h) + 8px);left:50%;transform:translateX(-50%);width:calc(100% - 32px);max-width:398px;background:var(--white);border-radius:var(--radius);box-shadow:0 8px 32px rgba(0,0,0,0.2);padding:16px;z-index:600;}
+</style>
+<script>
+/* ====================================================
+   SETTINGS SCREEN
+   ==================================================== */
+const appSettings = {
+  textSize: 'default',
+  language: 'en',
+  privateAccount: false,
+  showActivity: true,
+  allowLocation: false,
+  highContrast: false,
+  reduceMotion: false,
+  largeText: false,
+  ...JSON.parse(localStorage.getItem('appSettings') || '{}')
+};
+function saveAppSettings() {
+  localStorage.setItem('appSettings', JSON.stringify(appSettings));
+}
+function applyAppSettings() {
+  // Text size
+  const sizes = {small:'13px', default:'15px', large:'17px'};
+  document.documentElement.style.setProperty('--base-font', sizes[appSettings.textSize] || '15px');
+  // High contrast
+  document.body.classList.toggle('hc', !!appSettings.highContrast);
+  // Reduce motion
+  document.body.classList.toggle('no-motion', !!appSettings.reduceMotion);
+  // Large text
+  if (appSettings.largeText) document.documentElement.style.fontSize = '120%';
+  else document.documentElement.style.fontSize = '';
+}
+applyAppSettings();
+
+function openSettingsScreen() {
+  let overlay = document.getElementById('settings-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'settings-overlay';
+    document.body.appendChild(overlay);
+  }
+  overlay.className = 'open';
+  renderSettingsScreen();
+}
+function closeSettingsScreen() {
+  const o = document.getElementById('settings-overlay');
+  if (o) o.className = '';
+}
+
+const LANGUAGES = [
+  {code:'en',name:'English',flag:'🇺🇸'},
+  {code:'es',name:'Español',flag:'🇪🇸'},
+  {code:'pt',name:'Português',flag:'🇧🇷'},
+  {code:'fr',name:'Français',flag:'🇫🇷'},
+  {code:'de',name:'Deutsch',flag:'🇩🇪'},
+  {code:'ja',name:'日本語',flag:'🇯🇵'}
+];
+
+function renderSettingsScreen() {
+  const overlay = document.getElementById('settings-overlay');
+  if (!overlay) return;
+  const dm = _isDark ? _isDark() : false;
+  const s = appSettings;
+  overlay.innerHTML = `
+    <div style="background:var(--white);position:sticky;top:0;z-index:5;border-bottom:1px solid var(--gray2);display:flex;align-items:center;gap:12px;padding:14px 20px;">
+      <button onclick="closeSettingsScreen()" style="background:var(--gray1);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;cursor:pointer;">←</button>
+      <span style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;">Settings</span>
+    </div>
+
+    <div class="settings-section-hdr">Appearance</div>
+    <div class="settings-card">
+      <div class="settings-row" style="cursor:default;">
+        <span class="settings-row-icon">🌙</span>
+        <span class="settings-row-label">Dark Mode</span>
+        <label class="s-toggle"><input type="checkbox" ${dm?'checked':''} onchange="if(typeof toggleDarkMode==='function')toggleDarkMode()"><span class="s-toggle-slider"></span></label>
+      </div>
+      <div class="settings-row" style="cursor:default;">
+        <span class="settings-row-icon">🔆</span>
+        <span class="settings-row-label">High Contrast</span>
+        <label class="s-toggle"><input type="checkbox" ${s.highContrast?'checked':''} onchange="appSettings.highContrast=this.checked;saveAppSettings();applyAppSettings()"><span class="s-toggle-slider"></span></label>
+      </div>
+      <div class="settings-row" style="cursor:default;">
+        <span class="settings-row-icon">✨</span>
+        <span class="settings-row-label">Reduce Motion</span>
+        <label class="s-toggle"><input type="checkbox" ${s.reduceMotion?'checked':''} onchange="appSettings.reduceMotion=this.checked;saveAppSettings();applyAppSettings()"><span class="s-toggle-slider"></span></label>
+      </div>
+    </div>
+
+    <div class="settings-section-hdr">Text Size</div>
+    <div class="settings-card">
+      <div class="text-size-chips">
+        ${['small','default','large'].map(sz=>`<button class="ts-chip${s.textSize===sz?' on':''}" onclick="setTextSize('${sz}')" style="font-size:${sz==='small'?'12px':sz==='large'?'17px':'14px'}">${sz.charAt(0).toUpperCase()+sz.slice(1)}</button>`).join('')}
+      </div>
+    </div>
+
+    <div class="settings-section-hdr">Language</div>
+    <div class="settings-card">
+      <div class="settings-row" style="cursor:default;">
+        <span class="settings-row-icon">🌐</span>
+        <span class="settings-row-label">Language</span>
+        <select class="lang-select" onchange="setLanguage(this.value)">
+          ${LANGUAGES.map(l=>`<option value="${l.code}" ${s.language===l.code?'selected':''}>${l.flag} ${l.name}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+
+    <div class="settings-section-hdr">Privacy</div>
+    <div class="settings-card">
+      ${[
+        {key:'privateAccount',label:'Private Account',icon:'🔒'},
+        {key:'showActivity',label:'Show My Activity to Friends',icon:'👁️'},
+        {key:'allowLocation',label:'Allow Location Tracking',icon:'📍'}
+      ].map(p=>`<div class="settings-row" style="cursor:default;">
+        <span class="settings-row-icon">${p.icon}</span>
+        <span class="settings-row-label">${p.label}</span>
+        <label class="s-toggle"><input type="checkbox" ${appSettings[p.key]?'checked':''} onchange="appSettings['${p.key}']=this.checked;saveAppSettings()"><span class="s-toggle-slider"></span></label>
+      </div>`).join('')}
+      <div class="settings-row" onclick="showToast('Your data export will be ready within 24 hours 📧')">
+        <span class="settings-row-icon">📥</span>
+        <span class="settings-row-label">Download My Data</span>
+        <span class="settings-row-arrow">›</span>
+      </div>
+      <div class="settings-row" onclick="openPrivacyPolicy()">
+        <span class="settings-row-icon">📄</span>
+        <span class="settings-row-label">Privacy Policy</span>
+        <span class="settings-row-arrow">›</span>
+      </div>
+      <div class="settings-row" onclick="openTermsOfService()">
+        <span class="settings-row-icon">📋</span>
+        <span class="settings-row-label">Terms of Service</span>
+        <span class="settings-row-arrow">›</span>
+      </div>
+    </div>
+
+    <div class="settings-section-hdr">Notifications</div>
+    <div class="settings-card">
+      <div class="settings-row" onclick="openNotifSettings?openNotifSettings():showToast('Opening notification settings...')">
+        <span class="settings-row-icon">🔔</span>
+        <span class="settings-row-label">Notification Settings</span>
+        <span class="settings-row-arrow">›</span>
+      </div>
+    </div>
+
+    <div class="settings-section-hdr">App Info</div>
+    <div class="settings-card">
+      <div class="settings-row" style="cursor:default;">
+        <span class="settings-row-icon">📱</span>
+        <span class="settings-row-label">App Version</span>
+        <span class="settings-row-val">1.0.0</span>
+      </div>
+      <div class="settings-row" style="cursor:default;">
+        <span class="settings-row-icon">#️⃣</span>
+        <span class="settings-row-label">Build Number</span>
+        <span class="settings-row-val">2025001</span>
+      </div>
+      <div class="settings-row" onclick="openWhatsNew()">
+        <span class="settings-row-icon">🆕</span>
+        <span class="settings-row-label">What's New</span>
+        <span class="settings-row-arrow">›</span>
+      </div>
+      <div class="settings-row" onclick="clearCache()">
+        <span class="settings-row-icon">🗑️</span>
+        <span class="settings-row-label">Clear Cache</span>
+        <span class="settings-row-arrow">›</span>
+      </div>
+      <div class="settings-row" onclick="rateApp()">
+        <span class="settings-row-icon">⭐</span>
+        <span class="settings-row-label">Rate the App</span>
+        <span class="settings-row-arrow">›</span>
+      </div>
+      <div class="settings-row" onclick="shareApp()">
+        <span class="settings-row-icon">📤</span>
+        <span class="settings-row-label">Share the App</span>
+        <span class="settings-row-arrow">›</span>
+      </div>
+      <div class="settings-row" onclick="openSupportForm()">
+        <span class="settings-row-icon">💬</span>
+        <span class="settings-row-label">Contact Support</span>
+        <span class="settings-row-arrow">›</span>
+      </div>
+    </div>
+
+    <div class="settings-section-hdr" style="color:#E53935;">Danger Zone</div>
+    <div class="settings-card" style="border:1.5px solid #FFEBEE;">
+      <div class="settings-row danger" onclick="initiateDeleteAccount()" style="color:#E53935;">
+        <span class="settings-row-icon">⚠️</span>
+        <span class="settings-row-label" style="color:#E53935;">Delete Account</span>
+        <span class="settings-row-arrow" style="color:#E53935;">›</span>
+      </div>
+    </div>
+    <div style="height:40px;"></div>`;
+}
+
+function setTextSize(sz) {
+  appSettings.textSize = sz;
+  saveAppSettings();
+  applyAppSettings();
+  renderSettingsScreen();
+  showToast('Text size: ' + sz);
+}
+
+function setLanguage(code) {
+  appSettings.language = code;
+  saveAppSettings();
+  const lang = LANGUAGES.find(l=>l.code===code);
+  showToast('Language changed to ' + (lang?.name || code) + ' ' + (lang?.flag || ''));
+}
+
+function clearCache() {
+  if (!confirm('This will clear locally stored data and cannot be undone.')) return;
+  showToast('Cache cleared successfully 🗑️');
+}
+
+function rateApp() { showRatingPrompt(); closeSettingsScreen(); }
+
+function shareApp() {
+  const url = window.location.href;
+  try { navigator.clipboard.writeText(url); showToast('Link copied! Share Orlando Explorer 🌴'); }
+  catch(e) { showToast('Share: ' + url); }
+}
+
+function openSupportForm() {
+  const modal = document.createElement('div');
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:600;display:flex;align-items:flex-end;justify-content:center;';
+  modal.innerHTML = `<div style="background:var(--white);width:100%;max-width:430px;border-radius:24px 24px 0 0;padding:24px 20px 32px;animation:slideUp 0.25s ease;">
+    <div style="font-family:'Playfair Display',serif;font-size:20px;margin-bottom:16px;">Contact Support</div>
+    <input class="support-field" type="text" placeholder="Subject">
+    <textarea class="support-field" placeholder="Describe your issue..." style="min-height:100px;resize:none;"></textarea>
+    <button onclick="this.closest('div[style*=fixed]').remove();showToast('Message sent! We\'ll reply within 24 hours 📨')" style="width:100%;background:var(--sun);color:white;border:none;border-radius:24px;padding:13px;font-size:15px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">Send Message</button>
+    <button onclick="this.closest('div[style*=fixed]').remove()" style="display:block;width:100%;text-align:center;margin-top:10px;background:none;border:none;color:var(--gray3);font-size:13px;cursor:pointer;">Cancel</button>
+  </div>`;
+  modal.addEventListener('click',e=>{if(e.target===modal)modal.remove();});
+  document.body.appendChild(modal);
+}
+
+function initiateDeleteAccount() {
+  const input = prompt('Type DELETE to confirm account deletion. This cannot be undone.');
+  if (input === 'DELETE') {
+    showToast('Account deletion request submitted.');
+    if (typeof logout === 'function') logout();
+  } else if (input !== null) {
+    showToast('Deletion cancelled — you must type DELETE exactly');
+  }
+}
+
+function openWhatsNew() {
+  const modal = document.createElement('div');
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:600;display:flex;align-items:flex-end;justify-content:center;';
+  modal.innerHTML = `<div style="background:var(--white);width:100%;max-width:430px;border-radius:24px 24px 0 0;max-height:80vh;overflow-y:auto;animation:slideUp 0.25s ease;">
+    <div style="position:sticky;top:0;background:var(--white);padding:20px 20px 12px;border-bottom:1px solid var(--gray2);display:flex;align-items:center;justify-content:space-between;">
+      <span style="font-family:'Playfair Display',serif;font-size:20px;">What's New 🆕</span>
+      <button onclick="this.closest('div[style*=fixed]').remove()" style="background:var(--gray1);border:none;border-radius:50%;width:32px;height:32px;font-size:18px;cursor:pointer;">×</button>
+    </div>
+    <div class="wn-version-block" style="padding:16px 20px;">
+      <div class="wn-version-tag">v1.0.0 — Latest</div>
+      ${[
+        '🏷️ Hot Deals system with promo codes and countdowns',
+        '🧭 Tours & Shopping listings added to Explore',
+        '🗺️ Get Directions & Nearby Places on every listing',
+        '📅 Multi-day Trip Planner with Export',
+        '⭐ Enhanced Reviews with star breakdown and sort',
+        '😊 Universal Emoji Picker on all text inputs',
+        '📷 Photo uploads on posts and reviews',
+        '👤 User Dashboard on Home screen',
+        '🎯 Personalized onboarding and recommendations',
+        '🌙 Dark mode, text size, and full Settings screen'
+      ].map(f=>`<div class="wn-feature-item"><div class="wn-dot"></div><span>${f}</span></div>`).join('')}
+    </div>
+    <div style="height:24px;"></div>
+  </div>`;
+  modal.addEventListener('click',e=>{if(e.target===modal)modal.remove();});
+  document.body.appendChild(modal);
+}
+
+function openPrivacyPolicy() {
+  const modal = document.createElement('div');
+  modal.style.cssText = 'position:fixed;inset:0;background:var(--sand);z-index:600;overflow-y:auto;max-width:430px;left:50%;transform:translateX(-50%);';
+  modal.innerHTML = `<div style="background:var(--white);position:sticky;top:0;padding:14px 20px;border-bottom:1px solid var(--gray2);display:flex;align-items:center;gap:12px;"><button onclick="this.closest('div[style*=fixed]').remove()" style="background:var(--gray1);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;cursor:pointer;">←</button><span style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;">Privacy Policy</span></div>
+  <div style="padding:20px;font-size:13px;color:var(--gray4);line-height:1.8;">
+    <h3 style="color:var(--text);font-size:16px;margin-bottom:8px;">1. Information We Collect</h3>
+    <p>We collect information you provide directly, such as when you create an account, save places, write reviews, or contact support. This includes your name, email address, profile photo, and any content you post.</p>
+    <h3 style="color:var(--text);font-size:16px;margin:16px 0 8px;">2. How We Use Your Information</h3>
+    <p>We use your information to personalize your experience, provide recommendations, process bookings, send notifications you've opted into, and improve our services.</p>
+    <h3 style="color:var(--text);font-size:16px;margin:16px 0 8px;">3. Data Storage</h3>
+    <p>All data is currently stored locally in your browser. In a production version, data would be stored securely in encrypted cloud databases with appropriate access controls.</p>
+    <h3 style="color:var(--text);font-size:16px;margin:16px 0 8px;">4. Your Rights</h3>
+    <p>You may request access to, correction of, or deletion of your personal data at any time through the Settings screen.</p>
+    <div style="height:40px;"></div>
+  </div>`;
+  document.body.appendChild(modal);
+}
+
+function openTermsOfService() {
+  const modal = document.createElement('div');
+  modal.style.cssText = 'position:fixed;inset:0;background:var(--sand);z-index:600;overflow-y:auto;max-width:430px;left:50%;transform:translateX(-50%);';
+  modal.innerHTML = `<div style="background:var(--white);position:sticky;top:0;padding:14px 20px;border-bottom:1px solid var(--gray2);display:flex;align-items:center;gap:12px;"><button onclick="this.closest('div[style*=fixed]').remove()" style="background:var(--gray1);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;cursor:pointer;">←</button><span style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;">Terms of Service</span></div>
+  <div style="padding:20px;font-size:13px;color:var(--gray4);line-height:1.8;">
+    <h3 style="color:var(--text);font-size:16px;margin-bottom:8px;">1. Acceptance of Terms</h3>
+    <p>By using Orlando Explorer, you agree to these Terms of Service. If you do not agree, please do not use the app.</p>
+    <h3 style="color:var(--text);font-size:16px;margin:16px 0 8px;">2. User Conduct</h3>
+    <p>You agree not to post harmful, misleading, or illegal content. Reviews must be genuine and based on personal experience. Spam and fake reviews are prohibited.</p>
+    <h3 style="color:var(--text);font-size:16px;margin:16px 0 8px;">3. Intellectual Property</h3>
+    <p>Content you post remains yours. By posting, you grant Orlando Explorer a license to display and distribute your content within the app.</p>
+    <h3 style="color:var(--text);font-size:16px;margin:16px 0 8px;">4. Limitation of Liability</h3>
+    <p>Orlando Explorer is provided as-is. We are not responsible for the accuracy of listing information, prices, or third-party bookings.</p>
+    <div style="height:40px;"></div>
+  </div>`;
+  document.body.appendChild(modal);
+}
+
+// Wire Settings to Account screen ⚙️ button
+const _origRenderAccountSettings = renderAccount;
+renderAccount = function() {
+  _origRenderAccountSettings();
+  setTimeout(() => {
+    const items = document.querySelectorAll('#account-content .account-menu-item');
+    const settingsItem = [...items].find(el => el.querySelector('.icon')?.textContent === '⚙️');
+    if (settingsItem) settingsItem.onclick = openSettingsScreen;
+  }, 80);
+};
+
+// Cookie consent
+function showCookieConsent() {
+  if (localStorage.getItem('cookieConsent')) return;
+  const banner = document.getElementById('cookie-banner');
+  if (!banner) {
+    const b = document.createElement('div');
+    b.id = 'cookie-banner';
+    b.innerHTML = `<div style="font-size:13px;font-weight:600;margin-bottom:8px;">🍪 We use cookies to enhance your experience</div>
+      <div style="font-size:12px;color:var(--gray4);margin-bottom:12px;">By using Orlando Explorer, you accept our use of cookies for personalization and analytics.</div>
+      <div style="display:flex;gap:8px;">
+        <button onclick="acceptCookies()" style="flex:2;padding:9px;border-radius:20px;background:var(--sun);color:white;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">Accept All</button>
+        <button onclick="document.getElementById('cookie-banner').style.display='none'" style="flex:1;padding:9px;border-radius:20px;background:var(--gray1);color:var(--gray4);border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">Manage</button>
+      </div>`;
+    b.style.cssText = 'display:none;position:fixed;bottom:calc(var(--nav-h) + 8px);left:50%;transform:translateX(-50%);width:calc(100% - 32px);max-width:398px;background:var(--white);border-radius:var(--radius);box-shadow:0 8px 32px rgba(0,0,0,0.2);padding:16px;z-index:600;';
+    document.body.appendChild(b);
+  }
+  const bEl = document.getElementById('cookie-banner');
+  if (bEl) bEl.style.display = 'block';
+}
+function acceptCookies() {
+  localStorage.setItem('cookieConsent','1');
+  const b = document.getElementById('cookie-banner');
+  if (b) b.style.display = 'none';
+}
+if (!localStorage.getItem('cookieConsent')) setTimeout(showCookieConsent, 3000);
+</script>
+
+<style>
+/* ====================================================
+   SKELETON LOADING + PULL-TO-REFRESH + ERROR STATES
+   ==================================================== */
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.skeleton-pulse{background:linear-gradient(90deg,var(--gray2) 25%,var(--gray1) 50%,var(--gray2) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;}
+.skeleton-card{background:var(--white);border-radius:var(--radius);margin:0 16px 16px;overflow:hidden;box-shadow:var(--card-shadow);}
+.skeleton-img{height:180px;width:100%;}
+.skeleton-body{padding:14px 16px;}
+.skeleton-line{height:14px;border-radius:7px;margin-bottom:10px;}
+.skeleton-line.w-80{width:80%;}
+.skeleton-line.w-60{width:60%;}
+.skeleton-line.w-40{width:40%;}
+.skeleton-hcard{min-width:200px;max-width:200px;border-radius:var(--radius);overflow:hidden;flex-shrink:0;background:var(--white);box-shadow:var(--card-shadow);}
+.skeleton-hcard-img{height:120px;width:100%;}
+.skeleton-hcard-body{padding:10px 12px;}
+.skeleton-hline{height:12px;border-radius:6px;margin-bottom:8px;}
+.skeleton-hline.w-70{width:70%;}
+.skeleton-hline.w-50{width:50%;}
+/* PTR */
+.ptr-indicator{display:none;text-align:center;padding:12px;color:var(--gray3);font-size:13px;font-weight:600;}
+.ptr-spinner{display:inline-block;width:20px;height:20px;border:2px solid var(--gray2);border-top-color:var(--sun);border-radius:50%;animation:spin 0.6s linear infinite;margin-right:8px;vertical-align:middle;}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* Error state */
+.error-state{text-align:center;padding:48px 24px;}
+.error-state-icon{font-size:52px;margin-bottom:12px;}
+.error-state-msg{font-size:15px;font-weight:600;color:var(--text);margin-bottom:6px;}
+.error-state-sub{font-size:13px;color:var(--gray3);margin-bottom:20px;}
+.retry-btn{background:var(--sun);color:white;border:none;padding:12px 28px;border-radius:24px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;}
+/* Connection banners */
+#offline-banner-new{display:none;background:#E53935;color:white;text-align:center;padding:8px 16px;font-size:13px;font-weight:600;position:sticky;top:0;z-index:99;}
+#online-banner{display:none;background:#4CAF50;color:white;text-align:center;padding:8px 16px;font-size:13px;font-weight:600;position:sticky;top:0;z-index:99;}
+</style>
+<script>
+/* ====================================================
+   SKELETON LOADING + PULL-TO-REFRESH + ERROR STATES
+   ==================================================== */
+
+// ----- Skeleton Helpers -----
+function skeletonCardHTML() {
+  return `<div class="skeleton-card"><div class="skeleton-img skeleton-pulse"></div>
+    <div class="skeleton-body"><div class="skeleton-line w-80 skeleton-pulse"></div>
+    <div class="skeleton-line w-60 skeleton-pulse"></div>
+    <div class="skeleton-line w-40 skeleton-pulse"></div></div></div>`;
+}
+function skeletonHCardHTML() {
+  return `<div class="skeleton-hcard"><div class="skeleton-hcard-img skeleton-pulse"></div>
+    <div class="skeleton-hcard-body"><div class="skeleton-hline w-70 skeleton-pulse"></div>
+    <div class="skeleton-hline w-50 skeleton-pulse"></div></div></div>`;
+}
+function showSkeletonList(containerId, count, hcard) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = Array(count).fill(0).map(() => hcard ? skeletonHCardHTML() : skeletonCardHTML()).join('');
+}
+function errorStateHTML(msg, retryFn) {
+  return `<div class="error-state"><div class="error-state-icon">⚠️</div>
+    <div class="error-state-msg">Oops! Something went wrong</div>
+    <div class="error-state-sub">${msg || 'Unable to load content.'}</div>
+    <button class="retry-btn" onclick="(${retryFn.toString()})()">Retry</button></div>`;
+}
+
+// ----- Simulate 1s loading on Explore tab switch -----
+const _origSwitchExploreTabSkel = switchExploreTab;
+switchExploreTab = function(tab, btn) {
+  _origSwitchExploreTabSkel(tab, btn);
+  // Show skeleton immediately, then real content after 1s
+  const container = document.getElementById('explore-list');
+  if (container) {
+    showSkeletonList('explore-list', 4, false);
+    clearTimeout(window._exploreSkeletonTimer);
+    window._exploreSkeletonTimer = setTimeout(() => renderExploreList(), 1000);
+  }
+};
+
+// ----- Pull to Refresh -----
+function initPullToRefresh(scrollEl, onRefresh) {
+  if (!scrollEl || scrollEl._ptrWired) return;
+  scrollEl._ptrWired = true;
+  let startY = 0, pulling = false;
+  const indicator = document.createElement('div');
+  indicator.className = 'ptr-indicator';
+  indicator.innerHTML = `<div class="ptr-spinner"></div>Refreshing...`;
+  scrollEl.parentNode.insertBefore(indicator, scrollEl);
+
+  scrollEl.addEventListener('touchstart', e => {
+    if (scrollEl.scrollTop === 0) startY = e.touches[0].clientY;
+  }, { passive: true });
+  scrollEl.addEventListener('touchmove', e => {
+    if (!startY) return;
+    const dy = e.touches[0].clientY - startY;
+    if (dy > 60 && !pulling) {
+      pulling = true;
+      indicator.style.display = 'block';
+    }
+  }, { passive: true });
+  scrollEl.addEventListener('touchend', () => {
+    if (pulling) {
+      setTimeout(() => {
+        onRefresh();
+        indicator.style.display = 'none';
+        pulling = false;
+        startY = 0;
+        showToast('Content refreshed 🔄');
+      }, 1000);
+    }
+    startY = 0;
+  });
+}
+
+// Wire pull-to-refresh on screens
+setTimeout(() => {
+  const homeScroll = document.querySelector('#screen-home .scroll-content') || document.getElementById('screen-home');
+  const exploreList = document.getElementById('explore-list');
+  const tripContent = document.getElementById('my-trip-content');
+  const forumList = document.getElementById('forum-posts-list');
+  if (homeScroll) initPullToRefresh(homeScroll, () => { if(typeof renderHome==='function') renderHome(); });
+  if (exploreList) initPullToRefresh(exploreList, () => { if(typeof renderExploreList==='function') renderExploreList(); });
+  if (tripContent) initPullToRefresh(tripContent, () => { if(typeof renderMyTrip==='function') renderMyTrip(); });
+  if (forumList) initPullToRefresh(forumList, () => { if(typeof renderForumPosts==='function') renderForumPosts(); });
+}, 1000);
+
+// ----- Connection Banner -----
+function injectConnectionBanners() {
+  // Remove/hide old offline banner if present
+  const oldBanner = document.getElementById('offline-banner');
+
+  const screens = ['screen-home','screen-explore','screen-mytrip','screen-account'];
+  screens.forEach(id => {
+    const screen = document.getElementById(id);
+    if (!screen) return;
+    if (!screen.querySelector('.offline-banner-new')) {
+      const offB = document.createElement('div');
+      offB.className = 'offline-banner-new';
+      offB.style.cssText = 'display:none;background:#E53935;color:white;text-align:center;padding:8px 16px;font-size:13px;font-weight:600;';
+      offB.textContent = '⚠️ No internet connection. Some features may be unavailable.';
+      screen.prepend(offB);
+    }
+  });
+}
+
+function setConnectionStatus(online) {
+  document.querySelectorAll('.offline-banner-new').forEach(b => b.style.display = online ? 'none' : 'block');
+  if (online) {
+    // Show green "Connected" briefly
+    const toast = document.createElement('div');
+    toast.style.cssText = 'position:fixed;top:0;left:50%;transform:translateX(-50%);background:#4CAF50;color:white;padding:10px 24px;font-size:13px;font-weight:700;z-index:999;border-radius:0 0 12px 12px;transition:opacity 0.4s;max-width:430px;width:100%;text-align:center;';
+    toast.textContent = '✅ Connected';
+    document.body.appendChild(toast);
+    setTimeout(() => { toast.style.opacity='0'; setTimeout(()=>toast.remove(),400); }, 2000);
+  }
+}
+
+window.addEventListener('online', () => setConnectionStatus(true));
+window.addEventListener('offline', () => setConnectionStatus(false));
+setTimeout(() => {
+  injectConnectionBanners();
+  if (!navigator.onLine) setConnectionStatus(false);
+}, 500);
+</script>
+
+<style>
+/* ====================================================
+   BOOKING + PAYMENTS + PREMIUM
+   ==================================================== */
+.booking-overlay{display:none;position:fixed;inset:0;z-index:300;background:var(--sand);max-width:430px;left:50%;transform:translateX(-50%);overflow-y:auto;font-family:'DM Sans',sans-serif;}
+.booking-overlay.open{display:block;}
+.booking-header{background:linear-gradient(135deg,#1A1A2E,#0099CC);padding:20px;display:flex;align-items:center;gap:12px;}
+.booking-header h2{color:white;font-family:'Playfair Display',serif;font-size:18px;flex:1;}
+.booking-back{background:rgba(255,255,255,0.15);border:none;color:white;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.booking-progress{display:flex;gap:4px;padding:12px 16px;}
+.bp-step{flex:1;height:4px;border-radius:2px;background:var(--gray2);transition:background 0.3s;}
+.bp-step.done{background:var(--sun);}
+.booking-body{padding:16px;}
+.booking-section{background:var(--white);border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:var(--card-shadow);}
+.booking-section h3{font-family:'Playfair Display',serif;font-size:16px;margin-bottom:12px;}
+.date-input{width:100%;border:1.5px solid var(--gray2);border-radius:var(--radius-sm);padding:11px 14px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;background:var(--white);color:var(--text);margin-bottom:8px;}
+.date-input:focus{border-color:var(--sky);}
+.counter-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.counter-label{font-size:14px;font-weight:600;}
+.counter-ctrl{display:flex;align-items:center;gap:12px;}
+.counter-btn{width:32px;height:32px;border-radius:50%;background:var(--gray1);border:2px solid var(--gray2);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700;}
+.counter-val{font-size:16px;font-weight:700;min-width:24px;text-align:center;}
+.room-option{border:2px solid var(--gray2);border-radius:var(--radius-sm);padding:14px;margin-bottom:8px;cursor:pointer;transition:all 0.15s;}
+.room-option.selected{border-color:var(--sun);background:#FFF0E8;}
+.room-option-name{font-weight:700;font-size:14px;}
+.room-option-price{font-size:18px;font-weight:700;color:var(--sun);}
+.time-chips{display:flex;gap:8px;flex-wrap:wrap;}
+.time-chip{padding:9px 16px;border-radius:20px;border:2px solid var(--gray2);background:var(--white);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;}
+.time-chip.selected{border-color:var(--sun);background:var(--sun);color:white;}
+/* Card input */
+.card-input-field{width:100%;border:1.5px solid var(--gray2);border-radius:var(--radius-sm);padding:12px 14px;font-family:'DM Sans',sans-serif;font-size:16px;outline:none;background:var(--white);color:var(--text);margin-bottom:10px;letter-spacing:0.5px;}
+.card-input-field:focus{border-color:var(--sky);}
+.card-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+/* Confirmation */
+.booking-confirm{text-align:center;padding:32px 20px;}
+.confirm-check{font-size:72px;margin-bottom:16px;animation:bounceIn 0.5s ease;}
+@keyframes bounceIn{0%{transform:scale(0)}60%{transform:scale(1.15)}100%{transform:scale(1)}}
+.confirm-num{font-size:22px;font-weight:700;letter-spacing:2px;color:var(--sun);margin-bottom:8px;}
+/* Payment processing */
+.pay-spinner{width:40px;height:40px;border:3px solid var(--gray2);border-top-color:var(--sun);border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto 16px;}
+/* My Bookings */
+.booking-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--card-shadow);padding:14px 16px;margin-bottom:12px;overflow:hidden;}
+.booking-card-status{display:inline-block;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:700;}
+.status-confirmed{background:#E8F5E9;color:#2E7D32;}
+.status-cancelled{background:#FFEBEE;color:#C62828;}
+.status-completed{background:#E3F2FD;color:#1565C0;}
+/* QR code placeholder */
+.qr-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:2px;width:120px;height:120px;margin:12px auto;}
+.qr-cell{background:var(--text);border-radius:1px;}
+.qr-cell.light{background:var(--white);}
+/* Premium */
+.premium-overlay{display:none;position:fixed;inset:0;z-index:350;background:var(--sand);max-width:430px;left:50%;transform:translateX(-50%);overflow-y:auto;}
+.premium-overlay.open{display:block;}
+.premium-hero{background:linear-gradient(135deg,#B8860B,#FFD700,#FF8C00);padding:28px 20px;text-align:center;}
+.premium-crown{font-size:56px;margin-bottom:8px;}
+.premium-title{font-family:'Playfair Display',serif;font-size:24px;color:white;font-weight:900;}
+.premium-sub{color:rgba(255,255,255,0.85);font-size:14px;margin-top:4px;}
+.premium-badge{display:inline-flex;align-items:center;gap:4px;background:white;color:#B8860B;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;margin-top:10px;}
+.compare-table{width:100%;border-collapse:collapse;font-size:13px;margin:0 0 8px;}
+.compare-table th{padding:10px 12px;background:var(--gray1);font-weight:700;text-align:center;}
+.compare-table th:first-child{text-align:left;background:var(--gray1);}
+.compare-table td{padding:9px 12px;border-bottom:1px solid var(--gray2);text-align:center;}
+.compare-table td:first-child{text-align:left;color:var(--gray4);}
+.compare-check{color:#4CAF50;font-size:16px;font-weight:700;}
+.compare-x{color:var(--gray3);}
+.pricing-card{border-radius:var(--radius);padding:16px;margin-bottom:10px;cursor:pointer;border:2px solid var(--gray2);transition:all 0.2s;}
+.pricing-card.selected{border-color:#FFD700;background:#FFFDE7;}
+.pricing-card.popular{border-color:#FF6B35;}
+.trial-banner{background:linear-gradient(135deg,#4CAF50,#2E7D32);color:white;text-align:center;padding:10px;border-radius:var(--radius-sm);font-size:13px;font-weight:700;margin-bottom:12px;}
+</style>
+<script>
+/* ====================================================
+   BOOKING & PAYMENT FLOWS
+   ==================================================== */
+const bookingState = {
+  current: { type:null, item:null, step:0, checkIn:null, checkOut:null,
+    adults:2, children:0, room:null, date:null, time:null, partySize:2,
+    specialReq:'', ticketType:'general', qty:1, cardNum:'', expiry:'', cvv:'', name:'' },
+  myBookings: JSON.parse(localStorage.getItem('myBookings') || '[]')
+};
+function saveBookings() { localStorage.setItem('myBookings', JSON.stringify(bookingState.myBookings)); }
+
+function openBookingFlow(item) {
+  const type = item.type === 'hotel' ? 'hotel' : item.type === 'food' ? 'restaurant' : 'event';
+  bookingState.current = { ...bookingState.current, type, item, step: 0, room: null, time: null };
+  let overlay = document.getElementById('booking-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'booking-overlay';
+    overlay.className = 'booking-overlay';
+    document.body.appendChild(overlay);
+  }
+  overlay.classList.add('open');
+  renderBookingStep();
+}
+function closeBookingFlow() {
+  const o = document.getElementById('booking-overlay');
+  if (o) o.classList.remove('open');
+}
+
+function renderBookingStep() {
+  const overlay = document.getElementById('booking-overlay');
+  if (!overlay) return;
+  const { type, item, step } = bookingState.current;
+  const steps = type === 'hotel' ? 4 : type === 'restaurant' ? 3 : 3;
+  const stepLabels = type === 'hotel' ? ['Dates','Guests','Room','Payment'] :
+    type === 'restaurant' ? ['Date & Time','Party','Payment'] :
+    ['Tickets','Attendee','Payment'];
+
+  let bodyHTML = '';
+  const cur = bookingState.current;
+  if (type === 'hotel') {
+    if (step === 0) bodyHTML = `<div class="booking-section"><h3>📅 Select Dates</h3>
+      <label style="font-size:12px;color:var(--gray3);font-weight:600;">CHECK-IN</label>
+      <input type="date" class="date-input" value="${cur.checkIn||''}" onchange="bookingState.current.checkIn=this.value">
+      <label style="font-size:12px;color:var(--gray3);font-weight:600;">CHECK-OUT</label>
+      <input type="date" class="date-input" value="${cur.checkOut||''}" onchange="bookingState.current.checkOut=this.value">
+    </div>`;
+    else if (step === 1) bodyHTML = `<div class="booking-section"><h3>👥 Number of Guests</h3>
+      ${[['adults','Adults','1'],['children','Children','0']].map(([k,l,min])=>`<div class="counter-row"><span class="counter-label">${l}</span><div class="counter-ctrl"><button class="counter-btn" onclick="bookingState.current.${k}=Math.max(${min},bookingState.current.${k}-1);renderBookingStep()">−</button><span class="counter-val">${cur[k]}</span><button class="counter-btn" onclick="bookingState.current.${k}++;renderBookingStep()">+</button></div></div>`).join('')}
+    </div>`;
+    else if (step === 2) {
+      const rooms = [{name:'Standard Room',desc:'1 King Bed, City View',price:item.price==='$$$$'?350:item.price==='$$$'?220:item.price==='$$'?150:90},{name:'Deluxe Suite',desc:'Living Area, Park View',price:item.price==='$$$$'?580:item.price==='$$$'?380:250}];
+      bodyHTML = `<div class="booking-section"><h3>🛏️ Select Room Type</h3>
+        ${rooms.map((r,i)=>`<div class="room-option ${cur.room===i?'selected':''}" onclick="bookingState.current.room=${i};renderBookingStep()">
+          <div class="room-option-name">${r.name}</div>
+          <div style="font-size:12px;color:var(--gray3);margin:2px 0;">${r.desc}</div>
+          <div class="room-option-price">$${r.price}<span style="font-size:13px;color:var(--gray3);font-weight:400;">/night</span></div>
+        </div>`).join('')}
+      </div>`;
+    } else if (step === 3) bodyHTML = renderPaymentStep();
+  } else if (type === 'restaurant') {
+    if (step === 0) bodyHTML = `<div class="booking-section"><h3>📅 Date & Time</h3>
+      <input type="date" class="date-input" value="${cur.date||''}" onchange="bookingState.current.date=this.value">
+      <div style="font-size:12px;color:var(--gray3);font-weight:600;margin-bottom:8px;">AVAILABLE TIMES</div>
+      <div class="time-chips">${['6:00 PM','6:30 PM','7:00 PM','7:30 PM','8:00 PM','8:30 PM','9:00 PM'].map(t=>`<div class="time-chip ${cur.time===t?'selected':''}" onclick="bookingState.current.time='${t}';renderBookingStep()">${t}</div>`).join('')}</div>
+    </div>`;
+    else if (step === 1) bodyHTML = `<div class="booking-section"><h3>👥 Party Size</h3>
+      <div class="counter-row"><span class="counter-label">Guests</span><div class="counter-ctrl"><button class="counter-btn" onclick="bookingState.current.partySize=Math.max(1,bookingState.current.partySize-1);renderBookingStep()">−</button><span class="counter-val">${cur.partySize}</span><button class="counter-btn" onclick="bookingState.current.partySize++;renderBookingStep()">+</button></div></div>
+      <div style="margin-top:12px;"><label style="font-size:12px;color:var(--gray3);font-weight:600;display:block;margin-bottom:6px;">SPECIAL REQUESTS</label><textarea class="date-input" placeholder="Dietary restrictions, special occasions..." style="resize:none;min-height:70px;" onchange="bookingState.current.specialReq=this.value">${cur.specialReq}</textarea></div>
+    </div>`;
+    else if (step === 2) bodyHTML = renderPaymentStep(true);
+  } else { // event
+    if (step === 0) bodyHTML = `<div class="booking-section"><h3>🎟️ Select Tickets</h3>
+      ${[{t:'general',name:'General Admission',price:49},{t:'vip',name:'VIP Experience',price:149}].map(tk=>`<div class="room-option ${cur.ticketType===tk.t?'selected':''}" onclick="bookingState.current.ticketType='${tk.t}';renderBookingStep()">
+        <div class="room-option-name">${tk.name}</div>
+        <div class="room-option-price">$${tk.price}</div>
+      </div>`).join('')}
+      <div class="counter-row" style="margin-top:12px;"><span class="counter-label">Quantity</span><div class="counter-ctrl"><button class="counter-btn" onclick="bookingState.current.qty=Math.max(1,bookingState.current.qty-1);renderBookingStep()">−</button><span class="counter-val">${cur.qty}</span><button class="counter-btn" onclick="bookingState.current.qty++;renderBookingStep()">+</button></div></div>
+    </div>`;
+    else if (step === 1) bodyHTML = `<div class="booking-section"><h3>👤 Attendee Details</h3>
+      <input class="date-input" type="text" placeholder="Full Name" value="${cur.name||''}" onchange="bookingState.current.name=this.value">
+    </div>`;
+    else if (step === 2) bodyHTML = renderPaymentStep();
+  }
+
+  const isLast = step === steps - 1;
+  overlay.innerHTML = `<div class="booking-header">
+    <button class="booking-back" onclick="${step>0?'bookingState.current.step--;renderBookingStep()':'closeBookingFlow()'}" >←</button>
+    <h2>${item.name}</h2>
+    <button class="booking-back" onclick="closeBookingFlow()">×</button>
+  </div>
+  <div class="booking-progress">${Array(steps).fill(0).map((_,i)=>`<div class="bp-step${i<=step?' done':''}"></div>`).join('')}</div>
+  <div style="display:flex;justify-content:space-between;padding:4px 16px 0;font-size:12px;color:var(--gray3);font-weight:600;">
+    ${stepLabels.map((l,i)=>`<span style="color:${i<=step?'var(--sun)':'var(--gray3)'};">${l}</span>`).join('')}
+  </div>
+  <div class="booking-body">${bodyHTML}
+    <button onclick="${isLast?'processPayment()':'bookingState.current.step++;renderBookingStep()'}" style="width:100%;background:var(--sun);color:white;border:none;border-radius:30px;padding:15px;font-size:16px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:8px;">
+      ${isLast ? '🔒 Pay Now' : 'Continue →'}
+    </button>
+  </div>`;
+}
+
+function renderPaymentStep(isReservation) {
+  const cur = bookingState.current;
+  const price = cur.type==='hotel' ? (cur.room===1?580:350) : cur.type==='restaurant' ? 0 : cur.ticketType==='vip'?149:49;
+  const total = cur.type==='event' ? price * cur.qty : price;
+  return `<div class="booking-section"><h3>💳 Payment</h3>
+    ${isReservation ? '<div style="text-align:center;padding:12px;background:#E8F5E9;border-radius:10px;font-size:14px;font-weight:600;color:#2E7D32;margin-bottom:12px;">✓ Free Reservation — No card needed!</div>' : `
+    <input class="card-input-field" type="text" placeholder="1234 5678 9012 3456" maxlength="19" oninput="this.value=this.value.replace(/[^0-9]/g,'').replace(/(.{4})/g,'$1 ').trim()">
+    <div class="card-row">
+      <input class="card-input-field" type="text" placeholder="MM/YY" maxlength="5" oninput="this.value=this.value.replace(/[^0-9]/g,'').replace(/^(\d{2})(\d)/,'$1/$2').slice(0,5)">
+      <input class="card-input-field" type="text" placeholder="CVV" maxlength="3">
+    </div>
+    <input class="card-input-field" type="text" placeholder="Cardholder Name">
+    <div style="text-align:right;font-size:18px;font-weight:700;color:var(--sun);margin-top:4px;">Total: $${total}</div>`}
+  </div>`;
+}
+
+function processPayment() {
+  const overlay = document.getElementById('booking-overlay');
+  if (!overlay) return;
+  const cur = bookingState.current;
+  // Show loading
+  overlay.querySelector('.booking-body').innerHTML = `<div style="text-align:center;padding:48px 24px;"><div class="pay-spinner"></div><div style="font-size:16px;font-weight:600;color:var(--gray4);">Processing payment...</div></div>`;
+  setTimeout(() => {
+    const confNum = 'ORL-' + Math.random().toString(36).substring(2,8).toUpperCase();
+    const booking = {id:confNum, type:cur.type, name:cur.item.name, emoji:cur.item.emoji, date:cur.checkIn||cur.date||new Date().toISOString().slice(0,10), conf:confNum, status:'confirmed', details: cur};
+    bookingState.myBookings.unshift(booking);
+    saveBookings();
+    showBookingConfirmation(confNum, cur.item);
+  }, 2000);
+}
+
+function showBookingConfirmation(confNum, item) {
+  const overlay = document.getElementById('booking-overlay');
+  if (!overlay) return;
+  overlay.innerHTML = `<div class="booking-confirm">
+    <div class="confirm-check">✅</div>
+    <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:900;margin-bottom:8px;">Booking Confirmed!</div>
+    <div class="confirm-num">${confNum}</div>
+    <div style="font-size:15px;color:var(--gray4);margin-bottom:8px;">${item.emoji} ${item.name}</div>
+    <div style="font-size:13px;color:var(--gray3);margin-bottom:24px;">Confirmation sent to your account</div>
+    <button onclick="closeBookingFlow()" style="background:var(--sun);color:white;border:none;border-radius:24px;padding:14px 32px;font-size:15px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">Done</button>
+    <button onclick="closeBookingFlow()" style="display:block;margin:12px auto 0;background:none;border:none;color:var(--sky);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;">💾 Save to Wallet</button>
+  </div>`;
+  showToast('Booking confirmed! 🎉');
+  if (typeof addXP === 'function') addXP(30, 'Booking made');
+}
+
+// My Bookings screen
+function openMyBookings() {
+  let overlay = document.getElementById('mybookings-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'mybookings-overlay';
+    overlay.style.cssText = 'display:none;position:fixed;inset:0;z-index:300;background:var(--sand);max-width:430px;left:50%;transform:translateX(-50%);overflow-y:auto;font-family:"DM Sans",sans-serif;';
+    document.body.appendChild(overlay);
+  }
+  overlay.style.display = 'block';
+  renderMyBookings(overlay);
+}
+
+function renderMyBookings(overlay) {
+  const bk = bookingState.myBookings;
+  // Generate QR-like grid
+  function qrHTML() {
+    const cells = Array(100).fill(0).map(()=>Math.random()>0.5?'':'light');
+    return `<div class="qr-grid">${cells.map(c=>`<div class="qr-cell ${c}"></div>`).join('')}</div>`;
+  }
+  overlay.innerHTML = `
+    <div style="background:var(--white);position:sticky;top:0;z-index:5;border-bottom:1px solid var(--gray2);display:flex;align-items:center;gap:12px;padding:14px 20px;">
+      <button onclick="document.getElementById('mybookings-overlay').style.display='none'" style="background:var(--gray1);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;cursor:pointer;">←</button>
+      <span style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;">My Bookings</span>
+    </div>
+    <div style="padding:16px;">
+      ${bk.length ? bk.map(b=>`
+        <div class="booking-card">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+            <div style="font-size:32px;">${b.emoji||'🎟️'}</div>
+            <div style="flex:1;"><div style="font-weight:700;font-size:15px;">${b.name}</div>
+              <div style="font-size:12px;color:var(--gray3);">📅 ${b.date} · ${b.conf}</div>
+            </div>
+            <span class="booking-card-status status-${b.status}">${b.status.charAt(0).toUpperCase()+b.status.slice(1)}</span>
+          </div>
+          ${qrHTML()}
+          <div style="display:flex;gap:8px;margin-top:12px;">
+            <button onclick="showToast('Ticket saved to device 📲')" style="flex:1;padding:9px;border-radius:20px;background:var(--sky);color:white;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">📥 Download Ticket</button>
+            ${b.status==='confirmed'?`<button onclick="cancelBooking('${b.id}')" style="flex:1;padding:9px;border-radius:20px;background:#FFEBEE;color:#E53935;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">Cancel</button>`:''}
+          </div>
+        </div>`).join('') :
+        '<div style="text-align:center;padding:48px 24px;color:var(--gray3);"><div style="font-size:48px;margin-bottom:12px;">🎟️</div><div style="font-weight:600;">No bookings yet</div><div style="font-size:13px;margin-top:6px;">Book hotels, restaurants & events to see them here</div></div>'}
+    </div>`;
+}
+
+function cancelBooking(id) {
+  if (!confirm('Cancel this booking? Refund policy: Full refund within 48 hours.')) return;
+  const b = bookingState.myBookings.find(x=>x.id===id);
+  if (b) { b.status='cancelled'; saveBookings(); }
+  openMyBookings();
+  showToast('Booking cancelled. Refund in 3-5 days.');
+}
+
+// Add Book Now button to detail pages
+const _origBuildDetailBook = buildDetailHTML;
+buildDetailHTML = function(item) {
+  let html = _origBuildDetailBook(item);
+  if (['hotel','food','event'].includes(item.type)) {
+    const btn = `<div style="padding:0 20px 8px;">
+      <button onclick="openBookingFlow(findItem('${item.id}','${item.type}'))" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#FF6B35,#FF8A65);color:white;border:none;padding:14px;border-radius:30px;font-size:15px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">
+        ${item.type==='hotel'?'🏨 Book Now — Check Availability':item.type==='food'?'🍽️ Reserve a Table':'🎟️ Buy Tickets'}
+      </button>
+    </div>`;
+    html = html.replace('<div class="detail-body">', btn + '<div class="detail-body">');
+  }
+  return html;
+};
+
+// Add My Bookings to Account menu
+const _origRenderAccountBookings = renderAccount;
+renderAccount = function() {
+  _origRenderAccountBookings();
+  setTimeout(() => {
+    const loggedIn = !!appState.user;
+    if (!loggedIn) return;
+    const acctContent = document.getElementById('account-content');
+    if (acctContent && !document.getElementById('my-bookings-btn')) {
+      const div = document.createElement('div');
+      div.id = 'my-bookings-btn';
+      div.className = 'account-menu-item';
+      div.innerHTML = '<span class="icon">🎟️</span><span>My Bookings</span><span class="arrow">›</span>';
+      div.onclick = openMyBookings;
+      const savedBtn = acctContent.querySelector('.account-menu-item');
+      if (savedBtn) savedBtn.parentNode.insertBefore(div, savedBtn);
+    }
+  }, 90);
+};
+
+/* ====================================================
+   PREMIUM SUBSCRIPTION
+   ==================================================== */
+const premiumState = {
+  isPremium: JSON.parse(localStorage.getItem('isPremium') || 'false'),
+  plan: localStorage.getItem('premiumPlan') || null
+};
+
+function openPremiumScreen() {
+  let overlay = document.getElementById('premium-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'premium-overlay';
+    overlay.className = 'premium-overlay';
+    document.body.appendChild(overlay);
+  }
+  overlay.classList.add('open');
+  renderPremiumScreen(overlay);
+}
+function closePremiumScreen() { document.getElementById('premium-overlay')?.classList.remove('open'); }
+
+let _selectedPlan = 'annual';
+function renderPremiumScreen(overlay) {
+  overlay.innerHTML = `
+    <div class="booking-header" style="background:linear-gradient(135deg,#B8860B,#FFD700);">
+      <button class="booking-back" onclick="closePremiumScreen()">←</button>
+      <h2 style="font-size:20px;">Go Premium 👑</h2>
+      <div style="width:36px;"></div>
+    </div>
+    <div class="premium-hero">
+      <div class="premium-crown">👑</div>
+      <div class="premium-title">Unlock Premium</div>
+      <div class="premium-sub">The ultimate Orlando experience</div>
+      <div class="premium-badge">⭐ Trusted by 10,000+ Orlando adventurers</div>
+    </div>
+    <div style="padding:16px;">
+      <div class="trial-banner">🎁 7-Day Free Trial — No charge until trial ends</div>
+      <div class="booking-section">
+        <h3>What's Included</h3>
+        <table class="compare-table">
+          <tr><th>Feature</th><th>Free</th><th style="color:var(--sun);">Premium</th></tr>
+          ${[
+            ['Browse listings','✓','✓'],
+            ['Save places','Up to 10','Unlimited'],
+            ['AI Planner','Basic','Advanced'],
+            ['Offline maps','—','✓'],
+            ['Exclusive deals','—','✓'],
+            ['No ads','—','✓'],
+            ['Early access','—','✓'],
+            ['Premium badge','—','✓'],
+            ['Priority support','—','✓']
+          ].map(r=>`<tr><td>${r[0]}</td><td class="compare-x">${r[1]}</td><td class="compare-check">${r[2]}</td></tr>`).join('')}
+        </table>
+      </div>
+      <div class="booking-section">
+        <h3>Choose Your Plan</h3>
+        <div class="pricing-card ${_selectedPlan==='monthly'?'selected':''}" onclick="_selectedPlan='monthly';renderPremiumScreen(document.getElementById('premium-overlay'))">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div><div style="font-weight:700;font-size:16px;">Monthly</div><div style="font-size:12px;color:var(--gray3);">Billed monthly</div></div>
+            <div style="font-size:24px;font-weight:700;color:var(--sun);">$4.99<span style="font-size:13px;color:var(--gray3);font-weight:400;">/mo</span></div>
+          </div>
+        </div>
+        <div class="pricing-card popular ${_selectedPlan==='annual'?'selected':''}" onclick="_selectedPlan='annual';renderPremiumScreen(document.getElementById('premium-overlay'))">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div><div style="display:flex;align-items:center;gap:6px;"><div style="font-weight:700;font-size:16px;">Annual</div><span style="background:var(--sun);color:white;padding:1px 7px;border-radius:8px;font-size:11px;font-weight:700;">Save 33%</span></div><div style="font-size:12px;color:var(--gray3);">$39.99/year — best value</div></div>
+            <div style="font-size:24px;font-weight:700;color:var(--sun);">$3.33<span style="font-size:13px;color:var(--gray3);font-weight:400;">/mo</span></div>
+          </div>
+        </div>
+        <button onclick="subscribePremium()" style="width:100%;background:linear-gradient(135deg,#B8860B,#FFD700);color:white;border:none;border-radius:30px;padding:16px;font-size:16px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:8px;">
+          👑 Start Free Trial
+        </button>
+        <div style="text-align:center;font-size:12px;color:var(--gray3);margin-top:8px;">Cancel anytime · No commitment</div>
+      </div>
+      <div style="height:24px;"></div>
+    </div>`;
+}
+
+function subscribePremium() {
+  closePremiumScreen();
+  // Show payment simulation
+  const modal = document.createElement('div');
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:600;display:flex;align-items:center;justify-content:center;';
+  modal.innerHTML = `<div style="background:var(--white);border-radius:20px;padding:28px;margin:20px;max-width:340px;width:100%;text-align:center;">
+    <div class="pay-spinner" style="margin:0 auto 16px;"></div>
+    <div style="font-size:15px;font-weight:600;color:var(--gray4);">Activating your trial...</div>
+  </div>`;
+  document.body.appendChild(modal);
+  setTimeout(() => {
+    modal.remove();
+    premiumState.isPremium = true;
+    premiumState.plan = _selectedPlan;
+    localStorage.setItem('isPremium','true');
+    localStorage.setItem('premiumPlan', _selectedPlan);
+    showToast('Welcome to Premium! 👑 Your 7-day trial has started');
+    renderAccount();
+  }, 2000);
+}
+
+// Wire Premium button to Account screen
+const _origRenderAccountPremium = renderAccount;
+renderAccount = function() {
+  _origRenderAccountPremium();
+  if (!appState.user) return;
+  setTimeout(() => {
+    if (document.getElementById('premium-upsell-btn')) return;
+    const loggedInDiv = document.querySelector('#account-content .account-loggedin');
+    if (loggedInDiv) {
+      const statsDiv = loggedInDiv.querySelector('div[style*="gap:12px"]');
+      if (statsDiv) {
+        const premBtn = document.createElement('div');
+        premBtn.id = 'premium-upsell-btn';
+        premBtn.style.cssText = 'margin-bottom:20px;';
+        if (premiumState.isPremium) {
+          premBtn.innerHTML = `<div style="background:linear-gradient(135deg,#B8860B,#FFD700);border-radius:var(--radius-sm);padding:12px 16px;display:flex;align-items:center;gap:10px;color:white;"><span style="font-size:20px;">👑</span><span style="font-weight:700;flex:1;">Premium Member</span><span style="font-size:12px;opacity:0.8;">Renews ${_selectedPlan==='annual'?'annually':'monthly'}</span></div>`;
+        } else {
+          premBtn.innerHTML = `<button onclick="openPremiumScreen()" style="width:100%;background:linear-gradient(135deg,#B8860B,#FFD700);color:white;border:none;border-radius:var(--radius-sm);padding:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;">👑 Upgrade to Premium</button>`;
+        }
+        statsDiv.parentNode.insertBefore(premBtn, statsDiv.nextSibling);
+      }
+    }
+  }, 85);
+};
+</script>
+
+<style>
+/* ====================================================
+   ADVANCED SEARCH + PERSONALIZATION
+   ==================================================== */
+#search-full-overlay{display:none;position:fixed;inset:0;z-index:450;background:var(--white);max-width:430px;left:50%;transform:translateX(-50%);overflow-y:auto;font-family:'DM Sans',sans-serif;flex-direction:column;}
+#search-full-overlay.open{display:flex;}
+.sf-header{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--white);border-bottom:1px solid var(--gray2);flex-shrink:0;position:sticky;top:0;z-index:5;}
+.sf-input{flex:1;border:1.5px solid var(--gray2);border-radius:20px;padding:10px 14px;font-family:'DM Sans',sans-serif;font-size:15px;outline:none;background:var(--gray1);}
+.sf-input:focus{border-color:var(--sun);}
+.sf-mic{width:36px;height:36px;border-radius:50%;background:var(--gray1);border:none;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sf-mic.listening{background:#FFEBEE;animation:pulse 0.8s ease infinite;}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+.sf-section-hdr{font-size:11px;font-weight:700;color:var(--gray3);text-transform:uppercase;letter-spacing:0.5px;padding:14px 16px 8px;}
+.sf-history-item{display:flex;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid var(--gray1);cursor:pointer;}
+.sf-history-item:active{background:var(--gray1);}
+.sf-trend-chip{padding:8px 14px;border-radius:20px;background:var(--gray1);border:none;font-size:13px;font-weight:600;color:var(--gray4);cursor:pointer;transition:all 0.15s;font-family:'DM Sans',sans-serif;}
+.sf-trend-chip:active{background:var(--sun);color:white;}
+.sf-chips-wrap{display:flex;flex-wrap:wrap;gap:8px;padding:4px 16px 8px;}
+.sf-date-chip{padding:8px 14px;border-radius:20px;border:1.5px solid var(--gray2);background:var(--white);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;font-family:'DM Sans',sans-serif;}
+.sf-date-chip.on{border-color:var(--sun);background:var(--sun);color:white;}
+.sf-results-tab{padding:8px 14px;border-radius:20px;border:none;background:var(--gray1);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;font-family:'DM Sans',sans-serif;color:var(--gray4);}
+.sf-results-tab.on{background:var(--sun);color:white;}
+/* Recently Viewed */
+#home-recently-viewed{padding:0;display:none;}
+</style>
+<script>
+/* ====================================================
+   ADVANCED SEARCH
+   ==================================================== */
+const searchFullState = {
+  query: '',
+  history: JSON.parse(localStorage.getItem('sfHistory') || '[]'),
+  dateFilter: null,
+  budgetFilter: null,
+  categoryFilter: 'all',
+  results: []
+};
+const SF_TRENDS = ['Disney World','Best Brunch','Thrill Rides','Free Things','Waterparks','Romantic Dinners','Hidden Gems','Theme Park Tips','Nightlife','Family Fun','Budget Eats','Local Favorites'];
+
+function openAdvancedSearch() {
+  let overlay = document.getElementById('search-full-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'search-full-overlay';
+    document.body.appendChild(overlay);
+  }
+  overlay.classList.add('open');
+  searchFullState.query = '';
+  renderSearchHome();
+  setTimeout(() => { document.getElementById('sf-main-input')?.focus(); }, 100);
+}
+function closeAdvancedSearch() { document.getElementById('search-full-overlay')?.classList.remove('open'); }
+
+function renderSearchHome() {
+  const overlay = document.getElementById('search-full-overlay');
+  if (!overlay) return;
+  const hist = searchFullState.history;
+  overlay.innerHTML = `
+    <div class="sf-header">
+      <button onclick="closeAdvancedSearch()" style="background:var(--gray1);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;cursor:pointer;flex-shrink:0;">←</button>
+      <input type="text" class="sf-input" id="sf-main-input" placeholder="Search Orlando..." autocomplete="off" value="${searchFullState.query}" oninput="sfHandleInput(this.value)" onkeydown="if(event.key==='Enter')sfSubmit(this.value)">
+      <button class="sf-mic" id="sf-mic-btn" onclick="sfVoiceSearch()" title="Voice search">🎙️</button>
+    </div>
+    <div id="sf-suggestions" style="display:none;border-bottom:1px solid var(--gray2);"></div>
+    <div style="overflow-y:auto;flex:1;">
+      ${hist.length ? `<div class="sf-section-hdr">Recent Searches</div>
+        ${hist.slice(0,6).map((h,i)=>`<div class="sf-history-item" onclick="sfSubmit('${h}')">
+          <span style="font-size:16px;color:var(--gray3);">🕐</span>
+          <span style="flex:1;font-size:14px;">${h}</span>
+          <button onclick="event.stopPropagation();sfRemoveHistory(${i})" style="background:none;border:none;color:var(--gray3);font-size:16px;cursor:pointer;">×</button>
+        </div>`).join('') }` : ''}
+      <div class="sf-section-hdr">Trending Searches</div>
+      <div class="sf-chips-wrap">${SF_TRENDS.map(t=>`<button class="sf-trend-chip" onclick="sfSubmit('${t}')">${t}</button>`).join('')}</div>
+      <div class="sf-section-hdr">Search by Date</div>
+      <div class="sf-chips-wrap">${['Today','This Weekend','Next Week','Pick a Date'].map(d=>`<button class="sf-date-chip ${searchFullState.dateFilter===d?'on':''}" onclick="sfSetDate('${d}',this)">${d}</button>`).join('')}</div>
+      <div class="sf-section-hdr">Search by Budget</div>
+      <div class="sf-chips-wrap">${['Free','Under $25','Under $50','Any Budget'].map(b=>`<button class="sf-date-chip ${searchFullState.budgetFilter===b?'on':''}" onclick="sfSetBudget('${b}',this)">${b}</button>`).join('')}</div>
+    </div>`;
+}
+
+function sfHandleInput(val) {
+  searchFullState.query = val;
+  const suggEl = document.getElementById('sf-suggestions');
+  if (!suggEl) return;
+  if (!val.trim()) { suggEl.style.display='none'; return; }
+  const allData = [...attractions,...restaurants,...parks,...hotels,...events,...(typeof tours!=='undefined'?tours:[]),...(typeof shopping!=='undefined'?shopping:[])];
+  const q = val.toLowerCase();
+  const matches = allData.filter(i=>i.name.toLowerCase().includes(q)||i.area?.toLowerCase().includes(q)||(i.category||'').toLowerCase().includes(q)).slice(0,5);
+  if (!matches.length) { suggEl.style.display='none'; return; }
+  suggEl.style.display='block';
+  suggEl.innerHTML = matches.map(m=>`<div onclick="openDetail('${m.id}','${m.type}');closeAdvancedSearch();" style="display:flex;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid var(--gray1);cursor:pointer;">
+    <span style="font-size:18px;">${m.emoji||'📍'}</span>
+    <div><div style="font-size:14px;font-weight:600;">${m.name}</div><div style="font-size:12px;color:var(--gray3);">${m.type} · ${m.area}</div></div>
+  </div>`).join('');
+}
+
+function sfSubmit(query) {
+  if (!query.trim()) return;
+  searchFullState.query = query;
+  // Save to history
+  searchFullState.history = [query, ...searchFullState.history.filter(h=>h!==query)].slice(0,10);
+  localStorage.setItem('sfHistory', JSON.stringify(searchFullState.history));
+  renderSearchResults(query);
+}
+
+function sfRemoveHistory(idx) {
+  searchFullState.history.splice(idx, 1);
+  localStorage.setItem('sfHistory', JSON.stringify(searchFullState.history));
+  renderSearchHome();
+}
+
+function sfSetDate(d, btn) {
+  searchFullState.dateFilter = searchFullState.dateFilter===d ? null : d;
+  document.querySelectorAll('.sf-date-chip').forEach(b=>b.classList.toggle('on',false));
+  if (searchFullState.dateFilter) btn.classList.add('on');
+}
+function sfSetBudget(b, btn) {
+  searchFullState.budgetFilter = searchFullState.budgetFilter===b ? null : b;
+  document.querySelectorAll('.sf-date-chip').forEach(el => { if(el.textContent===b) el.classList.toggle('on'); });
+}
+
+function renderSearchResults(query) {
+  const overlay = document.getElementById('search-full-overlay');
+  if (!overlay) return;
+  const allData = [...attractions,...restaurants,...parks,...hotels,...events,...(typeof tours!=='undefined'?tours:[]),...(typeof shopping!=='undefined'?shopping:[])];
+  const q = query.toLowerCase();
+  const all = allData.filter(i=>i.name.toLowerCase().includes(q)||i.desc?.toLowerCase().includes(q)||i.area?.toLowerCase().includes(q)||(i.tags||[]).some(t=>t.toLowerCase().includes(q)));
+  searchFullState.results = all;
+  let activeTab = searchFullState.categoryFilter || 'all';
+  const tabs = ['all','attraction','food','hotel','event','tour','shopping'];
+
+  function getFiltered() {
+    return activeTab==='all' ? all : all.filter(i=>i.type===activeTab);
+  }
+
+  function render() {
+    const filtered = getFiltered();
+    const resultsEl = document.getElementById('sf-results-list');
+    if (resultsEl) {
+      resultsEl.innerHTML = filtered.length ?
+        filtered.map(item=>cardHTML(item)).join('') :
+        `<div style="text-align:center;padding:40px 24px;color:var(--gray3);"><div style="font-size:48px;">🔍</div><div style="font-size:15px;font-weight:600;margin-top:12px;">No results for "${query}"</div></div>`;
+    }
+  }
+
+  overlay.innerHTML = `
+    <div class="sf-header">
+      <button onclick="renderSearchHome()" style="background:var(--gray1);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;cursor:pointer;flex-shrink:0;">←</button>
+      <div style="flex:1;font-weight:600;font-size:15px;">"${query}"</div>
+      <div style="font-size:12px;color:var(--gray3);">${all.length} results</div>
+    </div>
+    <div style="display:flex;gap:8px;padding:10px 16px;overflow-x:auto;scrollbar-width:none;flex-shrink:0;">
+      ${tabs.map(t=>`<button class="sf-results-tab ${activeTab===t?'on':''}" onclick="searchFullState.categoryFilter='${t}';document.querySelectorAll('.sf-results-tab').forEach(b=>b.classList.remove('on'));this.classList.add('on');(${render.toString()})()">${t.charAt(0).toUpperCase()+t.slice(1)}</button>`).join('')}
+    </div>
+    <div id="sf-results-list" style="overflow-y:auto;flex:1;"></div>`;
+  render();
+}
+
+function sfVoiceSearch() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) { showToast('Voice search not supported on this browser'); return; }
+  const mic = document.getElementById('sf-mic-btn');
+  if (mic) mic.classList.add('listening');
+  const rec = new SpeechRecognition();
+  rec.lang = 'en-US';
+  rec.onresult = e => {
+    const t = e.results[0][0].transcript;
+    if (mic) mic.classList.remove('listening');
+    const inp = document.getElementById('sf-main-input');
+    if (inp) { inp.value = t; sfHandleInput(t); }
+    sfSubmit(t);
+  };
+  rec.onerror = () => { if(mic) mic.classList.remove('listening'); showToast('Voice search failed. Try again.'); };
+  rec.start();
+}
+
+// Wire hero search to open advanced search
+setTimeout(() => {
+  const heroInp = document.getElementById('hero-search-input');
+  if (heroInp) {
+    heroInp.onclick = function() { this.blur(); openAdvancedSearch(); };
+    heroInp.onfocus = function() { this.blur(); openAdvancedSearch(); };
+  }
+}, 300);
+
+/* ====================================================
+   RECENTLY VIEWED + PERSONALIZED RECOMMENDATIONS
+   ==================================================== */
+const recentlyViewedState = { items: JSON.parse(localStorage.getItem('recentlyViewed') || '[]') };
+
+function trackRecentlyViewed(id, type) {
+  const item = findItem(id, type);
+  if (!item) return;
+  recentlyViewedState.items = [item, ...recentlyViewedState.items.filter(i=>i.id!==id)].slice(0,6);
+  localStorage.setItem('recentlyViewed', JSON.stringify(recentlyViewedState.items));
+  renderRecentlyViewed();
+}
+
+function renderRecentlyViewed() {
+  const el = document.getElementById('home-recently-viewed');
+  if (!el) return;
+  const items = recentlyViewedState.items;
+  if (!items.length) return;
+  el.style.display = 'block';
+  el.innerHTML = `<div class="section-hdr"><h3>👁️ Recently Viewed</h3></div>
+    <div class="hscroll">${items.map(i=>`<div class="hcard" onclick="openDetail('${i.id}','${i.type}')">
+      <div class="hcard-img" style="background:${cardGradient(i.type)};">${i.emoji}</div>
+      <div class="hcard-body"><div class="hcard-title">${i.name}</div><div class="hcard-meta">⭐${i.rating} · ${i.area||''}</div></div>
+    </div>`).join('')}</div>`;
+}
+
+// Inject recently viewed section before events on home
+(function injectRecentlyViewed() {
+  const eventsHdr = document.querySelector('#screen-home .section-hdr');
+  if (eventsHdr) {
+    const div = document.createElement('div');
+    div.id = 'home-recently-viewed';
+    eventsHdr.parentNode.insertBefore(div, eventsHdr);
+  }
+})();
+
+// Track openDetail calls
+const _origOpenDetailTracked = openDetail;
+openDetail = function(id, type) {
+  _origOpenDetailTracked(id, type);
+  trackRecentlyViewed(id, type);
+};
+
+// Personalized Recommendations section
+function renderPersonalizedRecs() {
+  const el = document.getElementById('home-personalized-recs');
+  if (!el) return;
+  const interests = appState.interests || JSON.parse(localStorage.getItem('userInterests') || '[]');
+  const savedTypes = Object.values(appState.savedItems || {}).map(i=>i.type);
+  const allTypes = [...interests.map(i=>({family:'attraction',thrill:'attraction',foodie:'food',culture:'attraction',budget:'food',nightlife:'event'}[i]||'attraction')), ...savedTypes];
+  const typeCount = allTypes.reduce((a,t)=>{a[t]=(a[t]||0)+1;return a;},{});
+  const topType = Object.entries(typeCount).sort((a,b)=>b[1]-a[1])[0]?.[0] || 'attraction';
+  const allData = [...attractions,...restaurants,...parks,...hotels,...events,...(typeof tours!=='undefined'?tours:[])];
+  const recs = allData.filter(i=>i.type===topType||i.type===topType+'s').slice(0,4);
+  if (!recs.length) return;
+  el.style.display = 'block';
+  el.innerHTML = `<div class="section-hdr"><h3>⭐ Recommended For You</h3><span class="see-all" onclick="goToExplore('${topType==='food'?'food':topType==='event'?'events':'attractions'}')">See all</span></div>
+    <div class="hscroll">${recs.map(i=>hCardHTML(i)).join('')}</div>`;
+}
+
+// Add home sections div
+(function injectRecSections() {
+  const friendsDiv = document.getElementById('home-friends-activity');
+  if (friendsDiv && !document.getElementById('home-personalized-recs')) {
+    const div = document.createElement('div');
+    div.id = 'home-personalized-recs';
+    div.style.display = 'none';
+    friendsDiv.parentNode.insertBefore(div, friendsDiv.nextSibling);
+  }
+})();
+
+// Patch renderHome to include personalized sections
+const _origRenderHomePersonalized = renderHome;
+renderHome = function() {
+  _origRenderHomePersonalized();
+  renderRecentlyViewed();
+  renderPersonalizedRecs();
+};
+setTimeout(() => { renderRecentlyViewed(); renderPersonalizedRecs(); }, 600);
+
+// Because You Saved section on detail pages
+const _origBuildDetailBYS = buildDetailHTML;
+buildDetailHTML = function(item) {
+  let html = _origBuildDetailBYS(item);
+  const allData = [...attractions,...restaurants,...parks,...hotels,...events,...(typeof tours!=='undefined'?tours:[]),...(typeof shopping!=='undefined'?shopping:[])];
+  const similar = allData.filter(i => i.id !== item.id && (
+    (i.type===item.type) ||
+    (i.area===item.area) ||
+    (i.tags||[]).some(t=>(item.tags||[]).includes(t))
+  )).slice(0,3);
+  if (!similar.length) return html;
+  const bysHTML = `<div style="padding:0 20px 20px;">
+    <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:12px;">💡 Because You Viewed This</div>
+    ${similar.map(s=>`<div onclick="openDetail('${s.id}','${s.type}')" style="display:flex;align-items:center;gap:12px;background:var(--white);padding:11px 14px;border-radius:var(--radius-sm);margin-bottom:8px;box-shadow:var(--card-shadow);cursor:pointer;">
+      <div style="font-size:28px;width:44px;height:44px;background:${cardGradient(s.type)};border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${s.emoji}</div>
+      <div style="flex:1;min-width:0;"><div style="font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${s.name}</div><div style="font-size:12px;color:var(--gray3);margin-top:1px;">⭐${s.rating} · ${s.area||''}</div></div>
+    </div>`).join('')}
+  </div>`;
+  return html + bysHTML;
+};
+</script>
+
+<script>
+// ============================================================
+// BLOCK F: Direct Messaging + Calendar Integration + Gestures
+// ============================================================
+
+// ---- GESTURES: Swipe down to close overlays ----
+function addSwipeDownToClose(overlayEl, closeFn) {
+  let startY = 0, startX = 0;
+  overlayEl.addEventListener('touchstart', e => {
+    startY = e.touches[0].clientY;
+    startX = e.touches[0].clientX;
+  }, { passive: true });
+  overlayEl.addEventListener('touchend', e => {
+    const dy = e.changedTouches[0].clientY - startY;
+    const dx = Math.abs(e.changedTouches[0].clientX - startX);
+    if (dy > 80 && dx < 60) closeFn();
+  }, { passive: true });
+}
+
+// Patch all overlay close functions to support swipe-down
+const _swipePatched = new Set();
+function patchOverlaySwipe(id, closeFn) {
+  if (_swipePatched.has(id)) return;
+  const el = document.getElementById(id);
+  if (el) { addSwipeDownToClose(el, closeFn); _swipePatched.add(id); }
+}
+
+// Swipe left to delete trip items
+function addSwipeLeftDelete(itemEl, onDelete) {
+  let startX = 0, startY = 0;
+  itemEl.addEventListener('touchstart', e => {
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+  }, { passive: true });
+  itemEl.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - startX;
+    const dy = Math.abs(e.changedTouches[0].clientY - startY);
+    if (dx < -80 && dy < 40) {
+      itemEl.style.transition = 'transform 0.2s, opacity 0.2s';
+      itemEl.style.transform = 'translateX(-100%)';
+      itemEl.style.opacity = '0';
+      setTimeout(onDelete, 200);
+    }
+  }, { passive: true });
+}
+
+// Long press menu
+function addLongPress(el, onLongPress) {
+  let timer = null;
+  el.addEventListener('touchstart', e => {
+    timer = setTimeout(() => { onLongPress(e); timer = null; }, 600);
+  }, { passive: true });
+  el.addEventListener('touchend', () => { if (timer) { clearTimeout(timer); timer = null; } }, { passive: true });
+  el.addEventListener('touchmove', () => { if (timer) { clearTimeout(timer); timer = null; } }, { passive: true });
+}
+
+// Double tap to like
+function addDoubleTap(el, onDoubleTap) {
+  let last = 0;
+  el.addEventListener('touchend', e => {
+    const now = Date.now();
+    if (now - last < 350) { onDoubleTap(e); last = 0; }
+    else last = now;
+  }, { passive: true });
+}
+
+// Haptic simulation (vibrate API)
+function haptic(pattern) {
+  if (navigator.vibrate) navigator.vibrate(pattern || 30);
+}
+
+// Patch overlay creation to add swipe-down
+const _origOpenDetail_swipe = openDetail;
+openDetail = function(id, type) {
+  _origOpenDetail_swipe(id, type);
+  setTimeout(() => {
+    const ov = document.getElementById('detail-overlay');
+    if (ov && !_swipePatched.has('detail-overlay')) {
+      addSwipeDownToClose(ov, () => { ov.classList.remove('active'); });
+      _swipePatched.add('detail-overlay');
+    }
+  }, 100);
+};
+
+// ---- CALENDAR INTEGRATION ----
+function addToCalendar(event) {
+  const title = encodeURIComponent(event.name || event.title || '');
+  const loc   = encodeURIComponent(event.location || 'Orlando, FL');
+  const desc  = encodeURIComponent((event.description || event.desc || '').substring(0, 200));
+
+  // Build date/time strings (YYYYMMDD format)
+  const now = new Date();
+  const startDate = event.date ? event.date.replace(/-/g,'') : 
+    (now.getFullYear()+''+String(now.getMonth()+2).padStart(2,'0')+'15');
+  const endDate = startDate; // same day event
+
+  const gcUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startDate}T120000/${endDate}T140000&details=${desc}&location=${loc}`;
+
+  // Build .ics data
+  const icsContent = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'BEGIN:VEVENT',
+    `SUMMARY:${event.name || event.title || 'Event'}`,
+    `DTSTART:${startDate}T120000`,
+    `DTEND:${endDate}T140000`,
+    `LOCATION:Orlando, FL`,
+    `DESCRIPTION:${(event.description || event.desc || '').substring(0,200)}`,
+    'END:VEVENT',
+    'END:VCALENDAR'
+  ].join('\r\n');
+
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay active';
+  overlay.style.cssText = 'z-index:9999;';
+  overlay.innerHTML = `
+    <div class="modal-sheet" style="max-width:380px;margin:auto;">
+      <div class="modal-header">
+        <span style="font-weight:700;font-size:1.1rem;">📅 Add to Calendar</span>
+        <button class="icon-btn" onclick="this.closest('.overlay').remove()">✕</button>
+      </div>
+      <div style="padding:1.2rem;">
+        <p style="margin:0 0 1rem;color:var(--gray3);font-size:.95rem;">Choose your calendar app:</p>
+        <div style="display:flex;flex-direction:column;gap:.7rem;">
+          <a href="${gcUrl}" target="_blank" onclick="this.closest('.overlay').remove()"
+             style="display:flex;align-items:center;gap:.8rem;padding:.9rem 1rem;background:var(--gray1);border-radius:12px;text-decoration:none;color:var(--text);">
+            <span style="font-size:1.4rem;">📆</span>
+            <div><div style="font-weight:600;">Google Calendar</div><div style="font-size:.8rem;color:var(--gray3);">Opens in browser</div></div>
+          </a>
+          <button onclick="downloadICS(${JSON.stringify(icsContent).replace(/</g,'\\x3c')}, '${(event.name||'event').replace(/[^a-z0-9]/gi,'-')}'); this.closest('.overlay').remove();"
+             style="display:flex;align-items:center;gap:.8rem;padding:.9rem 1rem;background:var(--gray1);border-radius:12px;border:none;width:100%;text-align:left;cursor:pointer;color:var(--text);">
+            <span style="font-size:1.4rem;">📥</span>
+            <div><div style="font-weight:600;">Download .ics File</div><div style="font-size:.8rem;color:var(--gray3);">For Apple Calendar, Outlook & others</div></div>
+          </button>
+        </div>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  addSwipeDownToClose(overlay, () => overlay.remove());
+}
+
+function downloadICS(content, filename) {
+  const blob = new Blob([content], { type: 'text/calendar' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename + '.ics';
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('Calendar file downloaded!');
+}
+
+// Override buildDetailHTML to inject "Add to Calendar" on events
+const _origBuildDetailHTML_cal = buildDetailHTML;
+buildDetailHTML = function(item) {
+  let html = _origBuildDetailHTML_cal(item);
+  if (item && (item.type === 'event' || item.category === 'Events')) {
+    const calBtn = `<button class="btn-secondary" style="width:100%;margin-top:.5rem;" onclick='addToCalendar(${JSON.stringify({name:item.name||item.title,description:item.description||item.desc||'',location:item.location||'Orlando, FL',date:item.date||null})})'>📅 Add to Calendar</button>`;
+    html = html.replace('</div>\n</div>\n</div>', calBtn + '</div>\n</div>\n</div>');
+    if (!html.includes('Add to Calendar')) {
+      html += calBtn;
+    }
+  }
+  return html;
+};
+
+// ---- DIRECT MESSAGING ----
+const dmState = {
+  threads: JSON.parse(localStorage.getItem('dmThreads') || '[]'),
+  activeThread: null,
+  overlay: null
+};
+
+const DM_DEMO_USERS = [
+  { id:'u_sarah', name:'Sarah M.', avatar:'👩', status:'online', lastSeen:'now' },
+  { id:'u_mike', name:'Mike T.', avatar:'👨', status:'online', lastSeen:'2m ago' },
+  { id:'u_jessica', name:'Jessica L.', avatar:'👱‍♀️', status:'offline', lastSeen:'1h ago' },
+  { id:'u_carlos', name:'Carlos R.', avatar:'🧔', status:'online', lastSeen:'5m ago' },
+  { id:'u_emily', name:'Emily K.', avatar:'👩‍🦰', status:'offline', lastSeen:'yesterday' }
+];
+
+function ensureDmThreads() {
+  if (dmState.threads.length === 0) {
+    dmState.threads = DM_DEMO_USERS.slice(0,3).map((u,i) => ({
+      id: 'thread_' + u.id,
+      userId: u.id,
+      userName: u.name,
+      userAvatar: u.avatar,
+      messages: [
+        { from: 'them', text: i===0 ? 'Hey! Have you been to ICON Park yet? 🎡' : i===1 ? 'The food at Epcot last week was amazing! 🍜' : 'Looking for a good brunch spot in Orlando 🥞', time: Date.now() - (3600000*(i+1)) }
+      ],
+      unread: i === 0 ? 1 : 0,
+      lastTime: Date.now() - (3600000*(i+1))
+    }));
+    saveDmState();
+  }
+}
+
+function saveDmState() {
+  localStorage.setItem('dmThreads', JSON.stringify(dmState.threads));
+}
+
+function openMessages() {
+  ensureDmThreads();
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay active';
+  overlay.id = 'dm-overlay';
+  overlay.style.cssText = 'z-index:2200;';
+  overlay.innerHTML = `
+    <div style="width:100%;max-width:430px;height:100%;background:var(--white);display:flex;flex-direction:column;">
+      <div style="padding:1rem 1rem .5rem;display:flex;align-items:center;gap:.7rem;border-bottom:1px solid var(--gray1);">
+        <button class="icon-btn" onclick="document.getElementById('dm-overlay').remove()">←</button>
+        <div style="flex:1;font-size:1.1rem;font-weight:700;">Messages</div>
+        <button class="icon-btn" onclick="openNewDM()" title="New Message">✏️</button>
+      </div>
+      <div id="dm-thread-list" style="flex:1;overflow-y:auto;padding:.5rem 0;"></div>
+    </div>`;
+  document.body.appendChild(overlay);
+  addSwipeDownToClose(overlay, () => overlay.remove());
+  renderDMThreadList();
+}
+
+function renderDMThreadList() {
+  const el = document.getElementById('dm-thread-list');
+  if (!el) return;
+  ensureDmThreads();
+  if (dmState.threads.length === 0) {
+    el.innerHTML = `<div style="text-align:center;padding:3rem 1rem;color:var(--gray3);">
+      <div style="font-size:3rem;margin-bottom:1rem;">💬</div>
+      <div style="font-weight:600;margin-bottom:.5rem;">No Messages Yet</div>
+      <div style="font-size:.9rem;">Start a conversation with other Orlando explorers!</div>
+      <button class="btn-primary" style="margin-top:1.2rem;" onclick="openNewDM()">Start a Chat</button>
+    </div>`;
+    return;
+  }
+  el.innerHTML = dmState.threads.map(t => {
+    const last = t.messages[t.messages.length-1];
+    const timeStr = formatDMTime(t.lastTime);
+    return `<div style="display:flex;align-items:center;gap:.8rem;padding:.8rem 1rem;cursor:pointer;${t.unread?'background:var(--gray1)':''}" 
+               onclick="openDMThread('${t.id}')">
+      <div style="width:46px;height:46px;border-radius:50%;background:var(--sky);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;position:relative;">
+        ${t.userAvatar}
+        ${DM_DEMO_USERS.find(u=>u.id===t.userId)?.status==='online' ? '<div style="position:absolute;bottom:1px;right:1px;width:10px;height:10px;background:#22c55e;border-radius:50%;border:2px solid var(--white);"></div>' : ''}
+      </div>
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-weight:${t.unread?'700':'600'};font-size:.95rem;">${t.userName}</span>
+          <span style="font-size:.75rem;color:var(--gray3);">${timeStr}</span>
+        </div>
+        <div style="font-size:.85rem;color:${t.unread?'var(--text)':'var(--gray3)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:${t.unread?'600':'400'};">
+          ${last?.from==='me'?'You: ':''}${last?.text||''}
+        </div>
+      </div>
+      ${t.unread ? `<div style="width:20px;height:20px;background:var(--sun);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:#fff;flex-shrink:0;">${t.unread}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function formatDMTime(ts) {
+  const diff = Date.now() - ts;
+  if (diff < 60000) return 'now';
+  if (diff < 3600000) return Math.floor(diff/60000) + 'm';
+  if (diff < 86400000) return Math.floor(diff/3600000) + 'h';
+  return Math.floor(diff/86400000) + 'd';
+}
+
+function openDMThread(threadId) {
+  const thread = dmState.threads.find(t => t.id === threadId);
+  if (!thread) return;
+  thread.unread = 0;
+  saveDmState();
+  dmState.activeThread = threadId;
+
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay active';
+  overlay.id = 'dm-thread-overlay';
+  overlay.style.cssText = 'z-index:2300;';
+  overlay.innerHTML = `
+    <div style="width:100%;max-width:430px;height:100%;background:var(--white);display:flex;flex-direction:column;">
+      <div style="padding:1rem;display:flex;align-items:center;gap:.7rem;border-bottom:1px solid var(--gray1);">
+        <button class="icon-btn" onclick="document.getElementById('dm-thread-overlay').remove();renderDMThreadList();">←</button>
+        <div style="width:36px;height:36px;border-radius:50%;background:var(--sky);display:flex;align-items:center;justify-content:center;font-size:1.2rem;">${thread.userAvatar}</div>
+        <div style="flex:1;">
+          <div style="font-weight:700;font-size:.95rem;">${thread.userName}</div>
+          <div style="font-size:.75rem;color:var(--gray3);">${DM_DEMO_USERS.find(u=>u.id===thread.userId)?.status==='online'?'<span style="color:#22c55e;">● Online</span>':'Offline'}</div>
+        </div>
+        <button class="icon-btn" onclick="showToast('Voice calls coming soon! 📞')">📞</button>
+      </div>
+      <div id="dm-messages" style="flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:.6rem;"></div>
+      <div style="padding:.7rem;border-top:1px solid var(--gray1);display:flex;gap:.5rem;align-items:flex-end;">
+        <input id="dm-input" type="text" placeholder="Message ${thread.userName}..." 
+               style="flex:1;padding:.7rem .9rem;border:1.5px solid var(--gray2);border-radius:20px;font-size:.9rem;background:var(--white);color:var(--text);outline:none;"
+               onkeydown="if(event.key==='Enter'){sendDM('${threadId}');}" />
+        <button onclick="sendDM('${threadId}')" style="width:38px;height:38px;border-radius:50%;background:var(--sky);border:none;cursor:pointer;color:#fff;font-size:1.1rem;display:flex;align-items:center;justify-content:center;">➤</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  renderDMMessages(threadId);
+  addSwipeDownToClose(overlay, () => { overlay.remove(); renderDMThreadList(); });
+  setTimeout(() => {
+    const msgs = document.getElementById('dm-messages');
+    if (msgs) msgs.scrollTop = msgs.scrollHeight;
+  }, 50);
+}
+
+function renderDMMessages(threadId) {
+  const thread = dmState.threads.find(t => t.id === threadId);
+  const el = document.getElementById('dm-messages');
+  if (!thread || !el) return;
+  el.innerHTML = thread.messages.map(m => `
+    <div style="display:flex;justify-content:${m.from==='me'?'flex-end':'flex-start'};">
+      <div style="max-width:75%;padding:.6rem .9rem;border-radius:${m.from==='me'?'18px 18px 4px 18px':'18px 18px 18px 4px'};
+                  background:${m.from==='me'?'var(--sky)':'var(--gray1)'};
+                  color:${m.from==='me'?'#fff':'var(--text)'};font-size:.9rem;line-height:1.4;">
+        ${m.text}
+        <div style="font-size:.65rem;opacity:.7;margin-top:.2rem;text-align:right;">${formatDMTime(m.time)}</div>
+      </div>
+    </div>`).join('');
+}
+
+function sendDM(threadId) {
+  const input = document.getElementById('dm-input');
+  if (!input || !input.value.trim()) return;
+  const thread = dmState.threads.find(t => t.id === threadId);
+  if (!thread) return;
+  const text = input.value.trim();
+  thread.messages.push({ from: 'me', text, time: Date.now() });
+  thread.lastTime = Date.now();
+  input.value = '';
+  saveDmState();
+  renderDMMessages(threadId);
+  setTimeout(() => {
+    const msgs = document.getElementById('dm-messages');
+    if (msgs) msgs.scrollTop = msgs.scrollHeight;
+  }, 50);
+  // Simulate reply after 1.5-3 seconds
+  const replyDelay = 1500 + Math.random() * 1500;
+  const replies = [
+    "That's awesome! 😄", "I totally agree!", "Have you tried Epcot's food & wine?",
+    "Good to know, thanks!", "Orlando is the best 🌴", "We should meet up at Disney!",
+    "I just got back from Universal 🎢", "The weather here is perfect right now ☀️"
+  ];
+  setTimeout(() => {
+    const thread2 = dmState.threads.find(t => t.id === threadId);
+    if (!thread2) return;
+    thread2.messages.push({ from: 'them', text: replies[Math.floor(Math.random()*replies.length)], time: Date.now() });
+    thread2.lastTime = Date.now();
+    saveDmState();
+    renderDMMessages(threadId);
+    const msgs = document.getElementById('dm-messages');
+    if (msgs) msgs.scrollTop = msgs.scrollHeight;
+    haptic([20, 30, 20]);
+  }, replyDelay);
+}
+
+function openNewDM() {
+  ensureDmThreads();
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay active';
+  overlay.style.cssText = 'z-index:2400;';
+  overlay.innerHTML = `
+    <div class="modal-sheet" style="max-width:400px;margin:auto;">
+      <div class="modal-header">
+        <span style="font-weight:700;">New Message</span>
+        <button class="icon-btn" onclick="this.closest('.overlay').remove()">✕</button>
+      </div>
+      <div style="padding:.5rem 1rem 1rem;">
+        <div style="font-size:.85rem;color:var(--gray3);margin-bottom:.7rem;">Select someone to message:</div>
+        ${DM_DEMO_USERS.map(u => `
+          <div style="display:flex;align-items:center;gap:.8rem;padding:.7rem .5rem;cursor:pointer;border-radius:10px;"
+               onclick="startDMWith('${u.id}','${u.name}','${u.avatar}');this.closest('.overlay').remove();">
+            <div style="width:40px;height:40px;border-radius:50%;background:var(--sky);display:flex;align-items:center;justify-content:center;font-size:1.3rem;">${u.avatar}</div>
+            <div>
+              <div style="font-weight:600;">${u.name}</div>
+              <div style="font-size:.8rem;color:${u.status==='online'?'#22c55e':'var(--gray3)'};">${u.status==='online'?'● Online':'Last seen '+u.lastSeen}</div>
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+}
+
+function startDMWith(userId, userName, userAvatar) {
+  ensureDmThreads();
+  let thread = dmState.threads.find(t => t.userId === userId);
+  if (!thread) {
+    thread = { id: 'thread_' + userId, userId, userName, userAvatar, messages: [], unread: 0, lastTime: Date.now() };
+    dmState.threads.unshift(thread);
+    saveDmState();
+  }
+  openDMThread(thread.id);
+}
+
+// Wire Messages to account screen
+const _origRenderAccount_dm = renderAccount;
+renderAccount = function() {
+  _origRenderAccount_dm();
+  setTimeout(() => {
+    const menuItems = document.querySelectorAll('#account-screen .menu-item, #account-screen [onclick]');
+    menuItems.forEach(item => {
+      if (item.textContent && item.textContent.includes('Community')) {
+        const msgBtn = document.createElement('div');
+        msgBtn.className = item.className;
+        msgBtn.innerHTML = `<span>💬</span><span>Messages</span><span>›</span>`;
+        msgBtn.onclick = openMessages;
+        msgBtn.style.cssText = item.style.cssText || '';
+        // Insert after community
+        if (item.parentNode) item.parentNode.insertBefore(msgBtn, item.nextSibling);
+      }
+    });
+  }, 80);
+};
+</script>
+
+<script>
+// ============================================================
+// BLOCK G: Privacy & Safety + Accessibility + Enhanced Deals
+// ============================================================
+
+// ---- PRIVACY & SAFETY ----
+const privacyState = {
+  blockedUsers: JSON.parse(localStorage.getItem('blockedUsers') || '[]'),
+  reportedContent: JSON.parse(localStorage.getItem('reportedContent') || '[]')
+};
+
+function savePrivacyState() {
+  localStorage.setItem('blockedUsers', JSON.stringify(privacyState.blockedUsers));
+  localStorage.setItem('reportedContent', JSON.stringify(privacyState.reportedContent));
+}
+
+function blockUser(userId, userName) {
+  if (privacyState.blockedUsers.find(u => u.id === userId)) {
+    showToast(userName + ' is already blocked');
+    return;
+  }
+  if (confirm('Block ' + userName + '? They won\'t be able to see your content.')) {
+    privacyState.blockedUsers.push({ id: userId, name: userName, time: Date.now() });
+    savePrivacyState();
+    showToast(userName + ' has been blocked');
+  }
+}
+
+function reportContent(contentId, contentType, description) {
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay active';
+  overlay.style.cssText = 'z-index:3000;';
+  const reasons = ['Spam or misleading', 'Inappropriate content', 'Hate speech', 'Harassment', 'Fake review', 'Copyright violation', 'Other'];
+  overlay.innerHTML = `
+    <div class="modal-sheet" style="max-width:400px;margin:auto;">
+      <div class="modal-header">
+        <span style="font-weight:700;">🚩 Report Content</span>
+        <button class="icon-btn" onclick="this.closest('.overlay').remove()">✕</button>
+      </div>
+      <div style="padding:.5rem 1rem 1rem;">
+        <p style="font-size:.9rem;color:var(--gray3);margin:0 0 1rem;">Why are you reporting this ${contentType}?</p>
+        <div style="display:flex;flex-direction:column;gap:.4rem;" id="report-reasons">
+          ${reasons.map((r,i) => `
+            <label style="display:flex;align-items:center;gap:.7rem;padding:.7rem .8rem;background:var(--gray1);border-radius:10px;cursor:pointer;">
+              <input type="radio" name="report-reason" value="${r}" style="accent-color:var(--sky);">
+              <span style="font-size:.9rem;">${r}</span>
+            </label>`).join('')}
+        </div>
+        <button class="btn-primary" style="width:100%;margin-top:1rem;" onclick="submitReport('${contentId}','${contentType}',this.closest('.overlay'))">Submit Report</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+}
+
+function submitReport(contentId, contentType, overlayEl) {
+  const selected = overlayEl.querySelector('input[name="report-reason"]:checked');
+  if (!selected) { showToast('Please select a reason'); return; }
+  privacyState.reportedContent.push({ id: contentId, type: contentType, reason: selected.value, time: Date.now() });
+  savePrivacyState();
+  overlayEl.remove();
+  showToast('Report submitted. Thank you for keeping Orlando Explorer safe!');
+}
+
+function openPrivacySafetySettings() {
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay active';
+  overlay.style.cssText = 'z-index:2800;';
+  overlay.innerHTML = `
+    <div style="width:100%;max-width:430px;height:100%;background:var(--white);display:flex;flex-direction:column;overflow-y:auto;">
+      <div style="padding:1rem;display:flex;align-items:center;gap:.7rem;border-bottom:1px solid var(--gray1);position:sticky;top:0;background:var(--white);z-index:1;">
+        <button class="icon-btn" onclick="this.closest('.overlay').remove()">←</button>
+        <span style="font-size:1.05rem;font-weight:700;">Privacy & Safety</span>
+      </div>
+      <div style="padding:1rem;flex:1;">
+        <div style="background:var(--gray1);border-radius:14px;overflow:hidden;margin-bottom:1.2rem;">
+          <div style="padding:.8rem 1rem;font-size:.75rem;font-weight:700;color:var(--gray3);text-transform:uppercase;letter-spacing:.05em;">Account Privacy</div>
+          <div style="border-top:1px solid var(--gray2);padding:.9rem 1rem;display:flex;align-items:center;justify-content:space-between;">
+            <div><div style="font-weight:600;font-size:.95rem;">Private Account</div><div style="font-size:.8rem;color:var(--gray3);">Only approved followers see your activity</div></div>
+            <label class="toggle-switch"><input type="checkbox" id="ps-private" ${(typeof appSettings!=='undefined'&&appSettings.privateAccount)?'checked':''}
+              onchange="if(typeof appSettings!=='undefined'){appSettings.privateAccount=this.checked;if(typeof saveAppSettings!=='undefined')saveAppSettings();}"><span class="toggle-slider"></span></label>
+          </div>
+          <div style="border-top:1px solid var(--gray2);padding:.9rem 1rem;display:flex;align-items:center;justify-content:space-between;">
+            <div><div style="font-weight:600;font-size:.95rem;">Show Activity Status</div><div style="font-size:.8rem;color:var(--gray3);">Let others see when you're online</div></div>
+            <label class="toggle-switch"><input type="checkbox" id="ps-activity" ${(typeof appSettings!=='undefined'&&appSettings.showActivity)?'checked':''}
+              onchange="if(typeof appSettings!=='undefined'){appSettings.showActivity=this.checked;if(typeof saveAppSettings!=='undefined')saveAppSettings();}"><span class="toggle-slider"></span></label>
+          </div>
+          <div style="border-top:1px solid var(--gray2);padding:.9rem 1rem;display:flex;align-items:center;justify-content:space-between;">
+            <div><div style="font-weight:600;font-size:.95rem;">Location Sharing</div><div style="font-size:.8rem;color:var(--gray3);">Share your location with friends</div></div>
+            <label class="toggle-switch"><input type="checkbox" id="ps-location"
+              onchange="showToast('Location setting updated')"><span class="toggle-slider"></span></label>
+          </div>
+        </div>
+
+        <div style="background:var(--gray1);border-radius:14px;overflow:hidden;margin-bottom:1.2rem;">
+          <div style="padding:.8rem 1rem;font-size:.75rem;font-weight:700;color:var(--gray3);text-transform:uppercase;letter-spacing:.05em;">Blocked Users</div>
+          <div style="border-top:1px solid var(--gray2);padding:.9rem 1rem;">
+            ${privacyState.blockedUsers.length === 0 
+              ? '<div style="color:var(--gray3);font-size:.9rem;">No blocked users</div>'
+              : privacyState.blockedUsers.map(u => `
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem;">
+                  <span style="font-size:.9rem;">${u.name}</span>
+                  <button style="font-size:.8rem;color:var(--sky);background:none;border:none;cursor:pointer;"
+                    onclick="unblockUser('${u.id}','${u.name}');this.closest('.overlay').remove();openPrivacySafetySettings();">Unblock</button>
+                </div>`).join('')}
+          </div>
+        </div>
+
+        <div style="background:var(--gray1);border-radius:14px;overflow:hidden;margin-bottom:1.2rem;">
+          <div style="padding:.8rem 1rem;font-size:.75rem;font-weight:700;color:var(--gray3);text-transform:uppercase;letter-spacing:.05em;">Data & Reports</div>
+          <div style="border-top:1px solid var(--gray2);">
+            <button style="width:100%;padding:.9rem 1rem;background:none;border:none;text-align:left;cursor:pointer;color:var(--text);font-size:.9rem;display:flex;justify-content:space-between;"
+              onclick="showToast('Data export email sent! 📧')">
+              <span>Download My Data</span><span style="color:var(--gray3);">›</span>
+            </button>
+            <button style="width:100%;padding:.9rem 1rem;background:none;border:none;text-align:left;cursor:pointer;color:#ef4444;font-size:.9rem;border-top:1px solid var(--gray2);display:flex;justify-content:space-between;"
+              onclick="if(typeof privacyState!=='undefined'){privacyState.reportedContent=[];if(typeof savePrivacyState!=='undefined')savePrivacyState();showToast('Report history cleared');}">
+              <span>Clear Report History</span><span style="color:var(--gray3);">›</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  if (typeof addSwipeDownToClose !== 'undefined') addSwipeDownToClose(overlay, () => overlay.remove());
+}
+
+function unblockUser(userId, userName) {
+  privacyState.blockedUsers = privacyState.blockedUsers.filter(u => u.id !== userId);
+  savePrivacyState();
+  showToast(userName + ' has been unblocked');
+}
+
+// ---- ACCESSIBILITY ----
+function applyAccessibilitySettings() {
+  if (typeof appSettings === 'undefined') return;
+  // Large text
+  if (appSettings.largeText) {
+    document.documentElement.style.fontSize = '18px';
+  } else {
+    document.documentElement.style.fontSize = '';
+  }
+  // Reduce motion
+  document.body.classList.toggle('no-motion', !!appSettings.reduceMotion);
+  // High contrast
+  document.body.classList.toggle('hc', !!appSettings.highContrast);
+}
+
+// Add ARIA labels to key elements after they render
+function applyARIALabels() {
+  // Nav buttons
+  const navLabels = { 'nav-home':'Go to Home', 'nav-explore':'Explore attractions', 'nav-trip':'My Trip planner', 'nav-social':'Social and community', 'nav-account':'Your account and profile' };
+  Object.entries(navLabels).forEach(([id, label]) => {
+    const el = document.getElementById(id);
+    if (el) { el.setAttribute('aria-label', label); el.setAttribute('role', 'button'); }
+  });
+  // Search bar
+  const searchEl = document.getElementById('hero-search');
+  if (searchEl) { searchEl.setAttribute('aria-label', 'Search Orlando attractions, restaurants, events'); }
+  // Back buttons
+  document.querySelectorAll('.icon-btn').forEach(btn => {
+    if (btn.textContent.trim() === '←' && !btn.getAttribute('aria-label')) btn.setAttribute('aria-label', 'Go back');
+    if (btn.textContent.trim() === '✕' && !btn.getAttribute('aria-label')) btn.setAttribute('aria-label', 'Close');
+  });
+  // Cards
+  document.querySelectorAll('.card[onclick], .hcard[onclick]').forEach(card => {
+    if (!card.getAttribute('role')) card.setAttribute('role', 'button');
+    if (!card.getAttribute('tabindex')) card.setAttribute('tabindex', '0');
+  });
+}
+
+// Run accessibility after every render
+const _origRenderHome_a11y = renderHome;
+renderHome = function() {
+  _origRenderHome_a11y();
+  setTimeout(applyARIALabels, 200);
+};
+
+// Ensure min 44px tap targets (CSS enforcement via body class)
+document.addEventListener('DOMContentLoaded', () => {
+  applyARIALabels();
+  if (typeof applyAccessibilitySettings !== 'undefined') applyAccessibilitySettings();
+});
+
+// ---- ENHANCED DEALS SCREEN WITH COUNTDOWN ----
+const dealsScreenState = {
+  savedDeals: JSON.parse(localStorage.getItem('savedDeals') || '[]'),
+  dealOfDayExpiry: null
+};
+
+function getDealOfDayExpiry() {
+  // Countdown to midnight
+  const now = new Date();
+  const midnight = new Date(now);
+  midnight.setHours(24, 0, 0, 0);
+  return midnight.getTime();
+}
+
+function formatCountdown(ms) {
+  if (ms <= 0) return '00:00:00';
+  const totalSec = Math.floor(ms / 1000);
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  return [h, m, s].map(v => String(v).padStart(2, '0')).join(':');
+}
+
+function openDealsScreen() {
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay active';
+  overlay.id = 'deals-screen-overlay';
+  overlay.style.cssText = 'z-index:2500;';
+  overlay.innerHTML = `
+    <div style="width:100%;max-width:430px;height:100%;background:var(--white);display:flex;flex-direction:column;overflow-y:auto;" id="deals-scroll">
+      <div style="padding:1rem;display:flex;align-items:center;gap:.7rem;border-bottom:1px solid var(--gray1);position:sticky;top:0;background:var(--white);z-index:1;">
+        <button class="icon-btn" onclick="clearDealsCountdown();document.getElementById('deals-screen-overlay').remove()">←</button>
+        <span style="font-size:1.05rem;font-weight:700;">🏷️ Deals & Discounts</span>
+        <div style="flex:1;"></div>
+        <button style="background:none;border:none;cursor:pointer;font-size:.85rem;color:var(--sky);" onclick="showSavedDeals()">Saved</button>
+      </div>
+      <div style="padding:1rem;" id="deals-content"></div>
+    </div>`;
+  document.body.appendChild(overlay);
+  if (typeof addSwipeDownToClose !== 'undefined') addSwipeDownToClose(overlay, () => { clearDealsCountdown(); overlay.remove(); });
+  renderDealsContent();
+}
+
+function clearDealsCountdown() {
+  if (window._dealCountdownTimer) { clearInterval(window._dealCountdownTimer); window._dealCountdownTimer = null; }
+}
+
+function saveDeal(dealId) {
+  if (!dealsScreenState.savedDeals.includes(dealId)) {
+    dealsScreenState.savedDeals.push(dealId);
+    localStorage.setItem('savedDeals', JSON.stringify(dealsScreenState.savedDeals));
+    showToast('Deal saved! 🎉');
+  } else {
+    dealsScreenState.savedDeals = dealsScreenState.savedDeals.filter(d => d !== dealId);
+    localStorage.setItem('savedDeals', JSON.stringify(dealsScreenState.savedDeals));
+    showToast('Deal removed');
+  }
+}
+
+function renderDealsContent() {
+  const el = document.getElementById('deals-content');
+  if (!el) return;
+
+  const featuredDeal = {
+    id: 'deal_featured',
+    name: 'Disney World Magic Kingdom',
+    discount: '25% OFF',
+    originalPrice: 189,
+    salePrice: 142,
+    code: 'MAGIC25',
+    image: '🏰',
+    category: 'Theme Parks',
+    desc: 'Save big on 1-Day tickets to Magic Kingdom! Limited time offer for Orlando Explorer members.',
+    expiryMs: getDealOfDayExpiry()
+  };
+
+  const dealCategories = [
+    {
+      title: '🎢 Theme Park Deals', deals: [
+        { id:'d1', name:'Universal Studios Florida', discount:'20% OFF', original:149, sale:119, code:'UNIV20', emoji:'🎬', desc:'All-day access to Universal Studios Florida' },
+        { id:'d2', name:'SeaWorld Orlando', discount:'30% OFF', original:119, sale:83, code:'SEA30', emoji:'🐋', desc:'Feed stingrays, see killer whales & more' },
+        { id:'d3', name:'LEGOLAND Florida', discount:'Buy 1 Get 1', original:109, sale:109, code:'LEGO2X', emoji:'🧱', desc:'Perfect for families with kids 2-12' }
+      ]
+    },
+    {
+      title: '🍽️ Restaurant Deals', deals: [
+        { id:'d4', name:"The Capital Grille", discount:'15% OFF', original:85, sale:72, code:'CAP15', emoji:'🥩', desc:'Fine dining in Downtown Orlando' },
+        { id:'d5', name:'Bosphorous Restaurant', discount:'Free Dessert', original:45, sale:45, code:'BOSPHD', emoji:'🥙', desc:'Authentic Turkish cuisine, free baklava with entree' },
+        { id:'d6', name:'Taverna Opa', discount:'Happy Hour', original:35, sale:20, code:'OPA50', emoji:'🍷', desc:'2-for-1 cocktails 4-7pm Mon-Fri' }
+      ]
+    },
+    {
+      title: '🏨 Hotel Deals', deals: [
+        { id:'d7', name:"Loews Sapphire Falls", discount:'3rd Night Free', original:280, sale:186, code:'SAP3', emoji:'💧', desc:'On-site Universal hotel with water park access' },
+        { id:'d8', name:'Disney Port Orleans', discount:'Kids Stay Free', original:250, sale:250, code:'KIDSFREE', emoji:'🎠', desc:'Kids under 12 stay free with paying adult' }
+      ]
+    },
+    {
+      title: '🎭 Experiences & Tours', deals: [
+        { id:'d9', name:'Kennedy Space Center', discount:'10% OFF', original:75, sale:67, code:'KSC10', emoji:'🚀', desc:'Out-of-this-world experience 45 min from Orlando' },
+        { id:'d10', name:'Airboat Everglades Tour', discount:'25% OFF', original:65, sale:49, code:'GLADE25', emoji:'🐊', desc:'See real Florida wildlife up close' }
+      ]
+    }
+  ];
+
+  el.innerHTML = `
+    <!-- Deal of the Day -->
+    <div style="background:linear-gradient(135deg,#f59e0b,#ef4444);border-radius:16px;padding:1.2rem;margin-bottom:1.5rem;color:#fff;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:-20px;right:-20px;font-size:5rem;opacity:.15;">⭐</div>
+      <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;opacity:.85;margin-bottom:.3rem;">⚡ Deal of the Day</div>
+      <div style="display:flex;align-items:flex-start;gap:.8rem;margin-bottom:.8rem;">
+        <div style="font-size:2.5rem;">${featuredDeal.image}</div>
+        <div>
+          <div style="font-size:1rem;font-weight:700;line-height:1.3;">${featuredDeal.name}</div>
+          <div style="font-size:.85rem;opacity:.9;margin-top:.2rem;">${featuredDeal.desc}</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem;">
+        <div>
+          <span style="font-size:1.6rem;font-weight:800;">${featuredDeal.discount}</span>
+          <span style="font-size:.9rem;margin-left:.5rem;text-decoration:line-through;opacity:.7;">$${featuredDeal.originalPrice}</span>
+          <span style="font-size:1.1rem;font-weight:700;margin-left:.3rem;">$${featuredDeal.salePrice}</span>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div style="font-size:.7rem;opacity:.8;margin-bottom:.2rem;">⏱️ Expires in:</div>
+          <div id="deal-countdown" style="font-size:1.3rem;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:.05em;">00:00:00</div>
+        </div>
+        <button onclick="copyDealCode('${featuredDeal.code}','${featuredDeal.id}')" style="background:rgba(255,255,255,0.25);border:2px solid rgba(255,255,255,0.6);border-radius:10px;padding:.5rem 1rem;color:#fff;font-weight:700;cursor:pointer;font-size:.9rem;">
+          USE: ${featuredDeal.code}
+        </button>
+      </div>
+    </div>
+
+    <!-- Category sections -->
+    ${dealCategories.map(cat => `
+      <div style="margin-bottom:1.5rem;">
+        <div style="font-size:1rem;font-weight:700;margin-bottom:.8rem;">${cat.title}</div>
+        <div style="display:flex;flex-direction:column;gap:.7rem;">
+          ${cat.deals.map(deal => {
+            const isSaved = dealsScreenState.savedDeals.includes(deal.id);
+            return `<div style="background:var(--gray1);border-radius:14px;padding:1rem;display:flex;align-items:flex-start;gap:.8rem;">
+              <div style="font-size:2rem;">${deal.emoji}</div>
+              <div style="flex:1;min-width:0;">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                  <div style="font-weight:600;font-size:.9rem;flex:1;">${deal.name}</div>
+                  <span style="background:#fef3c7;color:#92400e;font-size:.75rem;font-weight:700;padding:.2rem .5rem;border-radius:6px;flex-shrink:0;margin-left:.4rem;">${deal.discount}</span>
+                </div>
+                <div style="font-size:.8rem;color:var(--gray3);margin:.2rem 0 .5rem;">${deal.desc}</div>
+                <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.4rem;">
+                  <div>
+                    <span style="font-size:1rem;font-weight:700;color:var(--sky);">$${deal.sale}</span>
+                    ${deal.sale < deal.original ? `<span style="font-size:.8rem;color:var(--gray3);text-decoration:line-through;margin-left:.3rem;">$${deal.original}</span>` : ''}
+                  </div>
+                  <div style="display:flex;gap:.4rem;">
+                    <button onclick="saveDeal('${deal.id}');this.textContent=dealsScreenState.savedDeals.includes('${deal.id}')?'❤️':'🤍';" 
+                            style="background:none;border:1px solid var(--gray2);border-radius:8px;padding:.3rem .5rem;cursor:pointer;font-size:.9rem;">${isSaved?'❤️':'🤍'}</button>
+                    <button onclick="copyDealCode('${deal.code}','${deal.id}')" 
+                            style="background:var(--sky);color:#fff;border:none;border-radius:8px;padding:.3rem .7rem;cursor:pointer;font-size:.8rem;font-weight:600;">COPY CODE</button>
+                  </div>
+                </div>
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`).join('')}
+  `;
+
+  // Start countdown timer
+  clearDealsCountdown();
+  function updateCountdown() {
+    const el2 = document.getElementById('deal-countdown');
+    if (!el2) { clearDealsCountdown(); return; }
+    const remaining = featuredDeal.expiryMs - Date.now();
+    el2.textContent = formatCountdown(remaining);
+  }
+  updateCountdown();
+  window._dealCountdownTimer = setInterval(updateCountdown, 1000);
+}
+
+function copyDealCode(code, dealId) {
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(code).then(() => showToast('Code ' + code + ' copied! 🎉'));
+  } else {
+    showToast('Code: ' + code + ' - Copy manually');
+  }
+  if (typeof haptic !== 'undefined') haptic([30, 20, 30]);
+}
+
+function showSavedDeals() {
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay active';
+  overlay.style.cssText = 'z-index:2600;';
+  const all = [
+    {id:'deal_featured',name:'Disney World Magic Kingdom',discount:'25% OFF',emoji:'🏰',code:'MAGIC25'},
+    {id:'d1',name:'Universal Studios Florida',discount:'20% OFF',emoji:'🎬',code:'UNIV20'},
+    {id:'d2',name:'SeaWorld Orlando',discount:'30% OFF',emoji:'🐋',code:'SEA30'},
+    {id:'d3',name:'LEGOLAND Florida',discount:'Buy 1 Get 1',emoji:'🧱',code:'LEGO2X'},
+    {id:'d4',name:'The Capital Grille',discount:'15% OFF',emoji:'🥩',code:'CAP15'},
+    {id:'d5',name:'Bosphorous Restaurant',discount:'Free Dessert',emoji:'🥙',code:'BOSPHD'},
+    {id:'d6',name:'Taverna Opa',discount:'Happy Hour',emoji:'🍷',code:'OPA50'},
+    {id:'d7',name:'Loews Sapphire Falls',discount:'3rd Night Free',emoji:'💧',code:'SAP3'},
+    {id:'d8',name:'Disney Port Orleans',discount:'Kids Stay Free',emoji:'🎠',code:'KIDSFREE'},
+    {id:'d9',name:'Kennedy Space Center',discount:'10% OFF',emoji:'🚀',code:'KSC10'},
+    {id:'d10',name:'Airboat Everglades Tour',discount:'25% OFF',emoji:'🐊',code:'GLADE25'}
+  ];
+  const saved = all.filter(d => dealsScreenState.savedDeals.includes(d.id));
+  overlay.innerHTML = `
+    <div class="modal-sheet" style="max-width:400px;margin:auto;max-height:80vh;overflow-y:auto;">
+      <div class="modal-header" style="position:sticky;top:0;background:var(--white);z-index:1;">
+        <span style="font-weight:700;">❤️ Saved Deals</span>
+        <button class="icon-btn" onclick="this.closest('.overlay').remove()">✕</button>
+      </div>
+      <div style="padding:.5rem 1rem 1rem;">
+        ${saved.length === 0 ? '<div style="text-align:center;padding:2rem;color:var(--gray3);">No saved deals yet.<br>Tap 🤍 on any deal to save it!</div>' :
+          saved.map(d => `
+            <div style="display:flex;align-items:center;gap:.8rem;padding:.7rem 0;border-bottom:1px solid var(--gray1);">
+              <span style="font-size:1.5rem;">${d.emoji}</span>
+              <div style="flex:1;"><div style="font-weight:600;font-size:.9rem;">${d.name}</div><div style="font-size:.8rem;color:var(--sky);">${d.discount}</div></div>
+              <button onclick="copyDealCode('${d.code}','${d.id}')" style="background:var(--sky);color:#fff;border:none;border-radius:8px;padding:.3rem .6rem;cursor:pointer;font-size:.8rem;">USE</button>
+            </div>`).join('')}
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+}
+
+// Wire Deals button in nav/home to openDealsScreen
+// Override the existing deals section in home to use new screen
+const _origRenderHome_deals = renderHome;
+renderHome = function() {
+  _origRenderHome_deals();
+  setTimeout(() => {
+    // Find deals section and wire click
+    document.querySelectorAll('[onclick*="deals"], [data-section="deals"]').forEach(el => {
+      el.onclick = openDealsScreen;
+    });
+  }, 150);
+};
+</script>
+
+<script>
+// ============================================================
+// BLOCK H: Multi-Language + Offline Mode + App Store Readiness
+// ============================================================
+
+// ---- MULTI-LANGUAGE SUPPORT ----
+const i18n = {
+  en: {
+    home: 'Home', explore: 'Explore', myTrip: 'My Trip', social: 'Social', account: 'Account',
+    search: 'Search Orlando...', deals: 'Hot Deals', nearby: 'Nearby',
+    topAttractions: 'Top Attractions', popularRestaurants: 'Popular Restaurants',
+    upcomingEvents: 'Upcoming Events', featured: 'Featured',
+    save: 'Save', saved: 'Saved', share: 'Share', reviews: 'Reviews',
+    bookNow: 'Book Now', reserveTable: 'Reserve a Table', buyTickets: 'Buy Tickets',
+    addToTrip: 'Add to Trip', removeFromTrip: 'Remove',
+    settings: 'Settings', logout: 'Log Out', premium: 'Go Premium',
+    messages: 'Messages', notifications: 'Notifications',
+    loading: 'Loading...', noResults: 'No results found',
+    hello: 'Hello', welcomeBack: 'Welcome back'
+  },
+  es: {
+    home: 'Inicio', explore: 'Explorar', myTrip: 'Mi Viaje', social: 'Social', account: 'Cuenta',
+    search: 'Buscar en Orlando...', deals: 'Ofertas', nearby: 'Cercano',
+    topAttractions: 'Principales Atracciones', popularRestaurants: 'Restaurantes Populares',
+    upcomingEvents: 'Próximos Eventos', featured: 'Destacado',
+    save: 'Guardar', saved: 'Guardado', share: 'Compartir', reviews: 'Reseñas',
+    bookNow: 'Reservar Ahora', reserveTable: 'Reservar Mesa', buyTickets: 'Comprar Boletos',
+    addToTrip: 'Añadir al Viaje', removeFromTrip: 'Quitar',
+    settings: 'Ajustes', logout: 'Cerrar Sesión', premium: 'Premium',
+    messages: 'Mensajes', notifications: 'Notificaciones',
+    loading: 'Cargando...', noResults: 'Sin resultados',
+    hello: 'Hola', welcomeBack: 'Bienvenido de nuevo'
+  },
+  pt: {
+    home: 'Início', explore: 'Explorar', myTrip: 'Minha Viagem', social: 'Social', account: 'Conta',
+    search: 'Pesquisar Orlando...', deals: 'Ofertas', nearby: 'Próximo',
+    topAttractions: 'Principais Atrações', popularRestaurants: 'Restaurantes Populares',
+    upcomingEvents: 'Próximos Eventos', featured: 'Destaque',
+    save: 'Salvar', saved: 'Salvo', share: 'Compartilhar', reviews: 'Avaliações',
+    bookNow: 'Reservar Agora', reserveTable: 'Reservar Mesa', buyTickets: 'Comprar Ingressos',
+    addToTrip: 'Adicionar à Viagem', removeFromTrip: 'Remover',
+    settings: 'Configurações', logout: 'Sair', premium: 'Premium',
+    messages: 'Mensagens', notifications: 'Notificações',
+    loading: 'Carregando...', noResults: 'Sem resultados',
+    hello: 'Olá', welcomeBack: 'Bem-vindo de volta'
+  },
+  fr: {
+    home: 'Accueil', explore: 'Explorer', myTrip: 'Mon Voyage', social: 'Social', account: 'Compte',
+    search: 'Rechercher Orlando...', deals: 'Promotions', nearby: 'Proximité',
+    topAttractions: 'Meilleures Attractions', popularRestaurants: 'Restaurants Populaires',
+    upcomingEvents: 'Événements à Venir', featured: 'En Vedette',
+    save: 'Sauvegarder', saved: 'Sauvegardé', share: 'Partager', reviews: 'Avis',
+    bookNow: 'Réserver', reserveTable: 'Réserver une Table', buyTickets: 'Acheter des Billets',
+    addToTrip: 'Ajouter au Voyage', removeFromTrip: 'Retirer',
+    settings: 'Paramètres', logout: 'Se Déconnecter', premium: 'Premium',
+    messages: 'Messages', notifications: 'Notifications',
+    loading: 'Chargement...', noResults: 'Aucun résultat',
+    hello: 'Bonjour', welcomeBack: 'Bon retour'
+  },
+  de: {
+    home: 'Startseite', explore: 'Erkunden', myTrip: 'Meine Reise', social: 'Sozial', account: 'Konto',
+    search: 'Orlando durchsuchen...', deals: 'Angebote', nearby: 'In der Nähe',
+    topAttractions: 'Top-Attraktionen', popularRestaurants: 'Beliebte Restaurants',
+    upcomingEvents: 'Kommende Events', featured: 'Empfohlen',
+    save: 'Speichern', saved: 'Gespeichert', share: 'Teilen', reviews: 'Bewertungen',
+    bookNow: 'Jetzt Buchen', reserveTable: 'Tisch Reservieren', buyTickets: 'Tickets Kaufen',
+    addToTrip: 'Zur Reise Hinzufügen', removeFromTrip: 'Entfernen',
+    settings: 'Einstellungen', logout: 'Abmelden', premium: 'Premium',
+    messages: 'Nachrichten', notifications: 'Benachrichtigungen',
+    loading: 'Laden...', noResults: 'Keine Ergebnisse',
+    hello: 'Hallo', welcomeBack: 'Willkommen zurück'
+  },
+  ja: {
+    home: 'ホーム', explore: '探索', myTrip: '旅行プラン', social: 'コミュニティ', account: 'アカウント',
+    search: 'オーランドを検索...', deals: 'お得情報', nearby: '近く',
+    topAttractions: 'トップアトラクション', popularRestaurants: '人気レストラン',
+    upcomingEvents: 'イベント情報', featured: 'おすすめ',
+    save: '保存', saved: '保存済み', share: '共有', reviews: 'レビュー',
+    bookNow: '今すぐ予約', reserveTable: 'テーブル予約', buyTickets: 'チケット購入',
+    addToTrip: '旅行に追加', removeFromTrip: '削除',
+    settings: '設定', logout: 'ログアウト', premium: 'プレミアム',
+    messages: 'メッセージ', notifications: '通知',
+    loading: '読み込み中...', noResults: '結果なし',
+    hello: 'こんにちは', welcomeBack: 'おかえりなさい'
+  }
+};
+
+function t(key) {
+  const lang = (typeof appSettings !== 'undefined' && appSettings.language) || 'en';
+  return (i18n[lang] && i18n[lang][key]) || i18n['en'][key] || key;
+}
+
+// Apply language to visible UI elements
+function applyLanguageToUI() {
+  // Nav labels
+  const navMap = {
+    'nav-home': 'home', 'nav-explore': 'explore',
+    'nav-trip': 'myTrip', 'nav-social': 'social', 'nav-account': 'account'
+  };
+  Object.entries(navMap).forEach(([id, key]) => {
+    const el = document.getElementById(id);
+    if (el) {
+      const label = el.querySelector('span:last-child, .nav-label');
+      if (label) label.textContent = t(key);
+    }
+  });
+  // Search placeholder
+  const searchEl = document.getElementById('hero-search');
+  if (searchEl) searchEl.placeholder = t('search');
+}
+
+// Override setLanguage to also apply UI translations
+const _origSetLanguage = typeof setLanguage !== 'undefined' ? setLanguage : null;
+if (_origSetLanguage) {
+  setLanguage = function(code) {
+    _origSetLanguage(code);
+    setTimeout(applyLanguageToUI, 100);
+  };
+} else {
+  window.setLanguage = function(code) {
+    if (typeof appSettings !== 'undefined') {
+      appSettings.language = code;
+      if (typeof saveAppSettings !== 'undefined') saveAppSettings();
+    }
+    setTimeout(applyLanguageToUI, 100);
+    const names = { en:'English', es:'Español', pt:'Português', fr:'Français', de:'Deutsch', ja:'日本語' };
+    if (typeof showToast !== 'undefined') showToast('Language: ' + (names[code] || code));
+  };
+}
+
+// ---- ENHANCED OFFLINE MODE ----
+const offlineCache = {
+  items: JSON.parse(localStorage.getItem('offlineCache') || '[]'),
+  maxItems: 20
+};
+
+function saveForOffline(item) {
+  const existing = offlineCache.items.findIndex(i => i.id === item.id);
+  if (existing >= 0) {
+    showToast('Already saved for offline');
+    return;
+  }
+  const cached = {
+    id: item.id, name: item.name || item.title, type: item.type || 'attraction',
+    emoji: item.emoji || '📍', rating: item.rating, desc: (item.description || item.desc || '').substring(0, 300),
+    address: item.address, price: item.price, savedAt: Date.now()
+  };
+  offlineCache.items.unshift(cached);
+  if (offlineCache.items.length > offlineCache.maxItems) offlineCache.items.pop();
+  localStorage.setItem('offlineCache', JSON.stringify(offlineCache.items));
+  showToast('Saved for offline access! 📥');
+}
+
+function openMyDownloads() {
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay active';
+  overlay.style.cssText = 'z-index:2700;';
+  overlay.innerHTML = `
+    <div style="width:100%;max-width:430px;height:100%;background:var(--white);display:flex;flex-direction:column;overflow-y:auto;">
+      <div style="padding:1rem;display:flex;align-items:center;gap:.7rem;border-bottom:1px solid var(--gray1);position:sticky;top:0;background:var(--white);z-index:1;">
+        <button class="icon-btn" onclick="this.closest('.overlay').remove()">←</button>
+        <span style="font-size:1.05rem;font-weight:700;">📥 My Downloads</span>
+        <div style="flex:1;"></div>
+        <span style="font-size:.8rem;color:var(--gray3);">${offlineCache.items.length}/${offlineCache.maxItems}</span>
+      </div>
+      <div style="padding:1rem;">
+        ${offlineCache.items.length === 0 ? `
+          <div style="text-align:center;padding:3rem 1rem;color:var(--gray3);">
+            <div style="font-size:3rem;margin-bottom:1rem;">📥</div>
+            <div style="font-weight:600;margin-bottom:.5rem;">No Downloaded Content</div>
+            <div style="font-size:.9rem;">Save items for offline access from any detail page</div>
+          </div>` :
+          offlineCache.items.map(item => `
+            <div style="display:flex;align-items:center;gap:.8rem;padding:.8rem 0;border-bottom:1px solid var(--gray1);">
+              <div style="font-size:1.8rem;">${item.emoji}</div>
+              <div style="flex:1;min-width:0;">
+                <div style="font-weight:600;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.name}</div>
+                <div style="font-size:.8rem;color:var(--gray3);">${item.type} • Saved ${new Date(item.savedAt).toLocaleDateString()}</div>
+              </div>
+              <button onclick="removeFromOffline('${item.id}');this.closest('.overlay').remove();openMyDownloads();"
+                      style="background:none;border:none;cursor:pointer;color:#ef4444;font-size:.85rem;">🗑️</button>
+            </div>`).join('')}
+        ${offlineCache.items.length > 0 ? `
+          <button onclick="offlineCache.items=[];localStorage.removeItem('offlineCache');this.closest('.overlay').remove();showToast('All downloads cleared');"
+                  style="width:100%;margin-top:1rem;padding:.7rem;background:none;border:1px solid #ef4444;border-radius:10px;color:#ef4444;cursor:pointer;font-size:.9rem;">
+            Clear All Downloads
+          </button>` : ''}
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  if (typeof addSwipeDownToClose !== 'undefined') addSwipeDownToClose(overlay, () => overlay.remove());
+}
+
+function removeFromOffline(itemId) {
+  offlineCache.items = offlineCache.items.filter(i => i.id !== itemId);
+  localStorage.setItem('offlineCache', JSON.stringify(offlineCache.items));
+  showToast('Removed from downloads');
+}
+
+// Override buildDetailHTML to add "Save for Offline" button
+const _origBuildDetailHTML_offline = buildDetailHTML;
+buildDetailHTML = function(item) {
+  let html = _origBuildDetailHTML_offline(item);
+  const offlineBtn = `<button class="btn-secondary" style="width:100%;margin-top:.4rem;" onclick='saveForOffline(${JSON.stringify({id:item.id,name:item.name||item.title,type:item.type||"attraction",emoji:item.emoji||"📍",rating:item.rating,description:(item.description||item.desc||"").substring(0,200),address:item.address,price:item.price}).replace(/'/g,"&#39;")})'>📥 Save for Offline</button>`;
+  // Add before last closing tags
+  const insertBefore = '</div>\n</div>\n</div>';
+  if (html.includes(insertBefore)) {
+    html = html.replace(insertBefore, offlineBtn + insertBefore);
+  } else {
+    html += offlineBtn;
+  }
+  return html;
+};
+
+// Wire My Downloads to account menu
+const _origRenderAccount_offline = renderAccount;
+renderAccount = function() {
+  _origRenderAccount_offline();
+  setTimeout(() => {
+    // Find the settings row to insert after
+    const settingsItems = document.querySelectorAll('#account-screen [onclick*="openSettings"], #account-screen [onclick*="Settings"]');
+    settingsItems.forEach(item => {
+      if (!document.querySelector('#account-screen [data-downloads]')) {
+        const dlBtn = document.createElement('div');
+        dlBtn.className = item.className;
+        dlBtn.setAttribute('data-downloads', '1');
+        dlBtn.innerHTML = `<span>📥</span><span>My Downloads</span><span>›</span>`;
+        dlBtn.onclick = openMyDownloads;
+        dlBtn.style.cssText = item.style.cssText || '';
+        if (item.parentNode) item.parentNode.insertBefore(dlBtn, item.nextSibling);
+      }
+    });
+  }, 100);
+};
+
+// ---- WHAT'S NEW / UPDATE BANNER ----
+const APP_VERSION = '2.5.0';
+const WHATS_NEW = [
+  { version: '2.5.0', date: 'April 2025', features: [
+    '🗓️ Calendar integration - add events directly to your calendar',
+    '💬 Direct messaging with other Orlando explorers',
+    '🏷️ Enhanced Deals screen with Deal of the Day countdown',
+    '📥 Offline mode - save content for offline viewing',
+    '🌍 Multi-language support (6 languages)',
+    '🔒 Privacy & Safety settings',
+    '♿ Improved accessibility features'
+  ]},
+  { version: '2.0.0', date: 'March 2025', features: [
+    '🎉 Complete onboarding experience',
+    '⚙️ App Settings with dark mode & text size',
+    '🎟️ In-app booking & payments',
+    '⭐ Premium subscription',
+    '🔍 Advanced search with voice input',
+    '😊 Emoji reactions & photo uploads'
+  ]}
+];
+
+// Override openWhatsNew if defined in settings block, otherwise define it
+window.openWhatsNew = function() {
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay active';
+  overlay.style.cssText = 'z-index:3100;';
+  overlay.innerHTML = `
+    <div style="width:100%;max-width:430px;height:100%;background:var(--white);display:flex;flex-direction:column;overflow-y:auto;">
+      <div style="padding:1rem;display:flex;align-items:center;gap:.7rem;border-bottom:1px solid var(--gray1);position:sticky;top:0;background:var(--white);z-index:1;">
+        <button class="icon-btn" onclick="this.closest('.overlay').remove()">←</button>
+        <span style="font-size:1.05rem;font-weight:700;">🆕 What's New</span>
+      </div>
+      <div style="padding:1rem;">
+        ${WHATS_NEW.map(v => `
+          <div style="margin-bottom:1.5rem;">
+            <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.8rem;">
+              <span style="background:var(--sky);color:#fff;font-size:.75rem;font-weight:700;padding:.2rem .6rem;border-radius:6px;">v${v.version}</span>
+              <span style="font-size:.85rem;color:var(--gray3);">${v.date}</span>
+              ${v.version === APP_VERSION ? '<span style="background:#dcfce7;color:#166534;font-size:.7rem;font-weight:700;padding:.15rem .5rem;border-radius:5px;">CURRENT</span>' : ''}
+            </div>
+            <div style="display:flex;flex-direction:column;gap:.4rem;">
+              ${v.features.map(f => `<div style="font-size:.9rem;color:var(--text);padding:.3rem 0;">${f}</div>`).join('')}
+            </div>
+          </div>`).join('<hr style="border:none;border-top:1px solid var(--gray1);margin:1rem 0;">')}
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  if (typeof addSwipeDownToClose !== 'undefined') addSwipeDownToClose(overlay, () => overlay.remove());
+};
+
+// Show update banner if not dismissed
+function checkAndShowUpdateBanner() {
+  const dismissed = localStorage.getItem('updateBannerDismissed_' + APP_VERSION);
+  if (dismissed) return;
+  const lastVersion = localStorage.getItem('lastSeenVersion');
+  if (lastVersion && lastVersion !== APP_VERSION) {
+    setTimeout(() => {
+      const banner = document.createElement('div');
+      banner.style.cssText = 'position:fixed;bottom:70px;left:50%;transform:translateX(-50%);background:var(--sky);color:#fff;border-radius:12px;padding:.7rem 1rem;display:flex;align-items:center;gap:.7rem;z-index:5000;max-width:360px;box-shadow:0 4px 20px rgba(0,0,0,.2);';
+      banner.innerHTML = `
+        <span style="font-size:1.1rem;">🆕</span>
+        <div style="flex:1;font-size:.85rem;"><strong>Orlando Explorer updated!</strong><br>See what's new in v${APP_VERSION}</div>
+        <button onclick="openWhatsNew()" style="background:rgba(255,255,255,.25);border:none;border-radius:8px;padding:.3rem .6rem;color:#fff;cursor:pointer;font-size:.8rem;font-weight:600;">View</button>
+        <button onclick="localStorage.setItem('updateBannerDismissed_${APP_VERSION}','1');this.closest('div').remove();" style="background:none;border:none;color:#fff;cursor:pointer;font-size:1rem;padding:.2rem;">✕</button>`;
+      document.body.appendChild(banner);
+      setTimeout(() => { if (banner.parentNode) { banner.style.opacity='0'; banner.style.transition='opacity .5s'; setTimeout(()=>banner.remove(),500); } }, 8000);
+    }, 3000);
+  }
+  localStorage.setItem('lastSeenVersion', APP_VERSION);
+}
+
+// Rating prompt after some engagement
+function checkAndShowRatingPrompt() {
+  const rated = localStorage.getItem('hasRated');
+  if (rated) return;
+  const openCount = parseInt(localStorage.getItem('appOpenCount') || '0') + 1;
+  localStorage.setItem('appOpenCount', openCount);
+  if (openCount === 5 || openCount === 10) {
+    setTimeout(() => showRatingPrompt(), 4000);
+  }
+}
+
+function showRatingPrompt() {
+  if (localStorage.getItem('hasRated')) return;
+  let selectedStar = 0;
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay active';
+  overlay.style.cssText = 'z-index:3200;background:rgba(0,0,0,.5);';
+  overlay.innerHTML = `
+    <div style="position:absolute;bottom:0;left:0;right:0;background:var(--white);border-radius:20px 20px 0 0;padding:1.5rem;text-align:center;max-width:430px;margin:0 auto;">
+      <div style="font-size:2.5rem;margin-bottom:.5rem;">⭐</div>
+      <div style="font-size:1.1rem;font-weight:700;margin-bottom:.3rem;">Enjoying Orlando Explorer?</div>
+      <div style="font-size:.9rem;color:var(--gray3);margin-bottom:1.2rem;">Rate us to help others discover Orlando!</div>
+      <div id="rating-stars" style="display:flex;justify-content:center;gap:.5rem;margin-bottom:1.2rem;font-size:2rem;">
+        ${[1,2,3,4,5].map(i => `<span onclick="selectRatingStarNew(${i})" style="cursor:pointer;opacity:.4;transition:opacity .15s;" data-star="${i}">⭐</span>`).join('')}
+      </div>
+      <div style="display:flex;gap:.7rem;">
+        <button onclick="this.closest('.overlay').remove();localStorage.setItem('ratingPromptDismissed','1');" 
+                style="flex:1;padding:.7rem;background:var(--gray1);border:none;border-radius:10px;cursor:pointer;font-size:.9rem;color:var(--gray3);">Not Now</button>
+        <button id="rating-submit-btn" onclick="submitRatingNew(this.closest('.overlay'))" disabled
+                style="flex:1;padding:.7rem;background:var(--sky);border:none;border-radius:10px;cursor:pointer;font-size:.9rem;font-weight:600;color:#fff;opacity:.5;">Rate App</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  window._ratingSelected = 0;
+}
+
+function selectRatingStarNew(n) {
+  window._ratingSelected = n;
+  const stars = document.querySelectorAll('#rating-stars [data-star]');
+  stars.forEach(s => { s.style.opacity = parseInt(s.dataset.star) <= n ? '1' : '.4'; });
+  const btn = document.getElementById('rating-submit-btn');
+  if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
+}
+
+function submitRatingNew(overlayEl) {
+  const stars = window._ratingSelected || 0;
+  localStorage.setItem('hasRated', '1');
+  localStorage.setItem('userRating', stars);
+  overlayEl.remove();
+  if (stars >= 4) {
+    showToast('Thank you! Your rating means the world to us 🌟');
+  } else {
+    // Open feedback
+    if (typeof openSupportForm !== 'undefined') {
+      setTimeout(() => {
+        showToast('Sorry to hear that. Let us know how we can improve!');
+        setTimeout(openSupportForm, 1500);
+      }, 500);
+    } else {
+      showToast('Thank you for your feedback! We\'ll keep improving 💪');
+    }
+  }
+}
+
+// Initialize app-store readiness features on load
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(() => {
+    checkAndShowUpdateBanner();
+    checkAndShowRatingPrompt();
+    if (typeof applyLanguageToUI !== 'undefined') applyLanguageToUI();
+    if (typeof applyARIALabels !== 'undefined') applyARIALabels();
+  }, 1000);
+});
+
+// Also run after splash/onboarding
+const _origObComplete = typeof obComplete !== 'undefined' ? obComplete : null;
+if (_origObComplete) {
+  window._afterOnboardingInited = true;
+}
+
+// Make key functions available globally for easy access
+window.openMessages = typeof openMessages !== 'undefined' ? openMessages : function(){};
+window.openDealsScreen = typeof openDealsScreen !== 'undefined' ? openDealsScreen : function(){};
+window.openPrivacySafetySettings = typeof openPrivacySafetySettings !== 'undefined' ? openPrivacySafetySettings : function(){};
+window.openMyDownloads = typeof openMyDownloads !== 'undefined' ? openMyDownloads : function(){};
+window.t = t;
+
+console.log('Orlando Explorer v' + APP_VERSION + ' fully loaded 🌴');
+</script>
