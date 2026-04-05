@@ -4772,3 +4772,78 @@ function vendorEditEventImage(eventId, eventName) {
   }
 }
 </script>
+<script>
+// ===== FIX: DOM-based hero injection (replaces fragile string approach) =====
+// Override openDetail again with reliable DOM manipulation
+const _prevOpenDetail = openDetail;
+openDetail = function(id, type) {
+  _prevOpenDetail(id, type);
+  setTimeout(() => {
+    const hero = document.querySelector('#screen-detail .detail-hero');
+    if(!hero) return;
+    // Mark with data-imgid for refreshAllImagesFor targeting
+    hero.dataset.imgid = id;
+    hero.style.position = 'relative';
+    hero.style.overflow = 'hidden';
+    // Apply stored admin image if exists
+    const src = adminImages[id];
+    if(src) {
+      let img = hero.querySelector('img.custom-img');
+      if(!img) {
+        img = document.createElement('img');
+        img.className = 'custom-img';
+        img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;';
+        hero.insertBefore(img, hero.firstChild);
+      }
+      img.src = src;
+    }
+    // Inject Change Image button for admin (only once)
+    if(isAdminActive() && !hero.querySelector('.hero-change-btn')) {
+      const item = findItem(id, type);
+      const btn = document.createElement('button');
+      btn.className = 'hero-change-btn';
+      btn.innerHTML = '📷 Change Image';
+      btn.onclick = () => triggerImageUpload(id, item ? item.name : id, false);
+      hero.appendChild(btn);
+    }
+  }, 60);
+};
+
+// ===== FIX: refreshAllImagesFor — also update open detail page =====
+const _prevRefreshAll = refreshAllImagesFor;
+refreshAllImagesFor = function(id) {
+  _prevRefreshAll(id);
+  // Also update the currently open detail page if it matches
+  const hero = document.querySelector('#screen-detail .detail-hero');
+  if(hero && hero.dataset.imgid === id) {
+    const src = adminImages[id];
+    let img = hero.querySelector('img.custom-img');
+    if(src) {
+      if(!img) {
+        img = document.createElement('img');
+        img.className = 'custom-img';
+        img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;';
+        hero.insertBefore(img, hero.firstChild);
+      }
+      img.src = src;
+    } else if(img) { img.remove(); }
+  }
+};
+
+// ===== PATCH vendorEventCardHTML — camera button for vendor + admin =====
+const _origVendorEventCardHTML = vendorEventCardHTML;
+vendorEventCardHTML = function(e) {
+  let html = _origVendorEventCardHTML(e);
+  // Determine display image: admin overrides vendor
+  const src = adminImages[e.id] || vendorImages[e.id];
+  const isAdmin = isAdminActive();
+  const camBtn = `<button class="cam-btn" style="display:flex;" onclick="event.stopPropagation();${isAdmin ? `triggerImageUpload('${e.id}','${e.name.replace(/'/g,"\\'")}',false)` : `vendorEditEventImage('${e.id}','${e.name.replace(/'/g,"\\'")}')`}" title="${isAdmin?'Admin: edit image':'Edit event image'}">📷</button>`;
+  const imgOverlay = src ? `<img src="${src}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;border-radius:inherit;">` : '';
+  // Inject into vec-img
+  html = html.replace(
+    `<div class="vec-img" style="background:${(()=>{const g={'🎷':'linear-gradient(135deg,#1A1A2E,#0099CC)','💃':'linear-gradient(135deg,#FF6B35,#1A1A2E)','🎤':'linear-gradient(135deg,#2ECC71,#1A1A2E)','🎵':'linear-gradient(135deg,#9C27B0,#E91E63)','🎸':'linear-gradient(135deg,#FF9800,#E53935)'};return g[e.emoji]||'linear-gradient(135deg,var(--sky),var(--sun))'})()}">`,
+    `<div class="vec-img" data-imgid="${e.id}" style="background:${(()=>{const g={'🎷':'linear-gradient(135deg,#1A1A2E,#0099CC)','💃':'linear-gradient(135deg,#FF6B35,#1A1A2E)','🎤':'linear-gradient(135deg,#2ECC71,#1A1A2E)','🎵':'linear-gradient(135deg,#9C27B0,#E91E63)','🎸':'linear-gradient(135deg,#FF9800,#E53935)'};return g[e.emoji]||'linear-gradient(135deg,var(--sky),var(--sun))'})()};position:relative;overflow:hidden;">${imgOverlay}${camBtn}`
+  );
+  return html;
+};
+</script>
