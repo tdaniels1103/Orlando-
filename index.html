@@ -5736,3 +5736,64 @@ renderAccount = function() {
 // Trigger weather on initial load
 setTimeout(fetchOrlandoWeather, 400);
 </script>
+<script>
+// ===== FIX: Wire hero search input (DOMContentLoaded already fired) =====
+(function wireHeroSearch() {
+  const heroInput = document.getElementById('hero-search-input');
+  if(heroInput) {
+    // Remove old keyup listener behavior — replace with tap-to-open search
+    heroInput.onfocus = function() { this.blur(); openGlobalSearch(); };
+    heroInput.onclick = function() { openGlobalSearch(); };
+  }
+})();
+
+// ===== FIX: Dark mode toggle — inject into Account settings reliably =====
+const _origRenderAcctDark = renderAccount;
+renderAccount = function() {
+  _origRenderAcctDark();
+  if(!appState.user) return;
+  setTimeout(() => {
+    if(document.getElementById('dark-mode-row')) return;
+    // Find the settings menu item by icon
+    const items = document.querySelectorAll('#account-content .account-menu-item');
+    const settingsItem = [...items].find(el => el.querySelector('.icon')?.textContent === '⚙️');
+    if(!settingsItem) return;
+    const row = document.createElement('div');
+    row.id = 'dark-mode-row';
+    row.className = 'account-menu-item';
+    row.style.cssText = 'justify-content:space-between;cursor:default;';
+    row.innerHTML = `<span class="icon">🌙</span><span style="flex:1;">Dark Mode</span>
+      <button class="dark-toggle-btn ${_isDark()?'dark':'light'}" onclick="toggleDarkMode()"></button>`;
+    settingsItem.parentNode.insertBefore(row, settingsItem.nextSibling);
+  }, 80);
+};
+
+// ===== FIX: Notification settings accessible from Settings menu item =====
+// (Settings item onclick was previously overridden — consolidate here)
+const _origRenderAcctSettings = renderAccount;
+renderAccount = function() {
+  _origRenderAcctSettings();
+  if(!appState.user) return;
+  setTimeout(() => {
+    const items = document.querySelectorAll('#account-content .account-menu-item');
+    const settingsItem = [...items].find(el => el.querySelector('.icon')?.textContent === '⚙️');
+    if(settingsItem && !settingsItem._settingsWired) {
+      settingsItem._settingsWired = true;
+      settingsItem.onclick = openNotifSettings;
+    }
+  }, 90);
+};
+
+// ===== FIX: Apply dark mode to gamify overlays when toggled =====
+const _origToggleDark = toggleDarkMode;
+toggleDarkMode = function() {
+  _origToggleDark();
+  // Re-apply dark styles to dynamically created overlays
+  document.querySelectorAll('.gamify-overlay, .modal-overlay').forEach(el => {
+    el.style.background = _isDark() ? '#12121F' : '';
+  });
+  // Update search overlay header
+  const sh = document.getElementById('search-overlay-header');
+  if(sh) sh.style.background = _isDark() ? '#1E1E2E' : 'white';
+};
+</script>
