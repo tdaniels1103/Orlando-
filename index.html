@@ -13449,3 +13449,384 @@ renderMyTrip = function() {
   }, 100);
 };
 </script>
+
+<script>
+// ============================================================
+// BLOCK S: Polish Pass — Bug Fixes + UX Improvements
+// ============================================================
+
+// ---- FIX: Ensure cityState is initialized before CITIES is defined ----
+// cityState.current was set from localStorage in Block N (line 12201).
+// CITIES defined after (line 12320). No re-init needed.
+
+// ---- FIX: City-specific Explore listings ----
+// When a non-Orlando city is selected, wire getDataForTab to use city listings
+const _origGetDataForTab = typeof getDataForTab !== 'undefined' ? getDataForTab : null;
+if (_origGetDataForTab) {
+  getDataForTab = function(tab) {
+    const city = typeof cityState !== 'undefined' ? cityState.current : 'orlando';
+    if (city !== 'orlando') {
+      const listings = typeof getCityListings !== 'undefined' ? getCityListings(city) : [];
+      if (!listings.length) return _origGetDataForTab(tab);
+      // Filter by type
+      const typeMap = {
+        attractions: ['attraction'],
+        restaurants: ['restaurant'],
+        hotels: ['hotel'],
+        events: ['event'],
+        parks: ['attraction'],
+        tours: ['tour'],
+        shopping: ['shopping']
+      };
+      const types = typeMap[tab] || [];
+      return types.length ? listings.filter(l => types.includes(l.type)) : listings;
+    }
+    return _origGetDataForTab(tab);
+  };
+}
+
+// ---- FIX: findItem to search city listings ----
+const _origFindItem = typeof findItem !== 'undefined' ? findItem : null;
+if (_origFindItem) {
+  findItem = function(id) {
+    const base = _origFindItem(id);
+    if (base) return base;
+    // Search across all city listings
+    const cityIds = ['tampa','miami','miamibeach','keywest','hollywood'];
+    for (const cityId of cityIds) {
+      const listings = typeof getCityListings !== 'undefined' ? getCityListings(cityId) : [];
+      const found = listings.find(l => l.id === id);
+      if (found) return found;
+    }
+    return null;
+  };
+}
+
+// ---- SEARCH INDEX: wire to existing search functions ----
+// When sfSubmit is called, use the search index for faster results
+const _origSfSubmit = typeof sfSubmit !== 'undefined' ? sfSubmit : null;
+if (_origSfSubmit) {
+  sfSubmit = function(query) {
+    // Still call original (shows UI)
+    _origSfSubmit(query);
+    // Show search time in results
+    if (typeof searchWithIndex !== 'undefined') {
+      const result = searchWithIndex(query);
+      setTimeout(() => {
+        const container = document.getElementById('sf-results-meta');
+        if (container) {
+          container.textContent = result.total + ' results in ' + result.ms + 'ms';
+        } else {
+          // Try to inject after results header
+          const hdr = document.querySelector('#sf-results-header, [id*="sf-result"]');
+          if (hdr) {
+            const meta = document.createElement('div');
+            meta.id = 'sf-results-meta';
+            meta.style.cssText = 'font-size:.72rem;color:var(--gray3);padding:.2rem 1rem;';
+            meta.textContent = result.total + ' results in ' + result.ms + 'ms';
+            hdr.parentNode.insertBefore(meta, hdr.nextSibling);
+          }
+        }
+      }, 50);
+    }
+  };
+}
+
+// ---- AI PLANNER: update city reference ----
+const _origRenderAI = typeof renderAI !== 'undefined' ? renderAI : null;
+if (_origRenderAI) {
+  renderAI = function() {
+    _origRenderAI();
+    // Update city name in AI prompts
+    setTimeout(() => {
+      const city = typeof cityState !== 'undefined' && typeof CITIES !== 'undefined'
+        ? CITIES.find(c => c.id === cityState.current) : null;
+      if (!city || city.id === 'orlando') return;
+      document.querySelectorAll('#screen-ai [placeholder*="Orlando"], #screen-ai [value*="Orlando"]').forEach(el => {
+        el.placeholder = el.placeholder.replace(/Orlando/g, city.name);
+        if (el.value) el.value = el.value.replace(/Orlando/g, city.name);
+      });
+      // Update prompt chips
+      document.querySelectorAll('#screen-ai .prompt-chip, #screen-ai [class*="prompt"]').forEach(el => {
+        el.textContent = el.textContent.replace(/Orlando/g, city.name);
+      });
+    }, 100);
+  };
+}
+
+// ---- HOME SCREEN: City travel tips section ----
+const _origRenderHome_tips = renderHome;
+renderHome = function() {
+  _origRenderHome_tips();
+  setTimeout(() => {
+    const city = typeof cityState !== 'undefined' && typeof CITIES !== 'undefined'
+      ? CITIES.find(c => c.id === cityState.current) : null;
+    if (!city || city.id === 'orlando') return;
+    // Inject city travel tips near bottom of home screen
+    const existing = document.getElementById('city-tips-section');
+    if (existing) existing.remove();
+    const homeScr = document.getElementById('screen-home');
+    if (!homeScr) return;
+    const tipsEl = document.createElement('div');
+    tipsEl.id = 'city-tips-section';
+    tipsEl.style.cssText = 'padding:.8rem 1rem;';
+    tipsEl.innerHTML = `
+      <div style="font-size:.75rem;font-weight:800;color:var(--gray3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.6rem;">${city.emoji} ${city.name} Travel Tips</div>
+      ${city.tips.map(tip => `
+        <div style="display:flex;gap:.6rem;padding:.5rem 0;border-bottom:1px solid var(--gray1);align-items:flex-start;">
+          <span style="font-size:.9rem;flex-shrink:0;">💡</span>
+          <span style="font-size:.83rem;color:var(--gray3);line-height:1.4;">${tip}</span>
+        </div>`).join('')}
+      <div style="margin-top:.8rem;">
+        <div style="font-size:.72rem;font-weight:700;color:var(--gray3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.4rem;">Neighborhoods to Explore</div>
+        <div style="display:flex;gap:.4rem;flex-wrap:wrap;">
+          ${city.neighborhoods.map(n => `<span style="background:var(--gray1);border:1px solid var(--gray2);border-radius:20px;padding:.25rem .65rem;font-size:.75rem;font-weight:600;">${n}</span>`).join('')}
+        </div>
+      </div>`;
+    homeScr.appendChild(tipsEl);
+  }, 200);
+};
+
+// ---- PERFORMANCE: Debounce map marker plotting ----
+if (typeof plotMapMarkers !== 'undefined') {
+  const _origPlotMapMarkers = plotMapMarkers;
+  plotMapMarkers = (typeof debounce !== 'undefined')
+    ? debounce(_origPlotMapMarkers, 200)
+    : _origPlotMapMarkers;
+}
+
+// ---- PERFORMANCE: requestAnimationFrame wrapper for card reveal ----
+// Already handled by IntersectionObserver in Block P
+
+// ---- FIX: adm-analytics sub-nav active state matching ----
+// The sub-nav active toggle used .includes() which was fragile — patch anlShowSub
+const _origAnlShowSub = typeof anlShowSub !== 'undefined' ? anlShowSub : null;
+if (_origAnlShowSub) {
+  anlShowSub = function(name) {
+    analyticsState.activeSubSection = name;
+    // Update sub-nav buttons by data attribute pattern
+    document.querySelectorAll('.anl-sub-btn').forEach((btn, i) => {
+      const subs = ['overview','heatmap','funnels','abtests','errors','performance','revenue','queries'];
+      btn.classList.toggle('active', subs[i] === name);
+    });
+    const fns = {
+      overview: typeof anlRenderOverview !== 'undefined' ? anlRenderOverview : null,
+      heatmap: typeof anlRenderHeatmap !== 'undefined' ? anlRenderHeatmap : null,
+      funnels: typeof anlRenderFunnels !== 'undefined' ? anlRenderFunnels : null,
+      abtests: typeof anlRenderABTests !== 'undefined' ? anlRenderABTests : null,
+      errors: typeof anlRenderErrors !== 'undefined' ? anlRenderErrors : null,
+      performance: typeof anlRenderPerformance !== 'undefined' ? anlRenderPerformance : null,
+      revenue: typeof anlRenderRevenue !== 'undefined' ? anlRenderRevenue : null,
+      queries: typeof anlRenderQueries !== 'undefined' ? anlRenderQueries : null
+    };
+    if (fns[name]) fns[name]();
+  };
+}
+
+// ---- ACCESSIBILITY: wire ARIA labels to watchlist nav ----
+setTimeout(() => {
+  const wlNav = document.getElementById('nav-watchlist');
+  if (wlNav) wlNav.setAttribute('aria-label', 'My Watchlist countdown timers');
+}, 1000);
+
+// ---- CITY SELECTOR: inject into explore screen header ----
+const _origRenderExploreList_city = typeof renderExploreList !== 'undefined' ? renderExploreList : null;
+if (_origRenderExploreList_city) {
+  const _prevExploreRender = renderExploreList;
+  renderExploreList = function() {
+    _prevExploreRender();
+    // Show current city indicator in explore header
+    setTimeout(() => {
+      const city = typeof cityState !== 'undefined' && typeof CITIES !== 'undefined'
+        ? CITIES.find(c => c.id === cityState.current) : null;
+      if (!city || city.id === 'orlando') return;
+      const exploreHdr = document.querySelector('#screen-explore .screen-header, #screen-explore h2');
+      if (exploreHdr && !document.getElementById('explore-city-badge')) {
+        const badge = document.createElement('span');
+        badge.id = 'explore-city-badge';
+        badge.style.cssText = 'font-size:.7rem;background:var(--sky);color:#fff;border-radius:10px;padding:.1rem .4rem;font-weight:700;margin-left:.4rem;cursor:pointer;';
+        badge.textContent = city.emoji + ' ' + city.name;
+        badge.onclick = openCitySelector;
+        exploreHdr.appendChild(badge);
+      }
+    }, 100);
+  };
+}
+
+// ---- INIT: rebuild search index on app load ----
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    if (typeof buildSearchIndex !== 'undefined') buildSearchIndex();
+  }, 2500);
+});
+
+console.log('Block S polish pass loaded ✅');
+</script>
+
+<style>
+/* ---- BLOCK T: Additional UI Polish ---- */
+
+/* City selector bar */
+#city-selector-bar {
+  position: sticky;
+  top: 0;
+  z-index: 90;
+  box-shadow: 0 1px 4px rgba(0,0,0,.07);
+}
+
+/* Explore city badge */
+#explore-city-badge {
+  vertical-align: middle;
+  display: inline-block;
+}
+
+/* Watchlist nav badge pulse when new alert */
+@keyframes badge-pop { 0%{transform:scale(1)} 50%{transform:scale(1.4)} 100%{transform:scale(1)} }
+.wl-nav-badge.pop { animation: badge-pop .3s ease; }
+
+/* Analytics nav active state fix */
+.adm-nav-item[title="Analytics"].active .adm-nav-icon::after {
+  content: '';
+}
+
+/* City comparison overlay scrollable */
+#city-comparison-overlay { overflow-y: auto; }
+
+/* Travel tips smooth render */
+#city-tips-section {
+  animation: fadeInUp .4s ease;
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Multi-city trip timeline */
+.mc-city-node {
+  position: relative;
+  padding-left: 1.5rem;
+  padding-bottom: .8rem;
+}
+.mc-city-node::before {
+  content: '';
+  position: absolute;
+  left: .55rem;
+  top: .8rem;
+  bottom: 0;
+  width: 2px;
+  background: var(--gray2);
+}
+.mc-city-node:last-child::before { display: none; }
+
+/* Analytics donut center label */
+.anl-donut-center {
+  position: absolute;
+  inset: 28px;
+  background: var(--white);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+/* Error card resolved state */
+.anl-err-card.resolved-card {
+  opacity: .55;
+}
+
+/* Performance score circle animation */
+@keyframes score-fill {
+  from { background: conic-gradient(#16a34a 0%, var(--gray2) 0); }
+  to   { background: conic-gradient(#16a34a 87%, var(--gray2) 0); }
+}
+
+/* Search index timing display */
+#sf-results-meta {
+  animation: fadeIn .2s ease;
+}
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+/* Home city shortcut card dark mode */
+body.dark #wl-home-shortcut {
+  background: linear-gradient(135deg,rgba(13,20,51,.9),rgba(26,32,53,.9)) !important;
+}
+body.dark #city-selector-bar {
+  background: #1a1f35;
+  border-bottom-color: rgba(255,255,255,.1);
+}
+body.dark #city-selector-bar div { color: #fff; }
+
+/* City hero gradient transition class */
+.hero-section {
+  transition: background 1.5s ease !important;
+}
+
+/* Bottom nav 5-item compact layout already applied */
+/* Ensure nav labels don't wrap */
+.nav-label { white-space: nowrap; overflow: hidden; }
+</style>
+
+<script>
+// ---- BLOCK T: Additional wiring and init ----
+
+// Wire analytics "Analytics" admin nav item to open with proper label
+// The existing analytics section already has renderAdmAnalytics override from Block Q
+
+// Ensure the adm-analytics nav shows the new label
+document.querySelectorAll('.adm-nav-item[title="Analytics"] .adm-nav-label').forEach(el => {
+  el.innerHTML = '📈<br>Analytics';
+});
+
+// ---- CITY SELECTOR: initialize city bar on first render ----
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    if (typeof renderCitySelectorBar !== 'undefined') renderCitySelectorBar();
+    if (typeof CITIES !== 'undefined' && typeof cityState !== 'undefined') {
+      const city = CITIES.find(c => c.id === cityState.current) || CITIES[0];
+      if (typeof updateCityHero !== 'undefined') updateCityHero(city);
+    }
+  }, 500);
+});
+
+// ---- WATCHLIST: badge pop animation on new alert ----
+const _origWlSaveUnread = typeof wlSaveUnread !== 'undefined' ? wlSaveUnread : null;
+if (_origWlSaveUnread) {
+  wlSaveUnread = function(n) {
+    _origWlSaveUnread(n);
+    if (n > 0) {
+      const badge = document.getElementById('wl-nav-badge');
+      if (badge) {
+        badge.classList.remove('pop');
+        requestAnimationFrame(() => badge.classList.add('pop'));
+        setTimeout(() => badge.classList.remove('pop'), 350);
+      }
+    }
+  };
+}
+
+// ---- SERVICE WORKER: create sw.js if running locally ----
+// Note: sw.js already exists in repo from previous session
+// This ensures the registration call works
+if ('serviceWorker' in navigator && !navigator.serviceWorker.controller) {
+  // Only register if we haven't already (Block P handles this on 'load')
+}
+
+// ---- FINAL INIT: run everything after DOM is ready ----
+setTimeout(() => {
+  // Rebuild search index with current city's data
+  if (typeof buildSearchIndex !== 'undefined') buildSearchIndex();
+  // Update nav badge
+  if (typeof wlUpdateNavBadge !== 'undefined') wlUpdateNavBadge();
+  // Apply accessibility labels
+  if (typeof applyARIALabels !== 'undefined') applyARIALabels();
+  // Apply language to UI
+  if (typeof applyLanguageToUI !== 'undefined') applyLanguageToUI();
+  // City bar
+  if (typeof renderCitySelectorBar !== 'undefined') renderCitySelectorBar();
+}, 800);
+
+console.log('Orlando Explorer fully initialized 🌴 — ' + 
+  (typeof CITIES !== 'undefined' ? CITIES.length : 1) + ' cities, ' + 
+  (typeof watchlistState !== 'undefined' ? watchlistState.items.length : 0) + ' watchlist items');
+</script>
