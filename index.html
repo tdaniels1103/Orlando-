@@ -22611,3 +22611,664 @@ setTimeout(() => {
   }
 }, 10000);
 </script>
+<script>
+/* ===== BLOCK AA1: Restaurant Reservation Flow ===== */
+const RESTAURANT_TIMES = ['11:30 AM','12:00 PM','12:30 PM','1:00 PM','1:30 PM','2:00 PM','5:00 PM','5:30 PM','6:00 PM','6:30 PM','7:00 PM','7:30 PM','8:00 PM','8:30 PM','9:00 PM'];
+const MENU_DATA = {
+  default: [
+    { section:'Starters', items:[{ name:'Crab Cakes', price:18, desc:'Jumbo lump crab, remoulade', emoji:'🦀' },{ name:'Bruschetta', price:12, desc:'Tomato, basil, balsamic', emoji:'🍅' },{ name:'Shrimp Cocktail', price:16, desc:'Gulf shrimp, cocktail sauce', emoji:'🍤' }]},
+    { section:'Mains', items:[{ name:'Grilled Salmon', price:28, desc:'Lemon butter, asparagus', emoji:'🐟' },{ name:'NY Strip Steak', price:42, desc:'12oz, garlic mash, truffle butter', emoji:'🥩' },{ name:'Pasta Primavera', price:22, desc:'Seasonal vegetables, basil cream', emoji:'🍝' },{ name:'Fish Tacos', price:19, desc:'Beer-battered, mango slaw', emoji:'🌮' }]},
+    { section:'Desserts', items:[{ name:'Key Lime Pie', price:9, desc:'Florida classic, graham crust', emoji:'🥧' },{ name:'Chocolate Lava Cake', price:11, desc:'Vanilla ice cream, berry coulis', emoji:'🍫' }]},
+  ]
+};
+
+window._reservations = JSON.parse(localStorage.getItem('reservations') || '[]');
+function saveReservations() { localStorage.setItem('reservations', JSON.stringify(window._reservations)); }
+
+function openRestaurantBooking(item) {
+  const name = (typeof item === 'string' ? item : item?.name) || 'Restaurant';
+  const emoji = (typeof item === 'object' ? item?.emoji : '') || '🍽️';
+  const existing = document.getElementById('res-booking-overlay');
+  if (existing) existing.remove();
+
+  const today = new Date().toISOString().slice(0,10);
+  const el = document.createElement('div');
+  el.id = 'res-booking-overlay';
+  el.style.cssText = 'position:fixed;inset:0;z-index:8000;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;max-width:430px;left:50%;transform:translateX(-50%);';
+  el.innerHTML = `<div style="background:var(--card-bg,#fff);border-radius:20px 20px 0 0;width:100%;max-height:92vh;overflow-y:auto;">
+    <div style="background:linear-gradient(135deg,#9C27B0,#E91E63);padding:20px 16px;border-radius:20px 20px 0 0;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>
+          <div style="font-size:32px;margin-bottom:6px;">${emoji}</div>
+          <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:#fff;">${name}</div>
+          <div style="font-size:12px;color:rgba(255,255,255,.8);margin-top:2px;">Make a Reservation</div>
+        </div>
+        <button onclick="document.getElementById('res-booking-overlay').remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;">✕</button>
+      </div>
+    </div>
+    <div style="padding:20px 16px 32px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+        <div>
+          <label style="font-size:11px;font-weight:700;color:#9E9E9E;display:block;margin-bottom:5px;">DATE</label>
+          <input id="res-date" type="date" value="${today}" min="${today}" style="width:100%;border:1px solid var(--border,#eee);border-radius:10px;padding:10px;font-size:13px;font-family:'DM Sans',sans-serif;background:var(--card-bg,#fff);color:var(--text-primary);box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:700;color:#9E9E9E;display:block;margin-bottom:5px;">PARTY SIZE</label>
+          <select id="res-party" style="width:100%;border:1px solid var(--border,#eee);border-radius:10px;padding:10px;font-size:13px;font-family:'DM Sans',sans-serif;background:var(--card-bg,#fff);color:var(--text-primary);box-sizing:border-box;">
+            ${[1,2,3,4,5,6,7,8].map(n => `<option value="${n}" ${n===2?'selected':''}>${n} ${n===1?'guest':'guests'}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div style="margin-bottom:16px;">
+        <label style="font-size:11px;font-weight:700;color:#9E9E9E;display:block;margin-bottom:8px;">SELECT TIME</label>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;" id="res-times">
+          ${RESTAURANT_TIMES.map((t,i) => {
+            const avail = Math.random() > 0.3;
+            return `<button class="res-time-btn ${i===4?'selected':''}" onclick="selectResTime(this,'${t}')" ${!avail?'disabled':''} style="padding:8px 4px;border:2px solid ${i===4?'#9C27B0':'var(--border,#eee)'};border-radius:8px;font-size:11px;font-weight:700;cursor:${avail?'pointer':'not-allowed'};background:${i===4?'#F3E5F5':avail?'var(--card-bg,#fff)':'#F5F5F5'};color:${i===4?'#9C27B0':avail?'var(--text-primary)':'#BDBDBD'};font-family:'DM Sans',sans-serif;transition:all .15s;">${t}</button>`;
+          }).join('')}
+        </div>
+      </div>
+      <div style="margin-bottom:16px;">
+        <label style="font-size:11px;font-weight:700;color:#9E9E9E;display:block;margin-bottom:5px;">SPECIAL REQUESTS</label>
+        <textarea id="res-notes" placeholder="Allergies, celebrations, seating preferences..." style="width:100%;border:1px solid var(--border,#eee);border-radius:10px;padding:10px;font-size:13px;font-family:'DM Sans',sans-serif;background:var(--card-bg,#fff);color:var(--text-primary);resize:none;height:72px;box-sizing:border-box;"></textarea>
+      </div>
+      <div style="background:#F3E5F5;border-radius:12px;padding:12px 14px;margin-bottom:16px;display:flex;align-items:center;gap:10px;">
+        <span style="font-size:20px;">💡</span>
+        <div style="font-size:12px;color:#7B1FA2;">No credit card required to reserve. Modify or cancel up to 2 hours before your reservation.</div>
+      </div>
+      <button onclick="confirmReservation('${name.replace(/'/g,"\\'")}','${emoji}')" style="width:100%;background:linear-gradient(135deg,#9C27B0,#E91E63);border:none;border-radius:14px;padding:15px;color:#fff;font-size:15px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;">Reserve Table</button>
+      <button onclick="openMenuViewer('${name.replace(/'/g,"\\'")}','${emoji}')" style="width:100%;background:none;border:2px solid #9C27B0;border-radius:14px;padding:12px;color:#9C27B0;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:8px;">📋 View Menu</button>
+    </div>
+  </div>`;
+  el.onclick = e => { if (e.target === el) el.remove(); };
+  document.body.appendChild(el);
+  window._selectedResTime = RESTAURANT_TIMES[4];
+}
+window.openRestaurantBooking = openRestaurantBooking;
+
+function selectResTime(btn, time) {
+  window._selectedResTime = time;
+  document.querySelectorAll('.res-time-btn').forEach(b => {
+    b.classList.remove('selected');
+    b.style.borderColor = 'var(--border,#eee)';
+    b.style.background = 'var(--card-bg,#fff)';
+    b.style.color = 'var(--text-primary)';
+  });
+  btn.classList.add('selected');
+  btn.style.borderColor = '#9C27B0';
+  btn.style.background = '#F3E5F5';
+  btn.style.color = '#9C27B0';
+}
+window.selectResTime = selectResTime;
+
+function confirmReservation(name, emoji) {
+  const date = document.getElementById('res-date')?.value;
+  const party = document.getElementById('res-party')?.value;
+  const notes = document.getElementById('res-notes')?.value || '';
+  const time = window._selectedResTime;
+  if (!date || !time) { if (typeof showToast !== 'undefined') showToast('Please select a date and time'); return; }
+
+  const id = 'res_' + Date.now();
+  const res = { id, name, emoji, date, time, party: parseInt(party), notes, confirmed: true, createdAt: Date.now() };
+  window._reservations.push(res);
+  saveReservations();
+
+  document.getElementById('res-booking-overlay')?.remove();
+  showReservationConfirmation(res);
+  if (typeof awardPoints !== 'undefined') awardPoints(25, 'Restaurant reservation');
+  if (typeof pushNotif !== 'undefined') pushNotif('trip', '🍽️', 'Reservation Confirmed!', `${name} · ${time} · ${party} guests · ${date}`);
+}
+window.confirmReservation = confirmReservation;
+
+function showReservationConfirmation(res) {
+  const el = document.createElement('div');
+  el.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;max-width:430px;left:50%;transform:translateX(-50%);';
+  el.innerHTML = `<div style="background:var(--card-bg,#fff);border-radius:20px;padding:28px 20px;width:300px;text-align:center;">
+    <div style="font-size:56px;margin-bottom:12px;animation:stampReveal .5s cubic-bezier(.175,.885,.32,1.275);">🎉</div>
+    <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--text-primary);">You're Booked!</div>
+    <div style="font-size:24px;margin:10px 0 4px;">${res.emoji}</div>
+    <div style="font-size:16px;font-weight:700;color:#9C27B0;margin-bottom:8px;">${res.name}</div>
+    <div style="background:#F3E5F5;border-radius:12px;padding:12px;margin-bottom:16px;">
+      <div style="font-size:13px;color:var(--text-primary);">📅 ${res.date}</div>
+      <div style="font-size:13px;color:var(--text-primary);">🕐 ${res.time}</div>
+      <div style="font-size:13px;color:var(--text-primary);">👥 ${res.party} ${res.party===1?'guest':'guests'}</div>
+      <div style="font-size:11px;font-weight:800;color:#9C27B0;margin-top:6px;letter-spacing:.06em;">CONFIRMATION #${res.id.slice(-6).toUpperCase()}</div>
+    </div>
+    <button onclick="this.closest('[style*=inset]').remove()" style="width:100%;background:#9C27B0;border:none;border-radius:12px;padding:13px;color:#fff;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">Done</button>
+  </div>`;
+  el.onclick = e => { if (e.target === el) el.remove(); };
+  document.body.appendChild(el);
+}
+
+function openMenuViewer(name, emoji) {
+  document.getElementById('res-booking-overlay')?.remove();
+  const menu = MENU_DATA.default;
+  const el = document.createElement('div');
+  el.id = 'menu-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:8000;overflow-y:auto;max-width:430px;left:50%;transform:translateX(-50%);';
+  el.innerHTML = `<div style="background:linear-gradient(135deg,#9C27B0,#E91E63);padding:18px 16px 20px;position:sticky;top:0;z-index:1;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <button onclick="document.getElementById('menu-overlay').remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;">←</button>
+      <div>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;">${emoji} ${name}</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.8);">Sample Menu</div>
+      </div>
+    </div>
+  </div>
+  <div style="padding:16px 16px 80px;">
+    ${menu.map(s => `<div style="margin-bottom:20px;">
+      <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--text-primary);margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid var(--border,#eee);">${s.section}</div>
+      ${s.items.map(item => `<div style="display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--border,#F5F5F5);">
+        <span style="font-size:28px;flex-shrink:0;">${item.emoji}</span>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:700;color:var(--text-primary);">${item.name}</div>
+          <div style="font-size:12px;color:#9E9E9E;margin-top:2px;">${item.desc}</div>
+        </div>
+        <div style="font-size:14px;font-weight:800;color:#9C27B0;flex-shrink:0;">$${item.price}</div>
+      </div>`).join('')}
+    </div>`).join('')}
+    <button onclick="document.getElementById('menu-overlay').remove();openRestaurantBooking({name:'${name.replace(/'/g,"\\'")}',emoji:'${emoji}'})" style="width:100%;background:linear-gradient(135deg,#9C27B0,#E91E63);border:none;border-radius:14px;padding:14px;color:#fff;font-size:14px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;">Reserve a Table</button>
+  </div>`;
+  document.body.appendChild(el);
+}
+window.openMenuViewer = openMenuViewer;
+
+function viewMyReservations() {
+  const el = document.createElement('div');
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;overflow-y:auto;max-width:430px;left:50%;transform:translateX(-50%);';
+  const res = window._reservations.slice().reverse();
+  el.innerHTML = `<div style="background:var(--card-bg,#fff);border-bottom:1px solid var(--border,#eee);padding:14px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:1;">
+    <button onclick="this.closest('[style*=inset]').remove()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-primary);">←</button>
+    <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--text-primary);">My Reservations</div>
+  </div>
+  <div style="padding:16px 16px 80px;">
+    ${res.length === 0 ? '<div style="text-align:center;padding:40px;color:#9E9E9E;">No reservations yet</div>' :
+      res.map(r => `<div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:10px;border-left:4px solid #9C27B0;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+          <span style="font-size:24px;">${r.emoji}</span>
+          <div style="flex:1;"><div style="font-size:14px;font-weight:700;color:var(--text-primary);">${r.name}</div>
+          <div style="font-size:11px;font-weight:700;color:#9C27B0;">CONFIRMED · #${r.id.slice(-6).toUpperCase()}</div></div>
+        </div>
+        <div style="display:flex;gap:16px;font-size:12px;color:#9E9E9E;">
+          <span>📅 ${r.date}</span><span>🕐 ${r.time}</span><span>👥 ${r.party} guests</span>
+        </div>
+        ${r.notes ? `<div style="font-size:11px;color:#9E9E9E;margin-top:6px;font-style:italic;">${r.notes}</div>` : ''}
+        <button onclick="cancelReservation('${r.id}',this.closest('div[style*=border-left]'))" style="margin-top:10px;background:none;border:1px solid #BDBDBD;border-radius:8px;padding:6px 12px;font-size:11px;font-weight:700;color:#9E9E9E;cursor:pointer;font-family:'DM Sans',sans-serif;">Cancel Reservation</button>
+      </div>`).join('')}
+  </div>`;
+  document.body.appendChild(el);
+}
+window.viewMyReservations = viewMyReservations;
+
+function cancelReservation(id, card) {
+  if (!confirm('Cancel this reservation?')) return;
+  window._reservations = window._reservations.filter(r => r.id !== id);
+  saveReservations();
+  card?.remove();
+  if (typeof showToast !== 'undefined') showToast('Reservation cancelled');
+}
+window.cancelReservation = cancelReservation;
+</script>
+<script>
+/* ===== BLOCK AA2: Hotel Booking Flow ===== */
+const ROOM_TYPES = [
+  { id:'std',  name:'Standard Room',   size:'320 sq ft', beds:'1 King',    price:89,  emoji:'🛏️', perks:['Free WiFi','TV','AC'] },
+  { id:'dbl',  name:'Double Queen',    size:'380 sq ft', beds:'2 Queens',  price:109, emoji:'🛌', perks:['Free WiFi','Mini-fridge','Sleeps 4'] },
+  { id:'ste',  name:'Junior Suite',    size:'560 sq ft', beds:'1 King',    price:159, emoji:'🛋️', perks:['Living area','Kitchenette','Free WiFi','Balcony'] },
+  { id:'pent', name:'Premium Suite',   size:'820 sq ft', beds:'1 King',    price:249, emoji:'🏙️', perks:['City view','Jetted tub','Lounge access','Concierge'] },
+];
+
+window._hotelBookings = JSON.parse(localStorage.getItem('hotelBookings') || '[]');
+function saveHotelBookings() { localStorage.setItem('hotelBookings', JSON.stringify(window._hotelBookings)); }
+
+function openHotelBooking(item) {
+  const name = (typeof item === 'string' ? item : item?.name) || 'Hotel';
+  const emoji = (typeof item === 'object' ? item?.emoji : '') || '🏨';
+  const price = (typeof item === 'object' ? item?.priceNum : null) || 129;
+  const existing = document.getElementById('hotel-booking-overlay');
+  if (existing) existing.remove();
+
+  const today = new Date();
+  const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate()+1);
+  const dayAfter = new Date(today); dayAfter.setDate(dayAfter.getDate()+2);
+  const fmt = d => d.toISOString().slice(0,10);
+
+  const el = document.createElement('div');
+  el.id = 'hotel-booking-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:8000;overflow-y:auto;max-width:430px;left:50%;transform:translateX(-50%);';
+  el.innerHTML = `
+    <div style="background:linear-gradient(135deg,#1565C0,#0097A7);padding:18px 16px 20px;position:sticky;top:0;z-index:1;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button onclick="document.getElementById('hotel-booking-overlay').remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;">←</button>
+        <div>
+          <div style="font-size:24px;">${emoji}</div>
+          <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;">${name}</div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:16px;">
+      <!-- Dates & guests -->
+      <div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:14px;">
+        <div style="font-size:12px;font-weight:700;color:#9E9E9E;margin-bottom:10px;">STAY DETAILS</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+          <div>
+            <label style="font-size:10px;font-weight:700;color:#9E9E9E;display:block;margin-bottom:4px;">CHECK-IN</label>
+            <input id="hotel-checkin" type="date" value="${fmt(tomorrow)}" min="${fmt(today)}" onchange="updateHotelTotal()" style="width:100%;border:1px solid var(--border,#eee);border-radius:8px;padding:8px;font-size:12px;font-family:'DM Sans',sans-serif;background:var(--card-bg,#fff);color:var(--text-primary);box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="font-size:10px;font-weight:700;color:#9E9E9E;display:block;margin-bottom:4px;">CHECK-OUT</label>
+            <input id="hotel-checkout" type="date" value="${fmt(dayAfter)}" min="${fmt(dayAfter)}" onchange="updateHotelTotal()" style="width:100%;border:1px solid var(--border,#eee);border-radius:8px;padding:8px;font-size:12px;font-family:'DM Sans',sans-serif;background:var(--card-bg,#fff);color:var(--text-primary);box-sizing:border-box;">
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div>
+            <label style="font-size:10px;font-weight:700;color:#9E9E9E;display:block;margin-bottom:4px;">ADULTS</label>
+            <select id="hotel-adults" onchange="updateHotelTotal()" style="width:100%;border:1px solid var(--border,#eee);border-radius:8px;padding:8px;font-size:12px;font-family:'DM Sans',sans-serif;background:var(--card-bg,#fff);color:var(--text-primary);">
+              ${[1,2,3,4].map(n=>`<option value="${n}" ${n===2?'selected':''}>${n} adult${n>1?'s':''}</option>`).join('')}
+            </select>
+          </div>
+          <div>
+            <label style="font-size:10px;font-weight:700;color:#9E9E9E;display:block;margin-bottom:4px;">CHILDREN</label>
+            <select id="hotel-children" onchange="updateHotelTotal()" style="width:100%;border:1px solid var(--border,#eee);border-radius:8px;padding:8px;font-size:12px;font-family:'DM Sans',sans-serif;background:var(--card-bg,#fff);color:var(--text-primary);">
+              ${[0,1,2,3,4].map(n=>`<option value="${n}" ${n===0?'selected':''}>${n} child${n>1?'ren':n===1?'':'ren'}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Room types -->
+      <div style="font-size:12px;font-weight:700;color:#9E9E9E;margin-bottom:8px;">SELECT ROOM</div>
+      <div id="hotel-rooms" style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px;">
+        ${ROOM_TYPES.map((r,i) => `<div class="hotel-room-card ${i===0?'selected':''}" data-room="${r.id}" data-price="${r.price}" onclick="selectHotelRoom('${r.id}',this)" style="background:var(--card-bg,#fff);border:2px solid ${i===0?'#1565C0':'var(--border,#eee)'};border-radius:14px;padding:14px;cursor:pointer;transition:border-color .15s;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
+            <div style="display:flex;gap:10px;align-items:flex-start;flex:1;">
+              <span style="font-size:26px;">${r.emoji}</span>
+              <div>
+                <div style="font-size:14px;font-weight:700;color:var(--text-primary);">${r.name}</div>
+                <div style="font-size:11px;color:#9E9E9E;">${r.size} · ${r.beds}</div>
+                <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:5px;">
+                  ${r.perks.map(p => `<span style="font-size:10px;background:#E3F2FD;color:#1565C0;border-radius:6px;padding:2px 6px;font-weight:700;">${p}</span>`).join('')}
+                </div>
+              </div>
+            </div>
+            <div style="text-align:right;flex-shrink:0;">
+              <div style="font-size:18px;font-weight:800;color:#1565C0;">$${r.price}</div>
+              <div style="font-size:10px;color:#9E9E9E;">/ night</div>
+              <div style="width:18px;height:18px;border-radius:50%;border:2px solid ${i===0?'#1565C0':'#BDBDBD'};margin:6px 0 0 auto;display:flex;align-items:center;justify-content:center;">
+                ${i===0?'<div style="width:10px;height:10px;border-radius:50%;background:#1565C0;"></div>':''}
+              </div>
+            </div>
+          </div>
+        </div>`).join('')}
+      </div>
+
+      <!-- Pricing breakdown -->
+      <div id="hotel-price-summary" style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:14px;"></div>
+
+      <!-- Confirm -->
+      <button onclick="confirmHotelBooking('${name.replace(/'/g,"\\'")}','${emoji}')" style="width:100%;background:linear-gradient(135deg,#1565C0,#0097A7);border:none;border-radius:14px;padding:15px;color:#fff;font-size:15px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;margin-bottom:80px;">Confirm Booking</button>
+    </div>`;
+  document.body.appendChild(el);
+  window._selectedRoomId = ROOM_TYPES[0].id;
+  updateHotelTotal();
+}
+window.openHotelBooking = openHotelBooking;
+
+function selectHotelRoom(roomId, card) {
+  window._selectedRoomId = roomId;
+  document.querySelectorAll('.hotel-room-card').forEach(c => {
+    const sel = c.dataset.room === roomId;
+    c.style.borderColor = sel ? '#1565C0' : 'var(--border,#eee)';
+    const radio = c.querySelector('div[style*="border-radius:50%"]');
+    if (radio) radio.innerHTML = sel ? '<div style="width:10px;height:10px;border-radius:50%;background:#1565C0;"></div>' : '';
+    if (radio) radio.style.borderColor = sel ? '#1565C0' : '#BDBDBD';
+  });
+  updateHotelTotal();
+}
+window.selectHotelRoom = selectHotelRoom;
+
+function updateHotelTotal() {
+  const checkin = new Date(document.getElementById('hotel-checkin')?.value || Date.now());
+  const checkout = new Date(document.getElementById('hotel-checkout')?.value || Date.now()+86400000);
+  const nights = Math.max(1, Math.round((checkout - checkin) / 86400000));
+  const room = ROOM_TYPES.find(r => r.id === (window._selectedRoomId || ROOM_TYPES[0].id));
+  if (!room) return;
+  const nightly = room.price;
+  const subtotal = nightly * nights;
+  const taxes = subtotal * 0.12;
+  const resort = 15 * nights;
+  const total = subtotal + taxes + resort;
+
+  const el = document.getElementById('hotel-price-summary');
+  if (!el) return;
+  el.innerHTML = `
+    <div style="font-size:12px;font-weight:700;color:#9E9E9E;margin-bottom:10px;">PRICE BREAKDOWN</div>
+    <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text-primary);margin-bottom:6px;"><span>$${nightly}/night × ${nights} night${nights>1?'s':''}</span><span>$${subtotal.toFixed(0)}</span></div>
+    <div style="display:flex;justify-content:space-between;font-size:12px;color:#9E9E9E;margin-bottom:6px;"><span>Taxes & fees (12%)</span><span>$${taxes.toFixed(0)}</span></div>
+    <div style="display:flex;justify-content:space-between;font-size:12px;color:#9E9E9E;margin-bottom:10px;"><span>Resort fee</span><span>$${resort.toFixed(0)}</span></div>
+    <div style="display:flex;justify-content:space-between;font-size:15px;font-weight:800;color:var(--text-primary);padding-top:10px;border-top:1px solid var(--border,#eee);"><span>Total</span><span style="color:#1565C0;">$${total.toFixed(0)}</span></div>`;
+}
+window.updateHotelTotal = updateHotelTotal;
+
+function confirmHotelBooking(name, emoji) {
+  const checkin = document.getElementById('hotel-checkin')?.value;
+  const checkout = document.getElementById('hotel-checkout')?.value;
+  const adults = document.getElementById('hotel-adults')?.value;
+  const children = document.getElementById('hotel-children')?.value;
+  const room = ROOM_TYPES.find(r => r.id === window._selectedRoomId) || ROOM_TYPES[0];
+  const nights = Math.max(1, Math.round((new Date(checkout)-new Date(checkin))/86400000));
+  const total = (room.price * nights * 1.12 + 15 * nights).toFixed(0);
+
+  const booking = { id:'hb_'+Date.now(), name, emoji, checkin, checkout, adults, children, roomName:room.name, roomEmoji:room.emoji, nights, total, confirmed:true };
+  window._hotelBookings.push(booking);
+  saveHotelBookings();
+
+  document.getElementById('hotel-booking-overlay')?.remove();
+
+  const el = document.createElement('div');
+  el.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;max-width:430px;left:50%;transform:translateX(-50%);';
+  el.innerHTML = `<div style="background:var(--card-bg,#fff);border-radius:20px;padding:28px 20px;width:300px;text-align:center;">
+    <div style="font-size:56px;margin-bottom:12px;animation:stampReveal .5s cubic-bezier(.175,.885,.32,1.275);">🏨</div>
+    <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--text-primary);">Room Booked!</div>
+    <div style="font-size:22px;margin:8px 0 4px;">${emoji}</div>
+    <div style="font-size:15px;font-weight:700;color:#1565C0;">${name}</div>
+    <div style="background:#E3F2FD;border-radius:12px;padding:12px;margin:12px 0;">
+      <div style="font-size:13px;color:var(--text-primary);">${room.emoji} ${room.name}</div>
+      <div style="font-size:13px;color:var(--text-primary);">📅 ${checkin} → ${checkout}</div>
+      <div style="font-size:13px;color:var(--text-primary);">👥 ${adults} adults, ${children} children</div>
+      <div style="font-size:16px;font-weight:800;color:#1565C0;margin-top:6px;">Total: $${total}</div>
+      <div style="font-size:10px;font-weight:800;color:#1565C0;letter-spacing:.06em;margin-top:4px;">BOOKING #${booking.id.slice(-6).toUpperCase()}</div>
+    </div>
+    <button onclick="this.closest('[style*=inset]').remove()" style="width:100%;background:#1565C0;border:none;border-radius:12px;padding:13px;color:#fff;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">Done</button>
+  </div>`;
+  el.onclick = e => { if (e.target === el) el.remove(); };
+  document.body.appendChild(el);
+  if (typeof awardPoints !== 'undefined') awardPoints(50, 'Hotel booked');
+  if (typeof pushNotif !== 'undefined') pushNotif('trip', '🏨', 'Hotel Booked!', `${name} · ${checkin} – ${checkout} · $${total}`);
+}
+window.confirmHotelBooking = confirmHotelBooking;
+</script>
+<script>
+/* ===== BLOCK AA3: Travel Personality Quiz + Leaderboard ===== */
+
+/* ---------- TRAVEL QUIZ ---------- */
+const QUIZ_QUESTIONS = [
+  { q:'What\'s your ideal Orlando day?', opts:[{t:'🎢 Riding every coaster at Universal',v:'thrill'},{t:'🌺 Exploring gardens & hidden gems',v:'explorer'},{t:'🍽️ Eating through every restaurant',v:'foodie'},{t:'👨‍👩‍👧 Family fun at Disney with the kids',v:'family'}] },
+  { q:'How do you prefer to travel?', opts:[{t:'⚡ Spontaneous — wing it!',v:'thrill'},{t:'🗺️ Carefully planned itinerary',v:'explorer'},{t:'🍷 Reservations at the best spots',v:'foodie'},{t:'📸 Capturing every moment',v:'family'}] },
+  { q:'What\'s your vacation vibe?', opts:[{t:'💰 Budget-savvy — max fun, min spend',v:'explorer'},{t:'👑 Luxury all the way',v:'foodie'},{t:'🎉 Party & nightlife',v:'thrill'},{t:'😴 Relax & recharge',v:'family'}] },
+  { q:'Ideal park experience?', opts:[{t:'⏱️ No wait times — early morning dash',v:'explorer'},{t:'🎆 Staying for fireworks & nighttime shows',v:'family'},{t:'🍕 Food & drink around the world',v:'foodie'},{t:'🏆 Completing every ride & attraction',v:'thrill'}] },
+  { q:'What do you always overpack?', opts:[{t:'👟 Comfortable walking shoes',v:'explorer'},{t:'📱 Camera gear & phone accessories',v:'family'},{t:'🧴 Sunscreen & theme park supplies',v:'thrill'},{t:'💳 Credit cards for dining',v:'foodie'}] },
+];
+
+const QUIZ_RESULTS = {
+  thrill: { type:'Thrill Seeker', emoji:'🎢', desc:'You live for the rush! Universal, Disney coasters, and VelociCoaster are your natural habitat. You\'re first in line and last to leave.', recs:['Universal\'s Islands of Adventure','VelociCoaster','Hagrid\'s Motorbike Adventure','SeaWorld\'s Ice Breaker'] },
+  explorer: { type:'Urban Explorer', emoji:'🧭', desc:'You seek the authentic Orlando — hidden neighborhoods, state parks, and cultural gems most tourists miss. Wekiwa Springs is calling.', recs:['Wekiwa Springs State Park','Harry P. Leu Gardens','Ivanhoe Village','Mills 50 District'] },
+  foodie: { type:'Culinary Adventurer', emoji:'🍽️', desc:'Orlando\'s food scene is your playground. From chef\'s tasting menus to taco trucks — you eat your way through every trip.', recs:['The Ravenous Pig','Hawkers Asian Street Fare','Hunger Street Tacos','Cask & Larder'] },
+  family: { type:'Family Memory Maker', emoji:'👨‍👩‍👧', desc:'It\'s all about the magic of shared experiences. Disney\'s detail, character meet & greets, and seeing the world through your kids\' eyes.', recs:['Magic Kingdom','Animal Kingdom','Disney Springs','LEGOLAND Florida'] },
+};
+
+window._quizAnswers = {};
+
+function openTravelQuiz() {
+  const existing = document.getElementById('quiz-overlay');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'quiz-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:linear-gradient(135deg,#1A1A2E,#16213E);z-index:8500;overflow-y:auto;max-width:430px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;';
+  el.innerHTML = `<div style="padding:20px 20px 0;display:flex;align-items:center;justify-content:space-between;">
+    <button onclick="document.getElementById('quiz-overlay').remove()" style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:34px;height:34px;color:#fff;font-size:16px;cursor:pointer;">✕</button>
+    <div style="font-size:12px;color:rgba(255,255,255,.6);font-weight:700;">TRAVEL QUIZ</div>
+    <div style="width:34px;"></div>
+  </div>
+  <div id="quiz-content" style="flex:1;padding:20px;display:flex;flex-direction:column;justify-content:center;"></div>`;
+  document.body.appendChild(el);
+  window._quizAnswers = {};
+  renderQuizQuestion(0);
+}
+window.openTravelQuiz = openTravelQuiz;
+
+function renderQuizQuestion(idx) {
+  const el = document.getElementById('quiz-content');
+  if (!el) return;
+  if (idx >= QUIZ_QUESTIONS.length) { renderQuizResult(); return; }
+  const q = QUIZ_QUESTIONS[idx];
+  const pct = ((idx) / QUIZ_QUESTIONS.length) * 100;
+  el.innerHTML = `
+    <div style="background:rgba(255,255,255,.1);border-radius:6px;height:6px;overflow:hidden;margin-bottom:24px;">
+      <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#FF6B35,#FFD700);border-radius:6px;transition:width .5s ease;"></div>
+    </div>
+    <div style="font-size:11px;color:rgba(255,255,255,.5);font-weight:700;margin-bottom:8px;">QUESTION ${idx+1} OF ${QUIZ_QUESTIONS.length}</div>
+    <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#fff;line-height:1.3;margin-bottom:28px;">${q.q}</div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      ${q.opts.map(opt => `<button onclick="answerQuiz(${idx},'${opt.v}',this)" class="quiz-opt-btn" style="background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.15);border-radius:14px;padding:16px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif;transition:all .2s;">${opt.t}</button>`).join('')}
+    </div>`;
+}
+window.renderQuizQuestion = renderQuizQuestion;
+
+function answerQuiz(idx, val, btn) {
+  window._quizAnswers[idx] = val;
+  btn.style.background = 'rgba(255,107,53,.3)';
+  btn.style.borderColor = '#FF6B35';
+  setTimeout(() => renderQuizQuestion(idx + 1), 400);
+}
+window.answerQuiz = answerQuiz;
+
+function renderQuizResult() {
+  const counts = {};
+  Object.values(window._quizAnswers).forEach(v => { counts[v] = (counts[v]||0)+1; });
+  const topType = Object.entries(counts).sort((a,b)=>b[1]-a[1])[0]?.[0] || 'explorer';
+  const result = QUIZ_RESULTS[topType];
+
+  const savedProfile = { type:topType, ...result, completedAt: new Date().toISOString() };
+  localStorage.setItem('travelPersonality', JSON.stringify(savedProfile));
+
+  const el = document.getElementById('quiz-content');
+  if (!el) return;
+  el.innerHTML = `
+    <div style="text-align:center;padding:20px 0;">
+      <div style="font-size:72px;margin-bottom:16px;animation:stampReveal .6s cubic-bezier(.175,.885,.32,1.275);">${result.emoji}</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.5);font-weight:700;letter-spacing:.08em;margin-bottom:8px;">YOU'RE A</div>
+      <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:#fff;margin-bottom:12px;">${result.type}</div>
+      <div style="font-size:14px;color:rgba(255,255,255,.75);line-height:1.6;margin-bottom:28px;padding:0 8px;">${result.desc}</div>
+      <div style="background:rgba(255,255,255,.08);border-radius:16px;padding:16px;margin-bottom:24px;text-align:left;">
+        <div style="font-size:12px;font-weight:700;color:rgba(255,255,255,.5);margin-bottom:10px;">RECOMMENDED FOR YOU</div>
+        ${result.recs.map(r => `<div style="font-size:13px;color:#fff;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.08);">✓ ${r}</div>`).join('')}
+      </div>
+      <button onclick="document.getElementById('quiz-overlay').remove();if(typeof showToast!=='undefined')showToast('Personality saved! Your feed is now personalized 🎯');" style="width:100%;background:linear-gradient(135deg,#FF6B35,#FFD700);border:none;border-radius:14px;padding:15px;color:#fff;font-size:15px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;">Explore My Orlando →</button>
+    </div>`;
+  if (typeof checkAndAwardBadge !== 'undefined') checkAndAwardBadge('quiz_done', 'Travel Personality Found', result.emoji);
+  if (typeof awardPoints !== 'undefined') awardPoints(50, 'Completed travel quiz');
+}
+
+/* ---------- LEADERBOARD ---------- */
+const LEADERBOARD_DATA = [
+  { rank:1, name:'Sarah M.',   handle:'@sarahm',   avatar:'🌸', points:4820, badges:12, trips:7,  city:'Orlando Native' },
+  { rank:2, name:'Jake R.',    handle:'@jaker',    avatar:'🧭', points:3960, badges:9,  trips:5,  city:'From Chicago' },
+  { rank:3, name:'Maria L.',   handle:'@marialx',  avatar:'🌺', points:3210, badges:11, trips:4,  city:'Miami → Orlando' },
+  { rank:4, name:'Tom B.',     handle:'@tomtravels',avatar:'⭐', points:2750, badges:7,  trips:6,  city:'Annual Passholder' },
+  { rank:5, name:'Alex W.',    handle:'@alexwphoto',avatar:'🦋', points:2340, badges:8,  trips:3,  city:'Travel Blogger' },
+  { rank:6, name:'Chris D.',   handle:'@chrisd',   avatar:'🎢', points:1980, badges:5,  trips:8,  city:'From New York' },
+  { rank:7, name:'Emma J.',    handle:'@emmaj',    avatar:'🌴', points:1760, badges:6,  trips:4,  city:'Annual Passholder' },
+  { rank:8, name:'You',        handle:'@you',      avatar:'👤', points: window._userPoints||1250, badges: (window._earnedBadges||[]).length||5, trips:3, city:'Orlando Explorer', isYou:true },
+];
+
+function openLeaderboard() {
+  const existing = document.getElementById('leaderboard-overlay');
+  if (existing) existing.remove();
+
+  // Sort with current user's points
+  const data = LEADERBOARD_DATA.map(u => u.isYou ? {...u, points: window._userPoints||1250, badges: (window._earnedBadges||[]).length||5} : u)
+    .sort((a,b)=>b.points-a.points).map((u,i)=>({...u,rank:i+1}));
+
+  const el = document.createElement('div');
+  el.id = 'leaderboard-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;overflow-y:auto;max-width:430px;left:50%;transform:translateX(-50%);';
+  el.innerHTML = `
+    <div style="background:linear-gradient(135deg,#FFD700,#FF6B35);padding:18px 16px 24px;position:sticky;top:0;z-index:1;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <button onclick="document.getElementById('leaderboard-overlay').remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;">←</button>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;">🏆 Leaderboard</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.8);font-weight:700;">THIS MONTH</div>
+      </div>
+      <!-- Top 3 podium -->
+      <div style="display:flex;align-items:flex-end;justify-content:center;gap:8px;height:100px;">
+        ${[data[1], data[0], data[2]].map((u, i) => {
+          const heights = [72,90,60]; const pos = [2,1,3];
+          return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
+            <div style="font-size:22px;">${u.avatar}</div>
+            <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.9);text-align:center;line-height:1.2;">${u.name.split(' ')[0]}</div>
+            <div style="background:rgba(255,255,255,${i===1?'.35':'.2'});border-radius:8px 8px 0 0;width:100%;height:${heights[i]}px;display:flex;align-items:flex-start;justify-content:center;padding-top:6px;">
+              <span style="font-size:${i===1?'20':'16'}px;">${['🥈','🥇','🥉'][i]}</span>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+    <div style="padding:12px 16px 80px;">
+      ${data.map(u => `<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border,#F5F5F5);${u.isYou?'background:#FFF3EE;margin:0 -16px;padding:12px 16px;':''}">
+        <div style="width:28px;text-align:center;font-size:${u.rank<=3?'18':'14'}px;font-weight:800;color:${u.rank===1?'#FFD700':u.rank===2?'#9E9E9E':u.rank===3?'#CD7F32':'var(--text-primary)'};">
+          ${u.rank<=3?['🥇','🥈','🥉'][u.rank-1]:u.rank}
+        </div>
+        <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#FF6B35,#FFD700);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">${u.avatar}</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:700;color:var(--text-primary);">${u.name} ${u.isYou?'<span style="font-size:10px;background:#FF6B35;color:#fff;border-radius:6px;padding:1px 6px;">YOU</span>':''}</div>
+          <div style="font-size:11px;color:#9E9E9E;">${u.city}</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:14px;font-weight:800;color:#FF6B35;">${u.points.toLocaleString()} XP</div>
+          <div style="font-size:10px;color:#9E9E9E;">${u.badges} badges · ${u.trips} trips</div>
+        </div>
+      </div>`).join('')}
+    </div>`;
+  document.body.appendChild(el);
+}
+window.openLeaderboard = openLeaderboard;
+</script>
+<style>
+/* ===== BLOCK AA: Booking + Quiz + Leaderboard CSS ===== */
+.res-time-btn:not(:disabled):hover{border-color:#9C27B0!important;color:#9C27B0!important;}
+.hotel-room-card:hover{border-color:#1565C0!important;}
+.quiz-opt-btn:hover{background:rgba(255,255,255,.15)!important;border-color:rgba(255,255,255,.4)!important;}
+.quiz-opt-btn:active{background:rgba(255,107,53,.3)!important;border-color:#FF6B35!important;}
+</style>
+<script>
+/* ===== BLOCK AA: Wiring — Booking + Quiz + Leaderboard into UI ===== */
+
+/* 1. Add Book Table / Book Room buttons into detail screen */
+(function patchDetailForBooking() {
+  const tryPatch = () => {
+    const detailEl = document.getElementById('screen-detail');
+    if (!detailEl) return;
+    // Observe for content changes
+    const observer = new MutationObserver(() => {
+      injectBookingButtons(detailEl);
+    });
+    observer.observe(detailEl, { childList: true, subtree: true });
+  };
+  setTimeout(tryPatch, 800);
+})();
+
+function injectBookingButtons(detailEl) {
+  if (!detailEl || detailEl.style.display === 'none') return;
+  if (detailEl.querySelector('[data-booking-injected]')) return;
+
+  // Detect type from content
+  const titleEl = detailEl.querySelector('h2, .detail-name, [class*="detail-title"]');
+  const title = titleEl?.textContent?.trim() || '';
+  const isRestaurant = detailEl.innerHTML.includes('restaurant') || detailEl.innerHTML.includes('🍽️') || detailEl.innerHTML.includes('cuisine') || detailEl.innerHTML.includes('Dining');
+  const isHotel = detailEl.innerHTML.includes('hotel') || detailEl.innerHTML.includes('🏨') || detailEl.innerHTML.includes('amenities') || detailEl.innerHTML.includes('pool');
+
+  if (!isRestaurant && !isHotel) return;
+
+  const btnWrap = document.createElement('div');
+  btnWrap.setAttribute('data-booking-injected','1');
+  btnWrap.style.cssText = 'padding:12px 16px;position:sticky;bottom:0;background:var(--card-bg,#fff);border-top:1px solid var(--border,#eee);z-index:10;';
+
+  if (isRestaurant) {
+    btnWrap.innerHTML = `<button onclick="openRestaurantBooking({name:'${title.replace(/'/g,"\\'")}',emoji:'🍽️'})" style="width:100%;background:linear-gradient(135deg,#9C27B0,#E91E63);border:none;border-radius:14px;padding:14px;color:#fff;font-size:14px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;">🍽️ Reserve a Table</button>`;
+  } else if (isHotel) {
+    btnWrap.innerHTML = `<button onclick="openHotelBooking({name:'${title.replace(/'/g,"\\'")}',emoji:'🏨'})" style="width:100%;background:linear-gradient(135deg,#1565C0,#0097A7);border:none;border-radius:14px;padding:14px;color:#fff;font-size:14px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;">🏨 Book a Room</button>`;
+  }
+  detailEl.appendChild(btnWrap);
+}
+
+/* 2. Add Quiz + Leaderboard to account screen */
+(function patchAccountForAA() {
+  const _prev = window.renderAccount;
+  window.renderAccount = function() {
+    if (_prev) _prev.apply(this, arguments);
+    setTimeout(() => {
+      const loggedIn = document.querySelector('.account-loggedin');
+      if (!loggedIn || loggedIn.querySelector('[data-aa-items]')) return;
+
+      const personality = JSON.parse(localStorage.getItem('travelPersonality') || 'null');
+      const quizBtn = document.createElement('div');
+      quizBtn.setAttribute('data-aa-items','1');
+      quizBtn.className = 'account-menu-item';
+      quizBtn.innerHTML = personality
+        ? `<span class="icon">${personality.emoji}</span><div style="flex:1;"><div>Travel Personality</div><div style="font-size:11px;color:#9E9E9E;">${personality.type}</div></div><span class="arrow">›</span>`
+        : '<span class="icon">🧭</span><span>Take Travel Quiz</span><span class="arrow">›</span>';
+      quizBtn.onclick = openTravelQuiz;
+
+      const lbBtn = document.createElement('div');
+      lbBtn.className = 'account-menu-item';
+      lbBtn.innerHTML = '<span class="icon">🏆</span><span>Leaderboard</span><span class="arrow">›</span>';
+      lbBtn.onclick = openLeaderboard;
+
+      const resBtn = document.createElement('div');
+      resBtn.className = 'account-menu-item';
+      resBtn.innerHTML = `<span class="icon">🍽️</span><span>My Reservations</span>${window._reservations?.length ? `<span style="background:#9C27B0;color:#fff;border-radius:10px;font-size:10px;padding:2px 7px;margin-left:auto;margin-right:8px;font-weight:700;">${window._reservations.length}</span>` : ''}<span class="arrow">›</span>`;
+      resBtn.onclick = viewMyReservations;
+
+      const adminBtn = loggedIn.querySelector('.adm-account-btn');
+      [quizBtn, lbBtn, resBtn].forEach(el => loggedIn.insertBefore(el, adminBtn || null));
+    }, 65);
+  };
+})();
+
+/* 3. Add Quiz shortcut to home quick-row */
+(function addQuizToHomeRow() {
+  const _prev = window.renderHome;
+  window.renderHome = function() {
+    if (_prev) _prev.apply(this, arguments);
+    setTimeout(() => {
+      const row = document.getElementById('y-quick-row');
+      if (!row || row.querySelector('[data-quiz-btn]')) return;
+      const btn = document.createElement('button');
+      btn.setAttribute('data-quiz-btn','1');
+      btn.style.cssText = "flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:5px;background:var(--card-bg,#fff);border:1px solid var(--border,#eee);border-radius:14px;padding:12px 14px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .15s;";
+      btn.innerHTML = '<span style="font-size:22px;">🧭</span><span style="font-size:11px;font-weight:700;color:var(--text-primary,#212121);white-space:nowrap;">Travel Quiz</span>';
+      btn.onclick = openTravelQuiz;
+      row.appendChild(btn);
+
+      const lb = document.createElement('button');
+      lb.style.cssText = btn.style.cssText;
+      lb.innerHTML = '<span style="font-size:22px;">🏆</span><span style="font-size:11px;font-weight:700;color:var(--text-primary,#212121);white-space:nowrap;">Leaderboard</span>';
+      lb.onclick = openLeaderboard;
+      row.appendChild(lb);
+    }, 220);
+  };
+})();
+
+/* 4. Inject "Book Table" button on restaurant cards in explore list */
+(function patchRestaurantCards() {
+  const _prevRender = window.renderExploreList;
+  if (!_prevRender) return;
+  window.renderExploreList = function() {
+    _prevRender.apply(this, arguments);
+    setTimeout(() => {
+      if (window.appState?.currentTab !== 'food') return;
+      document.querySelectorAll('.item-card:not([data-book-btn])').forEach(card => {
+        card.setAttribute('data-book-btn','1');
+        const name = card.querySelector('.card-name, h3, [class*="name"]')?.textContent?.trim() || '';
+        if (!name) return;
+        const bookBtn = document.createElement('button');
+        bookBtn.style.cssText = "margin-top:6px;width:100%;background:#9C27B0;border:none;border-radius:8px;padding:7px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;";
+        bookBtn.textContent = '🍽️ Reserve';
+        bookBtn.onclick = e => { e.stopPropagation(); openRestaurantBooking({name,emoji:'🍽️'}); };
+        card.appendChild(bookBtn);
+      });
+    }, 300);
+  };
+})();
+</script>
