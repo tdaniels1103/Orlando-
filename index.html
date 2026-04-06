@@ -14535,3 +14535,2504 @@ window.likeItin = function(id, btn) {
 .itin-action-btn.liked { background: #FFEBEE; color: #E53935; border-color: #FFCDD2; }
 [data-theme="dark"] .itin-action-btn.liked { background: #3E2723; border-color: #B71C1C; }
 </style>
+
+<style>
+/* ===== BLOCK W: Photo Enhancement & Video Content System CSS ===== */
+
+/* ---- Universal Video Player ---- */
+.vid-player-overlay{position:fixed;inset:0;background:#000;z-index:9100;max-width:430px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;overflow:hidden;}
+.vid-sim-bg{flex:1;position:relative;overflow:hidden;cursor:pointer;}
+.vid-sim-gradient{position:absolute;inset:0;background-size:400% 400%;animation:vidGradShift 4s ease infinite;}
+@keyframes vidGradShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.vid-center-emoji{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:72px;animation:vidEmojiZoom 8s ease-in-out infinite;filter:drop-shadow(0 4px 24px rgba(0,0,0,.5));}
+@keyframes vidEmojiZoom{0%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.18)}100%{transform:translate(-50%,-50%) scale(1)}}
+.vid-hd-badge{position:absolute;top:12px;right:12px;background:rgba(0,0,0,.6);color:#fff;font-size:10px;font-weight:700;padding:3px 7px;border-radius:6px;letter-spacing:.06em;}
+.vid-info-overlay{position:absolute;top:0;left:0;right:0;padding:14px 16px;background:linear-gradient(to bottom,rgba(0,0,0,.7),transparent);transition:opacity .3s;}
+.vid-title-overlay{color:#fff;font-size:15px;font-weight:700;font-family:'Playfair Display',serif;margin-bottom:2px;}
+.vid-creator-overlay{color:rgba(255,255,255,.8);font-size:12px;}
+.vid-controls{background:linear-gradient(to top,rgba(0,0,0,.9),transparent);padding:10px 16px 14px;transition:opacity .3s;}
+.vid-progress-bar{height:3px;background:rgba(255,255,255,.3);border-radius:2px;margin-bottom:10px;cursor:pointer;position:relative;}
+.vid-progress-fill{height:100%;background:#FF6B35;border-radius:2px;transition:width .5s linear;position:relative;}
+.vid-progress-fill::after{content:'';position:absolute;right:-5px;top:-4px;width:11px;height:11px;background:#FF6B35;border-radius:50%;box-shadow:0 0 6px rgba(255,107,53,.8);}
+.vid-time{color:rgba(255,255,255,.8);font-size:11px;margin-bottom:8px;}
+.vid-ctrl-row{display:flex;align-items:center;gap:14px;}
+.vid-ctrl-btn{background:none;border:none;color:#fff;font-size:22px;cursor:pointer;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:background .15s;}
+.vid-ctrl-btn:active{background:rgba(255,255,255,.15);}
+.vid-ctrl-btn.sm{font-size:16px;min-width:36px;min-height:36px;}
+.vid-speed-btn{background:rgba(255,255,255,.15);border:none;color:#fff;font-size:11px;font-weight:700;padding:4px 8px;border-radius:6px;cursor:pointer;font-family:'DM Sans',sans-serif;min-height:36px;}
+.vid-pip-window{position:fixed;bottom:80px;right:10px;width:160px;height:90px;background:#111;border-radius:10px;overflow:hidden;z-index:9200;box-shadow:0 4px 20px rgba(0,0,0,.5);cursor:move;border:2px solid rgba(255,107,53,.6);}
+.vid-related-panel{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.9);border-radius:16px 16px 0 0;padding:14px 0;transform:translateY(100%);transition:transform .35s ease;}
+.vid-related-panel.open{transform:translateY(0);}
+.vid-related-title{padding:0 16px 10px;color:#fff;font-weight:700;font-size:14px;}
+.vid-card-mini{display:flex;gap:10px;padding:8px 16px;cursor:pointer;transition:background .15s;}
+.vid-card-mini:active{background:rgba(255,255,255,.08);}
+.vid-card-mini-thumb{width:80px;height:52px;border-radius:8px;overflow:hidden;flex-shrink:0;position:relative;}
+.vid-card-mini-info{flex:1;}
+.vid-card-mini-title{color:#fff;font-size:12px;font-weight:600;line-height:1.3;margin-bottom:4px;}
+.vid-card-mini-meta{color:#9E9E9E;font-size:11px;}
+.vid-card-mini-duration{position:absolute;bottom:4px;right:4px;background:rgba(0,0,0,.7);color:#fff;font-size:9px;padding:1px 5px;border-radius:4px;}
+
+/* ---- Video Feed Cards ---- */
+.vid-feed-card{background:var(--card-bg,#fff);border-radius:14px;overflow:hidden;margin:0 0 14px;box-shadow:0 2px 10px rgba(0,0,0,.08);cursor:pointer;transition:transform .15s;}
+.vid-feed-card:active{transform:scale(.98);}
+.vid-thumb{height:180px;position:relative;overflow:hidden;}
+.vid-thumb-gradient{width:100%;height:100%;background-size:200% 200%;animation:vidGradShift 6s ease infinite;}
+.vid-thumb-emoji{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:52px;}
+.vid-play-btn{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:52px;height:52px;background:rgba(0,0,0,.55);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;border:2px solid rgba(255,255,255,.7);}
+.vid-duration-badge{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,.7);color:#fff;font-size:10px;padding:2px 7px;border-radius:6px;font-weight:600;}
+.vid-card-body{padding:10px 12px 12px;}
+.vid-card-title{font-weight:700;font-size:13px;color:var(--text-primary);margin-bottom:5px;line-height:1.3;}
+.vid-card-meta{display:flex;align-items:center;gap:8px;font-size:11px;color:#9E9E9E;}
+.vid-views{color:#9E9E9E;}
+
+/* ---- Photo Filter UI ---- */
+.filter-overlay{position:fixed;inset:0;background:#000;z-index:8800;max-width:430px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;}
+.filter-preview-area{flex:1;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+.filter-preview-img{max-width:100%;max-height:100%;object-fit:contain;transition:filter .25s ease;}
+.filter-preview-emoji{font-size:120px;transition:filter .25s ease;}
+.filter-before-after-badge{position:absolute;top:12px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.6);color:#fff;font-size:12px;font-weight:700;padding:5px 14px;border-radius:20px;}
+.filter-strip-wrap{background:#111;padding:12px 0 8px;}
+.filter-strip{display:flex;gap:10px;overflow-x:auto;padding:0 14px;scrollbar-width:none;}
+.filter-strip::-webkit-scrollbar{display:none;}
+.filter-thumb{flex-shrink:0;text-align:center;cursor:pointer;}
+.filter-thumb-circle{width:60px;height:60px;border-radius:50%;overflow:hidden;border:2px solid transparent;transition:border-color .2s;display:flex;align-items:center;justify-content:center;font-size:28px;background:#222;}
+.filter-thumb.active .filter-thumb-circle{border-color:#FF6B35;box-shadow:0 0 0 2px rgba(255,107,53,.4);}
+.filter-thumb-name{font-size:9px;color:#ccc;margin-top:4px;white-space:nowrap;max-width:64px;overflow:hidden;text-overflow:ellipsis;}
+.filter-controls{background:#1a1a1a;padding:12px 16px;}
+.filter-slider-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.filter-slider-label{color:#ccc;font-size:12px;white-space:nowrap;}
+.filter-intensity-slider{flex:1;accent-color:#FF6B35;height:4px;}
+.filter-pct{color:#FF6B35;font-size:12px;font-weight:700;width:36px;text-align:right;}
+.filter-btn-row{display:flex;gap:8px;}
+.filter-btn{flex:1;padding:10px 6px;border:none;border-radius:10px;font-size:12px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;}
+.filter-btn.primary{background:linear-gradient(135deg,#FF6B35,#FFD700);color:#fff;}
+.filter-btn.secondary{background:#2a2a2a;color:#ccc;}
+.filter-btn.danger{background:#311;color:#ff6b6b;}
+
+/* ---- Location Stamp UI ---- */
+.stamp-section{background:#111;padding:10px 14px;}
+.stamp-section-title{color:#ccc;font-size:11px;font-weight:700;letter-spacing:.08em;margin-bottom:8px;}
+.stamp-style-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;scrollbar-width:none;}
+.stamp-style-card{flex-shrink:0;background:#222;border:2px solid transparent;border-radius:10px;padding:6px 10px;cursor:pointer;text-align:center;transition:border-color .2s;}
+.stamp-style-card.active{border-color:#FF6B35;}
+.stamp-style-card-label{font-size:10px;color:#ccc;margin-top:3px;white-space:nowrap;}
+.stamp-options-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:8px;}
+.stamp-color-swatch{width:24px;height:24px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:border-color .2s;}
+.stamp-color-swatch.active{border-color:#FF6B35;}
+.stamp-size-btn{background:#222;border:none;color:#ccc;font-size:11px;font-weight:600;padding:5px 12px;border-radius:16px;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.stamp-size-btn.active{background:#FF6B35;color:#fff;}
+
+/* ---- Collage Builder ---- */
+.collage-overlay{position:fixed;inset:0;background:var(--bg,#fafafa);z-index:8700;max-width:430px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;overflow:hidden;}
+.collage-hdr{background:#fff;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #eee;flex-shrink:0;}
+.collage-body{flex:1;overflow-y:auto;}
+.collage-canvas-wrap{background:#eee;margin:14px;border-radius:14px;overflow:hidden;position:relative;}
+.collage-grid{display:grid;width:100%;background:#fff;}
+.collage-cell{overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:40px;background:#ddd;position:relative;}
+.collage-cell img{width:100%;height:100%;object-fit:cover;}
+.collage-sticker{position:absolute;font-size:32px;cursor:move;user-select:none;z-index:10;padding:4px;}
+.collage-section-hdr{padding:10px 16px 6px;font-weight:700;font-size:13px;color:var(--text-primary);}
+.layout-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:0 16px 10px;}
+.layout-thumb{border:2px solid #eee;border-radius:8px;padding:6px;cursor:pointer;transition:border-color .2s;aspect-ratio:1;}
+.layout-thumb.active{border-color:#FF6B35;}
+.layout-thumb svg{width:100%;height:100%;}
+.gap-btn,.radius-btn{background:#F5F5F5;border:none;padding:6px 14px;border-radius:16px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.gap-btn.active,.radius-btn.active{background:#FF6B35;color:#fff;}
+.bg-swatch-row{display:flex;gap:8px;padding:0 16px 10px;flex-wrap:wrap;}
+.bg-swatch{width:28px;height:28px;border-radius:50%;cursor:pointer;border:2px solid transparent;}
+.bg-swatch.active{border-color:#FF6B35;box-shadow:0 0 0 2px rgba(255,107,53,.3);}
+.sticker-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;padding:0 16px 10px;}
+.sticker-btn{font-size:28px;cursor:pointer;text-align:center;padding:4px;border-radius:8px;transition:background .15s;}
+.sticker-btn:active{background:#FF6B3520;}
+.export-bar{background:#fff;border-top:1px solid #eee;padding:12px 16px;display:flex;gap:8px;}
+.export-btn{flex:1;padding:12px;border:none;border-radius:12px;font-size:13px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;}
+.export-btn.primary{background:linear-gradient(135deg,#FF6B35,#FFD700);color:#fff;}
+.export-btn.secondary{background:#F5F5F5;color:var(--text-primary);}
+
+/* ---- Highlight Reel ---- */
+.reel-overlay{position:fixed;inset:0;background:var(--bg,#fafafa);z-index:8600;max-width:430px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;overflow:hidden;}
+.reel-photo-list{padding:0 16px;}
+.reel-photo-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #F5F5F5;}
+.reel-photo-thumb{width:56px;height:56px;border-radius:10px;background:#eee;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+.reel-photo-info{flex:1;}
+.reel-photo-name{font-size:13px;font-weight:600;}
+.reel-photo-loc{font-size:11px;color:#9E9E9E;}
+.reel-remove-btn{background:none;border:none;font-size:18px;cursor:pointer;color:#ccc;padding:8px;}
+.music-pill{background:#F5F5F5;border:none;border-radius:20px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:5px;}
+.music-pill.active{background:#FF6B3520;color:#FF6B35;border:1px solid #FF6B3540;}
+.music-play-btn{font-size:12px;cursor:pointer;}
+.transition-chip{background:#F5F5F5;border:none;border-radius:10px;padding:8px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.transition-chip.active{background:#FF6B35;color:#fff;}
+
+/* ---- Reel Player ---- */
+.reel-player-overlay{position:fixed;inset:0;background:#000;z-index:9050;max-width:430px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;}
+.reel-slide{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;transition:opacity .6s;}
+.reel-slide.hidden{opacity:0;pointer-events:none;}
+.reel-loc-overlay{position:absolute;bottom:100px;left:0;right:0;text-align:center;color:#fff;font-size:15px;font-weight:700;text-shadow:0 2px 8px rgba(0,0,0,.8);animation:locFadeIn 2s ease forwards;}
+@keyframes locFadeIn{0%{opacity:0;transform:translateY(10px)}20%{opacity:1;transform:translateY(0)}80%{opacity:1}100%{opacity:0}}
+.reel-progress-bar{position:absolute;bottom:0;left:0;right:0;height:3px;background:rgba(255,255,255,.2);}
+.reel-progress-fill{height:100%;background:#FF6B35;transition:width linear;}
+.reel-ctrl-bar{position:absolute;bottom:14px;left:16px;right:16px;display:flex;align-items:center;justify-content:center;gap:16px;}
+.reel-ctrl-btn{background:rgba(0,0,0,.5);border:none;color:#fff;font-size:20px;width:44px;height:44px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+
+/* ---- Share Album ---- */
+.album-modal{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:8500;max-width:430px;left:50%;transform:translateX(-50%);display:flex;align-items:flex-end;}
+.album-sheet{background:var(--white,#fff);border-radius:20px 20px 0 0;width:100%;max-height:90vh;overflow-y:auto;padding:20px 16px 34px;}
+.album-vis-btn{border:2px solid #eee;border-radius:12px;padding:12px;cursor:pointer;text-align:center;transition:border-color .2s;flex:1;}
+.album-vis-btn.active{border-color:#FF6B35;background:#FFF3EE;}
+.album-vis-icon{font-size:24px;margin-bottom:4px;}
+.album-vis-label{font-size:12px;font-weight:700;}
+.qr-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:2px;width:120px;margin:0 auto;}
+.qr-cell{width:11px;height:11px;border-radius:1px;}
+.share-dest-row{display:flex;gap:10px;overflow-x:auto;padding:4px 0;scrollbar-width:none;}
+.share-dest-btn{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;}
+.share-dest-icon{font-size:28px;}
+.share-dest-label{font-size:10px;color:#757575;font-weight:600;}
+.album-card{background:#fff;border:1px solid #eee;border-radius:14px;overflow:hidden;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.06);}
+.album-card-thumb{height:100px;background:#eee;display:flex;align-items:center;justify-content:center;font-size:48px;position:relative;}
+.album-card-vis-badge{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.6);color:#fff;font-size:10px;padding:2px 8px;border-radius:10px;}
+.album-card-body{padding:10px 12px;}
+
+/* ---- ZIP Download ---- */
+.zip-modal{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:8400;max-width:430px;left:50%;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;}
+.zip-sheet{background:#fff;border-radius:20px;padding:24px;width:88%;max-width:320px;}
+.zip-opt-btn{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #F5F5F5;cursor:pointer;}
+.zip-opt-btn:last-child{border-bottom:none;}
+.zip-opt-radio{width:18px;height:18px;border-radius:50%;border:2px solid #ddd;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.zip-opt-radio.selected{border-color:#FF6B35;background:#FF6B35;}
+.zip-opt-radio.selected::after{content:'';width:8px;height:8px;background:#fff;border-radius:50%;}
+.zip-progress-bar{height:8px;background:#eee;border-radius:4px;overflow:hidden;margin:10px 0;}
+.zip-progress-fill{height:100%;background:linear-gradient(90deg,#FF6B35,#FFD700);border-radius:4px;transition:width .3s;}
+
+/* ---- Theme Park Rides ---- */
+.ride-card{background:#fff;border:1px solid #eee;border-radius:12px;padding:12px 14px;margin-bottom:10px;display:flex;align-items:center;gap:10px;box-shadow:0 1px 6px rgba(0,0,0,.06);}
+[data-theme="dark"] .ride-card{background:#1e1e1e;border-color:#333;}
+.ride-info{flex:1;}
+.ride-name{font-size:14px;font-weight:700;color:var(--text-primary);}
+.ride-meta{font-size:11px;color:#9E9E9E;margin-top:3px;}
+.ride-thrill{display:flex;gap:2px;margin-top:4px;}
+.ride-preview-btn{background:linear-gradient(135deg,#FF6B35,#FFD700);color:#fff;border:none;border-radius:10px;padding:7px 12px;font-size:12px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;white-space:nowrap;}
+.rides-section{padding:0 16px 16px;}
+.rides-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 0 10px;}
+.roulette-btn{background:#F5F5F5;border:none;border-radius:20px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.must-ride-strip{display:flex;gap:10px;overflow-x:auto;padding-bottom:10px;scrollbar-width:none;}
+.must-ride-card{flex-shrink:0;width:140px;background:linear-gradient(135deg,#FF6B35,#FFD700);border-radius:12px;padding:12px;color:#fff;cursor:pointer;}
+
+/* ---- Video Review Recording ---- */
+.record-overlay{position:fixed;inset:0;background:#000;z-index:9000;max-width:430px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;}
+.record-preview{flex:1;background:#111;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.record-cam-sim{width:100%;height:100%;background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);display:flex;align-items:center;justify-content:center;font-size:80px;animation:camSim 3s ease-in-out infinite;}
+@keyframes camSim{0%,100%{filter:brightness(1)}50%{filter:brightness(1.1)}}
+.record-dot{position:absolute;top:16px;right:16px;width:14px;height:14px;background:#E53935;border-radius:50%;animation:recPulse 1s ease-in-out infinite;}
+@keyframes recPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+.record-timer{position:absolute;top:14px;left:50%;transform:translateX(-50%);color:#fff;font-size:16px;font-weight:700;font-family:monospace;background:rgba(0,0,0,.5);padding:4px 12px;border-radius:20px;}
+.waveform{position:absolute;bottom:0;left:0;right:0;height:40px;display:flex;align-items:center;justify-content:center;gap:3px;padding:0 10px;}
+.wave-bar{width:3px;background:rgba(255,107,53,.8);border-radius:2px;animation:waveDance .5s ease-in-out infinite;}
+@keyframes waveDance{0%,100%{height:4px}50%{height:28px}}
+.record-btn{width:72px;height:72px;border-radius:50%;background:#E53935;border:4px solid rgba(255,255,255,.4);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:28px;transition:background .2s;}
+.record-btn.recording{background:#fff;}
+.record-btn.recording .record-icon{width:20px;height:20px;background:#E53935;border-radius:4px;}
+
+/* ---- Live Stream ---- */
+.live-now-section{background:linear-gradient(135deg,#E53935,#FF6B35);margin:0 16px 16px;border-radius:16px;overflow:hidden;cursor:pointer;}
+.live-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.25);border-radius:20px;padding:4px 10px;font-size:11px;font-weight:800;color:#fff;letter-spacing:.06em;}
+.live-dot{width:8px;height:8px;background:#fff;border-radius:50%;animation:livePulse 1.2s ease-in-out infinite;}
+@keyframes livePulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.6)}}
+.live-stream-overlay{position:fixed;inset:0;background:#000;z-index:8900;max-width:430px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;}
+.live-viewer-count{position:absolute;top:14px;right:14px;background:rgba(0,0,0,.6);color:#fff;font-size:12px;font-weight:700;padding:5px 10px;border-radius:20px;display:flex;align-items:center;gap:5px;}
+.live-chat-panel{height:220px;overflow-y:auto;padding:8px 12px;display:flex;flex-direction:column;gap:6px;background:rgba(0,0,0,.7);}
+.live-chat-msg{font-size:12px;color:#fff;line-height:1.4;}
+.live-chat-username{color:#FFD700;font-weight:700;}
+.live-chat-input-row{display:flex;gap:8px;padding:8px 12px;background:rgba(0,0,0,.8);}
+.live-chat-input{flex:1;background:rgba(255,255,255,.1);border:none;border-radius:20px;padding:8px 12px;color:#fff;font-size:13px;font-family:'DM Sans',sans-serif;}
+.live-chat-input::placeholder{color:rgba(255,255,255,.4);}
+.live-send-btn{background:#FF6B35;border:none;border-radius:20px;padding:8px 14px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.live-reactions-row{display:flex;gap:8px;padding:6px 12px;background:rgba(0,0,0,.6);}
+.live-react-btn{background:rgba(255,255,255,.1);border:none;border-radius:20px;padding:6px 12px;color:#fff;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:4px;}
+.live-react-count{font-size:11px;font-weight:600;}
+.floating-emoji{position:absolute;right:20px;font-size:22px;animation:floatUp 2.5s ease-out forwards;pointer-events:none;}
+@keyframes floatUp{0%{opacity:1;transform:translateY(0) scale(1)}80%{opacity:.7}100%{opacity:0;transform:translateY(-180px) scale(.5)}}
+
+/* ---- Local Video Tips ---- */
+.local-tips-section{padding:0 0 16px;}
+.local-tips-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;}
+.local-tips-hdr-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;}
+.local-tips-scroll{display:flex;gap:12px;overflow-x:auto;padding:0 16px 4px;scrollbar-width:none;}
+.local-tips-scroll::-webkit-scrollbar{display:none;}
+.tip-card{flex-shrink:0;width:150px;border-radius:14px;overflow:hidden;cursor:pointer;box-shadow:0 3px 12px rgba(0,0,0,.12);}
+.tip-card-thumb{height:100px;position:relative;overflow:hidden;}
+.tip-card-thumb-gradient{width:100%;height:100%;background-size:200% 200%;animation:vidGradShift 6s ease infinite;}
+.tip-card-avatar{position:absolute;top:8px;left:8px;font-size:22px;background:rgba(0,0,0,.4);border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;}
+.tip-local-badge{position:absolute;top:8px;right:8px;background:#FF6B35;color:#fff;font-size:8px;font-weight:800;padding:2px 6px;border-radius:6px;}
+.tip-card-info{background:#fff;padding:8px 10px;}
+[data-theme="dark"] .tip-card-info{background:#1e1e1e;}
+.tip-card-title{font-size:11px;font-weight:700;line-height:1.3;color:var(--text-primary);}
+.tip-card-duration{font-size:10px;color:#9E9E9E;margin-top:3px;}
+
+/* ---- Leaderboard ---- */
+.leaderboard-overlay{position:fixed;inset:0;background:var(--bg,#fafafa);z-index:8300;max-width:430px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;overflow:hidden;}
+.lb-row{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid #F5F5F5;}
+.lb-rank{font-size:16px;font-weight:800;width:24px;text-align:center;color:#FF6B35;}
+.lb-avatar{font-size:28px;}
+.lb-info{flex:1;}
+.lb-name{font-size:13px;font-weight:700;}
+.lb-stats{font-size:11px;color:#9E9E9E;}
+.lb-follow-btn{background:#F5F5F5;border:none;border-radius:16px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;}
+
+/* ---- Tabs for detail pages ---- */
+.detail-video-tab{display:none;}
+.detail-video-tab.active{display:block;}
+
+/* Dark mode overrides */
+[data-theme="dark"] .vid-feed-card,[data-theme="dark"] .album-card,[data-theme="dark"] .ride-card{background:#1e1e1e;border-color:#333;}
+[data-theme="dark"] .zip-sheet,.album-sheet{background:var(--card-bg,#1e1e1e);}
+[data-theme="dark"] .collage-overlay,[data-theme="dark"] .reel-overlay{background:#121212;}
+[data-theme="dark"] .collage-hdr{background:#1e1e1e;border-color:#333;}
+[data-theme="dark"] .layout-thumb{border-color:#333;}
+[data-theme="dark"] .gap-btn,.radius-btn{background:#2a2a2a;color:#ccc;}
+[data-theme="dark"] .export-bar{background:#1e1e1e;border-color:#333;}
+[data-theme="dark"] .reel-photo-row{border-color:#333;}
+[data-theme="dark"] .music-pill{background:#2a2a2a;color:#ccc;}
+[data-theme="dark"] .zip-modal .zip-sheet{background:#1e1e1e;}
+[data-theme="dark"] .zip-opt-btn{border-color:#333;}
+[data-theme="dark"] .tip-card-info{background:#1e1e1e;}
+[data-theme="dark"] .lb-row{border-color:#333;}
+[data-theme="dark"] .lb-follow-btn{background:#2a2a2a;color:#ccc;}
+</style>
+
+<script>
+/* ===== BLOCK W2: Universal Video Player Component ===== */
+/* PRODUCTION NOTE: Replace simulated gradient+emoji with <video src="..."> elements pointing to real video files or HLS/DASH stream URLs */
+
+const VIDEO_GRADIENTS = {
+  attraction: 'linear-gradient(135deg,#1a237e,#283593,#1565c0,#0277bd)',
+  restaurant:  'linear-gradient(135deg,#bf360c,#e64a19,#ff6d00,#ff8f00)',
+  hotel:       'linear-gradient(135deg,#1b5e20,#2e7d32,#388e3c,#43a047)',
+  ride:        'linear-gradient(135deg,#4a148c,#6a1b9a,#7b1fa2,#8e24aa)',
+  local_tip:   'linear-gradient(135deg,#e65100,#ef6c00,#f57c00,#fb8c00)',
+  live:        'linear-gradient(135deg,#b71c1c,#c62828,#d32f2f,#e53935)',
+  review:      'linear-gradient(135deg,#006064,#00838f,#0097a7,#00acc1)',
+  default:     'linear-gradient(135deg,#FF6B35,#FFD700,#4CAF50,#2196F3)',
+};
+
+const videoPlayerState = {
+  isOpen: false,
+  isPlaying: false,
+  currentTime: 0,
+  duration: 60,
+  speed: 1,
+  isMuted: false,
+  isPip: false,
+  config: null,
+  timer: null,
+  relatedShown: false,
+  controlsVisible: true,
+  controlsTimer: null,
+};
+
+function openVideoPlayer(config) {
+  /* config: { title, creator, emoji, type, duration, relatedVideos:[], onClose } */
+  videoPlayerState.config = config;
+  videoPlayerState.isPlaying = false;
+  videoPlayerState.currentTime = 0;
+  videoPlayerState.duration = config.duration || 60;
+  videoPlayerState.speed = 1;
+  videoPlayerState.relatedShown = false;
+  videoPlayerState.controlsVisible = true;
+  clearInterval(videoPlayerState.timer);
+
+  const existing = document.getElementById('vid-player-overlay');
+  if (existing) existing.remove();
+
+  const grad = VIDEO_GRADIENTS[config.type] || VIDEO_GRADIENTS.default;
+  const related = (config.relatedVideos || []).slice(0, 3);
+
+  const el = document.createElement('div');
+  el.id = 'vid-player-overlay';
+  el.className = 'vid-player-overlay';
+  el.innerHTML = `
+    <div class="vid-sim-bg" id="vp-sim-bg" onclick="vpToggleControls()">
+      <div class="vid-sim-gradient" id="vp-gradient" style="background:${grad};"></div>
+      <div class="vid-center-emoji" id="vp-emoji">${config.emoji || '🎬'}</div>
+      <div class="vid-hd-badge">HD</div>
+      <div class="vid-info-overlay" id="vp-info-overlay">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <button onclick="closeVideoPlayer()" style="background:rgba(0,0,0,.4);border:none;color:#fff;font-size:20px;width:36px;height:36px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+          <div style="display:flex;gap:8px;">
+            <button class="vid-ctrl-btn sm" onclick="vpTogglePip()" title="Picture in Picture">⧉</button>
+            <button class="vid-ctrl-btn sm" onclick="vpShare()">↗</button>
+          </div>
+        </div>
+        <div style="margin-top:auto;padding-top:24px;">
+          <div class="vid-title-overlay" id="vp-title-el">${config.title || 'Video'}</div>
+          <div class="vid-creator-overlay">by ${config.creator || 'Orlando Explorer'}</div>
+        </div>
+      </div>
+      <div style="position:absolute;bottom:56px;left:50%;transform:translateX(-50%);font-size:28px;opacity:0.9;" id="vp-play-indicator"></div>
+      <div class="floating-emoji" id="vp-float-container" style="position:absolute;inset:0;pointer-events:none;overflow:hidden;"></div>
+    </div>
+    <div class="vid-controls" id="vp-controls">
+      <div class="vid-progress-bar" onclick="vpScrub(event)" id="vp-progress-bar">
+        <div class="vid-progress-fill" id="vp-progress-fill" style="width:0%;"></div>
+      </div>
+      <div class="vid-time" id="vp-time">0:00 / ${vpFmtTime(videoPlayerState.duration)}</div>
+      <div class="vid-ctrl-row">
+        <button class="vid-ctrl-btn" onclick="vpPrev()">⏮</button>
+        <button class="vid-ctrl-btn" id="vp-play-btn" onclick="vpTogglePlay()" style="font-size:28px;">▶</button>
+        <button class="vid-ctrl-btn" onclick="vpNext()">⏭</button>
+        <button class="vid-ctrl-btn sm" id="vp-mute-btn" onclick="vpToggleMute()">🔊</button>
+        <button class="vid-speed-btn" id="vp-speed-btn" onclick="vpCycleSpeed()">1×</button>
+        <div style="flex:1;"></div>
+        <button class="vid-ctrl-btn sm" onclick="vpShowRelated()">⋮</button>
+      </div>
+      <div style="font-size:10px;color:rgba(255,255,255,.3);text-align:center;margin-top:4px;" id="vp-shortcut-hint">Space = play/pause · ← → = seek</div>
+    </div>
+    <div class="vid-related-panel" id="vp-related-panel">
+      <div class="vid-related-title">Related Videos</div>
+      ${related.map(v => `
+        <div class="vid-card-mini" onclick="openVideoPlayer(${JSON.stringify(v).replace(/"/g,'&quot;')})">
+          <div class="vid-card-mini-thumb">
+            <div style="width:100%;height:100%;background:${VIDEO_GRADIENTS[v.type]||VIDEO_GRADIENTS.default};display:flex;align-items:center;justify-content:center;font-size:22px;">${v.emoji||'🎬'}</div>
+            <div class="vid-card-mini-duration">${vpFmtTime(v.duration||60)}</div>
+          </div>
+          <div class="vid-card-mini-info">
+            <div class="vid-card-mini-title">${v.title}</div>
+            <div class="vid-card-mini-meta">${v.creator||'Explorer'} · ${(v.views||1200).toLocaleString()} views</div>
+          </div>
+        </div>`).join('')}
+      <div style="height:10px;"></div>
+    </div>`;
+  document.body.appendChild(el);
+  videoPlayerState.isOpen = true;
+
+  /* Auto-fade info overlay after 3s */
+  setTimeout(() => {
+    const info = document.getElementById('vp-info-overlay');
+    if (info) info.style.opacity = '0';
+    const hint = document.getElementById('vp-shortcut-hint');
+    if (hint) hint.style.opacity = '0';
+  }, 3000);
+
+  vpPlay();
+}
+
+function closeVideoPlayer() {
+  clearInterval(videoPlayerState.timer);
+  videoPlayerState.isOpen = false;
+  videoPlayerState.isPlaying = false;
+  const el = document.getElementById('vid-player-overlay');
+  if (el) el.remove();
+  const pip = document.getElementById('vid-pip-window');
+  if (pip) pip.remove();
+  if (videoPlayerState.config?.onClose) videoPlayerState.config.onClose();
+}
+
+function vpTogglePlay() {
+  if (videoPlayerState.isPlaying) vpPause(); else vpPlay();
+}
+
+function vpPlay() {
+  videoPlayerState.isPlaying = true;
+  const btn = document.getElementById('vp-play-btn');
+  if (btn) btn.textContent = '⏸';
+  clearInterval(videoPlayerState.timer);
+  videoPlayerState.timer = setInterval(() => {
+    videoPlayerState.currentTime += videoPlayerState.speed;
+    if (videoPlayerState.currentTime >= videoPlayerState.duration) {
+      videoPlayerState.currentTime = videoPlayerState.duration;
+      vpPause();
+      /* Award XP for watching full video */
+      if (typeof addXP === 'function') addXP(5, 'Watched a full video');
+      setTimeout(() => vpShowRelated(), 1000);
+      return;
+    }
+    vpUpdateProgress();
+  }, 1000);
+}
+
+function vpPause() {
+  videoPlayerState.isPlaying = false;
+  clearInterval(videoPlayerState.timer);
+  const btn = document.getElementById('vp-play-btn');
+  if (btn) btn.textContent = '▶';
+}
+
+function vpUpdateProgress() {
+  const pct = (videoPlayerState.currentTime / videoPlayerState.duration) * 100;
+  const fill = document.getElementById('vp-progress-fill');
+  if (fill) fill.style.width = pct + '%';
+  const timeEl = document.getElementById('vp-time');
+  if (timeEl) timeEl.textContent = vpFmtTime(videoPlayerState.currentTime) + ' / ' + vpFmtTime(videoPlayerState.duration);
+}
+
+function vpScrub(e) {
+  const bar = document.getElementById('vp-progress-bar');
+  if (!bar) return;
+  const rect = bar.getBoundingClientRect();
+  const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+  videoPlayerState.currentTime = Math.round(pct * videoPlayerState.duration);
+  vpUpdateProgress();
+}
+
+function vpPrev() { videoPlayerState.currentTime = Math.max(0, videoPlayerState.currentTime - 10); vpUpdateProgress(); }
+function vpNext() { videoPlayerState.currentTime = Math.min(videoPlayerState.duration, videoPlayerState.currentTime + 10); vpUpdateProgress(); }
+
+function vpToggleMute() {
+  videoPlayerState.isMuted = !videoPlayerState.isMuted;
+  const btn = document.getElementById('vp-mute-btn');
+  if (btn) btn.textContent = videoPlayerState.isMuted ? '🔇' : '🔊';
+}
+
+function vpCycleSpeed() {
+  const speeds = [0.5, 1, 1.5, 2];
+  const idx = speeds.indexOf(videoPlayerState.speed);
+  videoPlayerState.speed = speeds[(idx + 1) % speeds.length];
+  const btn = document.getElementById('vp-speed-btn');
+  if (btn) btn.textContent = videoPlayerState.speed + '×';
+}
+
+function vpToggleControls() {
+  videoPlayerState.controlsVisible = !videoPlayerState.controlsVisible;
+  const ctrl = document.getElementById('vp-controls');
+  const info = document.getElementById('vp-info-overlay');
+  if (ctrl) ctrl.style.opacity = videoPlayerState.controlsVisible ? '1' : '0';
+  if (info) info.style.opacity = videoPlayerState.controlsVisible ? '1' : '0';
+}
+
+function vpShowRelated() {
+  const panel = document.getElementById('vp-related-panel');
+  if (panel) { panel.classList.add('open'); videoPlayerState.relatedShown = true; }
+}
+
+function vpTogglePip() {
+  const overlay = document.getElementById('vid-player-overlay');
+  if (!overlay) return;
+  if (videoPlayerState.isPip) {
+    const pip = document.getElementById('vid-pip-window');
+    if (pip) pip.remove();
+    videoPlayerState.isPip = false;
+    overlay.style.display = 'flex';
+  } else {
+    overlay.style.display = 'none';
+    const pip = document.createElement('div');
+    pip.id = 'vid-pip-window';
+    pip.className = 'vid-pip-window';
+    const config = videoPlayerState.config;
+    const grad = VIDEO_GRADIENTS[config?.type] || VIDEO_GRADIENTS.default;
+    pip.innerHTML = `<div style="width:100%;height:100%;background:${grad};display:flex;align-items:center;justify-content:center;font-size:36px;cursor:pointer;" onclick="vpClosePip()">
+      ${config?.emoji || '🎬'}
+      <div style="position:absolute;bottom:4px;right:4px;background:rgba(0,0,0,.6);color:#fff;font-size:9px;padding:2px 5px;border-radius:4px;">⬡ PiP</div>
+    </div>`;
+    pip.style.position = 'fixed';
+    document.body.appendChild(pip);
+    videoPlayerState.isPip = true;
+  }
+}
+
+function vpClosePip() {
+  const pip = document.getElementById('vid-pip-window');
+  if (pip) pip.remove();
+  const overlay = document.getElementById('vid-player-overlay');
+  if (overlay) overlay.style.display = 'flex';
+  videoPlayerState.isPip = false;
+}
+
+function vpShare() {
+  if (typeof showToast === 'function') showToast('Share link copied! 📋');
+}
+
+function vpFmtTime(secs) {
+  const s = Math.floor(secs % 60);
+  const m = Math.floor(secs / 60);
+  return m + ':' + String(s).padStart(2, '0');
+}
+
+/* Build a generic video card HTML */
+function buildVidCard(v) {
+  const grad = VIDEO_GRADIENTS[v.type] || VIDEO_GRADIENTS.default;
+  return `<div class="vid-feed-card" onclick='openVideoPlayer(${JSON.stringify(v)})'>
+    <div class="vid-thumb">
+      <div class="vid-thumb-gradient" style="background:${grad};"></div>
+      <div class="vid-thumb-emoji">${v.emoji || '🎬'}</div>
+      <div class="vid-play-btn">▶</div>
+      <div class="vid-duration-badge">${vpFmtTime(v.duration || 60)}</div>
+    </div>
+    <div class="vid-card-body">
+      <div class="vid-card-title">${v.title}</div>
+      <div class="vid-card-meta">
+        <span>${v.creator || 'Explorer'}</span>
+        <span>·</span>
+        <span class="vid-views">${(v.views || 0).toLocaleString()} views</span>
+        <span>·</span>
+        <span>❤️ ${(v.likes || 0).toLocaleString()}</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+window.openVideoPlayer = openVideoPlayer;
+window.closeVideoPlayer = closeVideoPlayer;
+window.vpTogglePlay = vpTogglePlay;
+window.vpPlay = vpPlay;
+window.vpPause = vpPause;
+window.vpPrev = vpPrev;
+window.vpNext = vpNext;
+window.vpToggleMute = vpToggleMute;
+window.vpCycleSpeed = vpCycleSpeed;
+window.vpToggleControls = vpToggleControls;
+window.vpShowRelated = vpShowRelated;
+window.vpTogglePip = vpTogglePip;
+window.vpClosePip = vpClosePip;
+window.vpShare = vpShare;
+window.vpScrub = vpScrub;
+window.buildVidCard = buildVidCard;
+window.vpFmtTime = vpFmtTime;
+window.VIDEO_GRADIENTS = VIDEO_GRADIENTS;
+</script>
+
+<script>
+/* ===== BLOCK W3: Photo Filter System + Location Stamps ===== */
+/* PRODUCTION NOTE: Canvas operations here should be replaced with server-side image processing
+   (e.g. Sharp, ImageMagick, or a CDN image transformation pipeline) for better performance at scale */
+
+const ORLANDO_FILTERS = [
+  { id:'none',       name:'Original',       css:'none',                                                                     r:1,  g:1,  b:1  },
+  { id:'sunshine',   name:'Sunshine State', css:'saturate(1.4) brightness(1.1) sepia(0.2) hue-rotate(10deg)',               r:1.1,g:1.05,b:.9 },
+  { id:'magic_hour', name:'Magic Hour',     css:'saturate(1.2) brightness(0.9) sepia(0.4) hue-rotate(340deg) contrast(1.1)',r:1.1,g:.95,b:.85 },
+  { id:'theme_pop',  name:'Theme Park Pop', css:'saturate(1.8) contrast(1.3) brightness(1.05)',                             r:1,  g:1,  b:1  },
+  { id:'old_fl',     name:'Old Florida',    css:'sepia(0.6) saturate(0.8) brightness(0.95) contrast(0.9)',                  r:1.1,g:1,  b:.8 },
+  { id:'trop_night', name:'Tropical Nights',css:'saturate(1.1) brightness(0.85) hue-rotate(180deg) contrast(1.2)',          r:.7, g:.9, b:1.1 },
+  { id:'neon_blvd',  name:'Neon Boulevard', css:'saturate(2.0) contrast(1.4) brightness(0.9) hue-rotate(280deg)',           r:.9, g:.7, b:1.2 },
+  { id:'golden',     name:'Golden Ticket',  css:'sepia(0.3) saturate(1.3) brightness(1.15) hue-rotate(20deg)',              r:1.2,g:1.1,b:.8 },
+  { id:'flamingo',   name:'Flamingo Dream', css:'saturate(1.3) hue-rotate(320deg) brightness(1.1) contrast(0.95)',          r:1.2,g:.9, b:1  },
+  { id:'everglades', name:'Everglades',     css:'saturate(1.2) hue-rotate(80deg) brightness(0.95) contrast(1.1)',           r:.8, g:1.1,b:.8 },
+  { id:'space_coast',name:'Space Coast',    css:'saturate(0.8) brightness(1.05) contrast(1.2) hue-rotate(200deg)',          r:.8, g:.9, b:1.2 },
+  { id:'crystal',    name:'Crystal Clear',  css:'saturate(1.1) contrast(1.15) brightness(1.05)',                            r:1,  g:1,  b:1  },
+  { id:'bw',         name:'B&W Classic',    css:'saturate(0) contrast(1.3) brightness(1.0)',                                r:1,  g:1,  b:1  },
+];
+
+const STAMP_STYLES = [
+  { id:'classic',    name:'Classic Badge', icon:'🏷️' },
+  { id:'polaroid',   name:'Polaroid',      icon:'📸' },
+  { id:'vintage',    name:'Vintage Stamp', icon:'📮' },
+  { id:'minimal',    name:'Minimal',       icon:'✦'  },
+  { id:'neon',       name:'Neon Glow',     icon:'💡' },
+  { id:'coords',     name:'Coordinates',   icon:'📍' },
+];
+
+const STAMP_LOCATIONS = [
+  'Walt Disney World','Universal Studios','SeaWorld Orlando','International Drive',
+  'Downtown Orlando','Winter Park','Kissimmee','Kennedy Space Center','Custom...'
+];
+
+const STAMP_COLORS = ['#ffffff','#000000','#FF6B35','rgba(0,0,0,0.6)','rgba(255,255,255,0.6)'];
+
+let filterState = {
+  selectedFilter: 'none',
+  intensity: 100,
+  showingOriginal: false,
+  stampEnabled: false,
+  stampStyle: 'classic',
+  stampLocation: 'Walt Disney World',
+  stampColor: '#ffffff',
+  stampSize: 'md',
+  stampX: null, stampY: null,
+  photoEmoji: '📸',
+  photoData: null,
+};
+
+function openPhotoFilter(photoData) {
+  /* photoData: { emoji, title, caption } */
+  filterState.photoData = photoData;
+  filterState.selectedFilter = 'none';
+  filterState.intensity = 100;
+  filterState.showingOriginal = false;
+  filterState.stampEnabled = false;
+  filterState.stampX = null; filterState.stampY = null;
+  filterState.photoEmoji = photoData?.emoji || '📸';
+
+  const existing = document.getElementById('filter-overlay');
+  if (existing) existing.remove();
+
+  const el = document.createElement('div');
+  el.id = 'filter-overlay';
+  el.className = 'filter-overlay';
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#111;flex-shrink:0;">
+      <button onclick="closePhotoFilter()" style="background:none;border:none;color:#ccc;font-size:22px;cursor:pointer;">✕</button>
+      <div style="color:#fff;font-weight:700;font-size:15px;font-family:'Playfair Display',serif;">Edit Photo</div>
+      <button onclick="saveFilteredPhoto()" style="background:#FF6B35;border:none;color:#fff;font-size:13px;font-weight:700;padding:7px 16px;border-radius:20px;cursor:pointer;font-family:'DM Sans',sans-serif;">Save</button>
+    </div>
+    <div class="filter-preview-area" id="fp-preview-area">
+      <div class="filter-preview-emoji" id="fp-main-emoji" style="filter:none;">${filterState.photoEmoji}</div>
+      <div class="filter-before-after-badge" id="fp-ba-badge" style="display:none;">ORIGINAL</div>
+      <canvas id="fp-canvas" style="display:none;max-width:100%;max-height:100%;"></canvas>
+    </div>
+    <div class="filter-strip-wrap">
+      <div class="filter-strip" id="fp-strip">
+        ${ORLANDO_FILTERS.map(f => `
+          <div class="filter-thumb ${f.id==='none'?'active':''}" id="fthumb-${f.id}" onclick="selectFilter('${f.id}')">
+            <div class="filter-thumb-circle" style="filter:${f.css};">${filterState.photoEmoji}</div>
+            <div class="filter-thumb-name">${f.name}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+    <div class="filter-controls">
+      <div class="filter-slider-row">
+        <span class="filter-slider-label">Intensity</span>
+        <input type="range" class="filter-intensity-slider" id="fp-intensity" min="0" max="100" value="100" oninput="setFilterIntensity(this.value)">
+        <span class="filter-pct" id="fp-pct">100%</span>
+      </div>
+      <div class="filter-btn-row">
+        <button class="filter-btn secondary" onclick="fpToggleBeforeAfter()">⟷ Before/After</button>
+        <button class="filter-btn primary" onclick="applyFilterToCanvas()">✓ Apply</button>
+        <button class="filter-btn danger" onclick="selectFilter('none')">↺ Reset</button>
+      </div>
+    </div>
+    <div class="stamp-section">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <span class="stamp-section-title">📍 LOCATION STAMP</span>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+          <input type="checkbox" id="stamp-toggle" onchange="toggleStamp(this.checked)" style="accent-color:#FF6B35;">
+          <span style="color:#ccc;font-size:12px;">Enable</span>
+        </label>
+      </div>
+      <div id="stamp-options" style="display:none;">
+        <div class="stamp-style-row" id="stamp-style-row">
+          ${STAMP_STYLES.map(s => `
+            <div class="stamp-style-card ${s.id==='classic'?'active':''}" id="ssc-${s.id}" onclick="selectStampStyle('${s.id}')">
+              <div style="font-size:18px;">${s.icon}</div>
+              <div class="stamp-style-card-label">${s.name}</div>
+            </div>`).join('')}
+        </div>
+        <div class="stamp-options-row" style="margin-top:8px;">
+          <span style="color:#ccc;font-size:11px;margin-right:2px;">Location:</span>
+          <select id="stamp-loc-select" onchange="filterState.stampLocation=this.value;renderStampPreview()" style="background:#222;color:#ccc;border:none;border-radius:8px;padding:4px 8px;font-size:12px;font-family:'DM Sans',sans-serif;flex:1;">
+            ${STAMP_LOCATIONS.map(l => `<option value="${l}">${l}</option>`).join('')}
+          </select>
+        </div>
+        <div class="stamp-options-row">
+          ${STAMP_COLORS.map((c,i) => `<div class="stamp-color-swatch ${i===0?'active':''}" id="sc-${i}" style="background:${c};border-color:${c==='#ffffff'?'#555':'transparent'};" onclick="selectStampColor('${c}',${i})"></div>`).join('')}
+          <div style="display:flex;gap:6px;margin-left:8px;">
+            ${['sm','md','lg'].map(s => `<button class="stamp-size-btn ${s==='md'?'active':''}" id="ssz-${s}" onclick="selectStampSize('${s}')">${s.toUpperCase()}</button>`).join('')}
+          </div>
+        </div>
+        <button style="background:#FF6B35;border:none;color:#fff;border-radius:10px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;width:100%;" onclick="applyStampToCanvas()">Apply Stamp to Photo</button>
+      </div>
+    </div>`;
+  document.body.appendChild(el);
+}
+
+function closePhotoFilter() {
+  const el = document.getElementById('filter-overlay');
+  if (el) el.remove();
+}
+
+function selectFilter(id) {
+  filterState.selectedFilter = id;
+  document.querySelectorAll('.filter-thumb').forEach(t => t.classList.remove('active'));
+  const thumb = document.getElementById('fthumb-' + id);
+  if (thumb) thumb.classList.add('active');
+  thumb?.scrollIntoView({ behavior:'smooth', block:'nearest', inline:'center' });
+  applyFilterPreview();
+}
+
+function applyFilterPreview() {
+  const f = ORLANDO_FILTERS.find(x => x.id === filterState.selectedFilter) || ORLANDO_FILTERS[0];
+  const emoji = document.getElementById('fp-main-emoji');
+  if (!emoji) return;
+  if (filterState.showingOriginal) { emoji.style.filter = 'none'; return; }
+  const pct = filterState.intensity / 100;
+  /* Interpolate between no filter and full filter based on intensity */
+  const blended = f.id === 'none' ? 'none' : f.css.replace(/\(([\d.]+)(deg)?\)/g, (m, v, deg) => {
+    const base = deg ? 0 : (m.includes('saturate')||m.includes('brightness')||m.includes('contrast') ? 1 : 0);
+    const val = base + (parseFloat(v) - base) * pct;
+    return `(${val.toFixed(3)}${deg||''})`;
+  });
+  emoji.style.filter = blended;
+}
+
+function setFilterIntensity(val) {
+  filterState.intensity = parseInt(val);
+  const pct = document.getElementById('fp-pct');
+  if (pct) pct.textContent = val + '%';
+  applyFilterPreview();
+}
+
+function fpToggleBeforeAfter() {
+  filterState.showingOriginal = !filterState.showingOriginal;
+  const badge = document.getElementById('fp-ba-badge');
+  if (badge) { badge.style.display = filterState.showingOriginal ? 'block' : 'none'; badge.textContent = filterState.showingOriginal ? 'ORIGINAL' : 'FILTERED'; }
+  applyFilterPreview();
+}
+
+function applyFilterToCanvas() {
+  if (typeof showToast === 'function') showToast('Filter applied! ✓');
+}
+
+function toggleStamp(enabled) {
+  filterState.stampEnabled = enabled;
+  const opts = document.getElementById('stamp-options');
+  if (opts) opts.style.display = enabled ? 'block' : 'none';
+}
+
+function selectStampStyle(id) {
+  filterState.stampStyle = id;
+  document.querySelectorAll('.stamp-style-card').forEach(c => c.classList.remove('active'));
+  const card = document.getElementById('ssc-' + id);
+  if (card) card.classList.add('active');
+}
+
+function selectStampColor(color, idx) {
+  filterState.stampColor = color;
+  document.querySelectorAll('.stamp-color-swatch').forEach(s => s.classList.remove('active'));
+  const sw = document.getElementById('sc-' + idx);
+  if (sw) sw.classList.add('active');
+}
+
+function selectStampSize(size) {
+  filterState.stampSize = size;
+  document.querySelectorAll('.stamp-size-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('ssz-' + size);
+  if (btn) btn.classList.add('active');
+}
+
+function applyStampToCanvas() {
+  /* PRODUCTION NOTE: Replace with server-side canvas compositing for large images */
+  if (typeof showToast === 'function') showToast('📍 Stamp applied to photo!');
+}
+
+function saveFilteredPhoto() {
+  closePhotoFilter();
+  if (typeof showToast === 'function') showToast('Photo saved with filter! 🎨');
+  if (typeof addXP === 'function') addXP(10, 'Applied photo filter');
+}
+
+window.openPhotoFilter = openPhotoFilter;
+window.closePhotoFilter = closePhotoFilter;
+window.selectFilter = selectFilter;
+window.setFilterIntensity = setFilterIntensity;
+window.fpToggleBeforeAfter = fpToggleBeforeAfter;
+window.applyFilterToCanvas = applyFilterToCanvas;
+window.saveFilteredPhoto = saveFilteredPhoto;
+window.toggleStamp = toggleStamp;
+window.selectStampStyle = selectStampStyle;
+window.selectStampColor = selectStampColor;
+window.selectStampSize = selectStampSize;
+window.applyStampToCanvas = applyStampToCanvas;
+</script>
+
+<script>
+/* ===== BLOCK W4: Photo Collage Builder ===== */
+
+const COLLAGE_LAYOUTS = [
+  { id:'grid2x2',   name:'2×2 Grid',      cols:2, rows:2, cells:4,  template:'repeat(2,1fr)/repeat(2,1fr)' },
+  { id:'grid3x3',   name:'3×3 Grid',      cols:3, rows:3, cells:9,  template:'repeat(3,1fr)/repeat(3,1fr)' },
+  { id:'hero3',     name:'Hero + 3',       cols:2, rows:3, cells:4,  template:'custom' },
+  { id:'strip',     name:'Strip',          cols:3, rows:1, cells:3,  template:'repeat(1,1fr)/repeat(3,1fr)' },
+  { id:'mosaic',    name:'Mosaic',         cols:3, rows:2, cells:4,  template:'custom' },
+  { id:'polaroid',  name:'Polaroid Wall',  cols:2, rows:2, cells:4,  template:'repeat(2,1fr)/repeat(2,1fr)', rotate:true },
+  { id:'story',     name:'Story 9:16',     cols:1, rows:3, cells:3,  template:'repeat(3,1fr)/1fr' },
+  { id:'cover',     name:'Cover Page',     cols:3, rows:1, cells:3,  template:'custom' },
+];
+
+const COLLAGE_STICKERS = ['🌴','☀️','⭐','❤️','🔥','🌊','🦩','🏰','🚀','📷','📍','✨'];
+
+let collageState = {
+  selectedPhotos: [],
+  layout: 'grid2x2',
+  gap: 4,
+  bgColor: '#ffffff',
+  radius: 0,
+  stickers: [],
+  titles: [],
+  font: 'Playfair Display',
+};
+
+function openCollageBuilder() {
+  if (typeof appState !== 'undefined' && !appState.user) { openAuthModal('build a collage'); return; }
+  const photos = typeof socialState !== 'undefined' ? (socialState.userPhotos || []) : [];
+  collageState.selectedPhotos = [];
+  collageState.stickers = [];
+  collageState.layout = 'grid2x2';
+  collageState.gap = 4;
+  collageState.bgColor = '#ffffff';
+
+  const existing = document.getElementById('collage-overlay');
+  if (existing) existing.remove();
+
+  /* Mock photos if none uploaded yet */
+  const mockPhotos = [
+    {id:'mp1',emoji:'🏰',caption:'Magic Kingdom'},
+    {id:'mp2',emoji:'🎢',caption:'Roller Coaster'},
+    {id:'mp3',emoji:'🌊',caption:'SeaWorld'},
+    {id:'mp4',emoji:'🦈',caption:'Aquarium'},
+    {id:'mp5',emoji:'🎡',caption:'Theme Park'},
+    {id:'mp6',emoji:'🌴',caption:'Pool Day'},
+    {id:'mp7',emoji:'🎆',caption:'Fireworks'},
+    {id:'mp8',emoji:'🍦',caption:'Ice Cream Stop'},
+    {id:'mp9',emoji:'🌅',caption:'Sunset View'},
+  ];
+  const allPhotos = photos.length ? photos : mockPhotos;
+
+  const el = document.createElement('div');
+  el.id = 'collage-overlay';
+  el.className = 'collage-overlay';
+  el.innerHTML = `
+    <div class="collage-hdr">
+      <button onclick="document.getElementById('collage-overlay').remove()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-primary);">✕</button>
+      <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;">📸 Collage Builder</div>
+      <span id="collage-sel-count" style="font-size:12px;color:#FF6B35;font-weight:700;">0 of 9</span>
+    </div>
+    <div class="collage-body">
+      <!-- Photo selection -->
+      <div class="collage-section-hdr">Select Photos (2–9)</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:0 16px 12px;">
+        ${allPhotos.slice(0,9).map(p => `
+          <div id="csph-${p.id}" onclick="collageTogglePhoto('${p.id}','${p.emoji}','${p.caption}')"
+               style="aspect-ratio:1;background:#eee;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:36px;cursor:pointer;border:2px solid transparent;transition:border-color .2s;position:relative;">
+            ${p.emoji}
+            <div id="csph-chk-${p.id}" style="display:none;position:absolute;top:4px;right:4px;background:#FF6B35;color:#fff;border-radius:50%;width:20px;height:20px;font-size:11px;display:none;align-items:center;justify-content:center;font-weight:700;"></div>
+          </div>`).join('')}
+      </div>
+      <!-- Layout picker -->
+      <div class="collage-section-hdr">Layout</div>
+      <div class="layout-grid">
+        ${COLLAGE_LAYOUTS.map(l => `
+          <div class="layout-thumb ${l.id==='grid2x2'?'active':''}" id="lt-${l.id}" onclick="selectCollageLayout('${l.id}')" title="${l.name}">
+            <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+              ${getLayoutSVG(l.id)}
+            </svg>
+          </div>`).join('')}
+      </div>
+      <!-- Collage preview -->
+      <div class="collage-section-hdr">Preview</div>
+      <div class="collage-canvas-wrap">
+        <div id="collage-grid-el" class="collage-grid" style="gap:4px;background:#fff;min-height:200px;"></div>
+      </div>
+      <!-- Gap -->
+      <div class="collage-section-hdr">Gap</div>
+      <div style="display:flex;gap:8px;padding:0 16px 10px;">
+        ${[['none','0px',0],['tight','4px',4],['medium','8px',8],['wide','16px',16]].map(([k,label,val]) =>
+          `<button class="gap-btn ${k==='tight'?'active':''}" id="gap-${k}" onclick="setCollageGap(${val},'${k}')">${label}</button>`).join('')}
+      </div>
+      <!-- Background -->
+      <div class="collage-section-hdr">Background</div>
+      <div class="bg-swatch-row">
+        ${[['#ffffff','White'],['#000000','Black'],['#FF6B35','Orange'],['#0d1b2a','Navy']].map(([c,n],i) =>
+          `<div class="bg-swatch ${i===0?'active':''}" id="bgsw-${i}" style="background:${c};" title="${n}" onclick="setCollageBg('${c}',${i})"></div>`).join('')}
+        <input type="color" value="#ffffff" onchange="setCollageBg(this.value,-1)" style="width:28px;height:28px;border-radius:50%;border:none;cursor:pointer;padding:0;">
+      </div>
+      <!-- Border Radius -->
+      <div class="collage-section-hdr">Cell Rounding</div>
+      <div style="display:flex;gap:8px;padding:0 16px 10px;">
+        ${[['none',0],['slight',8],['rounded',16]].map(([k,v]) =>
+          `<button class="radius-btn ${k==='none'?'active':''}" id="rad-${k}" onclick="setCollageRadius(${v},'${k}')">${k.charAt(0).toUpperCase()+k.slice(1)}</button>`).join('')}
+      </div>
+      <!-- Text -->
+      <div class="collage-section-hdr">Text Overlays</div>
+      <div style="padding:0 16px 10px;display:flex;gap:8px;">
+        <button onclick="addCollageTitle()" style="background:#F5F5F5;border:none;border-radius:10px;padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">+ Add Title</button>
+        <select onchange="collageState.font=this.value;renderCollageGrid()" style="flex:1;border:1px solid #eee;border-radius:10px;padding:8px;font-size:12px;font-family:'DM Sans',sans-serif;">
+          <option>Playfair Display</option><option>DM Sans</option><option>monospace</option><option>cursive</option><option>Impact</option>
+        </select>
+      </div>
+      <!-- Stickers -->
+      <div class="collage-section-hdr">Stickers</div>
+      <div class="sticker-grid">
+        ${COLLAGE_STICKERS.map(s => `<div class="sticker-btn" onclick="addCollageSticker('${s}')">${s}</div>`).join('')}
+      </div>
+    </div>
+    <div class="export-bar">
+      <button class="export-btn secondary" onclick="shareCollage()">↗ Share</button>
+      <button class="export-btn primary" onclick="exportCollage()">⬇ Export</button>
+    </div>`;
+  document.body.appendChild(el);
+  renderCollageGrid();
+}
+
+function getLayoutSVG(id) {
+  const svgs = {
+    grid2x2: '<rect x="1" y="1" width="18" height="18" rx="2" fill="#FF6B35"/><rect x="21" y="1" width="18" height="18" rx="2" fill="#FFD700"/><rect x="1" y="21" width="18" height="18" rx="2" fill="#4CAF50"/><rect x="21" y="21" width="18" height="18" rx="2" fill="#2196F3"/>',
+    grid3x3: '<rect x="1" y="1" width="11" height="11" rx="1" fill="#FF6B35"/><rect x="14" y="1" width="11" height="11" rx="1" fill="#FFD700"/><rect x="27" y="1" width="11" height="11" rx="1" fill="#4CAF50"/><rect x="1" y="14" width="11" height="11" rx="1" fill="#2196F3"/><rect x="14" y="14" width="11" height="11" rx="1" fill="#9C27B0"/><rect x="27" y="14" width="11" height="11" rx="1" fill="#E91E63"/><rect x="1" y="27" width="11" height="11" rx="1" fill="#00BCD4"/><rect x="14" y="27" width="11" height="11" rx="1" fill="#FF5722"/><rect x="27" y="27" width="11" height="11" rx="1" fill="#607D8B"/>',
+    hero3:   '<rect x="1" y="1" width="22" height="38" rx="2" fill="#FF6B35"/><rect x="25" y="1" width="14" height="11" rx="1" fill="#FFD700"/><rect x="25" y="14" width="14" height="11" rx="1" fill="#4CAF50"/><rect x="25" y="27" width="14" height="11" rx="1" fill="#2196F3"/>',
+    strip:   '<rect x="1" y="8" width="11" height="24" rx="2" fill="#FF6B35"/><rect x="14" y="8" width="11" height="24" rx="2" fill="#FFD700"/><rect x="27" y="8" width="11" height="24" rx="2" fill="#4CAF50"/>',
+    mosaic:  '<rect x="1" y="1" width="22" height="22" rx="2" fill="#FF6B35"/><rect x="25" y="1" width="14" height="22" rx="2" fill="#FFD700"/><rect x="1" y="25" width="11" height="14" rx="2" fill="#4CAF50"/><rect x="14" y="25" width="25" height="14" rx="2" fill="#2196F3"/>',
+    polaroid:'<rect x="2" y="4" width="16" height="16" rx="1" fill="#FF6B35" transform="rotate(-5 10 12)"/><rect x="22" y="2" width="16" height="16" rx="1" fill="#FFD700" transform="rotate(4 30 10)"/><rect x="4" y="22" width="16" height="16" rx="1" fill="#4CAF50" transform="rotate(3 12 30)"/><rect x="20" y="22" width="16" height="16" rx="1" fill="#2196F3" transform="rotate(-4 28 30)"/>',
+    story:   '<rect x="8" y="1" width="24" height="11" rx="2" fill="#FF6B35"/><rect x="8" y="14" width="24" height="11" rx="2" fill="#FFD700"/><rect x="8" y="27" width="24" height="11" rx="2" fill="#4CAF50"/>',
+    cover:   '<rect x="1" y="8" width="8" height="24" rx="2" fill="#FFD700"/><rect x="11" y="1" width="18" height="38" rx="2" fill="#FF6B35"/><rect x="31" y="8" width="8" height="24" rx="2" fill="#4CAF50"/>',
+  };
+  return svgs[id] || svgs.grid2x2;
+}
+
+function collageTogglePhoto(id, emoji, caption) {
+  const idx = collageState.selectedPhotos.findIndex(p => p.id === id);
+  const cell = document.getElementById('csph-' + id);
+  const chk = document.getElementById('csph-chk-' + id);
+  if (idx >= 0) {
+    collageState.selectedPhotos.splice(idx, 1);
+    if (cell) { cell.style.borderColor = 'transparent'; cell.style.opacity = '1'; }
+    if (chk) chk.style.display = 'none';
+  } else {
+    if (collageState.selectedPhotos.length >= 9) { if(typeof showToast==='function') showToast('Maximum 9 photos'); return; }
+    collageState.selectedPhotos.push({ id, emoji, caption });
+    if (cell) { cell.style.borderColor = '#FF6B35'; cell.style.opacity = '.85'; }
+    if (chk) { chk.style.display = 'flex'; chk.textContent = collageState.selectedPhotos.length; }
+  }
+  const cnt = document.getElementById('collage-sel-count');
+  if (cnt) cnt.textContent = collageState.selectedPhotos.length + ' of 9';
+  renderCollageGrid();
+}
+
+function selectCollageLayout(id) {
+  collageState.layout = id;
+  document.querySelectorAll('.layout-thumb').forEach(t => t.classList.remove('active'));
+  const lt = document.getElementById('lt-' + id);
+  if (lt) lt.classList.add('active');
+  renderCollageGrid();
+}
+
+function setCollageGap(val, key) {
+  collageState.gap = val;
+  document.querySelectorAll('.gap-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('gap-' + key);
+  if (btn) btn.classList.add('active');
+  renderCollageGrid();
+}
+
+function setCollageBg(color, idx) {
+  collageState.bgColor = color;
+  document.querySelectorAll('.bg-swatch').forEach(s => s.classList.remove('active'));
+  if (idx >= 0) { const sw = document.getElementById('bgsw-' + idx); if(sw) sw.classList.add('active'); }
+  renderCollageGrid();
+}
+
+function setCollageRadius(val, key) {
+  collageState.radius = val;
+  document.querySelectorAll('.radius-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('rad-' + key);
+  if (btn) btn.classList.add('active');
+  renderCollageGrid();
+}
+
+function renderCollageGrid() {
+  const grid = document.getElementById('collage-grid-el');
+  if (!grid) return;
+  const layout = COLLAGE_LAYOUTS.find(l => l.id === collageState.layout) || COLLAGE_LAYOUTS[0];
+  const photos = collageState.selectedPhotos;
+  const gap = collageState.gap;
+  const bg = collageState.bgColor;
+  const r = collageState.radius;
+
+  grid.style.gap = gap + 'px';
+  grid.style.background = bg;
+  grid.style.padding = gap + 'px';
+
+  const cellCount = Math.max(layout.cells, Math.max(2, photos.length));
+  const cells = Array.from({length: layout.cells}, (_, i) => photos[i] || null);
+
+  if (layout.template === 'custom') {
+    grid.style.gridTemplate = '';
+    grid.style.display = 'flex';
+    grid.style.flexWrap = 'wrap';
+    grid.innerHTML = cells.map((p, i) => {
+      const flex = (layout.id === 'hero3' && i === 0) ? '2' : '1';
+      return `<div style="flex:${flex};min-width:80px;height:150px;background:#ddd;border-radius:${r}px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:40px;${layout.rotate ? `transform:rotate(${(i%2===0?-3:3)}deg);` : ''}">
+        ${p ? p.emoji : ''}
+      </div>`;
+    }).join('');
+  } else {
+    grid.style.display = 'grid';
+    grid.style.gridTemplate = `repeat(${layout.rows},${160/layout.rows}px) / repeat(${layout.cols},1fr)`;
+    grid.innerHTML = cells.map((p, i) => {
+      return `<div style="background:#ddd;border-radius:${r}px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:${layout.cols===3?'28':layout.cols===1?'48':'36'}px;${layout.rotate?`transform:rotate(${(i%2===0?-3:3)}deg);`:''}" >
+        ${p ? p.emoji : ''}
+      </div>`;
+    }).join('');
+  }
+
+  /* Render stickers on top */
+  collageState.stickers.forEach((s, i) => {
+    const el = document.createElement('div');
+    el.className = 'collage-sticker';
+    el.textContent = s.emoji;
+    el.style.left = s.x + 'px';
+    el.style.top = s.y + 'px';
+    grid.appendChild(el);
+  });
+}
+
+function addCollageTitle() {
+  const title = prompt('Enter title text:', 'My Orlando Trip ✨');
+  if (!title) return;
+  if (typeof showToast === 'function') showToast('Title added to collage!');
+}
+
+function addCollageSticker(emoji) {
+  collageState.stickers.push({ emoji, x: 60 + Math.random() * 100, y: 40 + Math.random() * 80 });
+  renderCollageGrid();
+  if (typeof showToast === 'function') showToast(emoji + ' added!');
+}
+
+function exportCollage() {
+  /* PRODUCTION NOTE: Replace with html2canvas or server-side rendering for production */
+  if (typeof showToast === 'function') showToast('Collage exported! 🎉 (downloading...)');
+  if (typeof addXP === 'function') addXP(15, 'Created a photo collage');
+}
+
+function shareCollage() {
+  if (typeof appState !== 'undefined' && !appState.user) { openAuthModal('share collage'); return; }
+  if (typeof showToast === 'function') showToast('Collage added to your photos! 📸');
+  if (typeof addXP === 'function') addXP(10, 'Shared a collage');
+}
+
+window.openCollageBuilder = openCollageBuilder;
+window.collageTogglePhoto = collageTogglePhoto;
+window.selectCollageLayout = selectCollageLayout;
+window.setCollageGap = setCollageGap;
+window.setCollageBg = setCollageBg;
+window.setCollageRadius = setCollageRadius;
+window.addCollageTitle = addCollageTitle;
+window.addCollageSticker = addCollageSticker;
+window.exportCollage = exportCollage;
+window.shareCollage = shareCollage;
+window.renderCollageGrid = renderCollageGrid;
+</script>
+
+<script>
+/* ===== BLOCK W5: Highlight Reel Creator ===== */
+
+const REEL_TRANSITIONS = ['Fade','Slide','Zoom','Ken Burns','Flip','Wipe'];
+const REEL_DURATIONS = [2,3,4,5];
+const REEL_MUSIC_OPTIONS = [
+  {id:'none',   name:'No Music',           icon:'🔇'},
+  {id:'trop',   name:'Tropical Vibes',     icon:'🌴', freq:[261,329,392,523]},
+  {id:'upbeat', name:'Upbeat Orlando',     icon:'🎡', freq:[392,523,659,784]},
+  {id:'cinem',  name:'Cinematic Journey',  icon:'🎬', freq:[220,277,330,440]},
+  {id:'relax',  name:'Relaxing Escape',    icon:'🌊', freq:[174,220,261,349]},
+  {id:'park',   name:'Theme Park Magic',   icon:'🏰', freq:[349,440,523,698]},
+];
+
+let reelState = {
+  photos: [],
+  transition: 'Fade',
+  duration: 3,
+  music: 'none',
+  introSlide: true,
+  outroSlide: true,
+  currentSlide: 0,
+  isPlaying: false,
+  playerTimer: null,
+  audioCtx: null,
+};
+
+function openHighlightReel() {
+  if (typeof appState !== 'undefined' && !appState.user) { openAuthModal('create a highlight reel'); return; }
+
+  const mockPhotos = [
+    {id:'r1',emoji:'🏰',caption:'Magic Kingdom',loc:'Walt Disney World'},
+    {id:'r2',emoji:'🎢',caption:'Tron Lightcycle',loc:'Walt Disney World'},
+    {id:'r3',emoji:'🦈',caption:'SeaWorld',loc:'SeaWorld Orlando'},
+    {id:'r4',emoji:'🧙',caption:'Diagon Alley',loc:'Universal Studios'},
+    {id:'r5',emoji:'🌅',caption:'Sunset',loc:'International Drive'},
+    {id:'r6',emoji:'🍦',caption:'Ice Cream Stop',loc:'Disney Springs'},
+  ];
+  const userPhotos = (typeof socialState !== 'undefined' && socialState.userPhotos?.length) ? socialState.userPhotos : mockPhotos;
+  reelState.photos = userPhotos.slice();
+
+  const existing = document.getElementById('reel-overlay');
+  if (existing) existing.remove();
+
+  const el = document.createElement('div');
+  el.id = 'reel-overlay';
+  el.className = 'reel-overlay';
+  el.innerHTML = `
+    <div style="background:#fff;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #eee;flex-shrink:0;">
+      <button onclick="document.getElementById('reel-overlay').remove()" style="background:none;border:none;font-size:22px;cursor:pointer;">✕</button>
+      <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;">🎬 Highlight Reel</div>
+      <button onclick="previewReel()" style="background:linear-gradient(135deg,#FF6B35,#FFD700);border:none;color:#fff;font-size:12px;font-weight:700;padding:7px 14px;border-radius:20px;cursor:pointer;font-family:'DM Sans',sans-serif;">▶ Preview</button>
+    </div>
+    <div style="flex:1;overflow-y:auto;">
+      <!-- Photo list -->
+      <div style="padding:12px 16px 4px;font-weight:700;font-size:13px;">Photos (drag to reorder)</div>
+      <div id="reel-photo-list" class="reel-photo-list"></div>
+      <!-- Settings -->
+      <div style="padding:12px 16px 4px;font-weight:700;font-size:13px;">Transition Style</div>
+      <div style="display:flex;gap:8px;overflow-x:auto;padding:0 16px 10px;scrollbar-width:none;">
+        ${REEL_TRANSITIONS.map(t => `<button class="transition-chip ${t==='Fade'?'active':''}" id="rtrans-${t}" onclick="setReelTransition('${t}')">${t}</button>`).join('')}
+      </div>
+      <div style="padding:4px 16px;font-weight:700;font-size:13px;">Slide Duration</div>
+      <div style="display:flex;gap:8px;padding:8px 16px 10px;">
+        ${REEL_DURATIONS.map(d => `<button class="transition-chip ${d===3?'active':''}" id="rdur-${d}" onclick="setReelDuration(${d})">${d}s</button>`).join('')}
+      </div>
+      <div style="padding:4px 16px;font-weight:700;font-size:13px;">Background Music</div>
+      <div style="display:flex;gap:8px;overflow-x:auto;padding:8px 16px 10px;flex-wrap:wrap;">
+        ${REEL_MUSIC_OPTIONS.map(m => `
+          <button class="music-pill ${m.id==='none'?'active':''}" id="rmus-${m.id}" onclick="setReelMusic('${m.id}')">
+            ${m.icon} ${m.name} <span class="music-play-btn" onclick="event.stopPropagation();previewMusicTone('${m.id}')">▶</span>
+          </button>`).join('')}
+      </div>
+      <div style="padding:0 16px 10px;display:flex;flex-direction:column;gap:10px;">
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+          <input type="checkbox" checked id="reel-intro" onchange="reelState.introSlide=this.checked" style="accent-color:#FF6B35;width:18px;height:18px;">
+          <div><div style="font-size:13px;font-weight:600;">Intro Slide</div><div style="font-size:11px;color:#9E9E9E;">Trip name, city & dates</div></div>
+        </label>
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+          <input type="checkbox" checked id="reel-outro" onchange="reelState.outroSlide=this.checked" style="accent-color:#FF6B35;width:18px;height:18px;">
+          <div><div style="font-size:13px;font-weight:600;">Outro Slide</div><div style="font-size:11px;color:#9E9E9E;">Thanks for watching</div></div>
+        </label>
+      </div>
+      <div style="display:flex;gap:8px;padding:0 16px 24px;">
+        <button onclick="downloadReel()" style="flex:1;background:#F5F5F5;border:none;border-radius:12px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">⬇ Download</button>
+        <button onclick="shareReel()" style="flex:1;background:linear-gradient(135deg,#FF6B35,#FFD700);border:none;border-radius:12px;padding:12px;font-size:13px;font-weight:700;color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;">↗ Share Reel</button>
+      </div>
+    </div>`;
+  document.body.appendChild(el);
+  renderReelPhotoList();
+}
+
+function renderReelPhotoList() {
+  const list = document.getElementById('reel-photo-list');
+  if (!list) return;
+  list.innerHTML = reelState.photos.map((p, i) => `
+    <div class="reel-photo-row">
+      <div style="color:#ccc;font-size:14px;font-weight:700;width:20px;">${i+1}</div>
+      <div class="reel-photo-thumb">${p.emoji || '📸'}</div>
+      <div class="reel-photo-info">
+        <div class="reel-photo-name">${p.caption || p.name || 'Photo'}</div>
+        <div class="reel-photo-loc">📍 ${p.loc || p.location || 'Orlando'}</div>
+      </div>
+      <button class="reel-remove-btn" onclick="removeReelPhoto(${i})">✕</button>
+    </div>`).join('');
+}
+
+function removeReelPhoto(idx) {
+  reelState.photos.splice(idx, 1);
+  renderReelPhotoList();
+}
+
+function setReelTransition(t) {
+  reelState.transition = t;
+  document.querySelectorAll('.transition-chip[id^="rtrans-"]').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('rtrans-' + t);
+  if (btn) btn.classList.add('active');
+}
+
+function setReelDuration(d) {
+  reelState.duration = d;
+  document.querySelectorAll('.transition-chip[id^="rdur-"]').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('rdur-' + d);
+  if (btn) btn.classList.add('active');
+}
+
+function setReelMusic(id) {
+  reelState.music = id;
+  document.querySelectorAll('.music-pill').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('rmus-' + id);
+  if (btn) btn.classList.add('active');
+}
+
+function previewMusicTone(id) {
+  const m = REEL_MUSIC_OPTIONS.find(x => x.id === id);
+  if (!m || !m.freq) return;
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    m.freq.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.value = freq;
+      osc.type = 'sine';
+      gain.gain.setValueAtTime(0.12, ctx.currentTime + i * 0.25);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.25 + 0.3);
+      osc.start(ctx.currentTime + i * 0.25);
+      osc.stop(ctx.currentTime + i * 0.25 + 0.35);
+    });
+  } catch(e) { /* Web Audio not supported */ }
+}
+
+function previewReel() {
+  if (reelState.photos.length === 0) { if(typeof showToast==='function') showToast('Add some photos first!'); return; }
+  openReelPlayer();
+}
+
+function openReelPlayer() {
+  const existing = document.getElementById('reel-player-overlay');
+  if (existing) existing.remove();
+  clearInterval(reelState.playerTimer);
+  reelState.currentSlide = 0;
+  reelState.isPlaying = true;
+
+  const allSlides = [];
+  if (reelState.introSlide) allSlides.push({ type:'intro', emoji:'🌴', caption:'My Orlando Trip', sub:'Orlando, Florida · 2025' });
+  reelState.photos.forEach(p => allSlides.push({ type:'photo', emoji: p.emoji || '📸', caption: p.caption || '', loc: p.loc || 'Orlando' }));
+  if (reelState.outroSlide) allSlides.push({ type:'outro', emoji:'⭐', caption:'Thanks for watching!', sub:'Orlando Explorer' });
+
+  const el = document.createElement('div');
+  el.id = 'reel-player-overlay';
+  el.className = 'reel-player-overlay';
+  el.innerHTML = `
+    <div style="position:relative;flex:1;overflow:hidden;" id="reel-slides-wrap">
+      ${allSlides.map((s, i) => `
+        <div class="reel-slide ${i===0?'':'hidden'}" id="rsl-${i}"
+             style="position:absolute;inset:0;background:${['linear-gradient(135deg,#1a237e,#283593)','linear-gradient(135deg,#FF6B35,#FFD700)','linear-gradient(135deg,#1b5e20,#388e3c)','linear-gradient(135deg,#4a148c,#7b1fa2)','linear-gradient(135deg,#bf360c,#e64a19)','linear-gradient(135deg,#006064,#0097a7)'][i%6]};display:flex;align-items:center;justify-content:center;flex-direction:column;">
+          <div style="font-size:80px;animation:vidEmojiZoom 4s ease-in-out infinite;">${s.emoji}</div>
+          <div class="reel-loc-overlay" style="position:static;animation:none;text-align:center;padding:0 20px;">
+            <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.5);">${s.caption}</div>
+            ${s.sub ? `<div style="font-size:13px;color:rgba(255,255,255,.8);margin-top:6px;">${s.sub}</div>` : ''}
+            ${s.loc ? `<div style="font-size:13px;color:rgba(255,255,255,.8);margin-top:6px;">📍 ${s.loc}</div>` : ''}
+          </div>
+        </div>`).join('')}
+      <div class="reel-progress-bar"><div class="reel-progress-fill" id="reel-prog-fill" style="width:0%;"></div></div>
+    </div>
+    <div class="reel-ctrl-bar">
+      <button class="reel-ctrl-btn" onclick="reelGoSlide(-1)">⏮</button>
+      <button class="reel-ctrl-btn" id="reel-play-btn" onclick="toggleReelPlay()">⏸</button>
+      <button class="reel-ctrl-btn" onclick="reelGoSlide(1)">⏭</button>
+      <button class="reel-ctrl-btn" onclick="closeReelPlayer()" style="margin-left:auto;">✕</button>
+    </div>`;
+  document.body.appendChild(el);
+
+  reelState._slides = allSlides;
+  reelState._totalSlides = allSlides.length;
+  reelState._slideProgress = 0;
+  reelStartTimer();
+}
+
+function reelStartTimer() {
+  clearInterval(reelState.playerTimer);
+  const totalMs = reelState.duration * 1000;
+  const step = 100;
+  reelState._slideProgress = 0;
+  reelState.playerTimer = setInterval(() => {
+    if (!reelState.isPlaying) return;
+    reelState._slideProgress += step;
+    const pct = (reelState.currentSlide + reelState._slideProgress / totalMs) / reelState._totalSlides * 100;
+    const fill = document.getElementById('reel-prog-fill');
+    if (fill) fill.style.width = pct + '%';
+    if (reelState._slideProgress >= totalMs) {
+      reelGoSlide(1);
+    }
+  }, step);
+}
+
+function reelGoSlide(dir) {
+  const oldSlide = document.getElementById('rsl-' + reelState.currentSlide);
+  if (oldSlide) oldSlide.classList.add('hidden');
+  reelState.currentSlide = Math.max(0, Math.min(reelState._totalSlides - 1, reelState.currentSlide + dir));
+  const newSlide = document.getElementById('rsl-' + reelState.currentSlide);
+  if (newSlide) newSlide.classList.remove('hidden');
+  reelState._slideProgress = 0;
+  if (reelState.currentSlide >= reelState._totalSlides - 1 && dir > 0) {
+    clearInterval(reelState.playerTimer);
+    reelState.isPlaying = false;
+    const btn = document.getElementById('reel-play-btn');
+    if (btn) btn.textContent = '▶';
+    return;
+  }
+  reelStartTimer();
+}
+
+function toggleReelPlay() {
+  reelState.isPlaying = !reelState.isPlaying;
+  const btn = document.getElementById('reel-play-btn');
+  if (btn) btn.textContent = reelState.isPlaying ? '⏸' : '▶';
+}
+
+function closeReelPlayer() {
+  clearInterval(reelState.playerTimer);
+  const el = document.getElementById('reel-player-overlay');
+  if (el) el.remove();
+}
+
+function downloadReel() {
+  if (typeof showToast === 'function') showToast('Reel frames downloading... 📥');
+  if (typeof addXP === 'function') addXP(20, 'Created a highlight reel');
+}
+
+function shareReel() {
+  if (typeof showToast === 'function') showToast('Reel link copied! ↗');
+}
+
+window.openHighlightReel = openHighlightReel;
+window.previewReel = previewReel;
+window.setReelTransition = setReelTransition;
+window.setReelDuration = setReelDuration;
+window.setReelMusic = setReelMusic;
+window.previewMusicTone = previewMusicTone;
+window.removeReelPhoto = removeReelPhoto;
+window.openReelPlayer = openReelPlayer;
+window.reelGoSlide = reelGoSlide;
+window.toggleReelPlay = toggleReelPlay;
+window.closeReelPlayer = closeReelPlayer;
+window.downloadReel = downloadReel;
+window.shareReel = shareReel;
+</script>
+
+<script>
+/* ===== BLOCK W6: Share Album + ZIP Download ===== */
+/* NOTE: Replace with a server-side zip generation endpoint in production for large photo collections */
+
+let albumState = {
+  albums: [],
+  visibility: 'public',
+  coverPhotoIdx: 0,
+};
+
+function openShareAlbum() {
+  if (typeof appState !== 'undefined' && !appState.user) { openAuthModal('create an album'); return; }
+  const existing = document.getElementById('album-modal');
+  if (existing) existing.remove();
+
+  const user = (typeof appState !== 'undefined' && appState.user) ? appState.user : { name:'Explorer', avatar:'😊' };
+  const mockPhotos = [
+    {id:'ap1',emoji:'🏰'},{id:'ap2',emoji:'🎢'},{id:'ap3',emoji:'🌊'},{id:'ap4',emoji:'🌴'},{id:'ap5',emoji:'🎡'},
+  ];
+
+  const el = document.createElement('div');
+  el.id = 'album-modal';
+  el.className = 'album-modal';
+  el.onclick = e => { if (e.target === el) el.remove(); };
+  el.innerHTML = `<div class="album-sheet">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;">📸 Create Album</div>
+      <button onclick="document.getElementById('album-modal').remove()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#9E9E9E;">✕</button>
+    </div>
+    <div style="margin-bottom:12px;">
+      <label style="font-size:12px;font-weight:700;color:#9E9E9E;display:block;margin-bottom:5px;">ALBUM TITLE</label>
+      <input id="album-title" value="My Orlando Trip" style="width:100%;border:1px solid #eee;border-radius:10px;padding:10px 12px;font-size:14px;font-family:'DM Sans',sans-serif;box-sizing:border-box;">
+    </div>
+    <div style="margin-bottom:14px;">
+      <label style="font-size:12px;font-weight:700;color:#9E9E9E;display:block;margin-bottom:5px;">DESCRIPTION</label>
+      <textarea id="album-desc" rows="2" placeholder="Memories from my Orlando adventure..." style="width:100%;border:1px solid #eee;border-radius:10px;padding:10px 12px;font-size:13px;font-family:'DM Sans',sans-serif;box-sizing:border-box;resize:none;"></textarea>
+    </div>
+    <div style="margin-bottom:14px;">
+      <label style="font-size:12px;font-weight:700;color:#9E9E9E;display:block;margin-bottom:8px;">VISIBILITY</label>
+      <div style="display:flex;gap:8px;">
+        <div class="album-vis-btn active" id="avis-public" onclick="setAlbumVisibility('public')"><div class="album-vis-icon">🌐</div><div class="album-vis-label">Public</div></div>
+        <div class="album-vis-btn" id="avis-friends" onclick="setAlbumVisibility('friends')"><div class="album-vis-icon">👥</div><div class="album-vis-label">Friends</div></div>
+        <div class="album-vis-btn" id="avis-private" onclick="setAlbumVisibility('private')"><div class="album-vis-icon">🔒</div><div class="album-vis-label">Private Link</div></div>
+      </div>
+    </div>
+    <div style="margin-bottom:16px;">
+      <label style="font-size:12px;font-weight:700;color:#9E9E9E;display:block;margin-bottom:8px;">COVER PHOTO</label>
+      <div style="display:flex;gap:8px;overflow-x:auto;padding:2px 0;scrollbar-width:none;">
+        ${mockPhotos.map((p, i) => `<div onclick="albumState.coverPhotoIdx=${i}" style="width:60px;height:60px;background:#eee;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:28px;cursor:pointer;border:2px solid ${i===0?'#FF6B35':'transparent'};flex-shrink:0;">${p.emoji}</div>`).join('')}
+      </div>
+    </div>
+    <button onclick="createAlbum()" style="width:100%;background:linear-gradient(135deg,#FF6B35,#FFD700);border:none;border-radius:14px;padding:14px;font-size:15px;font-weight:700;color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;">Create Album →</button>
+  </div>`;
+  document.body.appendChild(el);
+}
+
+function setAlbumVisibility(v) {
+  albumState.visibility = v;
+  ['public','friends','private'].forEach(x => {
+    const btn = document.getElementById('avis-' + x);
+    if (btn) btn.classList.toggle('active', x === v);
+  });
+}
+
+function createAlbum() {
+  const title = document.getElementById('album-title')?.value || 'My Orlando Trip';
+  const desc = document.getElementById('album-desc')?.value || '';
+  const user = (typeof appState !== 'undefined' && appState.user) ? appState.user : { name:'Explorer' };
+  const slug = (user.name + '-' + title).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const album = { id: 'alb_' + Date.now(), title, desc, slug, visibility: albumState.visibility, photoCount: 5, views: 0, likes: 0, cover: '🏰', createdAt: 'Just now' };
+  albumState.albums.push(album);
+
+  const existing = document.getElementById('album-modal');
+  if (existing) existing.remove();
+
+  const shareUrl = 'orlandoexplorer.com/albums/' + (user.name || 'user').toLowerCase() + '/' + slug;
+  showAlbumSuccess(title, shareUrl);
+  if (typeof addXP === 'function') addXP(15, 'Created photo album: ' + title);
+}
+
+function showAlbumSuccess(title, url) {
+  const el = document.createElement('div');
+  el.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9200;max-width:430px;left:50%;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;';
+  el.innerHTML = `<div style="background:#fff;border-radius:20px;padding:28px 20px;width:90%;max-width:340px;text-align:center;">
+    <div style="font-size:52px;margin-bottom:12px;animation:vidEmojiZoom .5s ease;">✅</div>
+    <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:6px;">${title}</div>
+    <div style="font-size:13px;color:#9E9E9E;margin-bottom:14px;">Your album is live!</div>
+    <div style="background:#F5F5F5;border-radius:10px;padding:10px;font-size:11px;color:#424242;word-break:break-all;margin-bottom:12px;">${url}</div>
+    <!-- Share destinations -->
+    <div class="share-dest-row" style="justify-content:center;margin-bottom:14px;">
+      ${[['📋','Copy Link'],['💬','Messages'],['📷','Instagram'],['💚','WhatsApp'],['📘','Facebook'],['📧','Email']].map(([icon,name]) =>
+        `<div class="share-dest-btn" onclick="albumShareDest('${name}','${url}')"><div class="share-dest-icon">${icon}</div><div class="share-dest-label">${name}</div></div>`).join('')}
+    </div>
+    <!-- QR Code simulation -->
+    <div style="margin-bottom:10px;">
+      <div style="font-size:12px;font-weight:700;color:#9E9E9E;margin-bottom:8px;">QR CODE</div>
+      <div class="qr-grid" id="qr-grid-el"></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:12px;">
+      <button onclick="downloadQR()" style="flex:1;background:#F5F5F5;border:none;border-radius:20px;padding:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">⬇ QR Code</button>
+      <button onclick="this.closest('[style]').remove()" style="flex:1;background:linear-gradient(135deg,#FF6B35,#FFD700);border:none;border-radius:20px;padding:10px;font-size:12px;font-weight:700;color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;">Done ✓</button>
+    </div>
+  </div>`;
+  document.body.appendChild(el);
+  renderQRCode();
+}
+
+function renderQRCode() {
+  const grid = document.getElementById('qr-grid-el');
+  if (!grid) return;
+  /* Simulate a QR code pattern */
+  const pattern = [];
+  for (let i = 0; i < 100; i++) {
+    const row = Math.floor(i / 10), col = i % 10;
+    const isCorner = (row < 3 && col < 3) || (row < 3 && col > 6) || (row > 6 && col < 3);
+    pattern.push(isCorner || Math.random() > 0.5);
+  }
+  grid.innerHTML = pattern.map(filled => `<div class="qr-cell" style="background:${filled?'#000':'#fff'};"></div>`).join('');
+}
+
+function albumShareDest(name, url) {
+  if (name === 'Copy Link') {
+    navigator.clipboard?.writeText(url).catch(() => {});
+    if (typeof showToast === 'function') showToast('Album link copied to clipboard! 📋');
+  } else {
+    if (typeof showToast === 'function') showToast('Shared to ' + name + '! ' + '✓');
+  }
+}
+
+function downloadQR() {
+  if (typeof showToast === 'function') showToast('QR Code downloaded! 📲');
+}
+
+/* ===== ZIP Download ===== */
+let zipState = { option: 'all', quality: 'full', progress: 0 };
+
+function openZipDownload() {
+  const existing = document.getElementById('zip-modal');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'zip-modal';
+  el.className = 'zip-modal';
+  el.onclick = e => { if (e.target === el) el.remove(); };
+  el.innerHTML = `<div class="zip-sheet">
+    <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;margin-bottom:14px;">⬇ Download Photos</div>
+    <div>
+      ${[['all','All Photos'],['by_loc','By Location (folders)'],['filtered','Filtered Only'],['originals','Originals Only']].map(([k,label]) =>
+        `<div class="zip-opt-btn" onclick="selectZipOption('${k}')">
+          <div class="zip-opt-radio ${k==='all'?'selected':''}" id="zipopt-${k}"></div>
+          <div style="font-size:13px;font-weight:600;">${label}</div>
+        </div>`).join('')}
+    </div>
+    <div style="margin:12px 0 8px;font-weight:700;font-size:12px;color:#9E9E9E;">QUALITY</div>
+    <div style="display:flex;gap:8px;margin-bottom:14px;">
+      ${[['full','Full Quality'],['web','Web (80%)'],['thumb','Thumb (40%)']].map(([k,label]) =>
+        `<button class="gap-btn ${k==='full'?'active':''}" id="zipq-${k}" onclick="selectZipQuality('${k}')" style="flex:1;">${label}</button>`).join('')}
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button onclick="document.getElementById('zip-modal').remove()" style="flex:1;background:#F5F5F5;border:none;border-radius:12px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">Cancel</button>
+      <button onclick="startZipDownload()" style="flex:1;background:linear-gradient(135deg,#FF6B35,#FFD700);border:none;border-radius:12px;padding:12px;font-size:13px;font-weight:700;color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;">⬇ Download</button>
+    </div>
+  </div>`;
+  document.body.appendChild(el);
+}
+
+function selectZipOption(k) {
+  zipState.option = k;
+  document.querySelectorAll('.zip-opt-radio').forEach(r => r.classList.remove('selected'));
+  const r = document.getElementById('zipopt-' + k);
+  if (r) r.classList.add('selected');
+}
+
+function selectZipQuality(k) {
+  zipState.quality = k;
+  document.querySelectorAll('[id^="zipq-"]').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('zipq-' + k);
+  if (btn) btn.classList.add('active');
+}
+
+function startZipDownload() {
+  const modal = document.getElementById('zip-modal');
+  if (modal) modal.remove();
+  showZipProgress();
+}
+
+function showZipProgress() {
+  const el = document.createElement('div');
+  el.id = 'zip-progress-modal';
+  el.className = 'zip-modal';
+  el.innerHTML = `<div class="zip-sheet" style="text-align:center;">
+    <div style="font-size:36px;margin-bottom:10px;">📦</div>
+    <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;margin-bottom:6px;">Preparing your photos</div>
+    <div style="font-size:13px;color:#9E9E9E;margin-bottom:14px;">Adding to ZIP archive...</div>
+    <div class="zip-progress-bar"><div class="zip-progress-fill" id="zip-prog-fill" style="width:0%;"></div></div>
+    <div style="font-size:13px;font-weight:700;color:#FF6B35;margin-top:8px;" id="zip-pct-label">0%</div>
+  </div>`;
+  document.body.appendChild(el);
+
+  /* Simulate JSZip progress */
+  /* NOTE: Replace with real JSZip usage — load from https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js */
+  let pct = 0;
+  const timer = setInterval(() => {
+    pct += Math.random() * 18 + 5;
+    if (pct >= 100) { pct = 100; clearInterval(timer); finalizeZip(); }
+    const fill = document.getElementById('zip-prog-fill');
+    const label = document.getElementById('zip-pct-label');
+    if (fill) fill.style.width = pct + '%';
+    if (label) label.textContent = Math.round(pct) + '%';
+  }, 200);
+}
+
+function finalizeZip() {
+  const modal = document.getElementById('zip-progress-modal');
+  if (modal) modal.remove();
+  const count = 5 + Math.floor(Math.random() * 10);
+  if (typeof showToast === 'function') showToast(count + ' photos downloaded successfully! 📸');
+  if (typeof addXP === 'function') addXP(5, 'Downloaded photo album');
+}
+
+window.openShareAlbum = openShareAlbum;
+window.setAlbumVisibility = setAlbumVisibility;
+window.createAlbum = createAlbum;
+window.albumShareDest = albumShareDest;
+window.downloadQR = downloadQR;
+window.openZipDownload = openZipDownload;
+window.selectZipOption = selectZipOption;
+window.selectZipQuality = selectZipQuality;
+window.startZipDownload = startZipDownload;
+</script>
+
+<script>
+/* ===== BLOCK W7: Video Tours for Attractions / Restaurants / Hotels ===== */
+/* PRODUCTION NOTE: Replace simulated video players with real <video src="..."> pointing to CDN-hosted MP4/HLS files */
+
+/* ---- Video data per content type ---- */
+function getAttractionVideos(item) {
+  const name = item.name || item.title || 'This Place';
+  return [
+    { title:'Full Walking Tour of '+name, creator:'OrlandoPro', emoji:item.emoji||'🎬', type:'attraction', duration:480, views:24800, likes:1240, relatedVideos:[] },
+    { title:'Top Tips Before You Visit '+name, creator:'TravelTips_FL', emoji:item.emoji||'🎬', type:'attraction', duration:240, views:18200, likes:890, relatedVideos:[] },
+    { title:'Hidden Secrets of '+name, creator:'LocalExplorer', emoji:item.emoji||'🎬', type:'attraction', duration:360, views:31000, likes:2100, relatedVideos:[] },
+    { title:'Best Photo Spots at '+name, creator:'PhotoWalker', emoji:item.emoji||'📷', type:'attraction', duration:300, views:15600, likes:780, relatedVideos:[] },
+  ];
+}
+
+function getRestaurantVideos(item) {
+  const name = item.name || item.title || 'This Restaurant';
+  return [
+    { title:'60s Atmosphere Tour — '+name, creator:'FoodExplorer', emoji:item.emoji||'🍽️', type:'restaurant', duration:60, views:8400, likes:420, relatedVideos:[] },
+    { title:'Signature Dish Prep at '+name, creator:'ChefVids', emoji:'👨‍🍳', type:'restaurant', duration:90, views:12300, likes:670, relatedVideos:[] },
+    { title:'Chef Introduction — '+name, creator:item.name||'Chef', emoji:'🧑‍🍳', type:'restaurant', duration:120, views:6200, likes:310, relatedVideos:[] },
+    { title:'Happy Hour & Deals Highlight', creator:'HappyHourFL', emoji:'🍹', type:'restaurant', duration:75, views:9800, likes:520, relatedVideos:[] },
+    { title:'Customer Review Compilation', creator:'ReviewPro', emoji:'⭐', type:'restaurant', duration:180, views:11400, likes:590, relatedVideos:[] },
+    { title:'Before You Go — Tips & Tricks', creator:'TravelTips_FL', emoji:'💡', type:'restaurant', duration:150, views:7300, likes:380, relatedVideos:[] },
+  ];
+}
+
+function getHotelRoomTypes(item) {
+  return [
+    { id:'lobby',   label:'Lobby',         emoji:'🏨', desc:'Grand entrance, check-in area, and lobby bar.' },
+    { id:'std',     label:'Standard Room', emoji:'🛏️', desc:'1 King bed · 380 sq ft · Sleeps 2 · TV, WiFi, Mini-fridge.' },
+    { id:'suite',   label:'Suite',         emoji:'🛎️', desc:'Living room + bedroom · 750 sq ft · Sleeps 4 · Full kitchen.' },
+    { id:'pool',    label:'Pool Area',     emoji:'🏊', desc:'Heated outdoor pool open 7am–10pm · Towels included.' },
+    { id:'dining',  label:'Restaurant',    emoji:'🍽️', desc:'Casual dining open for breakfast & dinner. Full bar.' },
+    { id:'loc',     label:'Location Tour', emoji:'📍', desc:'Walking distance to attractions and transportation.' },
+  ];
+}
+
+/* ---- Render Videos Tab on detail page ---- */
+function renderDetailVideosTab(item, containerId) {
+  const cont = document.getElementById(containerId);
+  if (!cont) return;
+  const isRest = item.category === 'restaurant' || item.cuisine;
+  const videos = isRest ? getRestaurantVideos(item) : getAttractionVideos(item);
+
+  /* Wire related videos */
+  videos.forEach((v, i) => { v.relatedVideos = videos.filter((_, j) => j !== i).slice(0, 3); });
+
+  cont.innerHTML = `<div style="padding:12px 16px 20px;">
+    ${videos.map(v => buildVidCard(v)).join('')}
+  </div>`;
+}
+window.renderDetailVideosTab = renderDetailVideosTab;
+
+/* ---- Hotel Virtual Tour ---- */
+function openHotelTour(item) {
+  const roomTypes = getHotelRoomTypes(item);
+  const existing = document.getElementById('hotel-tour-overlay');
+  if (existing) existing.remove();
+
+  const el = document.createElement('div');
+  el.id = 'hotel-tour-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:#000;z-index:8950;max-width:430px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;';
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#111;flex-shrink:0;">
+      <button onclick="document.getElementById('hotel-tour-overlay').remove()" style="background:none;border:none;color:#ccc;font-size:22px;cursor:pointer;">✕</button>
+      <div style="color:#fff;font-weight:700;font-size:14px;font-family:'Playfair Display',serif;">🏨 Virtual Tour</div>
+      <button onclick="openHotelRoomCompare('${(item.name||'Hotel').replace(/'/g,'')}',${JSON.stringify(roomTypes).replace(/'/g,'').replace(/"/g,'&quot;')})" style="background:#FF6B35;border:none;color:#fff;font-size:11px;font-weight:700;padding:6px 12px;border-radius:16px;cursor:pointer;font-family:'DM Sans',sans-serif;">Compare</button>
+    </div>
+    <!-- Room type tabs -->
+    <div style="display:flex;overflow-x:auto;background:#1a1a1a;padding:6px 12px;gap:6px;scrollbar-width:none;flex-shrink:0;">
+      ${roomTypes.map((r, i) => `<button class="vid-ctrl-btn sm" id="htab-${r.id}" onclick="selectHotelRoom('${r.id}')" style="background:${i===0?'#FF6B35':'rgba(255,255,255,.1)'};border-radius:20px;padding:6px 12px;font-size:11px;font-weight:700;white-space:nowrap;min-width:auto;height:auto;">${r.emoji} ${r.label}</button>`).join('')}
+    </div>
+    <!-- Walkthrough viewer -->
+    <div style="flex:1;position:relative;overflow:hidden;" id="hotel-tour-view">
+      <div id="hotel-room-bg" style="width:100%;height:100%;background:linear-gradient(135deg,#1b5e20,#2e7d32,#388e3c);display:flex;align-items:center;justify-content:center;animation:vidGradShift 5s ease infinite;background-size:400% 400%;">
+        <div id="hotel-room-emoji" style="font-size:90px;animation:vidEmojiZoom 6s ease-in-out infinite;">${roomTypes[0].emoji}</div>
+      </div>
+      <div id="hotel-room-info" style="position:absolute;bottom:80px;left:0;right:0;padding:16px 20px;background:linear-gradient(to top,rgba(0,0,0,.8),transparent);">
+        <div style="color:#fff;font-size:16px;font-weight:700;font-family:'Playfair Display',serif;" id="hotel-room-label">${roomTypes[0].label}</div>
+        <div style="color:rgba(255,255,255,.8);font-size:13px;margin-top:4px;" id="hotel-room-desc">${roomTypes[0].desc}</div>
+      </div>
+    </div>
+    <div style="background:#111;padding:12px 16px;">
+      <button style="width:100%;background:linear-gradient(135deg,#FF6B35,#FFD700);border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:700;color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;" onclick="document.getElementById('hotel-tour-overlay').remove();if(typeof showToast==='function')showToast('Opening booking... 🏨')">Book This Room →</button>
+    </div>`;
+  document.body.appendChild(el);
+  window._hotelRoomTypes = roomTypes;
+}
+window.openHotelTour = openHotelTour;
+
+function selectHotelRoom(id) {
+  const room = (window._hotelRoomTypes || []).find(r => r.id === id);
+  if (!room) return;
+  document.querySelectorAll('[id^="htab-"]').forEach(b => b.style.background = 'rgba(255,255,255,.1)');
+  const tab = document.getElementById('htab-' + id);
+  if (tab) tab.style.background = '#FF6B35';
+  const emoji = document.getElementById('hotel-room-emoji');
+  const label = document.getElementById('hotel-room-label');
+  const desc = document.getElementById('hotel-room-desc');
+  if (emoji) emoji.textContent = room.emoji;
+  if (label) label.textContent = room.label;
+  if (desc) desc.textContent = room.desc;
+}
+window.selectHotelRoom = selectHotelRoom;
+
+function openHotelRoomCompare(hotelName, roomTypes) {
+  if (typeof showToast === 'function') showToast('Compare mode: side-by-side view! 🔄');
+}
+window.openHotelRoomCompare = openHotelRoomCompare;
+
+/* ---- Theme Park Rides ---- */
+const PARK_RIDES = {
+  'Walt Disney World': [
+    { name:'Space Mountain', thrill:4, height:'44"', wait:'45m', access:'Single rider available', emoji:'🚀' },
+    { name:'Tron Lightcycle Run', thrill:5, height:'48"', wait:'75m', access:'Individual Lightning Lane', emoji:'⚡' },
+    { name:'Guardians: Cosmic Rewind', thrill:4, height:'42"', wait:'60m', access:'Virtual queue / ILL', emoji:'🎵' },
+    { name:'Seven Dwarfs Mine Train', thrill:3, height:'38"', wait:'55m', access:'Lightning Lane', emoji:'⛏️' },
+    { name:'Splash Mountain', thrill:3, height:'40"', wait:'40m', access:'Accessible loading', emoji:'💧' },
+  ],
+  'Universal Studios': [
+    { name:"Hagrid's Motorbike Adventure", thrill:4, height:'48"', wait:'90m', access:'Single rider', emoji:'🧙' },
+    { name:'Velocicoaster', thrill:5, height:'51"', wait:'65m', access:'Express Pass', emoji:'🦕' },
+    { name:'Hollywood Rip Ride Rockit', thrill:5, height:'51"', wait:'45m', access:'Single rider', emoji:'🎸' },
+    { name:"Harry Potter: Forbidden Journey", thrill:3, height:'48"', wait:'50m', access:'Accessible gondola', emoji:'🏰' },
+  ],
+  'SeaWorld Orlando': [
+    { name:'Mako', thrill:5, height:'54"', wait:'35m', access:'Single rider', emoji:'🦈' },
+    { name:'Ice Breaker', thrill:4, height:'48"', wait:'25m', access:'Standard queue', emoji:'❄️' },
+    { name:'Manta', thrill:4, height:'54"', wait:'30m', access:'Accessible loading', emoji:'🐟' },
+    { name:'Pipeline: The Surf Coaster', thrill:4, height:'54"', wait:'40m', access:'Standard queue', emoji:'🌊' },
+  ],
+};
+
+function renderThemeParkRides(item, containerId) {
+  const cont = document.getElementById(containerId);
+  if (!cont) return;
+  const name = item.name || item.title || '';
+  let rides = null;
+  for (const [park, rideList] of Object.entries(PARK_RIDES)) {
+    if (name.toLowerCase().includes(park.toLowerCase().split(' ')[0]) || park.toLowerCase().includes(name.toLowerCase().split(' ')[0])) {
+      rides = rideList;
+      break;
+    }
+  }
+  if (!rides) { cont.innerHTML = ''; return; }
+
+  /* Must Ride Today — 3 with shortest wait times */
+  const mustRide = [...rides].sort((a,b) => parseInt(a.wait) - parseInt(b.wait)).slice(0,3);
+
+  cont.innerHTML = `<div class="rides-section">
+    <div class="rides-hdr">
+      <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;">🎢 Rides & Attractions</div>
+      <button class="roulette-btn" onclick="rideRoulette(${JSON.stringify(rides).replace(/"/g,'&quot;')})">🎲 Roulette</button>
+    </div>
+    <!-- Must Ride Today -->
+    <div style="font-size:12px;font-weight:700;color:#FF6B35;letter-spacing:.08em;margin-bottom:8px;">⚡ MUST RIDE TODAY</div>
+    <div class="must-ride-strip">
+      ${mustRide.map(r => `<div class="must-ride-card" onclick="openRidePreview(${JSON.stringify(r).replace(/"/g,'&quot;')})">
+        <div style="font-size:28px;margin-bottom:4px;">${r.emoji}</div>
+        <div style="font-size:11px;font-weight:700;line-height:1.2;">${r.name}</div>
+        <div style="font-size:10px;opacity:.85;margin-top:4px;">Wait: ${r.wait}</div>
+      </div>`).join('')}
+    </div>
+    <div style="font-size:12px;font-weight:700;color:#9E9E9E;letter-spacing:.08em;margin-top:14px;margin-bottom:8px;">ALL RIDES</div>
+    ${rides.map(r => `<div class="ride-card">
+      <div class="ride-info">
+        <div class="ride-name">${r.emoji} ${r.name}</div>
+        <div class="ride-thrill">${Array.from({length:5},(_,i)=>`<span style="color:${i<r.thrill?'#FF6B35':'#ddd'}">⚡</span>`).join('')}</div>
+        <div class="ride-meta">Height: ${r.height} · Wait: ${r.wait} · ${r.access}</div>
+      </div>
+      <button class="ride-preview-btn" onclick="openRidePreview(${JSON.stringify(r).replace(/"/g,'&quot;')})">▶ Preview</button>
+    </div>`).join('')}
+  </div>`;
+}
+window.renderThemeParkRides = renderThemeParkRides;
+
+function openRidePreview(ride) {
+  openVideoPlayer({
+    title: ride.name + ' — POV Preview',
+    creator: 'Orlando Explorer',
+    emoji: ride.emoji || '🎢',
+    type: 'ride',
+    duration: 180,
+    views: 45000,
+    likes: 2800,
+    relatedVideos: [],
+    thrillLevel: ride.thrill,
+  });
+}
+window.openRidePreview = openRidePreview;
+
+function rideRoulette(rides) {
+  if (!rides || !rides.length) return;
+  const ride = rides[Math.floor(Math.random() * rides.length)];
+  if (typeof showToast === 'function') showToast('🎲 Roulette picked: ' + ride.name + '!');
+  setTimeout(() => openRidePreview(ride), 800);
+}
+window.rideRoulette = rideRoulette;
+</script>
+
+<script>
+/* ===== BLOCK W8: User Video Reviews ===== */
+/* PRODUCTION NOTE: Request camera permissions gracefully and handle denial with a helpful message in production */
+
+let videoReviewState = {
+  isRecording: false,
+  recordingTimer: null,
+  secondsLeft: 60,
+  stream: null,
+  blob: null,
+  blobUrl: null,
+  targetItem: null,
+  starRating: 5,
+};
+
+function openVideoReview(item) {
+  if (typeof appState !== 'undefined' && !appState.user) { openAuthModal('record a video review'); return; }
+  videoReviewState.targetItem = item;
+  videoReviewState.isRecording = false;
+  videoReviewState.blob = null;
+  videoReviewState.blobUrl = null;
+  videoReviewState.secondsLeft = 60;
+
+  /* PRODUCTION NOTE: Request camera permissions gracefully and handle denial with a helpful message in production */
+  navigator.mediaDevices?.getUserMedia({ video: true, audio: true })
+    .then(stream => {
+      videoReviewState.stream = stream;
+      showRecordingInterface(true);
+    })
+    .catch(err => {
+      /* Camera denied — show simulated interface */
+      videoReviewState.stream = null;
+      showRecordingInterface(false);
+    });
+}
+
+function showRecordingInterface(hasCam) {
+  const item = videoReviewState.targetItem;
+  const existing = document.getElementById('record-overlay');
+  if (existing) existing.remove();
+
+  const el = document.createElement('div');
+  el.id = 'record-overlay';
+  el.className = 'record-overlay';
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#111;flex-shrink:0;">
+      <button onclick="closeVideoReview()" style="background:none;border:none;color:#ccc;font-size:22px;cursor:pointer;">✕</button>
+      <div style="color:#fff;font-size:13px;font-weight:700;">Video Review — ${item?.name||'Place'}</div>
+      <div style="width:36px;"></div>
+    </div>
+    <div class="record-preview" id="rec-preview">
+      ${hasCam
+        ? `<video id="rec-cam-video" autoplay muted playsinline style="width:100%;height:100%;object-fit:cover;"></video>`
+        : `<div class="record-cam-sim">${item?.emoji||'📸'}</div>`}
+      <div class="record-timer" id="rec-timer" style="display:none;">1:00</div>
+      <div class="record-dot" id="rec-dot" style="display:none;"></div>
+      <div class="waveform" id="rec-waveform" style="display:none;">
+        ${Array.from({length:20},(_,i)=>`<div class="wave-bar" style="animation-delay:${i*0.05}s;animation-duration:${0.4+Math.random()*.4}s;"></div>`).join('')}
+      </div>
+    </div>
+    <div style="background:#111;padding:16px;display:flex;flex-direction:column;align-items:center;gap:12px;flex-shrink:0;">
+      <div id="rec-hint" style="color:rgba(255,255,255,.6);font-size:13px;">Tap to start recording</div>
+      <button class="record-btn" id="rec-btn" onclick="toggleRecording()">
+        <div style="width:28px;height:28px;background:#fff;border-radius:50%;"></div>
+      </button>
+      <div style="font-size:12px;color:rgba(255,255,255,.4);">Max 60 seconds</div>
+    </div>`;
+  document.body.appendChild(el);
+
+  if (hasCam && videoReviewState.stream) {
+    const vid = document.getElementById('rec-cam-video');
+    if (vid) vid.srcObject = videoReviewState.stream;
+  }
+}
+
+function toggleRecording() {
+  if (!videoReviewState.isRecording) startRecording(); else stopRecording();
+}
+
+function startRecording() {
+  videoReviewState.isRecording = true;
+  videoReviewState.secondsLeft = 60;
+  const btn = document.getElementById('rec-btn');
+  const timer = document.getElementById('rec-timer');
+  const dot = document.getElementById('rec-dot');
+  const wave = document.getElementById('rec-waveform');
+  const hint = document.getElementById('rec-hint');
+  if (btn) { btn.classList.add('recording'); btn.innerHTML = '<div class="record-icon"></div>'; }
+  if (timer) timer.style.display = 'block';
+  if (dot) dot.style.display = 'block';
+  if (wave) wave.style.display = 'flex';
+  if (hint) hint.textContent = 'Recording...';
+
+  videoReviewState.recordingTimer = setInterval(() => {
+    videoReviewState.secondsLeft--;
+    const m = Math.floor(videoReviewState.secondsLeft / 60);
+    const s = videoReviewState.secondsLeft % 60;
+    if (timer) timer.textContent = m + ':' + String(s).padStart(2,'0');
+    if (videoReviewState.secondsLeft <= 0) stopRecording();
+  }, 1000);
+}
+
+function stopRecording() {
+  clearInterval(videoReviewState.recordingTimer);
+  videoReviewState.isRecording = false;
+  if (videoReviewState.stream) videoReviewState.stream.getTracks().forEach(t => t.stop());
+  showRecordingPlayback();
+}
+
+function showRecordingPlayback() {
+  const item = videoReviewState.targetItem;
+  const existing = document.getElementById('record-overlay');
+  if (existing) existing.remove();
+
+  const el = document.createElement('div');
+  el.id = 'record-overlay';
+  el.className = 'record-overlay';
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;padding:12px 16px;background:#111;flex-shrink:0;gap:10px;">
+      <button onclick="closeVideoReview()" style="background:none;border:none;color:#ccc;font-size:22px;cursor:pointer;">✕</button>
+      <div style="color:#fff;font-size:13px;font-weight:700;">Preview</div>
+    </div>
+    <!-- Playback preview -->
+    <div style="flex:1;background:linear-gradient(135deg,#006064,#0097a7);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;">
+      <div style="font-size:72px;animation:vidEmojiZoom 4s ease-in-out infinite;">${item?.emoji||'📸'}</div>
+      <div style="color:#fff;font-size:16px;font-weight:700;text-shadow:0 2px 8px rgba(0,0,0,.5);">Review Preview</div>
+    </div>
+    <!-- Caption & rating -->
+    <div style="background:#111;padding:14px 16px;flex-shrink:0;">
+      <div style="display:flex;gap:6px;justify-content:center;margin-bottom:10px;">
+        ${[1,2,3,4,5].map(n=>`<div onclick="setVideoReviewStar(${n})" id="vrstar-${n}" style="font-size:24px;cursor:pointer;">⭐</div>`).join('')}
+      </div>
+      <input id="vr-caption" placeholder="Add a caption..." style="width:100%;background:rgba(255,255,255,.1);border:none;border-radius:10px;padding:10px 12px;color:#fff;font-size:13px;font-family:'DM Sans',sans-serif;box-sizing:border-box;margin-bottom:10px;">
+      <div style="display:flex;gap:8px;">
+        <button onclick="showRecordingInterface(false)" style="flex:1;background:rgba(255,255,255,.1);border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:700;color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;">↺ Re-record</button>
+        <button onclick="postVideoReview()" style="flex:2;background:linear-gradient(135deg,#FF6B35,#FFD700);border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:700;color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;">Post Video Review ✓</button>
+      </div>
+    </div>`;
+  document.body.appendChild(el);
+}
+
+function setVideoReviewStar(n) {
+  videoReviewState.starRating = n;
+  [1,2,3,4,5].forEach(i => {
+    const el = document.getElementById('vrstar-' + i);
+    if (el) el.style.filter = i <= n ? 'none' : 'grayscale(1)';
+  });
+}
+
+function postVideoReview() {
+  const caption = document.getElementById('vr-caption')?.value || '';
+  const item = videoReviewState.targetItem;
+  closeVideoReview();
+  if (typeof showToast === 'function') showToast('Video review posted! 🎥');
+  if (typeof addXP === 'function') addXP(50, 'Posted a video review');
+}
+
+function closeVideoReview() {
+  if (videoReviewState.stream) videoReviewState.stream.getTracks().forEach(t => t.stop());
+  clearInterval(videoReviewState.recordingTimer);
+  const el = document.getElementById('record-overlay');
+  if (el) el.remove();
+}
+
+window.openVideoReview = openVideoReview;
+window.toggleRecording = toggleRecording;
+window.setVideoReviewStar = setVideoReviewStar;
+window.postVideoReview = postVideoReview;
+window.closeVideoReview = closeVideoReview;
+
+/* ---- Video Reviews display on detail page ---- */
+function renderVideoReviewsTab(item, containerId) {
+  const cont = document.getElementById(containerId);
+  if (!cont) return;
+  const mockReviews = [
+    { reviewer:'Sarah M.', avatar:'🌸', rating:5, duration:42, views:234, emoji:item?.emoji||'🎬', caption:'Amazing experience! Must visit.' },
+    { reviewer:'Alex K.', avatar:'🧭', rating:4, duration:58, views:189, emoji:'😊', caption:'Great tips for first timers.' },
+    { reviewer:'Jordan T.', avatar:'🦋', rating:5, duration:35, views:302, emoji:'⭐', caption:'Hidden gems you need to know!' },
+  ];
+  const grad = VIDEO_GRADIENTS?.review || 'linear-gradient(135deg,#006064,#0097a7)';
+  cont.innerHTML = `<div style="padding:12px 16px 20px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+      <div style="font-size:13px;font-weight:700;color:#9E9E9E;">${mockReviews.length} VIDEO REVIEWS</div>
+      <button onclick="openVideoReview(${JSON.stringify(item).replace(/"/g,'&quot;')})" style="background:linear-gradient(135deg,#FF6B35,#FFD700);border:none;border-radius:20px;padding:7px 14px;font-size:12px;font-weight:700;color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;">🎥 Record Review</button>
+    </div>
+    ${mockReviews.map(r => `<div class="vid-feed-card">
+      <div class="vid-thumb" style="height:120px;">
+        <div class="vid-thumb-gradient" style="background:${grad};"></div>
+        <div class="vid-thumb-emoji" style="font-size:36px;">${r.emoji}</div>
+        <div class="vid-play-btn" style="width:40px;height:40px;font-size:18px;">▶</div>
+        <div class="vid-duration-badge">${vpFmtTime?vpFmtTime(r.duration):r.duration+'s'}</div>
+        <div style="position:absolute;top:8px;left:8px;display:flex;gap:4px;">
+          ${[1,2,3,4,5].map(i=>`<span style="font-size:10px;${i>r.rating?'filter:grayscale(1);opacity:.4':''}">⭐</span>`).join('')}
+        </div>
+      </div>
+      <div class="vid-card-body">
+        <div class="vid-card-title">${r.caption}</div>
+        <div class="vid-card-meta"><span>${r.avatar} ${r.reviewer}</span><span>·</span><span>${r.views} views</span></div>
+      </div>
+    </div>`).join('')}
+  </div>`;
+}
+window.renderVideoReviewsTab = renderVideoReviewsTab;
+</script>
+
+<script>
+/* ===== BLOCK W9: Live Stream Events ===== */
+/* PRODUCTION NOTE: Replace simulated stream with real HLS/DASH stream URL or WebRTC connection */
+
+const LIVE_EVENTS = [
+  { id:'live1', title:'Friday Jazz Night Live', location:'Downtown Orlando', emoji:'🎷', viewers: 1240, startTime: Date.now() - 900000 },
+  { id:'live2', title:'Universal Park Opening Ceremony', location:'Universal Studios', emoji:'🏰', viewers: 8700, startTime: Date.now() - 300000 },
+];
+
+const UPCOMING_STREAMS = [
+  { title:'Saturday Night Fireworks Show', date:'Sat Apr 12', time:'9:00 PM', emoji:'🎆', location:'Magic Kingdom' },
+  { title:'Sunday Brunch Live Cook-Along', date:'Sun Apr 13', time:'10:00 AM', emoji:'🍳', location:'Winter Park' },
+  { title:'Gator Show Live Stream', date:'Mon Apr 14', time:'2:00 PM', emoji:'🐊', location:'Gatorland' },
+];
+
+const LIVE_MOCK_CHAT = [
+  { user:'TravelFan22', msg:'This is SO cool!! 🎉' },
+  { user:'OrlandoLocal', msg:'I go here every year, best show!' },
+  { user:'DisneyDreamer', msg:'When does it start? 👀' },
+  { user:'FamilyTrip2025', msg:'My kids are OBSESSED 😂' },
+  { user:'WanderlustKing', msg:'Watching from NYC! Wish I was there' },
+  { user:'SunshineState_', msg:'Florida vibes only 🌴☀️' },
+  { user:'ThemeParker', msg:'Got FastPass, no wait for me!' },
+  { user:'JetSetterJane', msg:'Adding this to my bucket list!!' },
+  { user:'OrlandoExplorer', msg:'Pro tip: arrive 30 mins early for best spot' },
+  { user:'MagicMoments', msg:'The atmosphere here is electric! ⚡' },
+];
+
+let liveState = {
+  activeEvent: null,
+  viewerCount: 0,
+  viewerTimer: null,
+  chatAutoTimer: null,
+  reactions: { '❤️':0, '🔥':0, '👏':0, '😮':0, '👍':0 },
+};
+
+function renderLiveNowSection() {
+  const sect = document.getElementById('live-now-section');
+  if (!sect) return;
+  if (LIVE_EVENTS.length === 0) { sect.style.display = 'none'; return; }
+  sect.style.display = 'block';
+  sect.innerHTML = `
+    <div style="padding:14px 16px 10px;">
+      <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px;">
+        <div class="live-badge"><div class="live-dot"></div>LIVE NOW</div>
+        <span style="font-size:16px;">${LIVE_EVENTS.length} Events</span>
+      </div>
+      ${LIVE_EVENTS.map(e => `
+        <div class="live-now-section" onclick="openLiveStream('${e.id}')" style="margin:0 0 10px;padding:16px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="font-size:40px;">${e.emoji}</div>
+            <div style="flex:1;">
+              <div style="color:#fff;font-weight:700;font-size:15px;font-family:'Playfair Display',serif;">${e.title}</div>
+              <div style="color:rgba(255,255,255,.8);font-size:12px;margin-top:2px;">📍 ${e.location}</div>
+              <div style="color:rgba(255,255,255,.7);font-size:11px;margin-top:4px;">👁 ${e.viewers.toLocaleString()} watching now</div>
+            </div>
+            <div style="color:#fff;font-size:22px;">▶</div>
+          </div>
+        </div>`).join('')}
+    </div>`;
+}
+window.renderLiveNowSection = renderLiveNowSection;
+
+function openLiveStream(eventId) {
+  const event = LIVE_EVENTS.find(e => e.id === eventId) || LIVE_EVENTS[0];
+  liveState.activeEvent = event;
+  liveState.viewerCount = event.viewers;
+  liveState.reactions = { '❤️': Math.floor(Math.random()*200), '🔥': Math.floor(Math.random()*150), '👏': Math.floor(Math.random()*100), '😮': Math.floor(Math.random()*80), '👍': Math.floor(Math.random()*120) };
+
+  const existing = document.getElementById('live-stream-overlay');
+  if (existing) existing.remove();
+  clearInterval(liveState.viewerTimer);
+  clearInterval(liveState.chatAutoTimer);
+
+  const el = document.createElement('div');
+  el.id = 'live-stream-overlay';
+  el.className = 'live-stream-overlay';
+  el.innerHTML = `
+    <!-- Stream header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:rgba(0,0,0,.8);position:relative;z-index:10;flex-shrink:0;">
+      <button onclick="closeLiveStream()" style="background:none;border:none;color:#fff;font-size:22px;cursor:pointer;">✕</button>
+      <div class="live-badge"><div class="live-dot"></div>LIVE</div>
+      <div class="live-viewer-count" style="position:static;">👁 <span id="live-viewer-num">${event.viewers.toLocaleString()}</span></div>
+    </div>
+    <!-- Stream video sim -->
+    <div style="position:relative;flex:1;max-height:240px;overflow:hidden;">
+      <div style="width:100%;height:100%;background:linear-gradient(135deg,#b71c1c,#c62828,#d32f2f,#e53935);background-size:400% 400%;animation:vidGradShift 3s ease infinite;display:flex;align-items:center;justify-content:center;font-size:80px;animation:vidGradShift 3s ease infinite,vidEmojiZoom 5s ease-in-out infinite;">
+        ${event.emoji}
+      </div>
+      <div style="position:absolute;top:10px;left:14px;display:flex;flex-direction:column;gap:8px;" id="float-react-wrap"></div>
+      <div style="position:absolute;bottom:10px;left:14px;">
+        <div style="color:#fff;font-family:'Playfair Display',serif;font-size:16px;font-weight:700;text-shadow:0 2px 8px rgba(0,0,0,.6);">${event.title}</div>
+        <div style="color:rgba(255,255,255,.8);font-size:12px;">📍 ${event.location}</div>
+      </div>
+      <div style="position:absolute;top:10px;right:10px;display:flex;gap:6px;">
+        <button onclick="shareLiveStream()" style="background:rgba(0,0,0,.5);border:none;color:#fff;border-radius:20px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;">↗ Share</button>
+        <select onchange="if(typeof showToast==='function')showToast('Quality: '+this.value)" style="background:rgba(0,0,0,.5);border:none;color:#fff;font-size:10px;border-radius:10px;padding:4px 6px;font-family:'DM Sans',sans-serif;">
+          <option>Auto</option><option>HD 1080p</option><option>SD 480p</option><option>Low 240p</option>
+        </select>
+      </div>
+    </div>
+    <!-- Reactions -->
+    <div class="live-reactions-row">
+      ${Object.entries(liveState.reactions).map(([emoji, count]) =>
+        `<button class="live-react-btn" onclick="sendLiveReaction('${emoji}',this)">${emoji} <span class="live-react-count" id="react-cnt-${encodeURIComponent(emoji)}">${count}</span></button>`
+      ).join('')}
+    </div>
+    <!-- Live Chat -->
+    <div class="live-chat-panel" id="live-chat-panel">
+      ${LIVE_MOCK_CHAT.map(m => `<div class="live-chat-msg"><span class="live-chat-username">${m.user}: </span>${m.msg}</div>`).join('')}
+    </div>
+    <div class="live-chat-input-row">
+      <input class="live-chat-input" id="live-chat-input" placeholder="Say something..." ${typeof appState!=='undefined'&&!appState.user?'disabled':''}
+             onkeydown="if(event.key==='Enter')sendLiveChat()">
+      <button class="live-send-btn" onclick="sendLiveChat()">Send</button>
+    </div>
+    <!-- Upcoming streams -->
+    <div style="background:#111;padding:10px 14px;flex-shrink:0;">
+      <div style="color:#9E9E9E;font-size:11px;font-weight:700;letter-spacing:.08em;margin-bottom:8px;">UPCOMING STREAMS</div>
+      ${UPCOMING_STREAMS.map(s => `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #222;">
+        <div style="font-size:20px;">${s.emoji}</div>
+        <div style="flex:1;">
+          <div style="color:#fff;font-size:12px;font-weight:600;">${s.title}</div>
+          <div style="color:#9E9E9E;font-size:11px;">${s.date} · ${s.time}</div>
+        </div>
+        <button onclick="notifyLiveStream('${s.title}')" style="background:#FF6B35;border:none;color:#fff;font-size:10px;font-weight:700;padding:5px 10px;border-radius:16px;cursor:pointer;font-family:'DM Sans',sans-serif;">🔔 Notify</button>
+      </div>`).join('')}
+    </div>`;
+  document.body.appendChild(el);
+
+  /* Fluctuating viewer count */
+  liveState.viewerTimer = setInterval(() => {
+    liveState.viewerCount += Math.floor(Math.random() * 40) - 15;
+    liveState.viewerCount = Math.max(500, liveState.viewerCount);
+    const el = document.getElementById('live-viewer-num');
+    if (el) el.textContent = liveState.viewerCount.toLocaleString();
+  }, 3000);
+
+  /* Auto chat messages */
+  const autoChatMsgs = [
+    { user:'GuestUser44', msg:'Just joined! This is awesome 🙌' },
+    { user:'DisneyKid_', msg:'Is the parade starting soon??' },
+    { user:'FLResident', msg:'This is right near my house! 😂' },
+    { user:'VacationMode', msg:'Adding to my must-do list! ✅' },
+    { user:'NightOwl_FL', msg:'The lights are incredible ✨✨' },
+  ];
+  let autoIdx = 0;
+  liveState.chatAutoTimer = setInterval(() => {
+    const chat = document.getElementById('live-chat-panel');
+    if (!chat) return;
+    const m = autoChatMsgs[autoIdx % autoChatMsgs.length];
+    const div = document.createElement('div');
+    div.className = 'live-chat-msg';
+    div.innerHTML = `<span class="live-chat-username">${m.user}: </span>${m.msg}`;
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+    autoIdx++;
+  }, 8000);
+}
+
+function sendLiveChat() {
+  if (typeof appState !== 'undefined' && !appState.user) { openAuthModal('chat in live streams'); return; }
+  const input = document.getElementById('live-chat-input');
+  const msg = input?.value.trim();
+  if (!msg) return;
+  const chat = document.getElementById('live-chat-panel');
+  if (!chat) return;
+  const user = typeof appState !== 'undefined' ? (appState.user?.name || 'You') : 'You';
+  const div = document.createElement('div');
+  div.className = 'live-chat-msg';
+  div.innerHTML = `<span class="live-chat-username" style="color:#FF6B35;">${user}: </span>${msg}`;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+  if (input) input.value = '';
+}
+
+function sendLiveReaction(emoji, btn) {
+  liveState.reactions[emoji] = (liveState.reactions[emoji] || 0) + 1;
+  const cnt = document.getElementById('react-cnt-' + encodeURIComponent(emoji));
+  if (cnt) cnt.textContent = liveState.reactions[emoji];
+
+  /* Float emoji up */
+  const wrap = document.getElementById('float-react-wrap');
+  if (!wrap) return;
+  const el = document.createElement('div');
+  el.className = 'floating-emoji';
+  el.textContent = emoji;
+  el.style.bottom = '0';
+  el.style.right = (10 + Math.random() * 40) + 'px';
+  wrap.appendChild(el);
+  setTimeout(() => el.remove(), 2500);
+}
+
+function closeLiveStream() {
+  clearInterval(liveState.viewerTimer);
+  clearInterval(liveState.chatAutoTimer);
+  const el = document.getElementById('live-stream-overlay');
+  if (el) el.remove();
+}
+
+function shareLiveStream() {
+  if (typeof showToast === 'function') showToast('Stream link copied! 📋');
+}
+
+function notifyLiveStream(title) {
+  if (typeof showToast === 'function') showToast('🔔 You\'ll be notified when "' + title + '" starts!');
+}
+
+window.openLiveStream = openLiveStream;
+window.closeLiveStream = closeLiveStream;
+window.sendLiveChat = sendLiveChat;
+window.sendLiveReaction = sendLiveReaction;
+window.shareLiveStream = shareLiveStream;
+window.notifyLiveStream = notifyLiveStream;
+</script>
+
+<script>
+/* ===== BLOCK W10: Local Video Tips + Leaderboard ===== */
+
+const LOCAL_TIP_VIDEOS = [
+  { id:'lt1', title:'Best Time to Visit Magic Kingdom', creator:'MagicKingdomPro', avatar:'🌟', duration:180, views:52000, emoji:'🏰', grad:'linear-gradient(135deg,#4a148c,#7b1fa2)' },
+  { id:'lt2', title:'Hidden Restaurant Gems on I-Drive', creator:'FoodieLocal', avatar:'🍽️', duration:240, views:38000, emoji:'🍕', grad:'linear-gradient(135deg,#bf360c,#e64a19)' },
+  { id:'lt3', title:'How to Beat the Crowds at Universal', creator:'ParkHacker', avatar:'🧙', duration:300, views:71000, emoji:'🎢', grad:'linear-gradient(135deg,#1b5e20,#388e3c)' },
+  { id:'lt4', title:'Best Photo Spots in Orlando', creator:'PhotoWanderer', avatar:'📷', duration:210, views:29000, emoji:'📸', grad:'linear-gradient(135deg,#006064,#0097a7)' },
+  { id:'lt5', title:'Budget Secrets the Tourist Traps Don\'t Want You to Know', creator:'SaverLocal', avatar:'💰', duration:420, views:89000, emoji:'💡', grad:'linear-gradient(135deg,#e65100,#f57c00)' },
+  { id:'lt6', title:'Getting Around Orlando Without a Car', creator:'NoCarNeeded', avatar:'🚌', duration:270, views:44000, emoji:'🚊', grad:'linear-gradient(135deg,#1a237e,#283593)' },
+  { id:'lt7', title:'What to Pack for Orlando in July', creator:'HeatExpert', avatar:'☀️', duration:195, views:63000, emoji:'🎒', grad:'linear-gradient(135deg,#e65100,#bf360c)' },
+  { id:'lt8', title:'Locals Only Happy Hour Guide', creator:'HappyHourFL', avatar:'🍹', duration:360, views:34000, emoji:'🍻', grad:'linear-gradient(135deg,#880e4f,#ad1457)' },
+];
+
+function renderLocalVideoTips() {
+  const wrap = document.getElementById('local-tips-section');
+  if (!wrap) return;
+  wrap.innerHTML = `
+    <div class="local-tips-hdr">
+      <div class="local-tips-hdr-title">🌴 Local Video Tips</div>
+      <button onclick="openTipsLeaderboard()" style="background:none;border:none;font-size:13px;color:#FF6B35;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">Leaderboard →</button>
+    </div>
+    <div class="local-tips-scroll">
+      ${LOCAL_TIP_VIDEOS.map(v => `
+        <div class="tip-card" onclick="openLocalTipVideo('${v.id}')">
+          <div class="tip-card-thumb">
+            <div class="tip-card-thumb-gradient" style="background:${v.grad};"></div>
+            <div class="tip-card-avatar">${v.avatar}</div>
+            <div class="tip-local-badge">LOCAL</div>
+            <div class="vid-play-btn" style="width:34px;height:34px;font-size:14px;">▶</div>
+          </div>
+          <div class="tip-card-info">
+            <div class="tip-card-title">${v.title}</div>
+            <div class="tip-card-duration">${vpFmtTime?vpFmtTime(v.duration):Math.floor(v.duration/60)+':'+String(v.duration%60).padStart(2,'0')} · ${(v.views/1000).toFixed(0)}k views</div>
+          </div>
+        </div>`).join('')}
+    </div>`;
+}
+window.renderLocalVideoTips = renderLocalVideoTips;
+
+function openLocalTipVideo(id) {
+  const v = LOCAL_TIP_VIDEOS.find(x => x.id === id);
+  if (!v) return;
+  openVideoPlayer({
+    title: v.title,
+    creator: v.creator + ' 🌴 Orlando Local',
+    emoji: v.emoji,
+    type: 'local_tip',
+    duration: v.duration,
+    views: v.views,
+    likes: Math.floor(v.views * 0.04),
+    relatedVideos: LOCAL_TIP_VIDEOS.filter(x => x.id !== id).slice(0,3).map(x => ({...x, type:'local_tip'})),
+  });
+}
+window.openLocalTipVideo = openLocalTipVideo;
+
+function openTipsLeaderboard() {
+  const existing = document.getElementById('leaderboard-overlay');
+  if (existing) existing.remove();
+  const leaders = [...LOCAL_TIP_VIDEOS].sort((a,b) => b.views - a.views).map((v, i) => ({
+    rank: i+1, avatar: v.avatar, name: v.creator, videos: Math.floor(Math.random()*12)+3,
+    totalViews: v.views + Math.floor(Math.random()*50000),
+  }));
+
+  const el = document.createElement('div');
+  el.id = 'leaderboard-overlay';
+  el.className = 'leaderboard-overlay';
+  el.innerHTML = `
+    <div style="background:#fff;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #eee;flex-shrink:0;">
+      <button onclick="document.getElementById('leaderboard-overlay').remove()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-primary);">✕</button>
+      <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;">🏆 Local Tips Leaderboard</div>
+      <div style="width:36px;"></div>
+    </div>
+    <div style="flex:1;overflow-y:auto;">
+      <div style="padding:12px 16px;font-size:12px;color:#9E9E9E;">Top creators ranked by total views</div>
+      ${leaders.map(l => `
+        <div class="lb-row">
+          <div class="lb-rank">${l.rank <= 3 ? ['🥇','🥈','🥉'][l.rank-1] : l.rank}</div>
+          <div class="lb-avatar">${l.avatar}</div>
+          <div class="lb-info">
+            <div class="lb-name">${l.name} <span style="background:#FF6B35;color:#fff;font-size:8px;font-weight:800;padding:2px 6px;border-radius:6px;">LOCAL</span></div>
+            <div class="lb-stats">${l.videos} videos · ${(l.totalViews/1000).toFixed(0)}k views</div>
+          </div>
+          <button class="lb-follow-btn" onclick="if(typeof toggleFollow==='function')toggleFollow('lb_${l.name.replace(/\s/g,'')}',this)">+ Follow</button>
+        </div>`).join('')}
+      <div style="height:30px;"></div>
+    </div>`;
+  document.body.appendChild(el);
+}
+window.openTipsLeaderboard = openTipsLeaderboard;
+
+/* ===== BLOCK W11: Home Screen + Detail Page Integration ===== */
+
+/* Inject Live Now section placeholder into home screen */
+(function injectLiveSection(){
+  const initOrig = typeof initApp !== 'undefined' ? initApp : null;
+  function ensureLiveSection() {
+    if (document.getElementById('live-now-section')) return;
+    const homeScroll = document.querySelector('#screen-home .scroll-content');
+    if (!homeScroll) return;
+    const sect = document.createElement('div');
+    sect.id = 'live-now-section';
+    sect.style.display = 'none';
+    const firstCard = homeScroll.querySelector('.section-card') || homeScroll.children[1];
+    if (firstCard) homeScroll.insertBefore(sect, firstCard);
+    else homeScroll.appendChild(sect);
+  }
+
+  function ensureLocalTipsSection() {
+    if (document.getElementById('local-tips-section')) return;
+    const homeScroll = document.querySelector('#screen-home .scroll-content');
+    if (!homeScroll) return;
+    const sect = document.createElement('div');
+    sect.id = 'local-tips-section';
+    sect.className = 'local-tips-section';
+    homeScroll.appendChild(sect);
+  }
+
+  /* Hook into home screen render */
+  const _origShowScreen = window.showScreen;
+  window.showScreen = function(id, el) {
+    if (typeof _origShowScreen === 'function') _origShowScreen(id, el);
+    if (id === 'home') {
+      setTimeout(() => {
+        ensureLiveSection();
+        ensureLocalTipsSection();
+        renderLiveNowSection();
+        renderLocalVideoTips();
+      }, 60);
+    }
+  };
+
+  /* Also run on load */
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      ensureLiveSection();
+      ensureLocalTipsSection();
+      renderLiveNowSection();
+      renderLocalVideoTips();
+    }, 800);
+  });
+  setTimeout(() => {
+    ensureLiveSection();
+    ensureLocalTipsSection();
+    renderLiveNowSection();
+    renderLocalVideoTips();
+  }, 1200);
+})();
+
+/* ===== Override buildDetailHTML to inject Video, Rides tabs ===== */
+(function(){
+  const _origBuildDetailHTML = window.buildDetailHTML;
+  if (typeof _origBuildDetailHTML !== 'function') return;
+
+  window.buildDetailHTML = function(item) {
+    let html = _origBuildDetailHTML(item);
+
+    /* Inject Video tab into tab bar */
+    html = html.replace(
+      /(<div[^>]*class="[^"]*detail-tab[^"]*"[^>]*>Reviews<\/div>)/i,
+      '<div class="detail-tab" id="dtab-videos" onclick="switchDetailTab(\'videos\',this)">🎬 Videos</div> $1'
+    );
+
+    /* Inject tab panels */
+    const isThemePark = item.category === 'theme_park' || (item.name||'').toLowerCase().match(/disney|universal|seaworld/i);
+    const isHotel = item.category === 'hotel' || item.type === 'hotel';
+    const isRestaurant = item.category === 'restaurant' || item.cuisine;
+
+    const videoPanel = `
+      <div class="detail-video-tab" id="dtab-panel-videos">
+        <div id="detail-video-feed-${item.id||'main'}"></div>
+        <div id="detail-video-reviews-${item.id||'main'}"></div>
+        ${isThemePark ? `<div id="detail-rides-${item.id||'main'}"></div>` : ''}
+        ${isHotel ? `<div style="padding:16px;"><button onclick='openHotelTour(${JSON.stringify(item)})' style="width:100%;background:linear-gradient(135deg,#1b5e20,#388e3c);border:none;border-radius:12px;padding:14px;font-size:14px;font-weight:700;color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;">🎬 Watch Room Tour</button></div>` : ''}
+        <div style="height:20px;"></div>
+      </div>`;
+
+    /* Insert before closing detail content */
+    html = html.replace(/(<\/div>\s*$)/, videoPanel + '$1');
+    return html;
+  };
+
+  /* Override switchDetailTab to handle videos tab */
+  const _origSwitchDetailTab = window.switchDetailTab;
+  window.switchDetailTab = function(tab, el) {
+    if (typeof _origSwitchDetailTab === 'function') _origSwitchDetailTab(tab, el);
+    if (tab === 'videos') {
+      /* Populate video feed if not already done */
+      const item = window._currentDetailItem;
+      if (!item) return;
+      const feedId = 'detail-video-feed-' + (item.id||'main');
+      const revId = 'detail-video-reviews-' + (item.id||'main');
+      const ridesId = 'detail-rides-' + (item.id||'main');
+      const feedEl = document.getElementById(feedId);
+      const revEl = document.getElementById(revId);
+      const ridesEl = document.getElementById(ridesId);
+      if (feedEl && !feedEl.dataset.loaded) { feedEl.dataset.loaded = '1'; renderDetailVideosTab(item, feedId); }
+      if (revEl && !revEl.dataset.loaded) { revEl.dataset.loaded = '1'; renderVideoReviewsTab(item, revId); }
+      if (ridesEl && !ridesEl.dataset.loaded) { ridesEl.dataset.loaded = '1'; renderThemeParkRides(item, ridesId); }
+    }
+  };
+})();
+
+/* ===== Account screen — My Photos buttons ===== */
+(function(){
+  const _origRenderAccPhotos = window.renderAccountPhotos || window.renderMyPhotos;
+  /* Inject buttons when account photos section renders */
+  function injectPhotoButtons() {
+    const wrap = document.getElementById('my-photos-wrap') || document.getElementById('account-photos-section');
+    if (!wrap || wrap.dataset.wBtnsInjected) return;
+    wrap.dataset.wBtnsInjected = '1';
+    const btnRow = document.createElement('div');
+    btnRow.style.cssText = 'display:flex;gap:8px;padding:12px 16px 4px;flex-wrap:wrap;';
+    btnRow.innerHTML = `
+      <button onclick="openZipDownload()" style="background:#F5F5F5;border:none;border-radius:10px;padding:9px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:5px;">⬇ Download All</button>
+      <button onclick="openCollageBuilder()" style="background:#F5F5F5;border:none;border-radius:10px;padding:9px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:5px;">🖼️ Create Collage</button>
+      <button onclick="openHighlightReel()" style="background:#F5F5F5;border:none;border-radius:10px;padding:9px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:5px;">🎬 Highlight Reel</button>
+      <button onclick="openShareAlbum()" style="background:linear-gradient(135deg,#FF6B35,#FFD700);border:none;border-radius:10px;padding:9px 14px;font-size:12px;font-weight:700;color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:5px;">↗ Share Album</button>`;
+    wrap.insertBefore(btnRow, wrap.firstChild);
+  }
+
+  /* My Albums section on account screen */
+  function renderMyAlbums() {
+    const acctScroll = document.querySelector('#screen-account .scroll-content');
+    if (!acctScroll || document.getElementById('my-albums-section')) return;
+    const sect = document.createElement('div');
+    sect.id = 'my-albums-section';
+    sect.style.cssText = 'padding:0 16px 20px;';
+    sect.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0 10px;">
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;">📁 My Albums</div>
+        <button onclick="openShareAlbum()" style="background:#FF6B35;border:none;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:700;color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;">+ New</button>
+      </div>
+      ${albumState.albums.length === 0
+        ? `<div style="text-align:center;padding:24px;color:#9E9E9E;background:#F9F9F9;border-radius:14px;">
+            <div style="font-size:36px;margin-bottom:8px;">📁</div>
+            <div style="font-size:14px;font-weight:600;">No albums yet</div>
+            <div style="font-size:12px;margin-top:4px;">Create your first album above</div>
+           </div>`
+        : albumState.albums.map(a => `<div class="album-card">
+            <div class="album-card-thumb">${a.cover||'🏰'}
+              <div class="album-card-vis-badge">${a.visibility==='public'?'🌐':a.visibility==='friends'?'👥':'🔒'} ${a.visibility}</div>
+            </div>
+            <div class="album-card-body">
+              <div style="font-weight:700;font-size:14px;">${a.title}</div>
+              <div style="font-size:12px;color:#9E9E9E;margin-top:3px;">${a.photoCount} photos · ${a.views} views · ❤️ ${a.likes}</div>
+              <div style="display:flex;gap:8px;margin-top:8px;">
+                <button onclick="if(typeof showToast!=='undefined')showToast('Edit album — coming soon!')" style="flex:1;background:#F5F5F5;border:none;border-radius:8px;padding:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">Edit</button>
+                <button onclick="albumState.albums=albumState.albums.filter(x=>x.id!=='${a.id}');renderMyAlbums()" style="flex:1;background:#FFEBEE;border:none;border-radius:8px;padding:7px;font-size:11px;font-weight:700;color:#E53935;cursor:pointer;font-family:'DM Sans',sans-serif;">Delete</button>
+              </div>
+            </div>
+          </div>`).join('')}`;
+    acctScroll.appendChild(sect);
+  }
+
+  /* Hook into showScreen for account */
+  const _prevShowScreen = window.showScreen;
+  window.showScreen = function(id, el) {
+    if (typeof _prevShowScreen === 'function') _prevShowScreen(id, el);
+    if (id === 'account') {
+      setTimeout(() => { injectPhotoButtons(); renderMyAlbums(); }, 200);
+    }
+  };
+})();
+
+/* Photo filter button on photo upload */
+(function(){
+  /* Override the photo upload confirmation to offer filter step */
+  const _origPhotoUpload = window.uploadPhoto || window.addUserPhoto;
+  if (typeof _origPhotoUpload === 'function') {
+    window._origPhotoUpload = _origPhotoUpload;
+    window.uploadPhotoWithFilter = function(photoData) {
+      _origPhotoUpload(photoData);
+      setTimeout(() => {
+        if (typeof showToast === 'function') showToast('Photo uploaded! Tap to add filters. 🎨');
+      }, 300);
+    };
+  }
+})();
+
+/* Expose restaurant video camera badge */
+(function(){
+  const _origBuildCard = window.buildListingCard || window.buildCard;
+  /* We cannot safely intercept the card builder here without risking breakage.
+     Instead we'll patch via CSS: restaurant cards with video content get a badge via ::before on a special class.
+     The badge is added when the card enters the viewport via IntersectionObserver. */
+  const vidRestaurantIds = new Set(); /* track which cards got a badge */
+  const observer = typeof IntersectionObserver !== 'undefined' ? new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const card = entry.target;
+      if (card.dataset.category === 'restaurant' && !card.dataset.vidBadged) {
+        card.dataset.vidBadged = '1';
+        const badge = document.createElement('div');
+        badge.textContent = '🎥';
+        badge.style.cssText = 'position:absolute;top:8px;left:8px;font-size:14px;background:rgba(0,0,0,.55);border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;z-index:4;pointer-events:none;';
+        card.style.position = 'relative';
+        card.appendChild(badge);
+        observer.unobserve(card);
+      }
+    });
+  }, { rootMargin:'200px' }) : null;
+
+  function badgeRestaurantCards() {
+    document.querySelectorAll('[data-category="restaurant"]:not([data-vid-badged])').forEach(c => {
+      if (observer) observer.observe(c);
+    });
+  }
+
+  setInterval(badgeRestaurantCards, 2000);
+})();
+
+console.log('✅ Orlando Explorer — Photo & Video System loaded (Block W)');
+</script>
