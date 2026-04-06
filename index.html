@@ -12191,3 +12191,1261 @@ setTimeout(() => {
   }
 })();
 </script>
+
+<script>
+// ============================================================
+// BLOCK N: City State + City-Specific Listing Data
+// ============================================================
+
+// replace with Firestore collection 'cityState' in production
+const cityState = {
+  current: localStorage.getItem('selectedCity') || 'orlando',
+  multiCityMode: false,
+  multiCityTrip: { cities: [], dayAssignments: {} }, // cityId -> [itemIds]
+  comparisonA: null,
+  comparisonB: null
+};
+
+// ---- TAMPA LISTINGS ----
+const tampaListings = [
+  {id:'tp1',type:'attraction',emoji:'🎢',name:'Busch Gardens Tampa',category:'Theme Park',area:'Busch Gardens Area',rating:4.7,lat:28.0364,lng:-82.4215,description:'World-class theme park featuring thrilling roller coasters, live entertainment, and over 12,000 animals in stunning African-themed habitats.',tags:['family','thrill','outdoor'],price:'$109'},
+  {id:'tp2',type:'attraction',emoji:'🌊',name:'Tampa Riverwalk',category:'Park',area:'Downtown Tampa',rating:4.8,lat:27.9472,lng:-82.4596,description:'2.6-mile scenic waterfront path connecting museums, parks, and restaurants along the Hillsborough River with stunning city skyline views.',tags:['outdoor','budget','family'],price:null},
+  {id:'tp3',type:'attraction',emoji:'🏛️',name:'Ybor City Historic District',category:'Landmark',area:'Ybor City',rating:4.5,lat:27.9597,lng:-82.4357,description:'National Historic Landmark district with Victorian architecture, Cuban heritage, craft breweries, and vibrant nightlife on 7th Avenue.',tags:['culture','nightlife','family'],price:null},
+  {id:'tp4',type:'attraction',emoji:'📚',name:'Tampa Bay History Center',category:'Museum',area:'Downtown Tampa',rating:4.6,lat:27.9444,lng:-82.4571,description:'Explore 12,000 years of Tampa Bay history through interactive exhibits, Native American artifacts, and Spanish colonial era treasures.',tags:['educational','indoor','family'],price:'$14'},
+  {id:'tp5',type:'attraction',emoji:'🏖️',name:'Clearwater Beach',category:'Beach',area:'Clearwater',rating:4.9,lat:27.9779,lng:-82.8268,description:'Consistently ranked one of America\'s best beaches, with powder-white sand, crystal-clear Gulf waters, and spectacular sunsets.',tags:['outdoor','family','romantic'],price:null},
+  {id:'tp6',type:'restaurant',emoji:'🥘',name:'Columbia Restaurant',category:'Cuban',area:'Ybor City',rating:4.7,lat:27.9593,lng:-82.4354,description:"Florida's oldest restaurant (1905) serving authentic Spanish-Cuban cuisine in a stunning flamenco-filled dining room in Ybor City.",tags:['foodie','culture','romantic'],price:'$$$$'},
+  {id:'tp7',type:'restaurant',emoji:'🥩',name:"Bern's Steak House",category:'Steakhouse',area:'South Tampa',rating:4.8,lat:27.9339,lng:-82.4851,description:'Legendary Tampa institution with dry-aged steaks, an extraordinary 6,800-label wine list, and the famous dessert room upstairs.',tags:['foodie','romantic','splurge'],price:'$$$$'},
+  {id:'tp8',type:'restaurant',emoji:'🌿',name:'Ulele Restaurant',category:'New American',area:'Tampa Heights',rating:4.6,lat:27.9557,lng:-82.4625,description:'Chef-driven New American restaurant in a restored 1903 Water Works building featuring Florida indigenous ingredients and craft beer.',tags:['foodie','romantic'],price:'$$$'},
+  {id:'tp9',type:'restaurant',emoji:'☕',name:'Oxford Exchange',category:'Cafe',area:'Hyde Park',rating:4.7,lat:27.9331,lng:-82.4794,description:'Stunning multi-concept space in a historic building housing a cafe, bookshop, and cocktail bar with an Instagram-worthy interior.',tags:['foodie','culture','budget'],price:'$$'},
+  {id:'tp10',type:'hotel',emoji:'🏨',name:'Hotel Haya',category:'Boutique Hotel',area:'Ybor City',rating:4.5,lat:27.9591,lng:-82.4348,description:'Sophisticated boutique hotel in historic Ybor City celebrating Cuban heritage with handcrafted cocktails, a rooftop pool, and original art.',tags:['boutique','culture','romantic'],price:'$$$'},
+  {id:'tp11',type:'hotel',emoji:'🍷',name:'Epicurean Hotel',category:'Lifestyle Hotel',area:'South Tampa',rating:4.7,lat:27.9300,lng:-82.4851,description:'Food-focused boutique hotel on Restaurant Row with a rooftop terrace, cooking classes, and a partnership with Bern\'s Steak House next door.',tags:['foodie','boutique','romantic'],price:'$$$$'},
+  {id:'tp12',type:'hotel',emoji:'🌊',name:'Tampa Marriott Water Street',category:'Luxury Hotel',area:'Downtown Tampa',rating:4.6,lat:27.9441,lng:-82.4555,description:'LEED Gold-certified luxury hotel in the Water Street Tampa district with stunning bay views, rooftop pool, and full-service spa.',tags:['luxury','family','business'],price:'$$$$'},
+  {id:'tp13',type:'event',emoji:'🏴‍☠️',name:'Gasparilla Pirate Festival',category:'Festival',area:'Downtown Tampa',rating:4.9,lat:27.9472,lng:-82.4596,description:'Tampa\'s legendary pirate invasion festival held every January — one of the largest parades in the US with over 300,000 attendees and Mardi Gras beads.',tags:['festival','family','culture'],price:null,date:'2026-01-31'},
+  {id:'tp14',type:'event',emoji:'⚾',name:'Tampa Bay Rays Game at Tropicana Field',category:'Sports',area:'St. Petersburg',rating:4.5,lat:27.7683,lng:-82.6534,description:'Catch MLB action at the Rays\' iconic dome stadium with affordable tickets, great sightlines, and Tampa Bay\'s electric baseball atmosphere.',tags:['sports','family'],price:'$$',date:'2026-04-15'}
+];
+
+// ---- MIAMI LISTINGS ----
+const miamiListings = [
+  {id:'mi1',type:'attraction',emoji:'🎨',name:'Wynwood Walls',category:'Art District',area:'Wynwood',rating:4.8,lat:25.8006,lng:-80.1996,description:'World-famous outdoor museum transforming the Wynwood Art District with massive murals by internationally acclaimed street artists from 50+ countries.',tags:['culture','outdoor','nightlife'],price:'$12'},
+  {id:'mi2',type:'attraction',emoji:'🏛️',name:'Vizcaya Museum and Gardens',category:'Museum',area:'Coconut Grove',rating:4.7,lat:25.7445,lng:-80.2034,description:'Extraordinary 1916 Italian Renaissance-style villa with 10 acres of formal European gardens and 70 rooms of rare antiques on Biscayne Bay.',tags:['culture','romantic','outdoor'],price:'$22'},
+  {id:'mi3',type:'attraction',emoji:'🛍️',name:'Bayside Marketplace',category:'Shopping',area:'Downtown Miami',rating:4.4,lat:25.7757,lng:-80.1870,description:'Open-air waterfront festival marketplace on Biscayne Bay with shops, restaurants, live music, and boat tours departing throughout the day.',tags:['shopping','family','outdoor'],price:null},
+  {id:'mi4',type:'attraction',emoji:'🇨🇺',name:'Little Havana Walking Tour',category:'Cultural Tour',area:'Little Havana',rating:4.6,lat:25.7657,lng:-80.2271,description:'Explore Miami\'s vibrant Cuban-American neighborhood, sampling cigars, cafe cubano, and croquetas while discovering the heart of Cuban culture in exile.',tags:['culture','foodie','budget'],price:'$25'},
+  {id:'mi5',type:'attraction',emoji:'🦁',name:'Zoo Miami',category:'Zoo',area:'South Miami',rating:4.5,lat:25.5963,lng:-80.3996,description:'The largest zoo in Florida spanning 740 acres in a cageless design where animals roam naturalistic habitats in the tropical Miami climate.',tags:['family','outdoor'],price:'$23'},
+  {id:'mi6',type:'restaurant',emoji:'🍽️',name:'Versailles Restaurant',category:'Cuban',area:'Little Havana',rating:4.7,lat:25.7658,lng:-80.2298,description:'The "World\'s Most Famous Cuban Restaurant" — a Miami institution since 1971 serving authentic ropa vieja, media noche sandwiches, and Cuban coffee.',tags:['foodie','culture','budget'],price:'$$'},
+  {id:'mi7',type:'restaurant',emoji:'🦀',name:"Joe's Stone Crab",category:'Seafood',area:'Miami Beach',rating:4.8,lat:25.7666,lng:-80.1370,description:'Miami\'s most iconic restaurant since 1913, famous for fresh stone crab claws served with Joe\'s famous mustard sauce — long waits but worth every minute.',tags:['foodie','splurge','romantic'],price:'$$$$'},
+  {id:'mi8',type:'restaurant',emoji:'🍖',name:'KYU Miami',category:'Wood-fire Asian',area:'Wynwood',rating:4.6,lat:25.7993,lng:-80.1996,description:'Asian-inspired wood-fire cooking with a buzzing Wynwood atmosphere — the crispy rice with spicy tuna and roasted cauliflower are legendary.',tags:['foodie','nightlife','trendy'],price:'$$$'},
+  {id:'mi9',type:'hotel',emoji:'🏨',name:'EAST Miami',category:'Design Hotel',area:'Brickell',rating:4.6,lat:25.7641,lng:-80.1921,description:'Sophisticated design hotel in Brickell City Centre with stunning Biscayne Bay views, a vibrant rooftop Sugar bar, and modern Asian-inspired interiors.',tags:['luxury','nightlife','business'],price:'$$$$'},
+  {id:'mi10',type:'hotel',emoji:'🦋',name:'Faena Hotel Miami Beach',category:'Luxury Hotel',area:'Mid-Beach',rating:4.8,lat:25.8165,lng:-80.1213,description:'Alan Faena\'s ultra-luxury masterpiece with gold woolly mammoth art in the lobby, a cabaret theater, and one of Miami\'s most opulent beach clubs.',tags:['luxury','splurge','romantic'],price:'$$$$$'},
+  {id:'mi11',type:'event',emoji:'🎨',name:'Art Basel Miami Beach',category:'Art Fair',area:'Miami Beach Convention',rating:4.9,lat:25.7930,lng:-80.1315,description:'The world\'s premier art fair transforms Miami every December with thousands of artworks from 4,000+ artists in galleries, hotels, and pop-ups citywide.',tags:['culture','nightlife','luxury'],price:'$55',date:'2026-12-04'},
+  {id:'mi12',type:'event',emoji:'🎵',name:'Ultra Music Festival',category:'Music Festival',area:'Bayfront Park',rating:4.8,lat:25.7742,lng:-80.1874,description:'Miami\'s legendary electronic music festival draws 165,000 fans over 3 days with world-renowned DJs across multiple stages in stunning Bayfront Park.',tags:['nightlife','festival'],price:'$399',date:'2026-03-27'},
+  {id:'mi13',type:'event',emoji:'🎺',name:'Calle Ocho Festival',category:'Cultural Festival',area:'Little Havana',rating:4.7,lat:25.7657,lng:-80.2271,description:'The largest Cuban-American cultural celebration in the world, stretching 23 blocks of Little Havana with 650,000 visitors, live music, and street food.',tags:['culture','festival','family'],price:null,date:'2026-03-08'}
+];
+
+// ---- MIAMI BEACH LISTINGS ----
+const miamiBeachListings = [
+  {id:'mb1',type:'attraction',emoji:'🏛️',name:'Ocean Drive Art Deco Tour',category:'Walking Tour',area:'South Beach',rating:4.7,lat:25.7849,lng:-80.1300,description:'Self-guided or guided tour of the world\'s largest collection of Art Deco architecture along the iconic Ocean Drive strip, best explored at night when lit up.',tags:['culture','outdoor','budget'],price:'$20'},
+  {id:'mb2',type:'attraction',emoji:'🏖️',name:'South Beach',category:'Beach',area:'South Beach',rating:4.8,lat:25.7907,lng:-80.1300,description:'America\'s most famous beach with crystal-clear Atlantic water, powdery white sand, and a legendary people-watching scene stretching 2.5 miles.',tags:['outdoor','family','romantic'],price:null},
+  {id:'mb3',type:'attraction',emoji:'🛍️',name:'Lincoln Road Mall',category:'Shopping',area:'Mid-Beach',rating:4.5,lat:25.7918,lng:-80.1389,description:'Miami Beach\'s open-air pedestrian promenade lined with 200+ shops, restaurants, and galleries — best on Sunday morning at the farmers market.',tags:['shopping','outdoor','family'],price:null},
+  {id:'mb4',type:'attraction',emoji:'🖼️',name:'Bass Museum of Art',category:'Museum',area:'North Beach',rating:4.6,lat:25.7963,lng:-80.1287,description:'Miami Beach\'s premier art museum with a stunning 2017 renovation featuring contemporary exhibitions and a permanent collection of Old Masters.',tags:['culture','indoor'],price:'$15'},
+  {id:'mb5',type:'restaurant',emoji:'☕',name:'News Cafe',category:'Cafe',area:'South Beach',rating:4.4,lat:25.7776,lng:-80.1293,description:'Miami Beach institution open 24 hours on Ocean Drive, perfect for people-watching with fresh pastries, salads, and a full international magazine selection.',tags:['budget','casual','outdoor'],price:'$$'},
+  {id:'mb6',type:'restaurant',emoji:'🍗',name:'Yardbird Southern Table & Bar',category:'Southern',area:'South Beach',rating:4.7,lat:25.7881,lng:-80.1386,description:'Best fried chicken in Miami Beach — the brined and honey-drizzled bird with waffles is legendary. Lively atmosphere with weekend brunch lines.',tags:['foodie','casual','brunch'],price:'$$$'},
+  {id:'mb7',type:'restaurant',emoji:'🥩',name:'Prime 112',category:'Steakhouse',area:'South Beach',rating:4.8,lat:25.7736,lng:-80.1342,description:'The steakhouse that defined Miami Beach dining — dry-aged prime steaks, truffle mac and cheese, and the see-and-be-seen celebrity clientele.',tags:['foodie','splurge','romantic'],price:'$$$$$'},
+  {id:'mb8',type:'hotel',emoji:'🌴',name:'The Setai Miami Beach',category:'Luxury Resort',area:'South Beach',rating:4.9,lat:25.7937,lng:-80.1295,description:'The pinnacle of Miami Beach luxury: three temperature-controlled pools, a spa inspired by the Far East, and Asian-influenced rooms facing the Atlantic.',tags:['luxury','romantic','splurge'],price:'$$$$$'},
+  {id:'mb9',type:'hotel',emoji:'🎰',name:'Fontainebleau Miami Beach',category:'Resort',area:'Mid-Beach',rating:4.7,lat:25.8078,lng:-80.1219,description:'Iconic 1954 Morris Lapidus-designed resort with 12 pools, 12 restaurants, LIV nightclub, and 1,504 rooms — the ultimate Miami Beach experience.',tags:['luxury','nightlife','family'],price:'$$$$'},
+  {id:'mb10',type:'hotel',emoji:'🏊',name:'Delano South Beach',category:'Design Hotel',area:'South Beach',rating:4.6,lat:25.7894,lng:-80.1306,description:'Ian Schrager\'s legendary white-on-white design hotel with a beachside pool scene, celebrity guests, and the iconic see-through curtained lobby.',tags:['luxury','nightlife','romantic'],price:'$$$$'},
+  {id:'mb11',type:'event',emoji:'🎧',name:'Winter Music Conference',category:'Music Conference',area:'Various Venues',rating:4.7,lat:25.7918,lng:-80.1389,description:'The music industry\'s annual electronic music gathering featuring panels, pool parties, and club nights at 60+ venues across Miami Beach in March.',tags:['nightlife','festival','culture'],price:'$99',date:'2026-03-23'}
+];
+
+// ---- KEY WEST LISTINGS ----
+const keyWestListings = [
+  {id:'kw1',type:'attraction',emoji:'🎉',name:'Duval Street',category:'Entertainment District',area:'Old Town',rating:4.6,lat:24.5587,lng:-81.8050,description:'The legendary "world\'s longest bar" stretching from the Gulf to the Atlantic, lined with bars, boutiques, restaurants, and street performers.',tags:['nightlife','culture','family'],price:null},
+  {id:'kw2',type:'attraction',emoji:'📚',name:'Ernest Hemingway Home & Museum',category:'Historic Site',area:'Old Town',rating:4.8,lat:24.5484,lng:-81.8000,description:'Visit the Spanish Colonial home where Hemingway wrote some of his greatest works, now home to 40+ six-toed descendants of his beloved cats.',tags:['culture','educational','romantic'],price:'$16'},
+  {id:'kw3',type:'attraction',emoji:'🌅',name:'Mallory Square Sunset Celebration',category:'Daily Event',area:'Old Town Waterfront',rating:4.9,lat:24.5617,lng:-81.8067,description:'Key West\'s beloved nightly ritual: gather at Mallory Dock to watch the sun sink into the Gulf while street performers, artisans, and food carts create a carnival atmosphere.',tags:['outdoor','family','romantic'],price:null},
+  {id:'kw4',type:'attraction',emoji:'🏝️',name:'Dry Tortugas National Park',category:'National Park',area:'Gulf of Mexico',rating:4.9,lat:24.6282,lng:-82.8729,description:'Remote island paradise 70 miles west of Key West accessible only by boat or seaplane — home to Fort Jefferson, pristine coral reefs, and spectacular snorkeling.',tags:['outdoor','thrill','romantic'],price:'$15'},
+  {id:'kw5',type:'attraction',emoji:'🦋',name:'Key West Butterfly & Nature Conservatory',category:'Nature Center',area:'Old Town',rating:4.7,lat:24.5508,lng:-81.8044,description:'Magical climate-controlled habitat with 60+ butterfly species, 20 bird species, and 15,000+ tropical plants — a serene oasis in the heart of Key West.',tags:['family','outdoor','educational'],price:'$15'},
+  {id:'kw6',type:'restaurant',emoji:'🍳',name:'Blue Heaven Restaurant',category:'Caribbean American',area:'Bahama Village',rating:4.6,lat:24.5547,lng:-81.8022,description:'Quirky tropical restaurant in a historic Bahama Village building with legendary pancakes, fresh lobster, and resident peacocks and roosters wandering the yard.',tags:['foodie','brunch','casual'],price:'$$$'},
+  {id:'kw7',type:'restaurant',emoji:'☕',name:"Pepe's Cafe",category:'American',area:'Old Town',rating:4.5,lat:24.5575,lng:-81.8047,description:"Key West's oldest restaurant (1909) serving hearty breakfasts and fresh seafood in a no-frills, cash-only Old Town classic loved by locals for over a century.",tags:['budget','casual','authentic'],price:'$$'},
+  {id:'kw8',type:'restaurant',emoji:'🌊',name:"Louie's Backyard",category:'New American',area:'Old Town',rating:4.7,lat:24.5476,lng:-81.7971,description:"Acclaimed waterfront restaurant serving contemporary American cuisine on a breathtaking deck overlooking the Atlantic — sunset dining doesn't get better.",tags:['romantic','foodie','splurge'],price:'$$$$'},
+  {id:'kw9',type:'hotel',emoji:'🏖️',name:'Casa Marina Key West',category:'Historic Resort',area:'Old Town',rating:4.7,lat:24.5474,lng:-81.7966,description:"Henry Flagler's grand 1920 beachfront resort with Key West's largest private beach, a new-wave poolscape, and classic Craftsman architecture.",tags:['luxury','romantic','beach'],price:'$$$$'},
+  {id:'kw10',type:'hotel',emoji:'⚓',name:'The Marker Waterfront Resort',category:'Luxury Resort',area:'Old Town',rating:4.8,lat:24.5591,lng:-81.8060,description:'Award-winning waterfront resort with three pools, a marina, luxury spa, and stunning Key West Harbor views within walking distance of everything.',tags:['luxury','romantic','family'],price:'$$$$'},
+  {id:'kw11',type:'event',emoji:'🎭',name:'Fantasy Fest',category:'Festival',area:'Key West Citywide',rating:4.8,lat:24.5587,lng:-81.8050,description:"Key West's most famous festival: 10 days of elaborate costume parades, body painting, and outrageous parties celebrating creativity and fantasy in October.",tags:['nightlife','festival','culture'],price:null,date:'2026-10-16'},
+  {id:'kw12',type:'event',emoji:'🦞',name:'Key West Lobster Fest',category:'Food Festival',area:'Duval Street',rating:4.7,lat:24.5587,lng:-81.8050,description:'Annual August street festival celebrating the Florida lobster mini-season with fresh lobster dishes, live music, and an outdoor cookoff on Duval Street.',tags:['foodie','festival','family'],price:null,date:'2026-08-14'}
+];
+
+// ---- UNIVERSAL HOLLYWOOD LISTINGS ----
+const hollywoodListings = [
+  {id:'uh1',type:'attraction',emoji:'🎬',name:'Universal Studios Hollywood',category:'Theme Park',area:'Universal City',rating:4.8,lat:34.1381,lng:-118.3534,description:'The entertainment capital of LA — ride blockbuster attractions, explore the world-famous backlot, and experience the magic of Hollywood filmmaking.',tags:['family','thrill','indoor'],price:'$109'},
+  {id:'uh2',type:'attraction',emoji:'⚡',name:'Wizarding World of Harry Potter',category:'Theme Park Zone',area:'Universal City',rating:4.9,lat:34.1381,lng:-118.3534,description:"Step into Hogsmeade village, sip Butterbeer, ride Harry Potter and the Forbidden Journey, and discover the magic of J.K. Rowling's wizarding world.",tags:['family','thrill','indoor'],price:'Included'},
+  {id:'uh3',type:'attraction',emoji:'🎭',name:'CityWalk Hollywood',category:'Entertainment',area:'Universal City',rating:4.6,lat:34.1375,lng:-118.3540,description:'Open-air entertainment complex adjacent to Universal Studios with 20+ restaurants, shops, a cinema multiplex, and live music venues.',tags:['family','nightlife','shopping'],price:null},
+  {id:'uh4',type:'attraction',emoji:'⭐',name:'Hollywood Walk of Fame',category:'Landmark',area:'Hollywood Blvd',rating:4.5,lat:34.1016,lng:-118.3266,description:'Walk among the 2,700+ terrazzo stars honoring entertainment legends along 15 blocks of Hollywood Boulevard and Vine Street since 1960.',tags:['culture','outdoor','budget'],price:null},
+  {id:'uh5',type:'attraction',emoji:'🔭',name:'Griffith Observatory',category:'Science Center',area:'Los Feliz',rating:4.8,lat:34.1184,lng:-118.3004,description:"LA's iconic 1935 observatory offering planetarium shows, astronomy exhibits, and the most spectacular 360° views of Los Angeles and the Hollywood Sign.",tags:['educational','outdoor','romantic'],price:null},
+  {id:'uh6',type:'attraction',emoji:'🎨',name:'The Getty Center',category:'Art Museum',area:'Brentwood',rating:4.9,lat:34.0780,lng:-118.4741,description:'Richard Meier\'s architectural masterpiece perched on a hilltop with free admission (parking fee), a world-class art collection, and stunning LA panoramas.',tags:['culture','outdoor','educational'],price:null},
+  {id:'uh7',type:'attraction',emoji:'🎬',name:'TCL Chinese Theatre',category:'Historic Theater',area:'Hollywood Blvd',rating:4.6,lat:34.1022,lng:-118.3408,description:"Hollywood's most famous cinema since 1927 — see celebrity hand and footprint impressions in the forecourt and catch first-run films in a legendary setting.",tags:['culture','indoor','family'],price:'$19'},
+  {id:'uh8',type:'restaurant',emoji:'🍔',name:'In-N-Out Burger',category:'Burger Joint',area:'Sunset Blvd',rating:4.7,lat:34.0963,lng:-118.3656,description:'California\'s legendary burger chain — order a Double-Double Animal Style or the secret menu Protein Style. A Hollywood rite of passage since 1948.',tags:['budget','casual','authentic'],price:'$'},
+  {id:'uh9',type:'restaurant',emoji:'🍸',name:'Musso & Frank Grill',category:'American Classic',area:'Hollywood Blvd',rating:4.6,lat:34.1014,lng:-118.3395,description:"Hollywood's oldest restaurant (1919) where Fitzgerald, Faulkner, and Bogart once drank — legendary dry martinis, old-school flannel cakes, and impeccable service.",tags:['culture','foodie','romantic'],price:'$$$$'},
+  {id:'uh10',type:'restaurant',emoji:'🍣',name:'Nobu Hollywood',category:'Japanese',area:'West Hollywood',rating:4.7,lat:34.0935,lng:-118.3600,description:'Nobu Matsuhisa\'s flagship Hollywood outpost in the Nobu Hotel with iconic black cod with miso, celebrity sightings, and Hollywood glamour.',tags:['foodie','splurge','romantic'],price:'$$$$$'},
+  {id:'uh11',type:'hotel',emoji:'🎬',name:'Hollywood Roosevelt Hotel',category:'Historic Hotel',area:'Hollywood Blvd',rating:4.5,lat:34.1014,lng:-118.3414,description:'Site of the first Academy Awards in 1929 — this landmark hotel has hosted Marilyn Monroe, Charlie Chaplin, and every Hollywood legend since.',tags:['culture','boutique','nightlife'],price:'$$$'},
+  {id:'uh12',type:'hotel',emoji:'🏰',name:'Chateau Marmont',category:'Boutique Hotel',area:'Sunset Strip',rating:4.7,lat:34.0977,lng:-118.3790,description:"Hollywood's most storied hideaway on Sunset Strip since 1929 — discreet, exclusive, and hauntingly beautiful with bungalows and a legendary bar.",tags:['luxury','boutique','romantic'],price:'$$$$$'},
+  {id:'uh13',type:'event',emoji:'🎵',name:'Coachella Valley Music Festival',category:'Music Festival',area:'Indio (2hrs from LA)',rating:4.9,lat:33.6819,lng:-116.2385,description:'The world\'s most famous music and arts festival held over two weekends in April in the California desert — a cultural pilgrimage for music lovers globally.',tags:['nightlife','festival','culture'],price:'$499',date:'2026-04-10'}
+];
+
+// ---- GET LISTINGS FUNCTION ----
+function getCityListings(cityId) {
+  const map = { tampa:tampaListings, miami:miamiListings, miamibeach:miamiBeachListings, keywest:keyWestListings, hollywood:hollywoodListings };
+  return map[cityId] || [];
+}
+
+function getAllListingsForCity(cityId) {
+  if (!cityId || cityId === 'orlando') {
+    return [
+      ...(typeof attractions!=='undefined'?attractions:[]),
+      ...(typeof restaurants!=='undefined'?restaurants:[]),
+      ...(typeof hotels!=='undefined'?hotels:[]),
+      ...(typeof events!=='undefined'?events:[]),
+      ...(typeof tours!=='undefined'?tours:[]),
+      ...(typeof shopping!=='undefined'?shopping:[])
+    ];
+  }
+  return getCityListings(cityId);
+}
+</script>
+
+<script>
+// ============================================================
+// BLOCK O: City Selector UI + Home Screen Integration
+// ============================================================
+
+// City definitions
+// replace city data with Firestore collection 'cities' in production
+const CITIES = [
+  { id:'orlando',   name:'Orlando',     state:'Florida',     emoji:'🏰', tagline:'The Theme Park Capital of the World',     listings:55, heroGrad:'linear-gradient(135deg,#FF6B35 0%,#1a6eb5 100%)', heroTagline:'Discover Magic in Every Corner', color:'#FF6B35', tips:['Visit theme parks on weekdays to avoid crowds','I-Drive is perfect for dining and entertainment','The Florida weather can change quickly — carry sunscreen'], neighborhoods:['International Drive','Downtown Orlando','Lake Nona'] },
+  { id:'tampa',     name:'Tampa',       state:'Florida',     emoji:'🏴‍☠️', tagline:'Sun, Sand & Adventure on the Gulf Coast', listings:40, heroGrad:'linear-gradient(135deg,#e07020 0%,#1a5f8a 100%)', heroTagline:'Where the Bay Meets the Adventure', color:'#e07020', tips:['Clearwater Beach is 45 minutes from downtown Tampa','Ybor City comes alive Thursday through Sunday nights','The Tampa Riverwalk connects 2.6 miles of waterfront attractions'], neighborhoods:['Downtown Tampa','Ybor City','South Tampa'] },
+  { id:'miami',     name:'Miami',       state:'Florida',     emoji:'🦩', tagline:'The Magic City Where Culture Meets the Beach', listings:45, heroGrad:'linear-gradient(135deg,#e91e8c 0%,#00bcd4 100%)', heroTagline:'Where the World Comes to Play', color:'#e91e8c', tips:['Little Havana is best explored on a walking tour','Traffic in Miami is notoriously heavy — use ride-share','Art Basel in December transforms the city into a global art stage'], neighborhoods:['Wynwood','Little Havana','Brickell'] },
+  { id:'miamibeach',name:'Miami Beach', state:'Florida',     emoji:'⛱️', tagline:'Art Deco Glamour and Ocean Breezes',           listings:35, heroGrad:'linear-gradient(135deg,#f48fb1 0%,#29b6f6 100%)', heroTagline:'Sun-Kissed Glamour on the Atlantic', color:'#f48fb1', tips:['Ocean Drive is best walked early morning before the crowds','South Beach metered parking is limited — use the garages','The Art Deco Historic District has free self-guided walking tours'], neighborhoods:['South Beach','Mid-Beach','North Beach'] },
+  { id:'keywest',   name:'Key West',    state:'Florida',     emoji:'🌅', tagline:'The Southernmost Paradise in the USA',         listings:30, heroGrad:'linear-gradient(135deg,#f9a825 0%,#e64a19 100%)', heroTagline:'Paradise at the End of US-1', color:'#f9a825', tips:['Rent a bicycle — Key West is only 4 miles wide','Mallory Square Sunset is a must-do every evening','Book the Dry Tortugas ferry far in advance — it sells out'], neighborhoods:['Old Town','Bahama Village','Truman Annex'] },
+  { id:'hollywood', name:'Universal Hollywood', state:'California', emoji:'🎬', tagline:'Hollywood Magic and Blockbuster Thrills', listings:38, heroGrad:'linear-gradient(135deg,#7b1fa2 0%,#f9a825 100%)', heroTagline:'Where Movies Come to Life', color:'#7b1fa2', tips:['Buy Universal Express Pass to skip the long lines','Visit The Wizarding World of Harry Potter first thing','Hollywood traffic is extreme — use the Metro Red Line from Hollywood/Highland'], neighborhoods:['Hollywood Blvd','Universal CityWalk','West Hollywood'] }
+];
+
+const CITIES_COMING_SOON = [
+  { name:'New York',   emoji:'🗽', state:'New York' },
+  { name:'Las Vegas',  emoji:'🎰', state:'Nevada' },
+  { name:'Nashville',  emoji:'🎸', state:'Tennessee' },
+  { name:'Chicago',    emoji:'🌆', state:'Illinois' }
+];
+
+// Travel times between cities (minutes)
+const CITY_TRAVEL_TIMES = {
+  'orlando-tampa': { drive: 75, desc: '1h 15m', fly: 60, flyCost: '$89', driveCost: '$28' },
+  'orlando-miami': { drive: 225, desc: '3h 45m', fly: 75, flyCost: '$79', driveCost: '$65' },
+  'orlando-miamibeach': { drive: 240, desc: '4h 0m', fly: 80, flyCost: '$79', driveCost: '$68' },
+  'orlando-keywest': { drive: 300, desc: '5h 0m', fly: 90, flyCost: '$129', driveCost: '$85' },
+  'tampa-miami': { drive: 280, desc: '4h 40m', fly: 80, flyCost: '$99', driveCost: '$78' },
+  'tampa-keywest': { drive: 240, desc: '4h 0m', fly: 85, flyCost: '$119', driveCost: '$67' },
+  'miami-keywest': { drive: 210, desc: '3h 30m', fly: 60, flyCost: '$109', driveCost: '$58' },
+  'miami-miamibeach': { drive: 20, desc: '20m', fly: null, flyCost: null, driveCost: '$8' }
+};
+
+function getTravelTime(city1, city2) {
+  const key1 = city1+'-'+city2, key2 = city2+'-'+city1;
+  return CITY_TRAVEL_TIMES[key1] || CITY_TRAVEL_TIMES[key2] || null;
+}
+
+// ---- CITY SELECTOR BAR ----
+function renderCitySelectorBar() {
+  const existing = document.getElementById('city-selector-bar');
+  if (existing) existing.remove();
+  const city = CITIES.find(c => c.id === cityState.current) || CITIES[0];
+  const bar = document.createElement('div');
+  bar.id = 'city-selector-bar';
+  bar.style.cssText = 'background:var(--white);border-bottom:1px solid var(--gray1);padding:.5rem 1rem;display:flex;align-items:center;justify-content:space-between;cursor:pointer;';
+  bar.innerHTML = `
+    <div style="display:flex;align-items:center;gap:.5rem;" onclick="openCitySelector()">
+      <span style="font-size:1.1rem;">${city.emoji}</span>
+      <div>
+        <div style="font-size:.75rem;color:var(--gray3);font-weight:500;">Exploring</div>
+        <div style="font-size:.9rem;font-weight:700;color:var(--text);">${city.name}, ${city.state}</div>
+      </div>
+      <span style="color:var(--gray3);font-size:.7rem;margin-left:.2rem;">▼</span>
+    </div>
+    <button onclick="openCitySelector()" style="background:var(--sky);color:#fff;border:none;border-radius:8px;padding:.3rem .7rem;font-size:.75rem;font-weight:600;cursor:pointer;">Change City</button>`;
+  const homeScr = document.getElementById('screen-home');
+  if (homeScr) homeScr.insertAdjacentElement('afterbegin', bar);
+}
+
+// ---- OPEN CITY SELECTOR ----
+function openCitySelector() {
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay active';
+  overlay.id = 'city-selector-overlay';
+  overlay.style.cssText = 'z-index:3600;align-items:flex-end;display:flex;';
+  overlay.innerHTML = `
+    <div style="width:100%;max-width:430px;margin:0 auto;background:var(--white);border-radius:20px 20px 0 0;max-height:88vh;display:flex;flex-direction:column;">
+      <div style="padding:1rem;border-bottom:1px solid var(--gray1);">
+        <div style="width:40px;height:4px;background:var(--gray2);border-radius:2px;margin:0 auto .7rem;"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div style="font-size:1.05rem;font-weight:700;">🌍 Choose Your Destination</div>
+          <div style="display:flex;gap:.5rem;">
+            <button onclick="openCityComparison()" style="background:var(--gray1);border:none;border-radius:8px;padding:.3rem .6rem;font-size:.75rem;cursor:pointer;font-weight:600;">⚖️ Compare</button>
+            <button onclick="document.getElementById('city-selector-overlay').remove()" style="background:none;border:none;cursor:pointer;font-size:1.1rem;color:var(--gray3);">✕</button>
+          </div>
+        </div>
+        <input id="city-search-input" type="text" placeholder="Search cities..." oninput="filterCityCards(this.value)"
+               style="width:100%;margin-top:.7rem;padding:.55rem .8rem;border:1.5px solid var(--gray2);border-radius:10px;font-size:.9rem;outline:none;box-sizing:border-box;background:var(--white);color:var(--text);">
+      </div>
+      <div id="city-cards-container" style="overflow-y:auto;padding:1rem;flex:1;">
+        ${buildCityCardsHTML(CITIES)}
+        <div style="margin-top:1rem;">
+          <div style="font-size:.7rem;font-weight:700;color:var(--gray3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.6rem;">Coming Soon</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;">
+            ${CITIES_COMING_SOON.map(c=>`
+              <div style="background:var(--gray1);border-radius:14px;padding:.9rem;opacity:.55;text-align:center;">
+                <div style="font-size:1.8rem;">${c.emoji}</div>
+                <div style="font-weight:700;font-size:.85rem;margin:.2rem 0 .1rem;">${c.name}</div>
+                <div style="font-size:.7rem;color:var(--gray3);">${c.state}</div>
+                <div style="font-size:.68rem;color:var(--gray3);margin-top:.3rem;background:var(--gray2);border-radius:5px;padding:.1rem .4rem;display:inline-block;">Coming Soon</div>
+              </div>`).join('')}
+          </div>
+        </div>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  if (typeof addSwipeDownToClose !== 'undefined') addSwipeDownToClose(overlay, () => overlay.remove());
+}
+
+function buildCityCardsHTML(cities) {
+  return `<div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;" id="city-grid">
+    ${cities.map(city => {
+      const isActive = city.id === cityState.current;
+      return `<div onclick="selectCity('${city.id}')"
+        style="background:${isActive?'var(--sky)':'var(--gray1)'};border:2px solid ${isActive?'var(--sky)':'transparent'};
+               border-radius:16px;padding:1rem .8rem;cursor:pointer;text-align:center;transition:all .2s;position:relative;">
+        ${isActive?'<div style="position:absolute;top:6px;right:8px;font-size:.65rem;background:#fff;color:var(--sky);font-weight:700;border-radius:5px;padding:.1rem .4rem;">✓ Active</div>':''}
+        <div style="font-size:2rem;margin-bottom:.3rem;">${city.emoji}</div>
+        <div style="font-weight:800;font-size:.9rem;color:${isActive?'#fff':'var(--text)'};">${city.name}</div>
+        <div style="font-size:.72rem;color:${isActive?'rgba(255,255,255,.75)':'var(--gray3)'};">${city.state}</div>
+        <div style="font-size:.68rem;color:${isActive?'rgba(255,255,255,.6)':'var(--gray3)'};margin-top:.3rem;line-height:1.3;">${city.tagline}</div>
+        <div style="margin-top:.5rem;background:${isActive?'rgba(255,255,255,.2)':'var(--gray2)'};border-radius:5px;padding:.15rem .4rem;display:inline-block;font-size:.68rem;font-weight:600;color:${isActive?'#fff':'var(--gray4)'};">${city.listings} listings</div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+function filterCityCards(q) {
+  const filtered = CITIES.filter(c => c.name.toLowerCase().includes(q.toLowerCase()) || c.state.toLowerCase().includes(q.toLowerCase()) || c.tagline.toLowerCase().includes(q.toLowerCase()));
+  const container = document.getElementById('city-grid');
+  if (container) container.outerHTML = buildCityCardsHTML(filtered);
+}
+
+// ---- SELECT CITY ----
+function selectCity(cityId) {
+  const city = CITIES.find(c => c.id === cityId);
+  if (!city) return;
+  const prev = cityState.current;
+  cityState.current = cityId;
+  localStorage.setItem('selectedCity', cityId);
+
+  // Close modal
+  const modal = document.getElementById('city-selector-overlay');
+  if (modal) modal.remove();
+
+  // Update hero gradient with transition
+  updateCityHero(city);
+
+  // Update city selector bar
+  renderCitySelectorBar();
+
+  // Re-render home
+  renderHome();
+
+  showToast(`Switched to ${city.emoji} ${city.name}!`);
+}
+
+function updateCityHero(city) {
+  // Update hero gradient
+  const hero = document.querySelector('#screen-home .hero-section, #screen-home [class*="hero"]');
+  if (hero) {
+    hero.style.transition = 'background 1.5s ease';
+    hero.style.background = city.heroGrad;
+  }
+  // Update hero tagline
+  const taglineEl = document.querySelector('#screen-home .hero-sub, #screen-home [class*="hero-sub"], #screen-home .hero-logo + *');
+  if (taglineEl) taglineEl.textContent = city.heroTagline;
+}
+
+// ---- CITY COMPARISON ----
+function openCityComparison() {
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay active';
+  overlay.style.cssText = 'z-index:3700;';
+  let selectedA = cityState.current, selectedB = null;
+
+  const compData = {
+    orlando:    { hotelAvg: 185, themeParks: 12, topRestaurants: 45, bestMonth: 'March–May', temp: '72°F', top3: ['Walt Disney World','Universal Studios','SeaWorld'] },
+    tampa:      { hotelAvg: 145, themeParks: 2,  topRestaurants: 38, bestMonth: 'Nov–April', temp: '74°F', top3: ['Busch Gardens','Clearwater Beach','Ybor City'] },
+    miami:      { hotelAvg: 220, themeParks: 0,  topRestaurants: 62, bestMonth: 'Dec–March', temp: '77°F', top3: ['Wynwood Walls','South Beach','Vizcaya Museum'] },
+    miamibeach: { hotelAvg: 295, themeParks: 0,  topRestaurants: 48, bestMonth: 'Dec–April', temp: '78°F', top3: ['Ocean Drive','South Beach','Lincoln Road'] },
+    keywest:    { hotelAvg: 310, themeParks: 0,  topRestaurants: 28, bestMonth: 'Nov–May',   temp: '80°F', top3: ['Mallory Square','Hemingway Home','Dry Tortugas'] },
+    hollywood:  { hotelAvg: 265, themeParks: 2,  topRestaurants: 55, bestMonth: 'Sept–Nov',  temp: '70°F', top3: ['Universal Studios HW','Griffith Observatory','The Getty'] }
+  };
+
+  function buildComparison() {
+    const cA = CITIES.find(c=>c.id===selectedA), cB = selectedB ? CITIES.find(c=>c.id===selectedB) : null;
+    const dA = compData[selectedA]||{}, dB = selectedB ? compData[selectedB]||{} : null;
+    return `
+      <div style="width:100%;max-width:430px;height:100%;background:var(--white);display:flex;flex-direction:column;overflow-y:auto;">
+        <div style="padding:1rem;display:flex;align-items:center;gap:.7rem;border-bottom:1px solid var(--gray1);position:sticky;top:0;background:var(--white);z-index:1;">
+          <button class="icon-btn" onclick="this.closest('.overlay').remove()">←</button>
+          <span style="font-size:1rem;font-weight:700;">⚖️ Compare Cities</span>
+        </div>
+        <div style="padding:1rem;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:1rem;">
+            <div>
+              <div style="font-size:.7rem;font-weight:700;color:var(--gray3);margin-bottom:.3rem;">CITY A</div>
+              <select onchange="selectedA=this.value;document.getElementById('comp-body').innerHTML=buildCompBody();"
+                      style="width:100%;padding:.5rem;border:1.5px solid var(--gray2);border-radius:8px;font-size:.85rem;background:var(--white);">
+                ${CITIES.map(c=>`<option value="${c.id}" ${c.id===selectedA?'selected':''}>${c.emoji} ${c.name}</option>`).join('')}
+              </select>
+            </div>
+            <div>
+              <div style="font-size:.7rem;font-weight:700;color:var(--gray3);margin-bottom:.3rem;">CITY B</div>
+              <select onchange="selectedB=this.value;document.getElementById('comp-body').innerHTML=buildCompBody();"
+                      style="width:100%;padding:.5rem;border:1.5px solid var(--gray2);border-radius:8px;font-size:.85rem;background:var(--white);">
+                <option value="">-- Select --</option>
+                ${CITIES.map(c=>`<option value="${c.id}" ${c.id===selectedB?'selected':''}>${c.emoji} ${c.name}</option>`).join('')}
+              </select>
+            </div>
+          </div>
+          <div id="comp-body">${buildCompBody()}</div>
+        </div>
+      </div>`;
+  }
+
+  function buildCompBody() {
+    const cA = CITIES.find(c=>c.id===selectedA), cB = selectedB ? CITIES.find(c=>c.id===selectedB) : null;
+    const dA = compData[selectedA]||{}, dB = selectedB ? (compData[selectedB]||{}) : null;
+    if (!cB) return `<div style="text-align:center;padding:2rem;color:var(--gray3);">Select City B to compare</div>`;
+    const rows = [
+      ['🏨 Avg Hotel/Night', '$'+dA.hotelAvg, '$'+dB.hotelAvg, dA.hotelAvg < dB.hotelAvg ? 'A' : 'B'],
+      ['🎢 Theme Parks',      dA.themeParks,   dB.themeParks,   dA.themeParks > dB.themeParks ? 'A' : 'B'],
+      ['🍽️ Top Restaurants',  dA.topRestaurants, dB.topRestaurants, dA.topRestaurants > dB.topRestaurants ? 'A' : 'B'],
+      ['📅 Best Month',       dA.bestMonth,    dB.bestMonth,    null],
+      ['🌡️ Avg Temperature',  dA.temp,         dB.temp,         null],
+    ];
+    const winner = [rows[0],rows[1],rows[2]].filter(r=>r[3]).reduce((acc,r)=>{ acc[r[3]] = (acc[r[3]]||0)+1; return acc; },{});
+    const winnerCity = winner['A'] >= winner['B'] ? cA : cB;
+    return `
+      <div style="background:var(--gray1);border-radius:14px;overflow:hidden;margin-bottom:1rem;">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:.6rem .8rem;background:var(--gray2);">
+          <div style="font-size:.72rem;font-weight:700;color:var(--gray3);">Metric</div>
+          <div style="font-size:.82rem;font-weight:800;text-align:center;">${cA.emoji} ${cA.name.split(' ')[0]}</div>
+          <div style="font-size:.82rem;font-weight:800;text-align:center;">${cB.emoji} ${cB.name.split(' ')[0]}</div>
+        </div>
+        ${rows.map(([label,a,b,win])=>`
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:.55rem .8rem;border-top:1px solid var(--gray2);align-items:center;">
+            <div style="font-size:.78rem;color:var(--gray3);">${label}</div>
+            <div style="font-size:.9rem;font-weight:700;text-align:center;color:${win==='A'?'#22c55e':'var(--text)'};">${a}${win==='A'?' 🏆':''}</div>
+            <div style="font-size:.9rem;font-weight:700;text-align:center;color:${win==='B'?'#22c55e':'var(--text)'};">${b}${win==='B'?' 🏆':''}</div>
+          </div>`).join('')}
+      </div>
+      <div style="background:linear-gradient(135deg,#0d1433,#1a2035);border-radius:14px;padding:1rem;color:#fff;margin-bottom:1rem;">
+        <div style="font-size:.75rem;font-weight:700;color:rgba(255,255,255,.5);margin-bottom:.4rem;">🏆 OUR RECOMMENDATION</div>
+        <div style="font-size:.95rem;font-weight:700;">${winnerCity.emoji} ${winnerCity.name} wins overall!</div>
+        <div style="font-size:.82rem;color:rgba(255,255,255,.7);margin-top:.3rem;line-height:1.4;">${winnerCity.tagline}</div>
+      </div>
+      <button onclick="selectCity('${winnerCity.id}');this.closest('.overlay').remove();"
+              style="width:100%;padding:.8rem;background:var(--sky);border:none;border-radius:12px;color:#fff;font-weight:700;font-size:.9rem;cursor:pointer;">
+        Explore ${winnerCity.name} →
+      </button>`;
+  }
+
+  window.buildCompBody = buildCompBody;
+  overlay.innerHTML = buildComparison();
+  document.body.appendChild(overlay);
+  if (typeof addSwipeDownToClose !== 'undefined') addSwipeDownToClose(overlay, () => overlay.remove());
+}
+
+// ---- PATCH renderHome to show city selector bar + city-specific content ----
+const _origRenderHome_city = renderHome;
+renderHome = function() {
+  _origRenderHome_city();
+  setTimeout(() => {
+    renderCitySelectorBar();
+    const city = CITIES.find(c => c.id === cityState.current) || CITIES[0];
+    updateCityHero(city);
+  }, 100);
+};
+
+// Initialize city from storage
+cityState.current = localStorage.getItem('selectedCity') || 'orlando';
+</script>
+
+<script>
+// ============================================================
+// BLOCK P: Performance Optimizations + Search Index + Perf
+// ============================================================
+
+// ---- CLIENT-SIDE SEARCH INDEX ----
+// replace with Elasticsearch or Algolia for production search at scale
+const searchIndex = {
+  index: new Map(), // inverted index: term -> Set of {id, score}
+  built: false,
+  buildTime: 0
+};
+
+function tokenize(str) {
+  return (str||'').toLowerCase().split(/[\s,.\-'&!?;:()]+/).filter(t => t.length > 1);
+}
+
+function buildSearchIndex() {
+  const t0 = performance.now();
+  searchIndex.index.clear();
+  const allItems = typeof getAllListingsForCity === 'function'
+    ? getAllListingsForCity(cityState ? cityState.current : 'orlando')
+    : [...(typeof attractions!=='undefined'?attractions:[]), ...(typeof restaurants!=='undefined'?restaurants:[]), ...(typeof hotels!=='undefined'?hotels:[]), ...(typeof events!=='undefined'?events:[]), ...(typeof tours!=='undefined'?tours:[]), ...(typeof shopping!=='undefined'?shopping:[])];
+
+  allItems.forEach(item => {
+    const fields = [item.name||'', item.description||item.desc||'', item.area||'', item.category||'', ...(item.tags||[])];
+    const terms = new Set(fields.flatMap(tokenize));
+    terms.forEach(term => {
+      if (!searchIndex.index.has(term)) searchIndex.index.set(term, new Set());
+      searchIndex.index.get(term).add(item.id);
+      // prefix indexing: add each prefix of length >= 2
+      for (let i = 2; i < term.length; i++) {
+        const prefix = term.slice(0, i);
+        if (!searchIndex.index.has(prefix)) searchIndex.index.set(prefix, new Set());
+        searchIndex.index.get(prefix).add(item.id);
+      }
+    });
+  });
+  searchIndex.built = true;
+  searchIndex.buildTime = Math.round(performance.now() - t0);
+  return allItems.length;
+}
+
+function fuzzyMatch(query, term) {
+  // Simple fuzzy: allow 1 char difference for terms >= 5 chars
+  if (query === term) return true;
+  if (Math.abs(query.length - term.length) > 2) return false;
+  let diff = 0;
+  for (let i = 0; i < Math.min(query.length, term.length); i++) {
+    if (query[i] !== term[i]) diff++;
+    if (diff > 1) return false;
+  }
+  return true;
+}
+
+function searchWithIndex(query) {
+  const t0 = performance.now();
+  if (!searchIndex.built) buildSearchIndex();
+  const tokens = tokenize(query);
+  if (!tokens.length) return { ids: [], ms: 0 };
+  const scores = new Map();
+  tokens.forEach(token => {
+    // Direct lookup
+    if (searchIndex.index.has(token)) {
+      searchIndex.index.get(token).forEach(id => scores.set(id, (scores.get(id)||0) + 2));
+    }
+    // Fuzzy lookup
+    searchIndex.index.forEach((ids, term) => {
+      if (term !== token && fuzzyMatch(token, term)) {
+        ids.forEach(id => scores.set(id, (scores.get(id)||0) + 1));
+      }
+    });
+  });
+  const ids = [...scores.entries()].sort((a,b)=>b[1]-a[1]).map(e=>e[0]);
+  const ms = Math.round(performance.now() - t0);
+  return { ids, ms, total: ids.length };
+}
+
+// Build index on load
+setTimeout(() => {
+  const count = buildSearchIndex();
+  console.log(`Search index built: ${count} items, ${searchIndex.buildTime}ms`);
+}, 2000);
+
+// Rebuild on city change
+const _origSelectCity_idx = typeof selectCity !== 'undefined' ? selectCity : null;
+if (_origSelectCity_idx) {
+  const _prevSelectCity = selectCity;
+  selectCity = function(cityId) {
+    _prevSelectCity(cityId);
+    setTimeout(() => buildSearchIndex(), 500);
+  };
+}
+
+// ---- DEBOUNCE / THROTTLE UTILITIES ----
+function debounce(fn, ms) {
+  let timer;
+  return function(...args) { clearTimeout(timer); timer = setTimeout(() => fn.apply(this, args), ms); };
+}
+
+function throttle(fn, ms) {
+  let last = 0;
+  return function(...args) {
+    const now = Date.now();
+    if (now - last >= ms) { last = now; fn.apply(this, args); }
+  };
+}
+
+// Debounced search (300ms)
+const debouncedSearch = debounce(function(val) {
+  if (typeof sfHandleInput !== 'undefined') sfHandleInput(val);
+}, 300);
+
+// ---- INTERSECTION OBSERVER LAZY LOADING ----
+const lazyObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const el = entry.target;
+      // Fade in
+      el.style.transition = 'opacity .3s ease';
+      el.style.opacity = '1';
+      // Load image if data-src present
+      const img = el.querySelector('[data-src]');
+      if (img) { img.src = img.dataset.src; img.removeAttribute('data-src'); }
+      lazyObserver.unobserve(el);
+    }
+  });
+}, { rootMargin: '200px 0px', threshold: 0.01 });
+
+function initLazyCards() {
+  document.querySelectorAll('.card, .hcard').forEach(card => {
+    if (!card.classList.contains('lazy-init')) {
+      card.classList.add('lazy-init');
+      card.style.opacity = '0.01';
+      lazyObserver.observe(card);
+    }
+  });
+}
+
+// Patch renderExploreList to init lazy loading after render
+const _origRenderExploreList_lazy = typeof renderExploreList !== 'undefined' ? renderExploreList : null;
+if (_origRenderExploreList_lazy) {
+  const _prevRender = renderExploreList;
+  renderExploreList = function() {
+    _prevRender();
+    requestAnimationFrame(() => initLazyCards());
+  };
+}
+
+// ---- INFINITE SCROLL PAGINATION ----
+const infiniteScrollState = {
+  explore: { page: 1, pageSize: 12, loading: false },
+  forum: { page: 1, pageSize: 12, loading: false },
+  watchlist: { page: 1, pageSize: 12, loading: false }
+};
+
+function setupInfiniteScroll(scrollEl, state, loadMoreFn) {
+  if (!scrollEl) return;
+  const handler = throttle(() => {
+    if (state.loading) return;
+    const distFromBottom = scrollEl.scrollHeight - scrollEl.scrollTop - scrollEl.clientHeight;
+    if (distFromBottom < 200) {
+      state.loading = true;
+      const spinner = document.createElement('div');
+      spinner.style.cssText = 'text-align:center;padding:.8rem;color:var(--gray3);font-size:.85rem;';
+      spinner.innerHTML = '<span style="display:inline-block;animation:spin 1s linear infinite;">⏳</span> Loading...';
+      scrollEl.appendChild(spinner);
+      setTimeout(() => {
+        spinner.remove();
+        state.loading = false;
+        loadMoreFn(state);
+      }, 500);
+    }
+  }, 16);
+  scrollEl.addEventListener('scroll', handler, { passive: true });
+}
+
+// ---- CDN SIMULATION ----
+// replace with actual CDN URLs from Firebase Storage or AWS CloudFront in production
+const cdnAssets = {
+  // Pattern: cdn.orlandoexplorer.com/images/{listing-id}.jpg
+  getUrl: (itemId) => `https://cdn.orlandoexplorer.com/images/${itemId}.jpg`,
+  baseUrl: 'https://cdn.orlandoexplorer.com',
+  status: 'connected',
+  cacheHitRate: 94.2,
+  assetsServed: 12847
+};
+
+function getCdnImage(itemId) {
+  // Check cdnAssets first, fall back to base64 stored image
+  if (typeof adminImages !== 'undefined' && adminImages[itemId]) return adminImages[itemId];
+  // replace with actual CDN URL lookup in production
+  return null; // CDN would serve from cdn.orlandoexplorer.com/images/{itemId}.jpg
+}
+
+// ---- CANVAS IMAGE COMPRESSION (80% quality) ----
+function compressImageBase64(base64, quality, callback) {
+  const img = new Image();
+  img.onload = function() {
+    const canvas = document.createElement('canvas');
+    // Target 800x600 max
+    const maxW = 800, maxH = 600;
+    let w = img.width, h = img.height;
+    if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+    if (h > maxH) { w = Math.round(w * maxH / h); h = maxH; }
+    canvas.width = w; canvas.height = h;
+    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+    callback(canvas.toDataURL('image/jpeg', quality || 0.8));
+  };
+  img.src = base64;
+}
+
+// ---- FPS MONITOR (admin analytics) ----
+const fpsMonitor = { fps: 60, frames: 0, lastTime: performance.now() };
+function startFPSMonitor() {
+  function tick() {
+    fpsMonitor.frames++;
+    const now = performance.now();
+    if (now - fpsMonitor.lastTime >= 1000) {
+      fpsMonitor.fps = Math.round(fpsMonitor.frames * 1000 / (now - fpsMonitor.lastTime));
+      fpsMonitor.frames = 0;
+      fpsMonitor.lastTime = now;
+      const el = document.getElementById('anl-fps-display');
+      if (el) el.textContent = fpsMonitor.fps + ' FPS';
+    }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+startFPSMonitor();
+
+// ---- SERVICE WORKER REGISTRATION ----
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').then(reg => {
+      console.log('SW registered:', reg.scope);
+      showToast('App is ready to work offline 📱');
+      // Listen for updates
+      reg.addEventListener('updatefound', () => {
+        const newSW = reg.installing;
+        newSW.addEventListener('statechange', () => {
+          if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+            // New version available
+            const banner = document.createElement('div');
+            banner.style.cssText = 'position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--sky);color:#fff;padding:.7rem 1rem;display:flex;align-items:center;justify-content:space-between;z-index:9999;';
+            banner.innerHTML = `<span style="font-size:.85rem;">A new version is available!</span><button onclick="window.location.reload()" style="background:#fff;color:var(--sky);border:none;border-radius:6px;padding:.25rem .6rem;font-size:.8rem;font-weight:700;cursor:pointer;">Refresh</button>`;
+            document.body.appendChild(banner);
+          }
+        });
+      });
+    }).catch(err => console.log('SW error:', err));
+  });
+}
+
+// ---- RAF WRAPPER FOR ANIMATIONS ----
+function rafAnimate(fn) { requestAnimationFrame(fn); }
+</script>
+<style>
+.anl-wrap{padding:0;color:var(--text);}
+.anl-header{background:linear-gradient(135deg,#0d1433,#1a2035);padding:1rem;color:#fff;border-bottom:1px solid rgba(255,255,255,.08);}
+.anl-header h2{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;margin:0 0 .2rem;}
+.anl-subnav{display:flex;gap:.3rem;overflow-x:auto;padding:.6rem .8rem;background:#f8f9fa;border-bottom:1px solid var(--gray2);scrollbar-width:none;}
+.anl-subnav::-webkit-scrollbar{display:none;}
+.anl-sub-btn{flex-shrink:0;padding:.3rem .7rem;border-radius:20px;font-size:.75rem;font-weight:600;background:var(--white);border:1px solid var(--gray2);color:var(--gray3);cursor:pointer;}
+.anl-sub-btn.active{background:var(--sky);color:#fff;border-color:var(--sky);}
+.anl-date-row{display:flex;gap:.4rem;overflow-x:auto;padding:.6rem .8rem;scrollbar-width:none;}
+.anl-date-row::-webkit-scrollbar{display:none;}
+.anl-date-chip{flex-shrink:0;padding:.28rem .65rem;border-radius:14px;font-size:.75rem;font-weight:600;background:var(--gray1);color:var(--gray3);cursor:pointer;border:1px solid var(--gray2);}
+.anl-date-chip.active{background:#f97316;color:#fff;border-color:#f97316;}
+.anl-section{padding:.8rem;}
+.anl-section-title{font-size:.7rem;font-weight:800;color:var(--gray3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.6rem;}
+.anl-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.8rem;}
+.anl-stat-card{background:var(--white);border-radius:12px;padding:.8rem;box-shadow:var(--card-shadow);}
+.anl-stat-num{font-size:1.3rem;font-weight:800;color:var(--sky);}
+.anl-stat-label{font-size:.72rem;color:var(--gray3);margin-top:.1rem;}
+.anl-stat-delta{font-size:.7rem;font-weight:600;margin-top:.15rem;}
+.anl-delta-up{color:#22c55e;}.anl-delta-down{color:#ef4444;}
+.anl-card{background:var(--white);border-radius:12px;padding:.9rem;box-shadow:var(--card-shadow);margin-bottom:.6rem;}
+/* Heatmap */
+.anl-heatmap-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:3px;margin:.5rem 0;}
+.anl-heat-cell{aspect-ratio:1;border-radius:3px;}
+.heat-0{background:#0d47a1;opacity:.5;}
+.heat-1{background:#1565c0;opacity:.6;}
+.heat-2{background:#2e7d32;opacity:.7;}
+.heat-3{background:#f9a825;opacity:.75;}
+.heat-4{background:#e65100;opacity:.85;}
+.heat-5{background:#c62828;}
+.anl-heat-legend{display:flex;align-items:center;gap:.3rem;margin:.4rem 0;}
+.anl-heat-swatch{width:14px;height:14px;border-radius:2px;}
+/* Funnels */
+.anl-funnel-step{margin-bottom:.5rem;}
+.anl-funnel-bar{height:32px;border-radius:6px;display:flex;align-items:center;padding:0 .6rem;transition:width .5s;}
+.anl-funnel-label{font-size:.78rem;font-weight:600;color:#fff;white-space:nowrap;}
+.anl-funnel-meta{display:flex;justify-content:space-between;font-size:.7rem;color:var(--gray3);margin-top:.15rem;padding:0 .2rem;}
+/* A/B */
+.anl-ab-card{background:var(--white);border-radius:12px;padding:.9rem;box-shadow:var(--card-shadow);margin-bottom:.6rem;}
+.anl-ab-winner{background:#dcfce7;color:#166534;font-size:.65rem;font-weight:700;padding:.15rem .45rem;border-radius:5px;display:inline-flex;align-items:center;gap:.2rem;}
+.anl-ab-loser{background:var(--gray1);color:var(--gray3);font-size:.65rem;font-weight:600;padding:.15rem .45rem;border-radius:5px;}
+.anl-ab-status-active{background:#dbeafe;color:#1e40af;font-size:.65rem;font-weight:700;padding:.15rem .45rem;border-radius:5px;}
+.anl-ab-status-completed{background:#dcfce7;color:#166534;font-size:.65rem;font-weight:700;padding:.15rem .45rem;border-radius:5px;}
+.anl-ab-status-collecting{background:#fef9c3;color:#854d0e;font-size:.65rem;font-weight:700;padding:.15rem .45rem;border-radius:5px;}
+/* Errors */
+.anl-err-card{background:var(--white);border-radius:12px;padding:.8rem;box-shadow:var(--card-shadow);margin-bottom:.6rem;border-left:3px solid transparent;}
+.anl-err-critical{border-left-color:#ef4444;}
+.anl-err-warning{border-left-color:#f97316;}
+.anl-err-info{border-left-color:#3b82f6;}
+.anl-sev-critical{background:#fee2e2;color:#991b1b;font-size:.65rem;font-weight:700;padding:.15rem .45rem;border-radius:5px;}
+.anl-sev-warning{background:#ffedd5;color:#9a3412;font-size:.65rem;font-weight:700;padding:.15rem .45rem;border-radius:5px;}
+.anl-sev-info{background:#dbeafe;color:#1e3a8a;font-size:.65rem;font-weight:700;padding:.15rem .45rem;border-radius:5px;}
+/* Performance */
+.anl-perf-card{background:var(--white);border-radius:12px;padding:.8rem;box-shadow:var(--card-shadow);margin-bottom:.5rem;display:flex;align-items:center;justify-content:space-between;}
+.anl-perf-good{color:#16a34a;font-weight:700;font-size:.8rem;}
+.anl-perf-warn{color:#d97706;font-weight:700;font-size:.8rem;}
+.anl-perf-poor{color:#dc2626;font-weight:700;font-size:.8rem;}
+.anl-score-circle{width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:900;color:#fff;flex-shrink:0;}
+/* Revenue */
+.anl-rev-bar-wrap{display:flex;align-items:flex-end;gap:.3rem;height:80px;margin-bottom:.3rem;}
+.anl-rev-bar{flex:1;border-radius:4px 4px 0 0;background:var(--gray2);transition:height .5s;}
+.anl-rev-bar.current{background:#f97316;}
+.anl-donut{width:120px;height:120px;border-radius:50%;margin:0 auto;}
+/* Sparkline */
+.anl-sparkline{display:flex;align-items:flex-end;gap:2px;height:30px;}
+.anl-spark-bar{flex:1;border-radius:2px 2px 0 0;background:var(--sky);min-height:2px;}
+/* Feature flags */
+.anl-flag-row{display:flex;align-items:center;justify-content:space-between;padding:.5rem 0;border-bottom:1px solid var(--gray1);}
+/* Queries */
+.anl-query-row{padding:.5rem 0;border-bottom:1px solid var(--gray1);}
+.anl-query-slow{color:#f97316;font-weight:600;}
+.anl-query-veryslow{color:#ef4444;font-weight:700;}
+</style>
+
+<script>
+// replace with real analytics platform (Mixpanel/Amplitude/GA) in production
+const analyticsState = {
+  dateRange: "7d",
+  activeSubSection: "overview",
+  heatmapScreen: "home",
+  errors: [
+    {id:"err1",type:"TypeError",msg:"Map failed to load: Cannot read properties of null",screen:"Explore",users:3,first:"2026-04-01",last:"2026-04-05",severity:"critical",status:"investigating"},
+    {id:"err2",type:"NetworkError",msg:"Image upload timeout after 30000ms",screen:"Review Modal",users:1,first:"2026-04-03",last:"2026-04-05",severity:"warning",status:"new"},
+    {id:"err3",type:"ValidationError",msg:"Payment form: card number invalid format",screen:"Booking Flow",users:2,first:"2026-04-02",last:"2026-04-04",severity:"critical",status:"resolved"},
+    {id:"err4",type:"ReferenceError",msg:"Cannot read rating of undefined in reviewCardHTML",screen:"Detail Page",users:5,first:"2026-03-28",last:"2026-04-01",severity:"warning",status:"resolved"},
+    {id:"err5",type:"RangeError",msg:"Maximum call stack size exceeded in renderExploreList",screen:"Explore",users:1,first:"2026-04-04",last:"2026-04-04",severity:"critical",status:"new"},
+    {id:"err6",type:"NetworkError",msg:"Service worker registration failed: fetch error",screen:"App Init",users:8,first:"2026-04-01",last:"2026-04-05",severity:"info",status:"investigating"}
+  ],
+  featureFlags: {
+    "New Search UI":{enabled:true,scope:"all"},
+    "Video Reviews Beta":{enabled:false,scope:"admin"},
+    "AI Recommendations V2":{enabled:true,scope:"percent",percent:30},
+    "Group Trip Chat":{enabled:false,scope:"admin"},
+    "Multi City Mode":{enabled:true,scope:"all"},
+    "Premium Widget":{enabled:true,scope:"percent",percent:50},
+    "Dark Mode V2":{enabled:false,scope:"percent",percent:10}
+  }
+};
+</script>
+
+<script>
+
+const _origRenderAdmAnalytics_new = typeof renderAdmAnalytics !== 'undefined' ? renderAdmAnalytics : function(){};
+renderAdmAnalytics = function() {
+  const el = document.getElementById('adm-analytics');
+  if (!el) return;
+  const subs = ['overview','heatmap','funnels','abtests','errors','performance','revenue','queries'];
+  const subLabels = {overview:'Overview',heatmap:'Heatmap',funnels:'Funnels',abtests:'A/B Tests',errors:'Errors',performance:'Perf',revenue:'Revenue',queries:'Queries'};
+  el.innerHTML = '<div class="anl-wrap">'
+    + '<div class="anl-header">'
+    + '<h2>📈 Analytics &amp; Tracking</h2>'
+    + '<div style="font-size:.75rem;color:rgba(255,255,255,.5);margin-top:.2rem;">replace with Mixpanel, Amplitude, or Google Analytics in production</div>'
+    + '</div>'
+    + '<div class="anl-subnav">'
+    + subs.map(s => '<button class="anl-sub-btn' + (analyticsState.activeSubSection===s?' active':'') + '" onclick="anlShowSub('+JSON.stringify(s)+')">'+subLabels[s]+'</button>').join('')
+    + '</div>'
+    + '<div class="anl-date-row">'
+    + ['Today','7 Days','30 Days','90 Days'].map((l,i) => {
+        const v = ['today','7d','30d','90d'][i];
+        return '<div class="anl-date-chip'+(analyticsState.dateRange===v?' active':'')+'" onclick="analyticsState.dateRange='+JSON.stringify(v)+';renderAdmAnalytics()">'+l+'</div>';
+      }).join('')
+    + '</div>'
+    + '<div id="anl-sub-content"></div>'
+    + '</div>';
+  anlShowSub(analyticsState.activeSubSection);
+};
+
+function anlShowSub(name) {
+  analyticsState.activeSubSection = name;
+  document.querySelectorAll('.anl-sub-btn').forEach(b => b.classList.toggle('active', b.textContent.toLowerCase().includes(name.replace('abtests','a/b').replace('performance','perf'))));
+  const fns = {overview:anlRenderOverview,heatmap:anlRenderHeatmap,funnels:anlRenderFunnels,abtests:anlRenderABTests,errors:anlRenderErrors,performance:anlRenderPerformance,revenue:anlRenderRevenue,queries:anlRenderQueries};
+  if (fns[name]) fns[name]();
+}
+
+function anlRenderOverview() {
+  const el = document.getElementById('anl-sub-content');
+  if (!el) return;
+  const sparks = [45,52,48,61,58,70,68].map(v => '<div class="anl-spark-bar" style="height:'+v+'%"></div>').join('');
+  el.innerHTML = '<div class="anl-section">'
+    + '<div class="anl-section-title">Key Metrics</div>'
+    + '<div class="anl-stat-grid">'
+    + '<div class="anl-stat-card"><div class="anl-stat-num">12,847</div><div class="anl-stat-label">Total Sessions</div><div class="anl-stat-delta anl-delta-up">↑ 8.3% vs last period</div></div>'
+    + '<div class="anl-stat-card"><div class="anl-stat-num">8,234</div><div class="anl-stat-label">Unique Users</div><div class="anl-stat-delta anl-delta-up">↑ 12.1% vs last period</div></div>'
+    + '<div class="anl-stat-card"><div class="anl-stat-num">4m 32s</div><div class="anl-stat-label">Avg Session</div><div class="anl-stat-delta anl-delta-up">↑ 2.1% vs last period</div></div>'
+    + '<div class="anl-stat-card"><div class="anl-stat-num">23%</div><div class="anl-stat-label">Bounce Rate</div><div class="anl-stat-delta anl-delta-up">↓ 4.2% (improved)</div></div>'
+    + '</div>'
+    + '<div class="anl-card"><div class="anl-section-title">Sessions — Last 7 Days</div><div class="anl-sparkline" style="height:60px;align-items:flex-end;">'+sparks+'</div><div style="display:flex;justify-content:space-between;font-size:.65rem;color:var(--gray3);margin-top:.3rem;"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div></div>'
+    + '<div class="anl-section-title" style="margin-top:.8rem;">Quick Navigation</div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:.4rem;">'
+    + [['heatmap','🗺️ Heatmap'],['funnels','📊 Funnels'],['abtests','🧪 A/B Tests'],['errors','🐛 Errors'],['performance','⚡ Performance'],['revenue','💰 Revenue']].map(([k,l]) => '<button onclick="anlShowSub('+JSON.stringify(k)+')'+'" style="padding:.5rem;background:var(--white);border:1px solid var(--gray2);border-radius:8px;font-size:.78rem;cursor:pointer;">'+l+'</button>').join('')
+    + '</div>'
+    + '</div>';
+}
+
+function anlRenderHeatmap() {
+  const el = document.getElementById('anl-sub-content');
+  if (!el) return;
+  const screen = analyticsState.heatmapScreen;
+  // Heat patterns per screen [row0-7][col0-7]
+  const patterns = {
+    home: [[4,5,5,5,5,5,5,4],[4,4,5,4,4,5,4,4],[3,3,3,3,3,3,3,3],[2,2,3,2,2,3,2,2],[2,2,2,2,2,2,2,2],[1,1,2,1,1,2,1,1],[1,1,1,1,1,1,1,1],[2,3,3,2,2,3,3,2]],
+    explore: [[1,1,1,1,1,1,1,1],[2,2,2,2,2,2,2,2],[3,3,4,3,3,4,3,3],[2,2,2,2,2,2,2,2],[1,1,1,2,2,1,1,1],[1,1,1,1,1,1,1,1],[4,5,3,2,2,3,5,4],[3,4,5,4,4,5,4,3]],
+    account: [[4,5,4,2,2,4,5,4],[3,3,3,1,1,3,3,3],[2,2,2,1,1,2,2,2],[2,2,2,1,1,2,2,2],[1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1],[2,2,3,2,2,3,2,2]],
+    mytrip: [[2,3,3,2,2,3,3,2],[2,2,2,2,2,2,2,2],[1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1],[2,2,2,2,2,2,2,2],[1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1]],
+    detail: [[2,2,2,2,2,2,2,2],[4,5,5,5,5,5,5,4],[3,3,3,3,3,3,3,3],[2,2,2,2,2,2,2,2],[1,1,2,1,1,2,1,1],[3,3,3,2,2,3,3,3],[2,2,2,2,2,2,2,2],[1,1,1,1,1,1,1,1]]
+  };
+  const pat = patterns[screen] || patterns.home;
+  const grid = pat.map(row => row.map(v => '<div class="anl-heat-cell heat-'+v+'"></div>').join('')).join('');
+  const topTaps = {
+    home: [['Hero Search Bar','3,241'],['Hot Deals Section','2,876'],['Featured Places Scroll','2,103'],['Home Nav Button','1,987'],['AI Planner Button','1,654']],
+    explore: [['Events Tab','4,521'],['Explore Nav Tab','3,987'],['Filter: All','2,341'],['Search Bar','2,108'],['Attractions Tab','1,876']],
+    account: [['My Reviews','2,341'],['Settings','1,987'],['My Saved Places','1,876'],['Vendor Dashboard','1,654'],['Admin Dashboard','1,203']],
+    mytrip: [['Add Day Button','1,543'],['Share Itinerary','1,234'],['Remove Item','987'],['Reorder Handle','876'],['Export Trip','654']],
+    detail: [['Save to Trip','5,432'],['Book Now','3,876'],['Add to Watchlist','2,341'],['Write Review','2,108'],['Share','1,987']]
+  };
+  const taps = topTaps[screen] || topTaps.home;
+  el.innerHTML = '<div class="anl-section">'
+    + '<div class="anl-section-title">Tap Density Heatmap</div>'
+    + '<select onchange="analyticsState.heatmapScreen=this.value;anlRenderHeatmap()" style="width:100%;padding:.45rem .6rem;border:1px solid var(--gray2);border-radius:8px;font-size:.85rem;background:var(--white);color:var(--text);margin-bottom:.7rem;">'
+    + ['home:Home Screen','explore:Explore Screen','mytrip:My Trip Screen','account:Account Screen','detail:Detail Pages'].map(s=>{const[v,l]=s.split(':');return '<option value="'+v+'"'+(screen===v?' selected':'')+'>'+l+'</option>';}).join('')
+    + '</select>'
+    + '<div style="background:#1a1f35;border-radius:16px;padding:.8rem;margin-bottom:.7rem;">'
+    + '<div style="background:#0d1220;border-radius:10px;padding:.5rem;width:100%;box-sizing:border-box;">'
+    + '<div class="anl-heatmap-grid">' + grid + '</div>'
+    + '</div></div>'
+    + '<div style="display:flex;align-items:center;gap:.3rem;margin-bottom:.9rem;">'
+    + '<span style="font-size:.7rem;color:var(--gray3);">Low</span>'
+    + [0,1,2,3,4,5].map(v=>'<div class="anl-heat-swatch heat-'+v+'"></div>').join('')
+    + '<span style="font-size:.7rem;color:var(--gray3);">High</span>'
+    + '</div>'
+    + '<div class="anl-section-title">Top Tap Targets</div>'
+    + taps.map(([name,count],i)=>'<div style="display:flex;align-items:center;justify-content:space-between;padding:.5rem 0;border-bottom:1px solid var(--gray1);"><div style="display:flex;align-items:center;gap:.5rem;"><span style="width:20px;height:20px;background:var(--sky);border-radius:50%;font-size:.7rem;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;">'+(i+1)+'</span><span style="font-size:.85rem;">'+name+'</span></div><span style="font-size:.8rem;font-weight:700;color:var(--sky);">'+count+' taps</span></div>').join('')
+    + '</div>';
+}
+
+function anlRenderFunnels() {
+  const el = document.getElementById('anl-sub-content');
+  if (!el) return;
+  function funnelHTML(title, steps, total) {
+    const maxUsers = steps[0][1];
+    return '<div class="anl-card" style="margin-bottom:.8rem;">'
+      + '<div style="font-weight:700;font-size:.9rem;margin-bottom:.8rem;">'+title+'</div>'
+      + steps.map(([label,users,pct],i) => {
+          const w = Math.round((users/maxUsers)*100);
+          const isGreen = pct >= 40, isRed = pct < 30 && pct > 0;
+          const color = isGreen ? '#16a34a' : isRed ? '#dc2626' : '#f97316';
+          return '<div class="anl-funnel-step">'
+            + '<div class="anl-funnel-bar" style="width:'+w+'%;background:'+color+';"><span class="anl-funnel-label">'+label+'</span></div>'
+            + '<div class="anl-funnel-meta"><span>'+users.toLocaleString()+' users</span>'+(pct?'<span style="color:'+color+';font-weight:700;">'+pct+'% continued</span>':'')+'</div>'
+            + '</div>';
+        }).join('')
+      + '<div style="margin-top:.6rem;text-align:center;background:var(--gray1);border-radius:8px;padding:.5rem;">'
+      + '<span style="font-size:.8rem;color:var(--gray3);">Overall Conversion: </span>'
+      + '<span style="font-size:1.1rem;font-weight:900;color:var(--sky);">'+total+'</span>'
+      + '</div></div>';
+  }
+  el.innerHTML = '<div class="anl-section">'
+    + '<div class="anl-section-title">Conversion Funnels</div>'
+    + funnelHTML('🎟️ Booking Funnel',
+        [['View Listing',8432,0],['Save to Trip',3847,45.6],['Tap Book Now',1205,31.3],['Complete Booking',342,28.4]], '4.1%')
+    + funnelHTML('👤 Registration Funnel',
+        [['Open App',12847,0],['View Content',11230,87.4],['Tap Sign In',4521,40.3],['Complete Registration',2134,47.2]], '16.6%')
+    + funnelHTML('⭐ Review Funnel',
+        [['View Detail Page',8432,0],['Tap Write Review',1876,22.3],['Submit Review',987,52.6]], '11.7%')
+    + '</div>';
+}
+
+function anlRenderABTests() {
+  const el = document.getElementById('anl-sub-content');
+  if (!el) return;
+  const tests = [
+    {name:'Home Hero Button Text',varA:'Get Started',varB:'Explore Orlando',winner:'B',improvement:'+23% CTR',users:'4,521',status:'completed'},
+    {name:'Save Button Color',varA:'Orange',varB:'Green',winner:'A',improvement:'+15% save rate',users:'3,847',status:'active'},
+    {name:'Onboarding Length',varA:'3 Slides',varB:'5 Slides',winner:'A',improvement:'+31% completion',users:'2,103',status:'completed'},
+    {name:'Deal Card Layout',varA:'Horizontal',varB:'Vertical',winner:null,improvement:'Still collecting',users:'892',status:'collecting'}
+  ];
+  const statusBadge = s => {
+    if (s==='active') return '<span class="anl-ab-status-active">Active</span>';
+    if (s==='completed') return '<span class="anl-ab-status-completed">Completed</span>';
+    return '<span class="anl-ab-status-collecting">Collecting</span>';
+  };
+  const testCards = tests.map(t => '<div class="anl-ab-card">'
+    + '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.5rem;">'
+    + '<div style="font-weight:700;font-size:.9rem;flex:1;">'+t.name+'</div>'
+    + statusBadge(t.status)
+    + '</div>'
+    + '<div style="display:flex;gap:.4rem;margin-bottom:.5rem;">'
+    + '<div style="flex:1;background:var(--gray1);border-radius:8px;padding:.5rem;border:2px solid '+(t.winner==='A'?'#16a34a':'var(--gray2)') + ';">'
+    + '<div style="font-size:.68rem;font-weight:700;color:var(--gray3);margin-bottom:.2rem;">VARIANT A</div>'
+    + '<div style="font-size:.82rem;font-weight:600;">'+t.varA+'</div>'
+    + (t.winner==='A'?'<div class="anl-ab-winner" style="margin-top:.25rem;">🏆 Winner</div>':'')
+    + '</div>'
+    + '<div style="flex:1;background:var(--gray1);border-radius:8px;padding:.5rem;border:2px solid '+(t.winner==='B'?'#16a34a':'var(--gray2)')+';">'
+    + '<div style="font-size:.68rem;font-weight:700;color:var(--gray3);margin-bottom:.2rem;">VARIANT B</div>'
+    + '<div style="font-size:.82rem;font-weight:600;">'+t.varB+'</div>'
+    + (t.winner==='B'?'<div class="anl-ab-winner" style="margin-top:.25rem;">🏆 Winner</div>':'')
+    + '</div></div>'
+    + '<div style="display:flex;justify-content:space-between;font-size:.78rem;">'
+    + '<span style="color:var(--gray3);">'+t.users+' users</span>'
+    + '<span style="font-weight:700;color:'+(t.winner?'#16a34a':'#f97316')+';">'+t.improvement+'</span>'
+    + '</div></div>').join('');
+  
+  const flagRows = Object.entries(analyticsState.featureFlags).map(([name,flag]) =>
+    '<div class="anl-flag-row">'
+    + '<div>'
+    + '<div style="font-size:.85rem;font-weight:600;">'+name+'</div>'
+    + '<div style="font-size:.72rem;color:var(--gray3);">'+(flag.scope==='all'?'All Users':flag.scope==='admin'?'Admin Only':flag.percent+'% of Users')+'</div>'
+    + '</div>'
+    + '<label class="toggle-switch" style="transform:scale(.85);transform-origin:right;">'
+    + '<input type="checkbox" '+(flag.enabled?'checked':'')+' onchange="analyticsState.featureFlags['+JSON.stringify(name)+'].enabled=this.checked;showToast('+JSON.stringify('Feature flag updated: '+name)+')">'
+    + '<span class="toggle-slider"></span>'
+    + '</label>'
+    + '</div>').join('');
+
+  el.innerHTML = '<div class="anl-section">'
+    + '<div class="anl-section-title">Active A/B Tests</div>'
+    + testCards
+    + '<div style="margin-top:.6rem;padding:.6rem;background:var(--sky);color:#fff;border-radius:10px;text-align:center;cursor:pointer;font-weight:700;font-size:.85rem;" onclick="showToast('+JSON.stringify('Create Test UI coming soon!')+')">'
+    + '+ Create New Test</div>'
+    + '<div class="anl-section-title" style="margin-top:1rem;">Feature Flags</div>'
+    + '<div class="anl-card">' + flagRows + '</div>'
+    + '</div>';
+}
+
+function anlRenderErrors() {
+  const el = document.getElementById('anl-sub-content');
+  if(!el) return;
+  const sevBadge = s => s==='critical'?'<span class="anl-sev-critical">Critical</span>':s==='warning'?'<span class="anl-sev-warning">Warning</span>':'<span class="anl-sev-info">Info</span>';
+  const statusBadge = s => s==='resolved'?'<span style="background:#dcfce7;color:#166534;font-size:.65rem;font-weight:700;padding:.1rem .4rem;border-radius:5px;">Resolved</span>':s==='investigating'?'<span style="background:#fef9c3;color:#854d0e;font-size:.65rem;font-weight:700;padding:.1rem .4rem;border-radius:5px;">Investigating</span>':'<span style="background:#fee2e2;color:#991b1b;font-size:.65rem;font-weight:700;padding:.1rem .4rem;border-radius:5px;">New</span>';
+  const today = analyticsState.errors.length;
+  const critical = analyticsState.errors.filter(e=>e.severity==='critical').length;
+  const warnings = analyticsState.errors.filter(e=>e.severity==='warning').length;
+  const resolved = analyticsState.errors.filter(e=>e.status==='resolved').length;
+  el.innerHTML = '<div class="anl-section">'
+    + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.7rem;">'
+    + '<div class="anl-section-title" style="margin:0;">Error Tracking</div>'
+    + '<button onclick="analyticsState.errors=analyticsState.errors.filter(e=>e.status!=='+JSON.stringify('resolved')+');anlRenderErrors()" style="font-size:.75rem;background:var(--gray1);border:1px solid var(--gray2);border-radius:6px;padding:.25rem .5rem;cursor:pointer;color:var(--gray3);">Clear Resolved</button>'
+    + '</div>'
+    + '<div class="anl-stat-grid" style="margin-bottom:.8rem;">'
+    + '<div class="anl-stat-card"><div class="anl-stat-num">'+today+'</div><div class="anl-stat-label">Total Today</div></div>'
+    + '<div class="anl-stat-card"><div class="anl-stat-num" style="color:#ef4444;">'+critical+'</div><div class="anl-stat-label">Critical</div></div>'
+    + '<div class="anl-stat-card"><div class="anl-stat-num" style="color:#f97316;">'+warnings+'</div><div class="anl-stat-label">Warnings</div></div>'
+    + '<div class="anl-stat-card"><div class="anl-stat-num" style="color:#22c55e;">'+resolved+'</div><div class="anl-stat-label">Resolved</div></div>'
+    + '</div>'
+    + analyticsState.errors.map((e,i) => '<div class="anl-err-card anl-err-'+e.severity+'">'
+      + '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.4rem;">'
+      + '<div style="display:flex;gap:.4rem;align-items:center;">'+sevBadge(e.severity)+'<code style="font-size:.72rem;background:var(--gray1);padding:.1rem .3rem;border-radius:3px;">'+e.type+'</code></div>'
+      + statusBadge(e.status)
+      + '</div>'
+      + '<div style="font-size:.82rem;margin-bottom:.3rem;font-weight:600;">'+e.msg+'</div>'
+      + '<div style="font-size:.72rem;color:var(--gray3);margin-bottom:.4rem;">Screen: '+e.screen+' · '+e.users+' user(s) · Last seen: '+e.last+'</div>'
+      + '<div style="display:flex;gap:.4rem;">'
+      + (e.status!=='resolved'?'<button onclick="analyticsState.errors['+i+'].status='+JSON.stringify('resolved')+';anlRenderErrors()" style="font-size:.72rem;background:#dcfce7;color:#166534;border:none;border-radius:6px;padding:.25rem .5rem;cursor:pointer;font-weight:600;">✓ Resolve</button>':'')
+      + (e.status!=='investigating'&&e.status!=='resolved'?'<button onclick="analyticsState.errors['+i+'].status='+JSON.stringify('investigating')+';anlRenderErrors()" style="font-size:.72rem;background:#fef9c3;color:#854d0e;border:none;border-radius:6px;padding:.25rem .5rem;cursor:pointer;font-weight:600;">🔍 Investigate</button>':'')
+      + '</div></div>').join('')
+    + '</div>';
+}
+
+function anlRenderPerformance() {
+  const el = document.getElementById('anl-sub-content');
+  if(!el) return;
+  const metrics = [
+    {label:'Page Load Time',val:'1.2s',status:'good',raw:1200,threshold:{good:2000,poor:4000}},
+    {label:'Time to Interactive',val:'2.1s',status:'warn',raw:2100,threshold:{good:2000,poor:4000}},
+    {label:'First Contentful Paint',val:'0.8s',status:'good',raw:800,threshold:{good:1800,poor:3000}},
+    {label:'Largest Contentful Paint',val:'2.4s',status:'poor',raw:2400,threshold:{good:2500,poor:4000}}
+  ];
+  const screens = [
+    {name:'Home Screen',ms:820},{name:'Explore Screen',ms:1240},{name:'Detail Page',ms:680},
+    {name:'My Trip',ms:450},{name:'Account',ms:380},{name:'Watchlist',ms:920}
+  ];
+  const netLog = [
+    {endpoint:'/api/listings',ms:45,status:200,size:'12.4KB'},{endpoint:'/api/events',ms:67,status:200,size:'8.2KB'},
+    {endpoint:'/api/user/profile',ms:23,status:200,size:'1.1KB'},{endpoint:'/api/reviews',ms:89,status:200,size:'15.3KB'},
+    {endpoint:'/api/deals',ms:34,status:200,size:'5.8KB'},{endpoint:'/api/bookings',ms:112,status:200,size:'3.4KB'},
+    {endpoint:'/api/notifications',ms:28,status:200,size:'2.1KB'},{endpoint:'/api/search',ms:145,status:200,size:'22.1KB'},
+    {endpoint:'/api/watchlist',ms:41,status:200,size:'4.2KB'},{endpoint:'/api/vendors',ms:198,status:200,size:'9.7KB'}
+  ];
+  const sparks1 = [1200,1350,1180,1420,1290,1150,1200].map(v=>'<div class="anl-spark-bar" style="height:'+Math.round((v/1600)*100)+'%;background:var(--sky);"></div>').join('');
+  const sparks2 = [2400,2200,2600,2100,2300,2150,2100].map(v=>'<div class="anl-spark-bar" style="height:'+Math.round((v/3000)*100)+'%;background:#f97316;"></div>').join('');
+  const statusColor = s => s==='good'?'#16a34a':s==='warn'?'#d97706':'#dc2626';
+  const statusIcon = s => s==='good'?'✅':s==='warn'?'⚠️':'❌';
+  el.innerHTML = '<div class="anl-section">'
+    + '<div class="anl-card" style="display:flex;align-items:center;gap:1rem;margin-bottom:.8rem;">'
+    + '<div class="anl-score-circle" style="background:conic-gradient(#16a34a 87%,var(--gray2) 0);position:relative;">'
+    + '<div style="position:absolute;inset:4px;background:var(--white);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:900;color:#16a34a;">87</div>'
+    + '</div>'
+    + '<div><div style="font-size:1.1rem;font-weight:800;">Performance Score</div><div style="font-size:.8rem;color:#16a34a;font-weight:600;">Good — above 85 threshold</div><div style="font-size:.72rem;color:var(--gray3);margin-top:.1rem;" id="anl-fps-display">-- FPS</div></div>'
+    + '</div>'
+    + metrics.map(m=>'<div class="anl-perf-card">'
+      + '<div><div style="font-size:.85rem;font-weight:600;">'+m.label+'</div><div style="font-size:.72rem;color:var(--gray3);">Threshold: Good &lt;'+m.threshold.good/1000+'s · Poor &gt;'+m.threshold.poor/1000+'s</div></div>'
+      + '<div style="text-align:right;"><div style="font-size:1.1rem;font-weight:900;color:'+statusColor(m.status)+';">'+ m.val+'</div><div class="anl-perf-'+m.status+'">'+statusIcon(m.status)+' '+m.status.charAt(0).toUpperCase()+m.status.slice(1)+'</div></div>'
+      + '</div>').join('')
+    + '<div class="anl-card"><div class="anl-section-title">Screen Load Times</div>'
+    + screens.map(s=>'<div style="display:flex;align-items:center;justify-content:space-between;padding:.35rem 0;border-bottom:1px solid var(--gray1);"><span style="font-size:.82rem;">'+s.name+'</span><div style="display:flex;align-items:center;gap:.4rem;"><div style="width:80px;height:6px;background:var(--gray1);border-radius:3px;overflow:hidden;"><div style="height:100%;background:'+(s.ms<1000?'#16a34a':s.ms<2000?'#f97316':'#ef4444')+';width:'+Math.min(100,Math.round(s.ms/20))+'%;"></div></div><span style="font-size:.78rem;font-weight:700;color:'+(s.ms<1000?'#16a34a':s.ms<2000?'#f97316':'#ef4444')+';">'+s.ms+'ms</span></div></div>').join('')
+    + '</div>'
+    + '<div class="anl-card"><div class="anl-section-title">Memory Usage (JS Heap)</div>'
+    + '<div style="background:var(--gray1);border-radius:4px;height:10px;overflow:hidden;margin-bottom:.3rem;"><div style="height:100%;width:45%;background:var(--sky);border-radius:4px;"></div></div>'
+    + '<div style="font-size:.75rem;color:var(--gray3);">45% used — 36.2MB / 80MB allocated</div></div>'
+    + '<div class="anl-card"><div class="anl-section-title">Trend — Load Time (7d)</div>'
+    + '<div class="anl-sparkline" style="height:40px;align-items:flex-end;">'+sparks1+'</div></div>'
+    + '<div class="anl-card"><div class="anl-section-title">Network Requests (Recent)</div>'
+    + '<div style="overflow-x:auto;">'
+    + '<table style="width:100%;border-collapse:collapse;font-size:.75rem;">'
+    + '<tr style="color:var(--gray3);border-bottom:1px solid var(--gray2);"><th style="text-align:left;padding:.3rem .2rem;">Endpoint</th><th>ms</th><th>Status</th><th>Size</th></tr>'
+    + netLog.map(n=>'<tr style="border-bottom:1px solid var(--gray1);"><td style="padding:.3rem .2rem;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+n.endpoint+'</td><td style="text-align:center;color:'+(n.ms>100?'#f97316':'#16a34a')+';font-weight:700;">'+n.ms+'</td><td style="text-align:center;color:#16a34a;">'+n.status+'</td><td style="text-align:center;color:var(--gray3);">'+n.size+'</td></tr>').join('')
+    + '</table></div></div>'
+    + '</div>';
+}
+
+function anlRenderRevenue() {
+  const el = document.getElementById('anl-sub-content');
+  if(!el) return;
+  const months = [['Oct','18200'],['Nov','19800'],['Dec','22100'],['Jan','20400'],['Feb','22800'],['Mar','24850']];
+  const maxRev = 25000;
+  const vendors = [
+    {name:'Orlando Magic Events',plan:'Pro',rev:',840',listings:12},
+    {name:'I-Drive Entertainment',plan:'Enterprise',rev:',410',listings:8},
+    {name:'Sunset Hotel Group',plan:'Pro',rev:',980',listings:5},
+    {name:'Lake Eola Dining',plan:'Basic',rev:',240',listings:3},
+    {name:'Adventure Sports Co.',plan:'Pro',rev:',180',listings:7}
+  ];
+  const txns = [
+    {date:'Apr 5','desc':'Premium Subscription — User #8234','amount':'+.99','status':'completed'},
+    {date:'Apr 5','desc':'Vendor Pro Plan — I-Drive Entertainment','amount':'+9.00','status':'completed'},
+    {date:'Apr 4','desc':'Booking Commission — Disney Hotel','amount':'+2.50','status':'completed'},
+    {date:'Apr 4','desc':'Featured Listing — Sunset Hotel Group','amount':'+9.00','status':'completed'},
+    {date:'Apr 3','desc':'Premium Subscription — User #7891','amount':'+.99','status':'completed'}
+  ];
+  const nextMonth = Math.round(24850 * 1.123);
+  const churnRisk = [
+    {name:'Tampa Bay Events Co.',plan:'Basic',days:3},
+    {name:'Clearwater Beach Tours',plan:'Pro',days:5},
+    {name:'Ybor City Nightlife',plan:'Basic',days:7}
+  ];
+  el.innerHTML = '<div class="anl-section">'
+    + '<div class="anl-stat-grid" style="margin-bottom:.8rem;">'
+    + '<div class="anl-stat-card"><div class="anl-stat-num">4,850</div><div class="anl-stat-label">This Month</div><div class="anl-stat-delta anl-delta-up">↑ 12.3% vs last month</div></div>'
+    + '<div class="anl-stat-card"><div class="anl-stat-num">8,200</div><div class="anl-stat-label">MRR</div><div class="anl-stat-delta anl-delta-up">↑ 8.1%</div></div>'
+    + '<div class="anl-stat-card"><div class="anl-stat-num">.40</div><div class="anl-stat-label">ARPU</div><div class="anl-stat-delta anl-delta-up">↑ 3.2%</div></div>'
+    + '<div class="anl-stat-card"><div class="anl-stat-num" style="color:#16a34a;">+12.3%</div><div class="anl-stat-label">Growth Rate</div></div>'
+    + '</div>'
+    + '<div class="anl-card"><div class="anl-section-title">Revenue Breakdown</div>'
+    + '<div style="background:conic-gradient(#f97316 0% 45%,var(--sky) 45% 73%,#16a34a 73% 91%,#a855f7 91% 100%);width:100px;height:100px;border-radius:50%;margin:0 auto 1rem;position:relative;">'
+    + '<div style="position:absolute;inset:28px;background:var(--white);border-radius:50%;"></div></div>'
+    + '<div style="display:flex;flex-wrap:wrap;gap:.4rem;justify-content:center;">'
+    + [['#f97316','Vendor Subs 45%'],['var(--sky)','Premium 28%'],['#16a34a','Booking 18%'],['#a855f7','Featured 9%']].map(([c,l])=>'<div style="display:flex;align-items:center;gap:.3rem;"><div style="width:10px;height:10px;border-radius:50%;background:'+c+'"></div><span style="font-size:.72rem;">'+l+'</span></div>').join('')
+    + '</div></div>'
+    + '<div class="anl-card"><div class="anl-section-title">Monthly Revenue (Oct–Mar)</div>'
+    + '<div class="anl-rev-bar-wrap">'
+    + months.map(([m,v],i)=>'<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:.2rem;height:100%;"><div class="anl-rev-bar'+(i===5?' current':'')+'" style="height:'+Math.round((parseInt(v.replace(',',''))/maxRev)*100)+'%;flex:none;width:100%;"></div><span style="font-size:.6rem;color:var(--gray3);">'+m+'</span></div>').join('')
+    + '</div></div>'
+    + '<div class="anl-card"><div class="anl-section-title">Top Vendors</div>'
+    + '<table style="width:100%;border-collapse:collapse;font-size:.78rem;"><tr style="color:var(--gray3);border-bottom:1px solid var(--gray2);"><th style="text-align:left;padding:.3rem 0;">Vendor</th><th>Plan</th><th>Revenue</th><th>Listings</th></tr>'
+    + vendors.map(v=>'<tr style="border-bottom:1px solid var(--gray1);"><td style="padding:.35rem 0;font-weight:600;">'+v.name.split(' ').slice(0,2).join(' ')+'</td><td style="text-align:center;"><span style="background:var(--gray1);border-radius:4px;padding:.1rem .3rem;font-size:.68rem;">'+v.plan+'</span></td><td style="text-align:center;font-weight:700;color:#16a34a;">'+v.rev+'</td><td style="text-align:center;color:var(--gray3);">'+v.listings+'</td></tr>').join('')
+    + '</table></div>'
+    + '<div class="anl-card"><div class="anl-section-title">Recent Transactions</div>'
+    + txns.map(t=>'<div style="display:flex;justify-content:space-between;padding:.35rem 0;border-bottom:1px solid var(--gray1);font-size:.8rem;"><div><div style="font-weight:600;">'+t.desc+'</div><div style="font-size:.7rem;color:var(--gray3);">'+t.date+'</div></div><span style="font-weight:700;color:#16a34a;">'+t.amount+'</span></div>').join('')
+    + '<button onclick="showToast('+JSON.stringify('Revenue report exported as CSV! 📊')+')" style="width:100%;margin-top:.7rem;padding:.6rem;background:var(--sky);border:none;border-radius:10px;color:#fff;font-weight:600;cursor:pointer;font-size:.85rem;">📥 Export Revenue Report</button>'
+    + '</div>'
+    + '<div class="anl-card"><div class="anl-section-title">Revenue Forecast</div>'
+    + '<div style="text-align:center;padding:.5rem 0;"><div style="font-size:.8rem;color:var(--gray3);">Next Month Forecast (at +12.3% growth)</div><div style="font-size:1.6rem;font-weight:900;color:#16a34a;">$'+nextMonth.toLocaleString()+'</div></div></div>'
+    + '<div class="anl-card"><div class="anl-section-title" style="color:#ef4444;">⚠️ Churn Risk — Renewing in 7 Days</div>'
+    + churnRisk.map(c=>'<div style="display:flex;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid var(--gray1);font-size:.82rem;"><div><div style="font-weight:600;">'+c.name+'</div><div style="font-size:.7rem;color:var(--gray3);">'+c.plan+' Plan</div></div><span style="color:#f97316;font-weight:700;">Renews in '+c.days+'d</span></div>').join('')
+    + '</div>'
+    + '</div>';
+}
+
+function anlRenderQueries() {
+  const el = document.getElementById('anl-sub-content');
+  if(!el) return;
+  // add database indexes on frequently queried fields: area, category, rating, and type in production
+  const queries = [
+    {q:'SELECT * FROM listings WHERE city = ?',ms:12,optimized:8,suggestion:'Indexed on city field'},
+    {q:'SELECT * FROM listings WHERE category = ? ORDER BY rating DESC',ms:45,optimized:18,suggestion:'Add composite index on category+rating'},
+    {q:'SELECT * FROM listings WHERE area LIKE ?',ms:134,optimized:22,suggestion:'Add index on listings.area field — currently full table scan'},
+    {q:'SELECT reviews JOIN listings ON ... WHERE rating > 4',ms:89,optimized:34,suggestion:'Consider denormalizing rating to reviews table'},
+    {q:'SELECT * FROM listings ORDER BY created_at DESC LIMIT 100',ms:67,optimized:15,suggestion:'Add index on created_at for pagination'},
+    {q:'SELECT COUNT(*) FROM users WHERE last_active > ?',ms:23,optimized:10,suggestion:'Indexed on last_active'},
+    {q:'SELECT events.* FROM events WHERE date BETWEEN ? AND ?',ms:567,optimized:45,suggestion:'Use pagination instead of loading all records — very slow!'},
+    {q:'SELECT * FROM listings JOIN vendors ON listings.vendor_id = vendors.id',ms:234,optimized:67,suggestion:'Add index on listings.vendor_id — N+1 query risk'}
+  ];
+  let useOptimized = false;
+  el.innerHTML = '<div class="anl-section">'
+    + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.7rem;">'
+    + '<div class="anl-section-title" style="margin:0;">DB Query Performance</div>'
+    + '<label class="toggle-switch" style="transform:scale(.85);transform-origin:right;">'
+    + '<input type="checkbox" id="anl-opt-toggle" onchange="document.querySelectorAll('.anl-query-ms').forEach((e,i)=>{const q=['
+    + queries.map(q=>q.optimized).join(',')
+    + '][i];if(q)e.textContent=this.checked?q+'ms (opt)':['
+    + queries.map(q=>q.ms).join(',')
+    + '][i]+'ms';})">'
+    + '<span class="toggle-slider"></span>'
+    + '</label>'
+    + '<span style="font-size:.72rem;color:var(--gray3);">Use Optimized</span>'
+    + '</div>'
+    + queries.map((q,i) => {
+        const slow = q.ms > 100 && q.ms < 500;
+        const vslow = q.ms >= 500;
+        const cls = vslow?'anl-query-veryslow':slow?'anl-query-slow':'';
+        return '<div class="anl-query-row">'
+          + '<div style="display:flex;justify-content:space-between;align-items:flex-start;">'
+          + '<code style="font-size:.7rem;background:var(--gray1);padding:.2rem .4rem;border-radius:4px;flex:1;margin-right:.5rem;word-break:break-all;">'+q.q+'</code>'
+          + '<span class="anl-query-ms '+cls+'" style="flex-shrink:0;">'+q.ms+'ms</span>'
+          + '</div>'
+          + (slow||vslow?'<div style="font-size:.72rem;color:'+(vslow?'#ef4444':'#f97316')+';margin-top:.2rem;">💡 '+q.suggestion+'</div>':'')
+          + '</div>';
+      }).join('')
+    + '</div>';
+}
+
+</script>
+<script>
+// ============================================================
+// BLOCK R: Multi-City Trip Planning
+// ============================================================
+
+function openMultiCityTrip() {
+  const cities = typeof CITIES !== 'undefined' ? CITIES : [];
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay active';
+  overlay.style.cssText = 'z-index:3800;';
+  const cityColors = {orlando:'#FF6B35',tampa:'#e07020',miami:'#e91e8c',miamibeach:'#f48fb1',keywest:'#f9a825',hollywood:'#7b1fa2'};
+  const savedCities = cities.filter(c => true); // show all cities
+
+  overlay.innerHTML = '<div style="width:100%;max-width:430px;height:100%;background:var(--white);display:flex;flex-direction:column;overflow-y:auto;">'
+    + '<div style="padding:1rem;display:flex;align-items:center;gap:.7rem;border-bottom:1px solid var(--gray1);position:sticky;top:0;background:var(--white);z-index:1;">'
+    + '<button class="icon-btn" onclick="this.closest('.overlay').remove()">←</button>'
+    + '<span style="font-size:1rem;font-weight:700;">🌍 Multi-City Trip Planner</span>'
+    + '</div>'
+    + '<div style="padding:1rem;flex:1;">'
+    + '<div style="background:linear-gradient(135deg,#0d1433,#1a2035);border-radius:16px;padding:1rem;color:#fff;margin-bottom:1rem;">'
+    + '<div style="font-size:.8rem;opacity:.6;margin-bottom:.5rem;">Your Florida Road Trip</div>'
+    + '<div style="display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;">'
+    + savedCities.slice(0,4).map((c,i) => '<span style="font-size:.9rem;">' + c.emoji + '</span>' + (i<3?'<span style="color:rgba(255,255,255,.4);font-size:.8rem;">→</span>':'')).join('')
+    + '</div>'
+    + '<div style="font-size:.75rem;opacity:.6;margin-top:.4rem;">' + savedCities.slice(0,4).map(c=>c.name).join(' → ') + '</div>'
+    + '</div>'
+    + '<div style="margin-bottom:1rem;">'
+    + '<div style="font-size:.8rem;font-weight:700;color:var(--gray3);margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.05em;">Trip Timeline</div>'
+    + renderCityTripTimeline(['orlando','tampa','miami','keywest'])
+    + '</div>'
+    + '<div style="margin-bottom:1rem;">'
+    + '<div style="font-size:.8rem;font-weight:700;color:var(--gray3);margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.05em;">Travel Between Cities</div>'
+    + [['orlando','tampa'],['tampa','miami'],['miami','keywest']].map(([a,b]) => {
+        const t = typeof getTravelTime !== 'undefined' ? getTravelTime(a,b) : null;
+        const cA = cities.find(c=>c.id===a), cB = cities.find(c=>c.id===b);
+        if (!t || !cA || !cB) return '';
+        return '<div style="background:var(--gray1);border-radius:12px;padding:.8rem;margin-bottom:.5rem;">'
+          + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem;">'
+          + '<span style="font-size:.85rem;font-weight:700;">' + cA.emoji + ' ' + cA.name + ' → ' + cB.emoji + ' ' + cB.name + '</span>'
+          + '</div>'
+          + '<div style="display:flex;gap:.5rem;">'
+          + '<div style="flex:1;background:var(--white);border-radius:8px;padding:.5rem;text-align:center;">'
+          + '<div style="font-size:1rem;">🚗</div>'
+          + '<div style="font-size:.8rem;font-weight:700;">' + t.desc + '</div>'
+          + '<div style="font-size:.68rem;color:var(--gray3);">Drive · ~' + t.driveCost + ' gas</div>'
+          + '</div>'
+          + (t.fly ? '<div style="flex:1;background:var(--white);border-radius:8px;padding:.5rem;text-align:center;"><div style="font-size:1rem;">✈️</div><div style="font-size:.8rem;font-weight:700;">' + Math.round(t.fly/60) + 'h ' + (t.fly%60) + 'm</div><div style="font-size:.68rem;color:var(--gray3);">Fly · from ' + t.flyCost + '</div></div>' : '')
+          + '</div>'
+          + '</div>';
+      }).join('')
+    + '</div>'
+    + renderCrossCityBundles()
+    + '<button onclick="exportMultiCityItinerary();this.closest('.overlay').remove();" style="width:100%;padding:.8rem;background:var(--sky);border:none;border-radius:12px;color:#fff;font-weight:700;cursor:pointer;font-size:.9rem;margin-top:.5rem;">📤 Export Full Itinerary</button>'
+    + '</div>'
+    + '</div>';
+  document.body.appendChild(overlay);
+  if (typeof addSwipeDownToClose !== 'undefined') addSwipeDownToClose(overlay, () => overlay.remove());
+}
+
+function renderCityTripTimeline(cityIds) {
+  const colors = {orlando:'#FF6B35',tampa:'#e07020',miami:'#e91e8c',miamibeach:'#f48fb1',keywest:'#f9a825',hollywood:'#7b1fa2'};
+  const cities = typeof CITIES !== 'undefined' ? CITIES : [];
+  return '<div style="position:relative;padding-left:2rem;">'
+    + '<div style="position:absolute;left:.6rem;top:0;bottom:0;width:2px;background:var(--gray2);"></div>'
+    + cityIds.map((id,i) => {
+        const c = cities.find(city=>city.id===id);
+        if (!c) return '';
+        const col = colors[id] || '#888';
+        return '<div style="position:relative;margin-bottom:.8rem;">'
+          + '<div style="position:absolute;left:-1.5rem;top:.2rem;width:12px;height:12px;border-radius:50%;background:'+col+';border:2px solid var(--white);box-shadow:0 0 0 2px '+col+';"></div>'
+          + '<div style="background:var(--gray1);border-radius:12px;padding:.6rem .8rem;border-left:3px solid '+col+';">'
+          + '<div style="font-size:.85rem;font-weight:700;">Day '+(i+1)+' · '+c.emoji+' '+c.name+'</div>'
+          + '<div style="font-size:.72rem;color:var(--gray3);">'+c.tagline+'</div>'
+          + '</div>'
+          + '</div>';
+      }).join('')
+    + '</div>';
+}
+
+function renderCrossCityBundles() {
+  const bundles = [
+    {title:'Florida Theme Park Pass',cities:'Orlando + Tampa',emoji:'🎢',savings:'Save 9',desc:'Universal + Busch Gardens combo ticket'},
+    {title:'Gulf Coast Beach Hopper',cities:'Tampa + Key West',emoji:'🏖️',savings:'Save 5',desc:'3 nights Tampa + 2 nights Key West package'},
+    {title:'Art & Culture Circuit',cities:'Miami + Miami Beach',emoji:'🎨',savings:'Save 5',desc:'Wynwood + Art Basel day pass bundle'}
+  ];
+  return '<div style="margin-bottom:1rem;">'
+    + '<div style="font-size:.8rem;font-weight:700;color:var(--gray3);margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.05em;">Cross-City Bundle Deals</div>'
+    + bundles.map(b => '<div style="background:var(--gray1);border-radius:12px;padding:.8rem;margin-bottom:.5rem;display:flex;gap:.7rem;">'
+      + '<div style="font-size:1.8rem;">' + b.emoji + '</div>'
+      + '<div style="flex:1;">'
+      + '<div style="font-size:.85rem;font-weight:700;">' + b.title + '</div>'
+      + '<div style="font-size:.75rem;color:var(--gray3);">' + b.cities + ' · ' + b.desc + '</div>'
+      + '<div style="font-size:.78rem;color:#16a34a;font-weight:700;margin-top:.2rem;">' + b.savings + '</div>'
+      + '</div>'
+      + '<button onclick="showToast('+JSON.stringify('Bundle details coming soon!')+')" style="background:var(--sky);border:none;color:#fff;border-radius:8px;padding:.3rem .6rem;font-size:.75rem;cursor:pointer;font-weight:600;align-self:flex-start;">View</button>'
+      + '</div>').join('')
+    + '</div>';
+}
+
+function exportMultiCityItinerary() {
+  const cities = typeof CITIES !== 'undefined' ? CITIES : [];
+  const lines = ['🌍 My Multi-City Florida Itinerary', '─────────────────────────────────'];
+  ['orlando','tampa','miami','keywest'].forEach((id,i) => {
+    const c = cities.find(city=>city.id===id);
+    if (c) lines.push('Day ' + (i+1) + ': ' + c.emoji + ' ' + c.name + ' — ' + c.tagline);
+  });
+  lines.push('', 'Plan your trip at orlandoexplorer.com');
+  const text = lines.join('
+');
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay active';
+  overlay.style.cssText = 'z-index:3900;align-items:flex-end;display:flex;';
+  overlay.innerHTML = '<div style="width:100%;max-width:430px;margin:0 auto;background:var(--white);border-radius:20px 20px 0 0;padding:1.2rem;">'
+    + '<div style="width:40px;height:4px;background:var(--gray2);border-radius:2px;margin:0 auto .8rem;"></div>'
+    + '<div style="font-size:.95rem;font-weight:700;margin-bottom:.7rem;">📤 Share Itinerary</div>'
+    + '<div style="background:var(--gray1);border-radius:12px;padding:.9rem;font-size:.82rem;white-space:pre-line;line-height:1.5;margin-bottom:.9rem;">' + text.replace(/
+/g,'<br>') + '</div>'
+    + '<button onclick="if(navigator.clipboard)navigator.clipboard.writeText('+JSON.stringify(text)+').then(()=>showToast('+JSON.stringify('Itinerary copied to clipboard! ✅')+'));" style="width:100%;padding:.75rem;background:var(--sky);border:none;border-radius:12px;color:#fff;font-weight:700;cursor:pointer;margin-bottom:.5rem;">📋 Copy to Clipboard</button>'
+    + '<button onclick="this.closest('.overlay').remove()" style="width:100%;padding:.6rem;background:none;border:none;cursor:pointer;color:var(--gray3);">Close</button>'
+    + '</div>';
+  document.body.appendChild(overlay);
+}
+
+// Wire to My Trip screen
+const _origRenderMyTrip_mc = typeof renderMyTrip !== 'undefined' ? renderMyTrip : function(){};
+renderMyTrip = function() {
+  _origRenderMyTrip_mc();
+  setTimeout(() => {
+    const scr = document.getElementById('screen-mytrip');
+    if (!scr || document.getElementById('mc-trip-btn')) return;
+    const btn = document.createElement('button');
+    btn.id = 'mc-trip-btn';
+    btn.innerHTML = '🌍 Multi-City Trip Planner';
+    btn.style.cssText = 'width:calc(100% - 2rem);margin:.5rem 1rem;padding:.75rem;background:linear-gradient(135deg,#0d1433,#1a2035);border:1px solid rgba(255,255,255,.15);color:#fff;border-radius:12px;font-size:.9rem;font-weight:600;cursor:pointer;display:block;';
+    btn.onclick = openMultiCityTrip;
+    const firstChild = scr.querySelector('.screen-header, h2, .section-hdr, [class]');
+    if (firstChild) firstChild.insertAdjacentElement('afterend', btn);
+    else scr.insertAdjacentElement('afterbegin', btn);
+  }, 100);
+};
+</script>
