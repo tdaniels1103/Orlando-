@@ -21392,3 +21392,414 @@ document.addEventListener('keydown', e => {
   }
 });
 </script>
+<script>
+/* ===== BLOCK Y: UI Wiring — Connect Block X Features to Live App ===== */
+
+/* 1. Patch account screen to wire Settings → openSettingsOverlay, add Stats + PIN + Find People */
+(function patchAccountScreen() {
+  const _prevRenderAccount = window.renderAccount;
+  window.renderAccount = function() {
+    if (_prevRenderAccount) _prevRenderAccount.apply(this, arguments);
+    setTimeout(() => {
+      const container = document.getElementById('account-content');
+      if (!container) return;
+
+      // Wire Settings item → openSettingsOverlay
+      container.querySelectorAll('.account-menu-item, .vendor-menu-item').forEach(item => {
+        const text = item.textContent || '';
+        if (text.includes('Settings') && !item.hasAttribute('data-y-patched')) {
+          item.setAttribute('data-y-patched','1');
+          item.onclick = () => openSettingsOverlay();
+        }
+      });
+
+      // Inject extra menu items after the Notifications row
+      const loggedInDiv = container.querySelector('.account-loggedin');
+      if (!loggedInDiv || loggedInDiv.querySelector('[data-y-extras]')) return;
+
+      const statsBtn = document.createElement('div');
+      statsBtn.className = 'account-menu-item';
+      statsBtn.setAttribute('data-y-extras','1');
+      statsBtn.innerHTML = '<span class="icon">📊</span><span>My Stats & Year in Review</span><span class="arrow">›</span>';
+      statsBtn.onclick = () => openStatsOverlay();
+
+      const pinBtn = document.createElement('div');
+      pinBtn.className = 'account-menu-item';
+      pinBtn.innerHTML = '<span class="icon">🔐</span><span>Set PIN Lock</span><span class="arrow">›</span>';
+      pinBtn.onclick = () => openPINSetup();
+
+      const findBtn = document.createElement('div');
+      findBtn.className = 'account-menu-item';
+      findBtn.innerHTML = '<span class="icon">🔍</span><span>Find People</span><span class="arrow">›</span>';
+      findBtn.onclick = () => openUserSearch();
+
+      const calBtn = document.createElement('div');
+      calBtn.className = 'account-menu-item';
+      calBtn.innerHTML = '<span class="icon">📅</span><span>My Calendar</span><span class="arrow">›</span>';
+      calBtn.onclick = () => openCalendarOverlay();
+
+      // Insert before admin button or at end of loggedInDiv
+      const adminBtn = loggedInDiv.querySelector('.adm-account-btn');
+      const ref = adminBtn || null;
+      [statsBtn, pinBtn, findBtn, calBtn].forEach(el => loggedInDiv.insertBefore(el, ref));
+    }, 50);
+  };
+})();
+
+/* 2. Calendar as standalone overlay (since no screen-calendar exists) */
+function openCalendarOverlay() {
+  const existing = document.getElementById('calendar-overlay');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'calendar-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;overflow-y:auto;max-width:430px;left:50%;transform:translateX(-50%);';
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--card-bg,#fff);border-bottom:1px solid var(--border,#eee);position:sticky;top:0;z-index:1;">
+      <button onclick="document.getElementById('calendar-overlay').remove()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-primary);">←</button>
+      <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--text-primary);">📅 My Calendar</div>
+      <button onclick="addCalEventDialog()" style="background:#FF6B35;border:none;border-radius:10px;padding:6px 12px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">+ Add</button>
+    </div>
+    <div id="calendar-content"></div>`;
+  document.body.appendChild(el);
+  setTimeout(() => { if (typeof renderCalendar === 'function') renderCalendar(); }, 100);
+}
+window.openCalendarOverlay = openCalendarOverlay;
+
+function addCalEventDialog() {
+  const title = prompt('Event name:');
+  if (!title) return;
+  const date = prompt('Date (YYYY-MM-DD):', new Date().toISOString().slice(0,10));
+  if (!date) return;
+  const time = prompt('Time:', '10:00 AM') || '10:00 AM';
+  const colors = ['#FF6B35','#1565C0','#2E7D32','#9C27B0','#E53935'];
+  const color = colors[Math.floor(Math.random()*colors.length)];
+  const icons = ['📍','🎢','🍽️','🏨','🎭','🌴'];
+  const icon = icons[Math.floor(Math.random()*icons.length)];
+  const ev = { id:'ce_'+Date.now(), title, date, time, color, icon };
+  window._calEvents = window._calEvents || [];
+  window._calEvents.push(ev);
+  localStorage.setItem('calEvents', JSON.stringify(window._calEvents));
+  if (typeof renderCalendar === 'function') renderCalendar();
+  if (typeof showToast !== 'undefined') showToast('Event added: ' + title + ' 📅');
+}
+window.addCalEventDialog = addCalEventDialog;
+
+/* 3. Floating AI Chat FAB button on home screen */
+(function injectAIFAB() {
+  const fab = document.createElement('button');
+  fab.id = 'ai-chat-fab';
+  fab.innerHTML = '🤖';
+  fab.title = 'AI Trip Planner';
+  fab.style.cssText = [
+    'position:fixed',
+    'bottom:80px',
+    'right:calc(50% - 215px + 16px)',
+    'width:52px',
+    'height:52px',
+    'border-radius:50%',
+    'background:linear-gradient(135deg,#FF6B35,#FFD700)',
+    'border:none',
+    'font-size:22px',
+    'cursor:pointer',
+    'z-index:500',
+    'box-shadow:0 4px 16px rgba(255,107,53,.5)',
+    'display:flex',
+    'align-items:center',
+    'justify-content:center',
+    'transition:transform .2s,opacity .2s',
+    'animation:fabPulse 3s ease infinite',
+  ].join(';');
+  fab.onclick = () => {
+    if (typeof openAIChat === 'function') openAIChat();
+  };
+  fab.addEventListener('touchstart', () => { fab.style.transform = 'scale(.92)'; }, {passive:true});
+  fab.addEventListener('touchend', () => { fab.style.transform = ''; }, {passive:true});
+  document.body.appendChild(fab);
+
+  // Hide FAB when not on home screen
+  const _prevSS = window.showScreen;
+  window.showScreen = function(name, navEl) {
+    if (_prevSS) _prevSS(name, navEl);
+    if (fab) fab.style.opacity = name === 'home' ? '1' : '0';
+  };
+
+  // Add FAB pulse animation if not already in styles
+  if (!document.getElementById('fab-pulse-style')) {
+    const style = document.createElement('style');
+    style.id = 'fab-pulse-style';
+    style.textContent = '@keyframes fabPulse{0%,100%{box-shadow:0 4px 16px rgba(255,107,53,.5)}50%{box-shadow:0 4px 24px rgba(255,107,53,.8),0 0 0 8px rgba(255,107,53,.1)}}';
+    document.head.appendChild(style);
+  }
+})();
+
+/* 4. Home screen quick-access row: Deals + Calendar + Wait Times */
+(function injectHomeQuickRow() {
+  const _prevRenderHome = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRenderHome) _prevRenderHome.apply(this, arguments);
+    setTimeout(() => {
+      const homeEl = document.getElementById('screen-home');
+      if (!homeEl || homeEl.querySelector('#y-quick-row')) return;
+      const scrollEl = homeEl.querySelector('.scroll-content') || homeEl;
+
+      const row = document.createElement('div');
+      row.id = 'y-quick-row';
+      row.style.cssText = 'padding:12px 16px;display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;';
+      row.innerHTML = [
+        { icon:'🎟️', label:'Deals', fn:'openDealsView()' },
+        { icon:'📅', label:'Calendar', fn:'openCalendarOverlay()' },
+        { icon:'⏱️', label:'Wait Times', fn:'openWaitTimesView()' },
+        { icon:'🔍', label:'Find People', fn:'openUserSearch()' },
+        { icon:'📸', label:'My Photos', fn:'showToast&&showToast('Opening photos...')' },
+      ].map(b => `<button onclick="${b.fn}" style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:5px;background:var(--card-bg,#fff);border:1px solid var(--border,#eee);border-radius:14px;padding:12px 14px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .15s;" ontouchstart="this.style.background='#FFF3EE'" ontouchend="this.style.background=''">
+        <span style="font-size:22px;">${b.icon}</span>
+        <span style="font-size:11px;font-weight:700;color:var(--text-primary,#212121);white-space:nowrap;">${b.label}</span>
+      </button>`).join('');
+
+      // Insert as first child of scrollable content area
+      const firstChild = scrollEl.firstChild;
+      scrollEl.insertBefore(row, firstChild);
+    }, 150);
+  };
+})();
+
+/* 5. Deals overlay (since screen-deals exists as a tab screen with deals-content div) */
+function openDealsView() {
+  // Try existing deals screen first (nav item 3 is watchlist, look for deals)
+  const dealsScreen = document.getElementById('screen-deals');
+  if (dealsScreen) {
+    showScreen && showScreen('deals');
+    return;
+  }
+  // Show as overlay
+  const existing = document.getElementById('deals-standalone-overlay');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'deals-standalone-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;overflow-y:auto;max-width:430px;left:50%;transform:translateX(-50%);';
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:linear-gradient(135deg,#FF6B35,#FFD700);position:sticky;top:0;z-index:1;">
+      <button onclick="document.getElementById('deals-standalone-overlay').remove()" style="background:rgba(0,0,0,.15);border:none;border-radius:50%;width:34px;height:34px;font-size:18px;cursor:pointer;color:#fff;">←</button>
+      <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;">🎟️ Deals</div>
+      <div style="width:34px;"></div>
+    </div>
+    <div id="deals-content"></div>`;
+  document.body.appendChild(el);
+  setTimeout(() => { if (typeof renderDealsScreen === 'function') renderDealsScreen(); }, 100);
+}
+window.openDealsView = openDealsView;
+
+/* 6. Wait Times overlay */
+function openWaitTimesView() {
+  const existing = document.getElementById('waittimes-overlay');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'waittimes-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;overflow-y:auto;max-width:430px;left:50%;transform:translateX(-50%);';
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--card-bg,#fff);border-bottom:1px solid var(--border,#eee);position:sticky;top:0;z-index:1;">
+      <button onclick="document.getElementById('waittimes-overlay').remove()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-primary);">←</button>
+      <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--text-primary);">⏱️ Live Wait Times</div>
+      <div style="font-size:11px;color:#4CAF50;font-weight:700;">LIVE</div>
+    </div>
+    <div style="padding:12px 16px 8px;font-size:12px;color:#9E9E9E;">Updates every 60 seconds · Last updated just now</div>
+    <div id="live-waits-container" style="padding:0 16px 24px;"></div>
+    <div style="padding:0 16px 16px;">
+      <div style="font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:10px;">Parking Availability</div>
+      <div id="parking-status-wrap"></div>
+    </div>`;
+  document.body.appendChild(el);
+  setTimeout(() => {
+    if (typeof renderLiveWaits === 'function') {
+      renderLiveWaits(document.getElementById('live-waits-container'));
+    }
+    if (typeof renderParkingStatus === 'function') {
+      renderParkingStatus(document.getElementById('parking-status-wrap'));
+    }
+  }, 100);
+}
+window.openWaitTimesView = openWaitTimesView;
+
+/* 7. Wire AI screen screen-ai to launch openAIChat overlay instead */
+(function patchAIScreen() {
+  const _prevSS = window.showScreen;
+  window.showScreen = function(name, navEl) {
+    if (_prevSS) _prevSS(name, navEl);
+    if (name === 'ai') {
+      setTimeout(() => {
+        const aiContent = document.getElementById('ai-content');
+        if (aiContent && !aiContent.querySelector('.ai-chat-launch-btn')) {
+          const btn = document.createElement('div');
+          btn.style.cssText = 'padding:16px;';
+          btn.innerHTML = `<button class="ai-chat-launch-btn" onclick="openAIChat()" style="width:100%;background:linear-gradient(135deg,#FF6B35,#FFD700);border:none;border-radius:16px;padding:18px;color:#fff;font-size:16px;font-weight:800;cursor:pointer;font-family:'Playfair Display',serif;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 4px 16px rgba(255,107,53,.4);">
+            🤖 Open AI Chat Planner
+          </button>
+          <div style="text-align:center;margin-top:12px;font-size:12px;color:#9E9E9E;">Ask me anything about Orlando — restaurants, parks, hotels, itineraries, deals</div>`;
+          aiContent.prepend(btn);
+        }
+      }, 200);
+    }
+  };
+})();
+
+/* 8. Timed missions widget on home */
+(function injectTimedMissionsHome() {
+  const _prevRH = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH) _prevRH.apply(this, arguments);
+    setTimeout(() => {
+      const homeEl = document.getElementById('screen-home');
+      if (!homeEl || homeEl.querySelector('#y-missions-wrap')) return;
+      const scrollEl = homeEl.querySelector('.scroll-content') || homeEl;
+
+      const wrap = document.createElement('div');
+      wrap.id = 'y-missions-wrap';
+      wrap.id = 'timed-missions-wrap';
+      if (typeof renderTimedMissions === 'function') {
+        scrollEl.appendChild(wrap);
+        renderTimedMissions();
+      }
+    }, 250);
+  };
+})();
+
+/* 9. Profile edit — inject edit button on account profile header */
+(function patchProfileEdit() {
+  const _prev = window.renderAccount;
+  window.renderAccount = function() {
+    if (_prev) _prev.apply(this, arguments);
+    setTimeout(() => {
+      const hdr = document.querySelector('.profile-header');
+      if (hdr && !hdr.querySelector('[data-edit-profile]')) {
+        const editBtn = document.createElement('button');
+        editBtn.setAttribute('data-edit-profile','1');
+        editBtn.textContent = 'Edit';
+        editBtn.style.cssText = 'background:none;border:1px solid var(--border,#eee);border-radius:10px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:"DM Sans",sans-serif;color:var(--text-primary);margin-left:auto;';
+        editBtn.onclick = openEditProfileModal;
+        hdr.appendChild(editBtn);
+      }
+    }, 60);
+  };
+})();
+
+function openEditProfileModal() {
+  const user = window.appState?.user;
+  if (!user) { if (typeof showToast !== 'undefined') showToast('Sign in to edit profile'); return; }
+  const el = document.createElement('div');
+  el.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:8000;display:flex;align-items:flex-end;max-width:430px;left:50%;transform:translateX(-50%);';
+  el.innerHTML = `<div style="background:var(--card-bg,#fff);border-radius:20px 20px 0 0;width:100%;padding:20px 16px 32px;">
+    <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--text-primary);margin-bottom:16px;">Edit Profile</div>
+    <div style="margin-bottom:12px;">
+      <label style="font-size:12px;font-weight:700;color:#9E9E9E;display:block;margin-bottom:6px;">DISPLAY NAME</label>
+      <input id="edit-profile-name" value="${user.name || ''}" style="width:100%;border:1px solid var(--border,#eee);border-radius:10px;padding:10px 12px;font-size:14px;font-family:'DM Sans',sans-serif;background:var(--card-bg,#fff);color:var(--text-primary);box-sizing:border-box;">
+    </div>
+    <div style="margin-bottom:12px;">
+      <label style="font-size:12px;font-weight:700;color:#9E9E9E;display:block;margin-bottom:6px;">BIO</label>
+      <textarea id="edit-profile-bio" placeholder="Tell people about yourself..." style="width:100%;border:1px solid var(--border,#eee);border-radius:10px;padding:10px 12px;font-size:14px;font-family:'DM Sans',sans-serif;background:var(--card-bg,#fff);color:var(--text-primary);resize:none;height:72px;box-sizing:border-box;">${user.bio || ''}</textarea>
+    </div>
+    <div style="margin-bottom:16px;">
+      <label style="font-size:12px;font-weight:700;color:#9E9E9E;display:block;margin-bottom:6px;">AVATAR EMOJI</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        ${['🌴','🦁','🎢','⭐','🌺','🧭','🦋','🌸','🎭','🏖️'].map(e => `<button onclick="selectAvatar('${e}',this)" style="width:40px;height:40px;border-radius:10px;border:2px solid ${(user.avatar===e)?'#FF6B35':'var(--border,#eee)'};background:${(user.avatar===e)?'#FFF3EE':'var(--card-bg,#fff)'};font-size:20px;cursor:pointer;" data-avatar="${e}">${e}</button>`).join('')}
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button onclick="saveProfileEdit()" style="flex:1;background:#FF6B35;border:none;border-radius:12px;padding:13px;color:#fff;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">Save Changes</button>
+      <button onclick="this.closest('[style*=inset]').remove()" style="flex:1;background:#F5F5F5;border:none;border-radius:12px;padding:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--text-primary);">Cancel</button>
+    </div>
+  </div>`;
+  el.onclick = e => { if (e.target === el) el.remove(); };
+  document.body.appendChild(el);
+  window._editSelectedAvatar = user.avatar;
+}
+window.openEditProfileModal = openEditProfileModal;
+
+function selectAvatar(emoji, btn) {
+  window._editSelectedAvatar = emoji;
+  btn.closest('div').querySelectorAll('button[data-avatar]').forEach(b => {
+    b.style.borderColor = b.dataset.avatar === emoji ? '#FF6B35' : 'var(--border,#eee)';
+    b.style.background = b.dataset.avatar === emoji ? '#FFF3EE' : 'var(--card-bg,#fff)';
+  });
+}
+window.selectAvatar = selectAvatar;
+
+function saveProfileEdit() {
+  const user = window.appState?.user;
+  if (!user) return;
+  const name = document.getElementById('edit-profile-name')?.value.trim();
+  const bio = document.getElementById('edit-profile-bio')?.value.trim();
+  if (name) user.name = name;
+  if (bio !== undefined) user.bio = bio;
+  if (window._editSelectedAvatar) user.avatar = window._editSelectedAvatar;
+  document.querySelector('[style*=inset]')?.remove();
+  if (typeof renderAccount === 'function') renderAccount();
+  if (typeof showToast !== 'undefined') showToast('Profile updated! ✅');
+}
+window.saveProfileEdit = saveProfileEdit;
+
+/* 10. Wire home screen hero search to voice search */
+setTimeout(() => {
+  if (typeof patchSearchBars === 'function') patchSearchBars();
+  if (typeof initDynamicHome === 'function') initDynamicHome();
+}, 500);
+</script>
+<style>
+/* ===== BLOCK Y: UI Wiring CSS ===== */
+
+/* AI FAB button */
+#ai-chat-fab {
+  animation: fabPulse 3s ease infinite;
+  transition: opacity .3s, transform .2s;
+}
+@keyframes fabPulse {
+  0%, 100% { box-shadow: 0 4px 16px rgba(255,107,53,.5); }
+  50% { box-shadow: 0 4px 24px rgba(255,107,53,.8), 0 0 0 8px rgba(255,107,53,.1); }
+}
+
+/* AI chat launch button on AI screen */
+.ai-chat-launch-btn {
+  transition: transform .15s;
+}
+.ai-chat-launch-btn:active {
+  transform: scale(.97);
+}
+
+/* Deals standalone overlay */
+#deals-standalone-overlay .deal-card:first-child {
+  margin-top: 0;
+}
+
+/* Wait times live badge */
+.live-badge {
+  display: inline-block;
+  background: #4CAF50;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 10px;
+  animation: livePulse 2s ease infinite;
+}
+@keyframes livePulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .6; }
+}
+
+/* Timed missions in home */
+#y-missions-wrap, #timed-missions-wrap {
+  padding-bottom: 4px;
+}
+
+/* Profile header edit button */
+.profile-header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Quick row buttons hover */
+#y-quick-row button:hover {
+  background: #FFF3EE !important;
+}
+</style>
