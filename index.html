@@ -13840,3 +13840,698 @@ console.log('Orlando Explorer fully initialized 🌴 — ' +
   (typeof CITIES !== 'undefined' ? CITIES.length : 1) + ' cities, ' + 
   (typeof watchlistState !== 'undefined' ? watchlistState.items.length : 0) + ' watchlist items');
 </script>
+<style>
+/* ============================================================
+   BLOCK U: CLEAN UI — Missions, Find Friends, Community Trips,
+             Community Forum, Community Home Section
+   ============================================================ */
+
+/* ---- GAMIFY OVERLAY BASE ---- */
+.gamify-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 600;
+  max-width: 430px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--white);
+  flex-direction: column;
+  font-family: 'DM Sans', sans-serif;
+}
+.gamify-overlay.open { display: flex; }
+.gamify-header {
+  padding: 1rem 1rem .9rem;
+  position: relative;
+  flex-shrink: 0;
+}
+.gamify-close {
+  position: absolute;
+  top: .8rem;
+  right: .8rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.22);
+  border: none;
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+.gamify-scroll {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* ---- MISSIONS PANEL ---- */
+.miss-panel { padding: 0 1rem .8rem; }
+.miss-hdr { display: flex; align-items: center; justify-content: space-between; padding: .2rem 0 .8rem; }
+.miss-hdr-title { font-family: 'Playfair Display', serif; font-size: 1.05rem; font-weight: 700; }
+.miss-reset { font-size: .7rem; color: var(--gray3); background: var(--gray1); padding: .2rem .5rem; border-radius: 6px; }
+.miss-wk-hdr {
+  font-family: 'Playfair Display', serif;
+  font-size: .95rem;
+  font-weight: 700;
+  margin: .9rem 0 .5rem;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+}
+.miss-wk-hdr::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--gray2);
+}
+
+/* Mission card redesign */
+.miss-card {
+  background: var(--white);
+  border-radius: 14px;
+  padding: .9rem 1rem;
+  margin-bottom: .6rem;
+  box-shadow: 0 1px 8px rgba(0,0,0,.07);
+  display: flex;
+  gap: .75rem;
+  align-items: flex-start;
+  border-left: 4px solid #FF6B35;
+  transition: opacity .3s, transform .2s;
+  position: relative;
+  overflow: hidden;
+}
+.miss-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(255,107,53,.04), transparent);
+  pointer-events: none;
+}
+.miss-card.done {
+  opacity: .6;
+  border-left-color: #22c55e;
+}
+.miss-card.done::before { background: linear-gradient(90deg, rgba(34,197,94,.05), transparent); }
+.miss-card.wk { border-left-color: #9C27B0; }
+.miss-card.wk::before { background: linear-gradient(90deg, rgba(156,39,176,.04), transparent); }
+.miss-emoji { font-size: 1.6rem; flex-shrink: 0; line-height: 1; margin-top: .1rem; }
+.miss-body { flex: 1; min-width: 0; }
+.miss-name { font-size: .88rem; font-weight: 700; color: var(--text); line-height: 1.3; }
+.miss-name.struck { text-decoration: line-through; color: var(--gray3); }
+.miss-desc { font-size: .75rem; color: var(--gray3); margin: .15rem 0 .45rem; line-height: 1.4; }
+.miss-ptrack {
+  height: 5px;
+  background: var(--gray1);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: .2rem;
+}
+.miss-pfill {
+  height: 100%;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #FF6B35, #FF8C42);
+  transition: width .6s cubic-bezier(.34,1.56,.64,1);
+}
+.miss-pfill.done { background: linear-gradient(90deg, #22c55e, #4ade80); }
+.miss-pfill.wk { background: linear-gradient(90deg, #9C27B0, #CE93D8); }
+.miss-ptext { font-size: .68rem; color: var(--gray3); }
+.miss-right { display: flex; flex-direction: column; align-items: flex-end; gap: .3rem; flex-shrink: 0; }
+.miss-xp {
+  font-size: .75rem;
+  font-weight: 800;
+  color: #FF6B35;
+  background: #fff3ee;
+  padding: .2rem .5rem;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+.miss-xp.wk { color: #9C27B0; background: #f3e5f5; }
+.miss-claimed {
+  font-size: .68rem;
+  font-weight: 700;
+  color: #22c55e;
+  background: #dcfce7;
+  padding: .15rem .4rem;
+  border-radius: 6px;
+}
+.miss-view-all-btn {
+  width: 100%;
+  margin-top: .7rem;
+  padding: .7rem;
+  border-radius: 12px;
+  border: 1.5px solid var(--gray2);
+  background: var(--white);
+  font-size: .85rem;
+  font-weight: 700;
+  color: var(--sky);
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: background .2s;
+}
+.miss-view-all-btn:active { background: var(--gray1); }
+
+/* Missions overlay tabs */
+.miss-tab-bar {
+  display: flex;
+  gap: .4rem;
+  padding: .7rem 1rem;
+  border-bottom: 1px solid var(--gray1);
+  background: var(--white);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+.miss-tab {
+  flex: 1;
+  padding: .45rem;
+  border-radius: 10px;
+  text-align: center;
+  font-size: .78rem;
+  font-weight: 700;
+  cursor: pointer;
+  background: var(--gray1);
+  color: var(--gray3);
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+  transition: all .2s;
+}
+.miss-tab.active { background: #FF6B35; color: #fff; }
+
+/* ---- FIND FRIENDS ---- */
+.user-suggestion {
+  display: flex;
+  align-items: center;
+  gap: .8rem;
+  padding: .85rem 1rem;
+  border-bottom: 1px solid var(--gray1);
+  transition: background .15s;
+}
+.user-suggestion:active { background: var(--gray1); }
+.user-sug-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--sky), #a78bfa);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+.user-sug-info { flex: 1; min-width: 0; }
+.user-sug-name { font-size: .88rem; font-weight: 700; color: var(--text); }
+.user-sug-meta { font-size: .72rem; color: var(--gray3); margin-top: .1rem; }
+.follow-btn {
+  padding: .35rem .8rem;
+  border-radius: 20px;
+  font-size: .78rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1.5px solid;
+  font-family: 'DM Sans', sans-serif;
+  transition: all .2s;
+  flex-shrink: 0;
+}
+.follow-btn.not-following { background: var(--sky); color: #fff; border-color: var(--sky); }
+.follow-btn.following { background: var(--white); color: var(--gray3); border-color: var(--gray2); }
+.friends-section-label {
+  padding: .5rem 1rem .3rem;
+  font-size: .68rem;
+  font-weight: 800;
+  color: var(--gray3);
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  background: var(--gray1);
+  border-bottom: 1px solid var(--gray2);
+}
+
+/* ---- COMMUNITY ITINERARY CARDS ---- */
+.comm-itin-card {
+  background: var(--white);
+  border-radius: 16px;
+  margin: .6rem 1rem;
+  padding: 1rem;
+  box-shadow: 0 1px 8px rgba(0,0,0,.07);
+  border: 1px solid var(--gray1);
+  transition: transform .15s, box-shadow .15s;
+}
+.comm-itin-card:active { transform: scale(.99); }
+.comm-itin-featured {
+  display: inline-flex;
+  align-items: center;
+  gap: .3rem;
+  background: linear-gradient(135deg, #f59e0b, #ea580c);
+  color: #fff;
+  font-size: .65rem;
+  font-weight: 800;
+  padding: .2rem .55rem;
+  border-radius: 6px;
+  margin-bottom: .6rem;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.from-follow-tag {
+  font-size: .72rem;
+  color: var(--sky);
+  font-weight: 600;
+  margin-bottom: .4rem;
+  display: flex;
+  align-items: center;
+  gap: .3rem;
+}
+.comm-itin-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: .25rem;
+  color: var(--text);
+  line-height: 1.3;
+}
+.comm-itin-meta {
+  font-size: .75rem;
+  color: var(--gray3);
+  margin-bottom: .5rem;
+  display: flex;
+  align-items: center;
+  gap: .3rem;
+  flex-wrap: wrap;
+}
+.comm-itin-emojis {
+  font-size: 1.1rem;
+  letter-spacing: .1rem;
+  margin-bottom: .6rem;
+  background: var(--gray1);
+  border-radius: 8px;
+  padding: .35rem .6rem;
+  display: inline-block;
+}
+.comm-itin-actions { display: flex; gap: .4rem; }
+.itin-action-btn {
+  flex: 1;
+  padding: .5rem .3rem;
+  border: 1.5px solid var(--gray2);
+  border-radius: 10px;
+  font-size: .75rem;
+  font-weight: 700;
+  font-family: 'DM Sans', sans-serif;
+  background: var(--white);
+  cursor: pointer;
+  transition: all .2s;
+  color: var(--text);
+  text-align: center;
+}
+.itin-action-btn:active { background: var(--gray1); }
+.itin-action-btn.liked { background: #fff0f0; border-color: #ef4444; color: #ef4444; }
+
+/* Community filter bar */
+.comm-filter-bar {
+  display: flex;
+  gap: .4rem;
+  padding: .6rem 1rem;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--gray1);
+  scrollbar-width: none;
+}
+.comm-filter-bar::-webkit-scrollbar { display: none; }
+.comm-filter-chip {
+  flex-shrink: 0;
+  padding: .28rem .7rem;
+  border-radius: 20px;
+  font-size: .75rem;
+  font-weight: 600;
+  background: var(--gray1);
+  color: var(--gray3);
+  border: 1px solid var(--gray2);
+  cursor: pointer;
+}
+.comm-filter-chip.active { background: #4CAF50; color: #fff; border-color: #4CAF50; }
+
+/* ---- COMMUNITY HOME SECTION ---- */
+.comm-home-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .6rem;
+  padding: 0 1rem .4rem;
+}
+.comm-home-tile {
+  border-radius: 16px;
+  padding: 1rem .8rem;
+  cursor: pointer;
+  text-align: center;
+  transition: transform .15s, box-shadow .15s;
+  position: relative;
+  overflow: hidden;
+}
+.comm-home-tile::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,.08);
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity .2s;
+}
+.comm-home-tile:active { transform: scale(.97); box-shadow: 0 2px 10px rgba(0,0,0,.15); }
+.comm-home-tile:active::before { opacity: 1; }
+.comm-home-tile-icon { font-size: 1.7rem; margin-bottom: .35rem; display: block; }
+.comm-home-tile-label { font-size: .82rem; font-weight: 700; color: #fff; }
+.comm-home-tile-sub { font-size: .68rem; color: rgba(255,255,255,.75); margin-top: .15rem; }
+
+/* ---- ACTIVITY FEED ---- */
+.activity-wrap {
+  background: var(--white);
+  border-radius: 16px;
+  overflow: hidden;
+  margin: 0 1rem .6rem;
+  box-shadow: 0 1px 8px rgba(0,0,0,.07);
+  border: 1px solid var(--gray1);
+}
+.activity-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .8rem 1rem .6rem;
+  border-bottom: 1px solid var(--gray1);
+}
+.activity-hdr-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem;
+  font-weight: 700;
+}
+.find-friends-btn {
+  background: var(--sky);
+  color: #fff;
+  border-radius: 20px;
+  padding: .3rem .7rem;
+  font-size: .75rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+}
+.activity-item {
+  display: flex;
+  align-items: center;
+  gap: .7rem;
+  padding: .65rem 1rem;
+  border-bottom: 1px solid var(--gray1);
+}
+.activity-item:last-child { border-bottom: none; }
+.activity-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FF6B35, #FFD700);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+.activity-text { flex: 1; font-size: .8rem; color: var(--text); line-height: 1.4; }
+.activity-time { font-size: .68rem; color: var(--gray3); flex-shrink: 0; }
+
+/* ---- COMMUNITY FORUM ---- */
+.forum-post-card {
+  background: var(--white);
+  border-radius: 14px;
+  margin: .5rem 1rem;
+  padding: .9rem 1rem;
+  box-shadow: 0 1px 8px rgba(0,0,0,.07);
+  border: 1px solid var(--gray1);
+  cursor: pointer;
+  transition: transform .15s;
+}
+.forum-post-card:active { transform: scale(.99); }
+.forum-post-header { display: flex; align-items: flex-start; gap: .6rem; margin-bottom: .5rem; }
+.forum-post-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--sky), #a78bfa);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+.forum-post-meta { flex: 1; min-width: 0; }
+.forum-post-author { font-size: .8rem; font-weight: 700; color: var(--text); }
+.forum-post-time { font-size: .7rem; color: var(--gray3); margin-top: .05rem; }
+.forum-post-category {
+  font-size: .65rem;
+  font-weight: 700;
+  padding: .15rem .45rem;
+  border-radius: 6px;
+  background: var(--gray1);
+  color: var(--gray3);
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+.forum-post-title { font-size: .9rem; font-weight: 700; color: var(--text); margin-bottom: .3rem; line-height: 1.3; }
+.forum-post-preview { font-size: .78rem; color: var(--gray3); line-height: 1.4; margin-bottom: .55rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.forum-post-footer { display: flex; align-items: center; gap: .7rem; }
+.forum-post-stat { font-size: .73rem; color: var(--gray3); display: flex; align-items: center; gap: .2rem; }
+.forum-post-stat.hot { color: #f97316; font-weight: 600; }
+
+/* Category tabs in forum */
+.forum-cat-tab {
+  flex-shrink: 0;
+  padding: .3rem .7rem;
+  border-radius: 20px;
+  font-size: .75rem;
+  font-weight: 600;
+  background: var(--gray1);
+  color: var(--gray3);
+  border: 1px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.forum-cat-tab.active { background: #FF6B35; color: #fff; border-color: #FF6B35; }
+
+/* Dark mode fixes */
+body.dark .miss-card,
+body.dark .comm-itin-card,
+body.dark .activity-wrap,
+body.dark .forum-post-card { background: #1a1f35; border-color: rgba(255,255,255,.08); }
+body.dark .miss-xp { background: rgba(255,107,53,.15); }
+body.dark .miss-xp.wk { background: rgba(156,39,176,.15); }
+body.dark .comm-itin-emojis { background: rgba(255,255,255,.07); }
+body.dark .itin-action-btn { background: transparent; border-color: rgba(255,255,255,.15); color: rgba(255,255,255,.8); }
+body.dark .forum-post-category { background: rgba(255,255,255,.08); }
+body.dark .gamify-overlay { background: #0f1120; }
+body.dark .user-suggestion:active { background: rgba(255,255,255,.05); }
+</style>
+
+<script>
+/* ===== BLOCK V: Community/Missions UI JS Overrides ===== */
+
+/* --- renderHomeCommunitySection: use comm-home-tile CSS classes --- */
+(function(){
+  const _orig = window.renderHomeCommunitySection;
+  window.renderHomeCommunitySection = function() {
+    const wrap = document.getElementById('home-community-btn-section');
+    if(!wrap) return;
+    wrap.style.display = 'block';
+    const postCount = (typeof MOCK_POSTS !== 'undefined') ? MOCK_POSTS.length : 0;
+    const itinCount = (typeof MOCK_ITINS !== 'undefined') ? MOCK_ITINS.length : 0;
+    const followCount = (typeof socialState !== 'undefined') ? socialState.following.length : 0;
+    wrap.innerHTML = `<div style="padding:0 16px 20px;">
+      <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:12px;color:var(--text-primary);">🌴 Orlando Community</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="comm-home-tile" style="--tile-grad:linear-gradient(135deg,#FF6B35 0%,#FF8C42 100%);" onclick="openCommunityForum()">
+          <div class="comm-home-tile-icon">💬</div>
+          <div class="comm-home-tile-label">Community Forum</div>
+          <div class="comm-home-tile-sub">${postCount} posts</div>
+        </div>
+        <div class="comm-home-tile" style="--tile-grad:linear-gradient(135deg,#4CAF50 0%,#66BB6A 100%);" onclick="openCommunityItineraries()">
+          <div class="comm-home-tile-icon">🗺️</div>
+          <div class="comm-home-tile-label">Community Trips</div>
+          <div class="comm-home-tile-sub">${itinCount} itineraries</div>
+        </div>
+        <div class="comm-home-tile" style="--tile-grad:linear-gradient(135deg,#1E88E5 0%,#42A5F5 100%);" onclick="openFindFriends()">
+          <div class="comm-home-tile-icon">👥</div>
+          <div class="comm-home-tile-label">Find Friends</div>
+          <div class="comm-home-tile-sub">${followCount} following</div>
+        </div>
+        <div class="comm-home-tile" style="--tile-grad:linear-gradient(135deg,#8E24AA 0%,#AB47BC 100%);" onclick="openUserProfile('me')">
+          <div class="comm-home-tile-icon">👤</div>
+          <div class="comm-home-tile-label">My Profile</div>
+          <div class="comm-home-tile-sub">View public profile</div>
+        </div>
+      </div>
+    </div>`;
+  };
+})();
+
+/* --- renderFindFriends: clean card layout --- */
+(function(){
+  window.renderFindFriends = function(users) {
+    const list = document.getElementById('find-friends-list');
+    if(!list) return;
+    if(!users || users.length === 0) {
+      list.innerHTML = '<div style="text-align:center;padding:40px 16px;color:#9E9E9E;"><div style="font-size:48px;margin-bottom:12px;">🔍</div><div style="font-size:15px;font-weight:600;">No users found</div><div style="font-size:13px;margin-top:6px;">Try a different search</div></div>';
+      return;
+    }
+    list.innerHTML = '<div style="padding:10px 16px 6px;font-size:11px;font-weight:700;color:#9E9E9E;letter-spacing:.08em;">SUGGESTED FOR YOU</div>'
+      + users.map(u => {
+          const isF = socialState.following.includes(u.id);
+          const cfg = (typeof LEVEL_CONFIG !== 'undefined' && LEVEL_CONFIG[u.level]) ? LEVEL_CONFIG[u.level] : {emoji:'🌟'};
+          return `<div class="user-suggestion">
+            <div class="user-sug-avatar" onclick="openUserProfile('${u.id}')" style="cursor:pointer;">${u.avatar}</div>
+            <div class="user-sug-info">
+              <div class="user-sug-name" onclick="openUserProfile('${u.id}')">${u.username}${u.isLocal?' 🌴':''}</div>
+              <div class="user-sug-meta">${cfg.emoji} ${u.level} &middot; ${u.followers} followers &middot; ${u.checkins} check-ins</div>
+              <div class="user-sug-bio">${u.bio}</div>
+            </div>
+            <button class="follow-btn ${isF?'following':'not-following'}" id="pfl-follow-${u.id}" onclick="toggleFollow('${u.id}',this)">${isF?'✓ Following':'+ Follow'}</button>
+          </div>`;
+        }).join('') + '<div style="height:24px;"></div>';
+  };
+})();
+
+/* --- renderFriendsActivity: clean activity feed --- */
+(function(){
+  window.renderFriendsActivity = function() {
+    const wrap = document.getElementById('home-friends-activity');
+    if(!wrap) return;
+    if(!appState.user || socialState.following.length === 0) { wrap.style.display='none'; return; }
+    wrap.style.display = 'block';
+    const acts = getMockActivity();
+    if(acts.length === 0) { wrap.style.display='none'; return; }
+    wrap.innerHTML = `<div class="activity-wrap">
+      <div class="activity-hdr">
+        <span class="activity-hdr-title">👥 Friends Activity</span>
+        <button class="find-friends-btn" onclick="openFindFriends()">+ Find Friends</button>
+      </div>
+      ${acts.map(a => `<div class="activity-item" onclick="openUserProfile('${a.uid}')" style="cursor:pointer;">
+          <div class="activity-avatar">${a.avatar}</div>
+          <div class="activity-text">${a.emoji} ${a.text}</div>
+          <div class="activity-time">${a.time}</div>
+        </div>`).join('')}
+    </div>`;
+  };
+})();
+
+/* --- renderCommunityItineraries: cleaner cards --- */
+(function(){
+  window.renderCommunityItineraries = function() {
+    const list = document.getElementById('community-itineraries-list');
+    if(!list) return;
+    const allItins = [...MOCK_ITINS, ...socialState.sharedItineraries.filter(i=>i.visibility==='public')];
+    const sorted = [...allItins.filter(i=>i.featured), ...allItins.filter(i=>!i.featured)];
+    if(sorted.length === 0) {
+      list.innerHTML = '<div style="text-align:center;padding:48px 16px;color:#9E9E9E;"><div style="font-size:48px;margin-bottom:12px;">🗺️</div><div style="font-size:15px;font-weight:600;">No trips yet</div><div style="font-size:13px;margin-top:6px;">Be the first to share a trip!</div></div>';
+      return;
+    }
+    list.innerHTML = sorted.map(itin => {
+      const author = itin.authorId === 'current_user'
+        ? {username: appState.user?.name||'You', avatar: appState.user?.avatar||'😊', isLocal: typeof gameState !== 'undefined' ? gameState.isOrlandoLocal : false}
+        : (getMockUser(itin.authorId)||{username:'Explorer',avatar:'😊',isLocal:false});
+      const isFollowed = socialState.following.includes(itin.authorId);
+      const isLiked = socialState.likedItins[itin.id];
+      const likeCount = itin.likes + (isLiked ? 1 : 0);
+      return `<div class="comm-itin-card">
+        ${itin.featured ? '<div class="comm-itin-featured">⭐ Featured</div>' : ''}
+        ${isFollowed ? '<div class="from-follow-tag">👥 From Someone You Follow</div>' : ''}
+        <div class="comm-itin-author">
+          <span class="comm-itin-author-avatar">${author.avatar}</span>
+          <span class="comm-itin-author-name">${author.username}${author.isLocal?' 🌴':''}</span>
+          <span class="comm-itin-dot">·</span>
+          <span class="comm-itin-time">${itin.time}</span>
+        </div>
+        <div class="comm-itin-title">${itin.title}</div>
+        <div class="comm-itin-meta">${itin.places.length} places</div>
+        <div class="comm-itin-emojis">${itin.emojis}</div>
+        ${itin.desc ? `<div class="comm-itin-desc">${itin.desc}</div>` : ''}
+        <div class="comm-itin-actions">
+          <button class="itin-action-btn ${isLiked?'liked':''}" onclick="likeItin('${itin.id}',this)">❤️ ${likeCount}</button>
+          <button class="itin-action-btn" onclick="saveItin('${itin.id}')">💾 ${itin.saves}</button>
+          <button class="itin-action-btn" onclick="copyItin('${itin.id}')">📋 Copy</button>
+        </div>
+      </div>`;
+    }).join('') + '<div style="height:24px;"></div>';
+  };
+})();
+
+/* --- expose likeItin globally since renderCommunityItineraries references it --- */
+window.likeItin = function(id, btn) {
+  if(!appState.user){openAuthModal('like itineraries');return;}
+  socialState.likedItins[id] = !socialState.likedItins[id];
+  renderCommunityItineraries();
+};
+</script>
+
+<style>
+/* ===== BLOCK V CSS: Community tile + itin author row ===== */
+
+/* comm-home-tile uses CSS custom property for gradient */
+.comm-home-tile {
+  background: var(--tile-grad, linear-gradient(135deg,#FF6B35,#FF8C42));
+  border-radius: 16px;
+  padding: 18px 14px;
+  cursor: pointer;
+  color: #fff;
+  text-align: center;
+  transition: transform .15s, box-shadow .15s;
+  box-shadow: 0 4px 14px rgba(0,0,0,.13);
+}
+.comm-home-tile:active { transform: scale(.96); }
+.comm-home-tile-icon { font-size: 30px; margin-bottom: 6px; }
+.comm-home-tile-label { font-weight: 700; font-size: 13px; line-height: 1.2; }
+.comm-home-tile-sub { font-size: 11px; opacity: .85; margin-top: 3px; }
+
+/* user-sug-bio */
+.user-sug-bio { font-size: 11px; color: #757575; margin-top: 3px; line-height: 1.4; }
+[data-theme="dark"] .user-sug-bio { color: #9E9E9E; }
+
+/* find-friends-btn */
+.find-friends-btn {
+  background: linear-gradient(135deg,#FF6B35,#FFD700);
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* activity-hdr-title */
+.activity-hdr-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* comm-itin author row */
+.comm-itin-author {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 6px;
+}
+.comm-itin-author-avatar { font-size: 16px; }
+.comm-itin-author-name { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+.comm-itin-dot, .comm-itin-time { font-size: 11px; color: #9E9E9E; }
+.comm-itin-desc {
+  font-size: 12px;
+  color: #757575;
+  line-height: 1.45;
+  margin-bottom: 10px;
+}
+[data-theme="dark"] .comm-itin-desc { color: #9E9E9E; }
+
+/* itin-action-btn liked state */
+.itin-action-btn.liked { background: #FFEBEE; color: #E53935; border-color: #FFCDD2; }
+[data-theme="dark"] .itin-action-btn.liked { background: #3E2723; border-color: #B71C1C; }
+</style>
