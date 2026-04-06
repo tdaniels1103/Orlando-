@@ -12357,27 +12357,31 @@ function renderCitySelectorBar() {
   const city = CITIES.find(c => c.id === cityState.current) || CITIES[0];
   const bar = document.createElement('div');
   bar.id = 'city-selector-bar';
-  bar.style.cssText = 'background:var(--white);border-bottom:1px solid var(--gray1);padding:.5rem 1rem;display:flex;align-items:center;justify-content:space-between;cursor:pointer;';
+  bar.style.cssText = 'background:var(--white);border-bottom:1px solid var(--gray1);padding:.5rem 1rem;display:flex;align-items:center;justify-content:space-between;';
   bar.innerHTML = `
-    <div style="display:flex;align-items:center;gap:.5rem;" onclick="openCitySelector()">
+    <div style="display:flex;align-items:center;gap:.5rem;cursor:pointer;" onclick="openCitySelector()">
       <span style="font-size:1.1rem;">${city.emoji}</span>
       <div>
-        <div style="font-size:.75rem;color:var(--gray3);font-weight:500;">Exploring</div>
-        <div style="font-size:.9rem;font-weight:700;color:var(--text);">${city.name}, ${city.state}</div>
+        <div style="font-size:.72rem;color:var(--gray3);font-weight:500;">Exploring</div>
+        <div style="font-size:.88rem;font-weight:700;color:var(--text);">${city.name}, ${city.state} <span style="color:var(--gray3);font-size:.65rem;">▼</span></div>
       </div>
-      <span style="color:var(--gray3);font-size:.7rem;margin-left:.2rem;">▼</span>
     </div>
-    <button onclick="openCitySelector()" style="background:var(--sky);color:#fff;border:none;border-radius:8px;padding:.3rem .7rem;font-size:.75rem;font-weight:600;cursor:pointer;">Change City</button>`;
+    <button onclick="openCitySelector()" style="background:var(--sky);color:#fff;border:none;border-radius:8px;padding:.35rem .8rem;font-size:.78rem;font-weight:700;cursor:pointer;flex-shrink:0;">Change City</button>`;
+  // Insert at top of scroll-content so it scrolls with the page and is always visible
+  const scrollContent = document.querySelector('#screen-home .scroll-content');
   const homeScr = document.getElementById('screen-home');
-  if (homeScr) homeScr.insertAdjacentElement('afterbegin', bar);
+  const target = scrollContent || homeScr;
+  if (target) target.insertAdjacentElement('afterbegin', bar);
 }
 
 // ---- OPEN CITY SELECTOR ----
 function openCitySelector() {
+  const existing = document.getElementById('city-selector-overlay');
+  if (existing) { existing.remove(); return; }
   const overlay = document.createElement('div');
-  overlay.className = 'overlay active';
   overlay.id = 'city-selector-overlay';
-  overlay.style.cssText = 'z-index:3600;align-items:flex-end;display:flex;';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:3600;display:flex;align-items:flex-end;max-width:430px;left:50%;transform:translateX(-50%);';
+  overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
   overlay.innerHTML = `
     <div style="width:100%;max-width:430px;margin:0 auto;background:var(--white);border-radius:20px 20px 0 0;max-height:88vh;display:flex;flex-direction:column;">
       <div style="padding:1rem;border-bottom:1px solid var(--gray1);">
@@ -12475,8 +12479,7 @@ function updateCityHero(city) {
 // ---- CITY COMPARISON ----
 function openCityComparison() {
   const overlay = document.createElement('div');
-  overlay.className = 'overlay active';
-  overlay.style.cssText = 'z-index:3700;';
+  overlay.style.cssText = 'position:fixed;inset:0;background:var(--white);z-index:3700;max-width:430px;left:50%;transform:translateX(-50%);overflow-y:auto;';
   let selectedA = cityState.current, selectedB = null;
 
   const compData = {
@@ -12577,6 +12580,13 @@ renderHome = function() {
 
 // Initialize city from storage
 cityState.current = localStorage.getItem('selectedCity') || 'orlando';
+
+// Expose city functions as window globals so onclick="..." in innerHTML always works
+window.openCitySelector = openCitySelector;
+window.selectCity = selectCity;
+window.filterCityCards = filterCityCards;
+window.openCityComparison = openCityComparison;
+window.buildCompBody = function() { return typeof buildCompBody === 'function' ? buildCompBody() : ''; };
 </script>
 
 <script>
