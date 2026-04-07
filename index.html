@@ -27718,3 +27718,383 @@ window.renderBabyTab = renderBabyTab;
   };
 })();
 </script>
+<script>
+/* ===== BLOCK LL1: Dining Plan Calculator ===== */
+const DINING_PLAN_PRICES = {
+  'Quick Service': { adult: 15, child: 11 },
+  'Table Service (1 credit)': { adult: 35, child: 22 },
+  'Table Service (2 credits)': { adult: 65, child: 40 },
+  'Signature Dining': { adult: 70, child: 42 },
+  'Character Dining': { adult: 55, child: 35 },
+  'Snack': { adult: 6, child: 5 },
+};
+
+const PLAN_COSTS = {
+  'Disney Quick Service Plan': { adult: 57, child: 23, credits: { qs: 2, snack: 2 }, desc: '2 Quick-Service meals + 2 snacks per night' },
+  'Disney Dining Plan': { adult: 78, child: 30, credits: { qs: 1, ts1: 1, snack: 2 }, desc: '1 Quick-Service + 1 Table-Service + 2 snacks per night' },
+  'Disney Deluxe Dining Plan': { adult: 119, child: 47, credits: { any: 3, snack: 2 }, desc: '3 meals (any type) + 2 snacks per night' },
+};
+
+function openDiningCalculator() {
+  const existing = document.getElementById('dining-calc-overlay');
+  if (existing) existing.remove();
+  const data = JSON.parse(localStorage.getItem('diningCalc') || '{"nights":5,"adults":2,"children":0,"meals":[]}');
+  const el = document.createElement('div');
+  el.id = 'dining-calc-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;overflow-y:auto;max-width:430px;left:50%;transform:translateX(-50%);';
+
+  const mealTypes = Object.keys(DINING_PLAN_PRICES);
+  const mealTotal = data.meals.reduce((s,m) => {
+    const price = DINING_PLAN_PRICES[m.type];
+    return s + (m.adults||0)*price.adult + (m.children||0)*price.child;
+  }, 0);
+
+  el.innerHTML = `
+    <div style="background:linear-gradient(135deg,#BF360C,#E64A19,#FF7043);padding:18px 16px 20px;position:sticky;top:0;z-index:1;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <button onclick="document.getElementById('dining-calc-overlay').remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;">←</button>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;">🍽️ Dining Plan Calculator</div>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:14px;padding:14px;">
+        <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.7);margin-bottom:10px;">TRIP DETAILS</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+          <div>
+            <div style="font-size:10px;color:rgba(255,255,255,.7);margin-bottom:4px;">NIGHTS</div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <button onclick="dcAdj('nights',-1)" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:24px;height:24px;color:#fff;font-size:14px;cursor:pointer;line-height:1;">−</button>
+              <span id="dc-nights" style="font-size:16px;font-weight:800;color:#fff;">${data.nights}</span>
+              <button onclick="dcAdj('nights',1)" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:24px;height:24px;color:#fff;font-size:14px;cursor:pointer;line-height:1;">+</button>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:10px;color:rgba(255,255,255,.7);margin-bottom:4px;">ADULTS</div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <button onclick="dcAdj('adults',-1)" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:24px;height:24px;color:#fff;font-size:14px;cursor:pointer;line-height:1;">−</button>
+              <span id="dc-adults" style="font-size:16px;font-weight:800;color:#fff;">${data.adults}</span>
+              <button onclick="dcAdj('adults',1)" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:24px;height:24px;color:#fff;font-size:14px;cursor:pointer;line-height:1;">+</button>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:10px;color:rgba(255,255,255,.7);margin-bottom:4px;">KIDS (3–9)</div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <button onclick="dcAdj('children',-1)" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:24px;height:24px;color:#fff;font-size:14px;cursor:pointer;line-height:1;">−</button>
+              <span id="dc-children" style="font-size:16px;font-weight:800;color:#fff;">${data.children}</span>
+              <button onclick="dcAdj('children',1)" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:24px;height:24px;color:#fff;font-size:14px;cursor:pointer;line-height:1;">+</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:14px 16px 80px;">
+      <!-- Add Meals -->
+      <div style="font-size:12px;font-weight:700;color:#9E9E9E;margin-bottom:8px;">ADD PLANNED MEALS</div>
+      <div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:14px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+          <div>
+            <div style="font-size:11px;font-weight:700;color:#9E9E9E;margin-bottom:5px;">MEAL TYPE</div>
+            <select id="dc-meal-type" style="width:100%;border:1px solid var(--border,#eee);border-radius:8px;padding:8px;font-size:12px;font-family:'DM Sans',sans-serif;background:var(--bg,#F9F9F9);color:var(--text-primary);">
+              ${mealTypes.map(t => `<option>${t}</option>`).join('')}
+            </select>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+            <div>
+              <div style="font-size:11px;font-weight:700;color:#9E9E9E;margin-bottom:5px;">ADULTS</div>
+              <input id="dc-meal-adults" type="number" min="0" value="${data.adults}" style="width:100%;border:1px solid var(--border,#eee);border-radius:8px;padding:8px;font-size:13px;font-family:'DM Sans',sans-serif;background:var(--bg,#F9F9F9);color:var(--text-primary);box-sizing:border-box;">
+            </div>
+            <div>
+              <div style="font-size:11px;font-weight:700;color:#9E9E9E;margin-bottom:5px;">KIDS</div>
+              <input id="dc-meal-kids" type="number" min="0" value="${data.children}" style="width:100%;border:1px solid var(--border,#eee);border-radius:8px;padding:8px;font-size:13px;font-family:'DM Sans',sans-serif;background:var(--bg,#F9F9F9);color:var(--text-primary);box-sizing:border-box;">
+            </div>
+          </div>
+        </div>
+        <button onclick="addDCMeal()" style="width:100%;background:#E64A19;border:none;border-radius:10px;padding:10px;color:#fff;font-size:13px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;">+ Add Meal</button>
+      </div>
+      <!-- Meal List -->
+      ${data.meals.length > 0 ? `
+      <div style="font-size:12px;font-weight:700;color:#9E9E9E;margin-bottom:8px;">PLANNED MEALS — Total OOP: <span style="color:#E64A19;">$${mealTotal.toFixed(2)}</span></div>
+      ${data.meals.map((m,i) => `<div style="background:var(--card-bg,#fff);border-radius:12px;padding:10px 12px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;">
+        <div><div style="font-size:12px;font-weight:700;color:var(--text-primary);">${m.type}</div>
+        <div style="font-size:10px;color:#9E9E9E;">${m.adults}A + ${m.children}K</div></div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:13px;font-weight:700;color:#E64A19;">$${((m.adults||0)*DINING_PLAN_PRICES[m.type].adult+(m.children||0)*DINING_PLAN_PRICES[m.type].child).toFixed(2)}</span>
+          <button onclick="removeDCMeal(${i})" style="background:none;border:none;color:#BDBDBD;font-size:13px;cursor:pointer;">✕</button>
+        </div>
+      </div>`).join('')}` : ''}
+      <!-- Plan Comparison -->
+      <div style="font-size:12px;font-weight:700;color:#9E9E9E;margin:14px 0 8px;">DINING PLAN COMPARISON</div>
+      ${Object.entries(PLAN_COSTS).map(([plan, details]) => {
+        const planTotal = (data.adults * details.adult + data.children * details.child) * data.nights;
+        const diff = mealTotal - planTotal;
+        const worth = diff > 0;
+        return `<div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:10px;border-left:4px solid ${worth?'#4CAF50':'#9E9E9E'};">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+            <div style="font-size:13px;font-weight:800;color:var(--text-primary);">${plan}</div>
+            <div style="font-size:16px;font-weight:800;color:${worth?'#2E7D32':'#9E9E9E'};">${worth?'✓ Worth it':'✗ Skip it'}</div>
+          </div>
+          <div style="font-size:11px;color:#9E9E9E;margin-bottom:8px;">${details.desc}</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
+            <div style="background:var(--bg,#F9F9F9);border-radius:8px;padding:6px;text-align:center;">
+              <div style="font-size:14px;font-weight:800;color:var(--text-primary);">$${planTotal.toFixed(0)}</div>
+              <div style="font-size:9px;color:#9E9E9E;font-weight:700;">PLAN COST</div>
+            </div>
+            <div style="background:var(--bg,#F9F9F9);border-radius:8px;padding:6px;text-align:center;">
+              <div style="font-size:14px;font-weight:800;color:var(--text-primary);">$${mealTotal.toFixed(0)}</div>
+              <div style="font-size:9px;color:#9E9E9E;font-weight:700;">OOP COST</div>
+            </div>
+            <div style="background:${worth?'#E8F5E9':'#FFEBEE'};border-radius:8px;padding:6px;text-align:center;">
+              <div style="font-size:14px;font-weight:800;color:${worth?'#2E7D32':'#C62828'};">${diff>=0?'+':'-'}$${Math.abs(diff).toFixed(0)}</div>
+              <div style="font-size:9px;color:#9E9E9E;font-weight:700;">${worth?'SAVINGS':'EXTRA'}</div>
+            </div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  document.body.appendChild(el);
+}
+window.openDiningCalculator = openDiningCalculator;
+
+function dcAdj(field, delta) {
+  const d = JSON.parse(localStorage.getItem('diningCalc') || '{"nights":5,"adults":2,"children":0,"meals":[]}');
+  d[field] = Math.max(0, (d[field]||0) + delta);
+  if (field === 'nights') d[field] = Math.max(1, d[field]);
+  if (field === 'adults') d[field] = Math.max(1, d[field]);
+  localStorage.setItem('diningCalc', JSON.stringify(d));
+  document.getElementById('dining-calc-overlay').remove(); openDiningCalculator();
+}
+window.dcAdj = dcAdj;
+
+function addDCMeal() {
+  const type = document.getElementById('dc-meal-type')?.value;
+  const adults = parseInt(document.getElementById('dc-meal-adults')?.value)||0;
+  const children = parseInt(document.getElementById('dc-meal-kids')?.value)||0;
+  if (!type) return;
+  const d = JSON.parse(localStorage.getItem('diningCalc') || '{"nights":5,"adults":2,"children":0,"meals":[]}');
+  d.meals.push({ type, adults, children });
+  localStorage.setItem('diningCalc', JSON.stringify(d));
+  document.getElementById('dining-calc-overlay').remove(); openDiningCalculator();
+}
+window.addDCMeal = addDCMeal;
+
+function removeDCMeal(i) {
+  const d = JSON.parse(localStorage.getItem('diningCalc') || '{"nights":5,"adults":2,"children":0,"meals":[]}');
+  d.meals.splice(i,1);
+  localStorage.setItem('diningCalc', JSON.stringify(d));
+  document.getElementById('dining-calc-overlay').remove(); openDiningCalculator();
+}
+window.removeDCMeal = removeDCMeal;
+</script>
+<script>
+/* ===== BLOCK LL2: Orlando Neighborhoods Guide ===== */
+const NEIGHBORHOODS = [
+  {
+    name: 'Winter Park',
+    tagline: 'Upscale boutiques, lakeside dining & world-class museums',
+    vibe: 'Sophisticated & Cultural',
+    icon: '🌿',
+    color: '#2E7D32',
+    highlights: [
+      { icon:'🎨', name:'The Charles Hosmer Morse Museum', note:'World\'s largest collection of Tiffany glass. Don\'t miss the chapel.'},
+      { icon:'🚢', name:'Scenic Boat Tour', note:'1-hour lakeside tour through the chain of lakes. Runs daily.'},
+      { icon:'🛍️', name:'Park Avenue Shopping', note:'Boutiques, galleries, sidewalk cafés. Best Sunday morning walk.'},
+      { icon:'🌳', name:'Mead Botanical Garden', note:'Free admission. Peaceful escape from park chaos.'},
+      { icon:'🍝', name:'Prato Restaurant', note:'Best pasta in Orlando. Outdoor seating on Park Ave.'},
+    ],
+    getHere: '20 min from Disney via I-4 East → 17-92 North. Free street parking.',
+    bestFor: 'Adults, couples, museum lovers, foodies',
+  },
+  {
+    name: 'Mills 50',
+    tagline: 'Orlando\'s arts & culture hub with Asian dining & vintage shops',
+    vibe: 'Artsy & Eclectic',
+    icon: '🎭',
+    color: '#6A1B9A',
+    highlights: [
+      { icon:'🍜', name:'Little Saigon / Pho & Banh Mi strip', note:'Authentic Vietnamese. Multiple spots on Mills Ave.'},
+      { icon:'🍣', name:'Se7en Bites Bakery', note:'Southern comfort + incredible baked goods. Lines form early.'},
+      { icon:'🛍️', name:'Vintage & Thrift Shops', note:'Decades-old stores with unique Orlando finds.'},
+      { icon:'🎨', name:'Street Art Murals', note:'Walk the neighborhood for rotating large-scale murals.'},
+      { icon:'🎶', name:'Will\'s Pub', note:'Local live music institution. Indie and alternative acts nightly.'},
+    ],
+    getHere: '15 min from downtown via Mills Ave. Street parking throughout.',
+    bestFor: 'Young adults, foodies, art lovers, night owls',
+  },
+  {
+    name: 'Downtown Orlando',
+    tagline: 'City skyline, rooftop bars & Lake Eola\'s swan boats',
+    vibe: 'Urban & Vibrant',
+    icon: '🏙️',
+    color: '#1565C0',
+    highlights: [
+      { icon:'🦢', name:'Lake Eola Park', note:'Walk the 0.9-mile path. Rent a swan pedal boat for $15/30 min.'},
+      { icon:'🍸', name:'The Courtesy Bar', note:'James Beard-recognized cocktail bar. Pre-Prohibition classics.'},
+      { icon:'🎪', name:'Dr. Phillips Center', note:'World-class Broadway touring shows and concerts.'},
+      { icon:'🌮', name:'Reyes Mezcaleria', note:'Acclaimed Mexican + mezcal bar. Rooftop seating.'},
+      { icon:'🏛️', name:'Orange County Regional History Center', note:'Free on Sundays. Florida history from pre-Columbian to present.'},
+    ],
+    getHere: '25 min from Disney via I-4 East. Parking garages on Magnolia Ave (~$5/day on weekends).',
+    bestFor: 'Culture seekers, nightlife, couples, locals',
+  },
+  {
+    name: 'Ivanhoe Village',
+    tagline: 'Antique shops, breweries & independent boutiques along Lake Ivanhoe',
+    vibe: 'Quirky & Laid-Back',
+    icon: '🏺',
+    color: '#E65100',
+    highlights: [
+      { icon:'🏺', name:'Antique Row', note:'Multi-dealer antique shops in historic buildings. Great finds.'},
+      { icon:'🍺', name:'Washburn Imports Craft Beer', note:'Imported beers + laid-back atmosphere.'},
+      { icon:'☕', name:'Lineage Coffee Roasting', note:'Specialty coffee roaster. Exceptional pour-overs.'},
+      { icon:'🛍️', name:'Independent Boutiques', note:'Unique home goods, clothing, and local art.'},
+      { icon:'🌊', name:'Lake Ivanhoe Waterfront', note:'Quiet lakeside walks away from tourist crowds.'},
+    ],
+    getHere: '20 min from Disney. Just north of downtown on Orange Ave.',
+    bestFor: 'Antique hunters, coffee enthusiasts, leisurely browsers',
+  },
+  {
+    name: 'Lake Nona',
+    tagline: 'Futuristic planned community near the airport with dining and wellness',
+    vibe: 'Modern & Family-Friendly',
+    icon: '🏡',
+    color: '#00838F',
+    highlights: [
+      { icon:'🏋️', name:'USTA National Campus', note:'World\'s largest tennis facility — open for public play.'},
+      { icon:'🍕', name:'Lake Nona Town Center', note:'Curated dining, shopping and entertainment hub.'},
+      { icon:'🚴', name:'Boxi Park', note:'Outdoor container park with food trucks and live music.'},
+      { icon:'🏥', name:'Medical City', note:'Cutting-edge hospital campus — useful to know if needed.'},
+      { icon:'🎨', name:'Public Art Installations', note:'Multiple large-scale art pieces throughout the community.'},
+    ],
+    getHere: '10 min from MCO Airport. 30 min from Disney via 417.',
+    bestFor: 'Families, sports enthusiasts, travelers staying near airport',
+  },
+  {
+    name: 'Thornton Park',
+    tagline: 'Charming bungalow neighborhood with sidewalk cafés on Lake Eola',
+    vibe: 'Relaxed & Romantic',
+    icon: '🌺',
+    color: '#AD1457',
+    highlights: [
+      { icon:'☕', name:'Sidewalk Cafés on Washington St.', note:'Weekend brunch hub. Outdoor seating + lake views.'},
+      { icon:'🍷', name:'Dexter\'s of Thornton Park', note:'Wine bar and New American comfort food.'},
+      { icon:'🏡', name:'Historic Bungalows', note:'Walk the oak-lined streets for 1920s Florida architecture.'},
+      { icon:'🦢', name:'Lake Eola Walkway', note:'Connecting path to the swan boats and farmers market.'},
+      { icon:'🥐', name:'Sunday Farmers Market', note:'Every Sunday 10am–4pm on Central Ave.'},
+    ],
+    getHere: 'Adjacent to downtown Orlando. 5-min walk from Lake Eola.',
+    bestFor: 'Couples, brunch lovers, weekend explorers',
+  },
+];
+
+window._nbrIdx = 0;
+
+function openNeighborhoodGuide() {
+  const existing = document.getElementById('nbr-overlay');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'nbr-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;display:flex;flex-direction:column;max-width:430px;left:50%;transform:translateX(-50%);';
+  el.innerHTML = `
+    <div style="background:linear-gradient(135deg,#33691E,#558B2F,#8BC34A);padding:18px 16px 14px;flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <button onclick="document.getElementById('nbr-overlay').remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;">←</button>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;">🗺️ Orlando Neighborhoods</div>
+      </div>
+      <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;" id="nbr-tabs">
+        ${NEIGHBORHOODS.map((n,i) => `<button onclick="setNbrIdx(${i},this)" style="flex-shrink:0;border-radius:20px;padding:5px 12px;border:1.5px solid ${i===0?'#fff':'rgba(255,255,255,.4)'};background:${i===0?'rgba(255,255,255,.25)':'transparent'};color:#fff;font-size:10px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">${n.icon} ${n.name.split(' ')[0]}</button>`).join('')}
+      </div>
+    </div>
+    <div style="overflow-y:auto;flex:1;padding:14px 16px 80px;" id="nbr-content"></div>`;
+  document.body.appendChild(el);
+  renderNeighborhood(0);
+}
+window.openNeighborhoodGuide = openNeighborhoodGuide;
+
+function setNbrIdx(i, btn) {
+  window._nbrIdx = i;
+  document.querySelectorAll('#nbr-tabs button').forEach(b => { b.style.background='transparent'; b.style.borderColor='rgba(255,255,255,.4)'; });
+  btn.style.background='rgba(255,255,255,.25)'; btn.style.borderColor='#fff';
+  renderNeighborhood(i);
+}
+window.setNbrIdx = setNbrIdx;
+
+function renderNeighborhood(i) {
+  const el = document.getElementById('nbr-content');
+  if (!el) return;
+  const n = NEIGHBORHOODS[i];
+  el.innerHTML = `
+    <div style="background:${n.color};border-radius:16px;padding:16px;margin-bottom:14px;">
+      <div style="font-size:32px;margin-bottom:6px;">${n.icon}</div>
+      <div style="font-size:20px;font-weight:800;color:#fff;margin-bottom:4px;">${n.name}</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.85);margin-bottom:8px;">${n.tagline}</div>
+      <div style="background:rgba(255,255,255,.15);border-radius:8px;padding:4px 10px;display:inline-block;">
+        <span style="font-size:11px;font-weight:700;color:#fff;">${n.vibe}</span>
+      </div>
+    </div>
+    <div style="font-size:12px;font-weight:700;color:#9E9E9E;margin-bottom:8px;">TOP HIGHLIGHTS</div>
+    ${n.highlights.map(h => `
+      <div style="background:var(--card-bg,#fff);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:flex-start;gap:10px;">
+        <span style="font-size:22px;">${h.icon}</span>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--text-primary);">${h.name}</div>
+          <div style="font-size:11px;color:#9E9E9E;line-height:1.4;margin-top:2px;">${h.note}</div>
+        </div>
+      </div>`).join('')}
+    <div style="background:${n.color}11;border:1px solid ${n.color}33;border-radius:14px;padding:14px;margin-top:6px;">
+      <div style="font-size:12px;font-weight:700;color:${n.color};margin-bottom:6px;">🚗 Getting There</div>
+      <div style="font-size:12px;color:#757575;line-height:1.5;">${n.getHere}</div>
+      <div style="font-size:12px;font-weight:700;color:${n.color};margin:8px 0 4px;">👥 Best For</div>
+      <div style="font-size:12px;color:#757575;">${n.bestFor}</div>
+    </div>`;
+}
+window.renderNeighborhood = renderNeighborhood;
+</script>
+<style>
+/* ===== BLOCK LL CSS ===== */
+#nbr-tabs::-webkit-scrollbar{display:none;}
+#nbr-tabs{-ms-overflow-style:none;scrollbar-width:none;}
+#dc-meal-type:focus,#dc-meal-adults:focus,#dc-meal-kids:focus{outline:none;}
+</style>
+<script>
+/* ===== BLOCK LL: Wiring ===== */
+(function wireLLFeatures() {
+  const LL_QUICK = [
+    { icon:'🍽️', label:'Dining Calc',    fn: openDiningCalculator },
+    { icon:'🗺️', label:'Neighborhoods',  fn: openNeighborhoodGuide },
+  ];
+
+  const _prevRH = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH) _prevRH.apply(this, arguments);
+    setTimeout(() => {
+      const row = document.getElementById('y-quick-row');
+      if (!row || row.querySelector('[data-ll-quick]')) return;
+      LL_QUICK.forEach(b => {
+        const btn = document.createElement('button');
+        btn.setAttribute('data-ll-quick','1');
+        btn.style.cssText = "flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:5px;background:var(--card-bg,#fff);border:1px solid var(--border,#eee);border-radius:14px;padding:12px 14px;cursor:pointer;font-family:'DM Sans',sans-serif;";
+        btn.innerHTML = `<span style="font-size:22px;">${b.icon}</span><span style="font-size:11px;font-weight:700;color:var(--text-primary,#212121);white-space:nowrap;">${b.label}</span>`;
+        btn.onclick = b.fn;
+        row.appendChild(btn);
+      });
+    }, 480);
+  };
+
+  const _prevRA = window.renderAccount;
+  window.renderAccount = function() {
+    if (_prevRA) _prevRA.apply(this, arguments);
+    setTimeout(() => {
+      const loggedIn = document.querySelector('.account-loggedin');
+      if (!loggedIn || loggedIn.querySelector('[data-ll-items]')) return;
+      const adminBtn = loggedIn.querySelector('.adm-account-btn');
+      const labels = { 'Dining Calc':'Dining Plan Calculator', 'Neighborhoods':'Orlando Neighborhoods Guide' };
+      LL_QUICK.forEach(item => {
+        const el = document.createElement('div');
+        el.setAttribute('data-ll-items','1');
+        el.className = 'account-menu-item';
+        el.innerHTML = `<span class="icon">${item.icon}</span><span>${labels[item.label]||item.label}</span><span class="arrow">›</span>`;
+        el.onclick = item.fn;
+        loggedIn.insertBefore(el, adminBtn || null);
+      });
+    }, 170);
+  };
+})();
+</script>
