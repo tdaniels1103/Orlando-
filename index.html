@@ -23944,3 +23944,637 @@ window.updateTicketCalc = updateTicketCalc;
   };
 })();
 </script>
+<script>
+/* ===== BLOCK CC1: Virtual Queue / Lightning Lane Simulator ===== */
+const VIRTUAL_QUEUE_RIDES = [
+  { id:'vq1', park:'Magic Kingdom',      name:'Seven Dwarfs Mine Train', emoji:'⛏️', currentWait:75, llPrice:12, tier:'Tier 1', capacity:100, booked:0 },
+  { id:'vq2', park:'Magic Kingdom',      name:'Space Mountain',          emoji:'🚀', currentWait:50, llPrice:10, tier:'Tier 2', capacity:150, booked:0 },
+  { id:'vq3', park:'Magic Kingdom',      name:'Big Thunder Mountain',    emoji:'🏔️', currentWait:40, llPrice:10, tier:'Tier 2', capacity:200, booked:0 },
+  { id:'vq4', park:'EPCOT',              name:'Guardians of the Galaxy', emoji:'🌌', currentWait:80, llPrice:15, tier:'Tier 1', capacity:80,  booked:0 },
+  { id:'vq5', park:'EPCOT',              name:'Test Track',              emoji:'🚗', currentWait:55, llPrice:10, tier:'Tier 2', capacity:120, booked:0 },
+  { id:'vq6', park:'Hollywood Studios',  name:'Slinky Dog Dash',         emoji:'🐕', currentWait:70, llPrice:12, tier:'Tier 1', capacity:90,  booked:0 },
+  { id:'vq7', park:'Animal Kingdom',     name:'Avatar: Flight of Passage',emoji:'🦋',currentWait:90, llPrice:15, tier:'Tier 1', capacity:70,  booked:0 },
+  { id:'vq8', park:'Universal',          name:'Hagrid\'s Motorbike',    emoji:'🏍️', currentWait:110,llPrice:20, tier:'Tier 1', capacity:60,  booked:0 },
+  { id:'vq9', park:'Universal',          name:'VelociCoaster',           emoji:'🦖', currentWait:85, llPrice:15, tier:'Tier 1', capacity:100, booked:0 },
+  { id:'vq10',park:'Universal',          name:'Escape from Gringotts',   emoji:'🐉', currentWait:65, llPrice:12, tier:'Tier 2', capacity:110, booked:0 },
+];
+
+window._myQueues = JSON.parse(localStorage.getItem('myQueues') || '[]');
+window._queueFilter = 'all';
+
+function saveQueues() { localStorage.setItem('myQueues', JSON.stringify(window._myQueues)); }
+
+function openVirtualQueue() {
+  const existing = document.getElementById('vqueue-overlay');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'vqueue-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;overflow-y:auto;max-width:430px;left:50%;transform:translateX(-50%);';
+  el.innerHTML = `
+    <div style="background:linear-gradient(135deg,#1A1A2E,#16213E);padding:18px 16px;position:sticky;top:0;z-index:1;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <button onclick="document.getElementById('vqueue-overlay').remove()" style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;">←</button>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;">⚡ Lightning Lane</div>
+        <button onclick="openMyQueues()" style="background:rgba(255,255,255,.15);border:none;border-radius:10px;padding:5px 10px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">My Passes ${window._myQueues.length > 0 ? '('+window._myQueues.length+')' : ''}</button>
+      </div>
+      <div style="display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;">
+        ${['all','Magic Kingdom','EPCOT','Hollywood Studios','Animal Kingdom','Universal'].map(p =>
+          `<button class="vq-filter-btn ${p==='all'?'active':''}" data-park="${p}" onclick="setVQFilter('${p}',this)" style="flex-shrink:0;padding:5px 10px;border-radius:10px;border:2px solid ${p==='all'?'#FF6B35':'rgba(255,255,255,.2)'};background:${p==='all'?'rgba(255,107,53,.25)':'transparent'};color:${p==='all'?'#FF6B35':'rgba(255,255,255,.8)'};font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;">${p==='all'?'All Parks':p.split(' ')[0]}</button>`
+        ).join('')}
+      </div>
+    </div>
+    <div style="padding:12px 16px 8px;">
+      <div style="background:#FFF3EE;border-radius:10px;padding:10px 12px;font-size:12px;color:#FF6B35;font-weight:600;display:flex;gap:8px;align-items:center;">
+        <span>💡</span><span>Book Lightning Lane to skip the standby queue. Prices and availability update live.</span>
+      </div>
+    </div>
+    <div id="vqueue-list" style="padding:8px 16px 80px;"></div>`;
+  document.body.appendChild(el);
+  renderVQueueList('all');
+
+  // Fluctuate wait times every 30s
+  window._vqInterval = setInterval(() => {
+    VIRTUAL_QUEUE_RIDES.forEach(r => {
+      r.currentWait = Math.max(5, Math.min(150, r.currentWait + Math.floor(Math.random()*11)-5));
+    });
+    renderVQueueList(window._queueFilter || 'all');
+  }, 30000);
+  el.addEventListener('remove', () => clearInterval(window._vqInterval), { once:true });
+}
+window.openVirtualQueue = openVirtualQueue;
+
+function setVQFilter(park, btn) {
+  window._queueFilter = park;
+  document.querySelectorAll('.vq-filter-btn').forEach(b => {
+    b.style.borderColor = 'rgba(255,255,255,.2)';
+    b.style.background = 'transparent';
+    b.style.color = 'rgba(255,255,255,.8)';
+    b.classList.remove('active');
+  });
+  btn.style.borderColor = '#FF6B35';
+  btn.style.background = 'rgba(255,107,53,.25)';
+  btn.style.color = '#FF6B35';
+  btn.classList.add('active');
+  renderVQueueList(park);
+}
+window.setVQFilter = setVQFilter;
+
+function renderVQueueList(park) {
+  const el = document.getElementById('vqueue-list');
+  if (!el) return;
+  const rides = park === 'all' ? VIRTUAL_QUEUE_RIDES : VIRTUAL_QUEUE_RIDES.filter(r => r.park === park);
+  const waitColor = w => w < 30 ? '#4CAF50' : w < 60 ? '#FFC107' : w < 90 ? '#FF5722' : '#E53935';
+  const avail = r => Math.max(0, r.capacity - r.booked);
+
+  el.innerHTML = rides.map(r => {
+    const already = window._myQueues.find(q => q.id === r.id);
+    const pct = Math.min(100,(r.booked/r.capacity)*100);
+    return `<div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:10px;box-shadow:0 2px 10px rgba(0,0,0,.06);">
+      <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;">
+        <div style="width:50px;height:50px;border-radius:14px;background:#1A1A2E;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;">${r.emoji}</div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:700;color:var(--text-primary);">${r.name}</div>
+          <div style="font-size:11px;color:#9E9E9E;margin-top:2px;">${r.park} · <span style="background:${r.tier==='Tier 1'?'#FFD700':'#E0E0E0'};color:${r.tier==='Tier 1'?'#212121':'#616161'};border-radius:4px;padding:1px 5px;font-weight:700;">${r.tier}</span></div>
+          <div style="display:flex;align-items:center;gap:12px;margin-top:6px;">
+            <div style="font-size:13px;font-weight:800;color:${waitColor(r.currentWait)};">${r.currentWait}m standby</div>
+            <div style="font-size:12px;color:#FF6B35;font-weight:700;">$${r.llPrice} LL</div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-bottom:8px;">
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:#9E9E9E;margin-bottom:4px;">
+          <span>Availability: ${avail(r)} passes left</span>
+          <span>${pct.toFixed(0)}% booked</span>
+        </div>
+        <div style="height:5px;background:#F0F0F0;border-radius:3px;overflow:hidden;">
+          <div style="height:100%;width:${pct}%;background:${pct>80?'#E53935':pct>50?'#FFC107':'#4CAF50'};border-radius:3px;transition:width .5s;"></div>
+        </div>
+      </div>
+      ${already
+        ? `<div style="background:#E8F5E9;border-radius:10px;padding:10px;text-align:center;font-size:12px;font-weight:700;color:#2E7D32;">✓ Pass Booked · Return ${already.returnTime}</div>`
+        : `<button onclick="bookLightningLane('${r.id}')" ${avail(r)===0?'disabled':''} style="width:100%;background:${avail(r)>0?'linear-gradient(135deg,#FF6B35,#FFD700)':'#F5F5F5'};border:none;border-radius:10px;padding:11px;color:${avail(r)>0?'#fff':'#BDBDBD'};font-size:13px;font-weight:800;cursor:${avail(r)>0?'pointer':'not-allowed'};font-family:'DM Sans',sans-serif;">${avail(r)>0?'⚡ Book Lightning Lane — $'+r.llPrice:'Sold Out'}</button>`
+      }
+    </div>`;
+  }).join('');
+}
+window.renderVQueueList = renderVQueueList;
+
+function bookLightningLane(rideId) {
+  const ride = VIRTUAL_QUEUE_RIDES.find(r => r.id === rideId);
+  if (!ride || ride.booked >= ride.capacity) return;
+
+  // Generate return window
+  const now = new Date();
+  const returnHour = now.getHours() + 1 + Math.floor(Math.random()*3);
+  const returnMin = Math.floor(Math.random()*4)*15;
+  const returnTime = `${returnHour > 12 ? returnHour-12 : returnHour}:${String(returnMin).padStart(2,'0')} ${returnHour>=12?'PM':'AM'}–${returnHour+1>12?returnHour+1-12:returnHour+1}:${String(returnMin).padStart(2,'0')} ${returnHour+1>=12?'PM':'AM'}`;
+
+  ride.booked = Math.min(ride.capacity, ride.booked + Math.floor(Math.random()*3+1));
+  const pass = { id: rideId, name: ride.name, emoji: ride.emoji, park: ride.park, price: ride.llPrice, returnTime, bookedAt: Date.now() };
+  window._myQueues.push(pass);
+  saveQueues();
+
+  // Update header button text
+  const headerBtn = document.querySelector('#vqueue-overlay button[onclick*="openMyQueues"]');
+  if (headerBtn) headerBtn.textContent = `My Passes (${window._myQueues.length})`;
+
+  renderVQueueList(window._queueFilter || 'all');
+
+  // Confirmation flash
+  const flash = document.createElement('div');
+  flash.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#FF6B35,#FFD700);color:#fff;border-radius:14px;padding:14px 20px;font-size:13px;font-weight:700;font-family:"DM Sans",sans-serif;z-index:9999;text-align:center;box-shadow:0 4px 20px rgba(255,107,53,.5);animation:slideUp .3s ease;max-width:320px;';
+  flash.innerHTML = `⚡ Pass Booked!<br><span style="font-size:11px;opacity:.9;">${ride.name} · Return ${returnTime}</span>`;
+  document.body.appendChild(flash);
+  setTimeout(() => flash.remove(), 3000);
+
+  if (typeof awardPoints !== 'undefined') awardPoints(20, 'Lightning Lane booked');
+  if (typeof pushNotif !== 'undefined') pushNotif('trip', '⚡', 'Lightning Lane Booked!', `${ride.name} · Return window: ${returnTime}`);
+}
+window.bookLightningLane = bookLightningLane;
+
+function openMyQueues() {
+  const passes = window._myQueues;
+  const el = document.createElement('div');
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:9000;overflow-y:auto;max-width:430px;left:50%;transform:translateX(-50%);';
+  el.innerHTML = `<div style="background:var(--card-bg,#fff);border-bottom:1px solid var(--border,#eee);padding:14px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:1;">
+    <button onclick="this.closest('[style*=inset]').remove()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-primary);">←</button>
+    <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--text-primary);">My Lightning Passes</div>
+  </div>
+  <div style="padding:16px 16px 80px;">
+    ${!passes.length ? '<div style="text-align:center;padding:40px;color:#9E9E9E;font-size:13px;">No passes booked yet</div>' :
+      passes.map((p,i) => `<div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:10px;border-left:4px solid #FF6B35;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+          <span style="font-size:28px;">${p.emoji}</span>
+          <div style="flex:1;">
+            <div style="font-size:14px;font-weight:700;color:var(--text-primary);">${p.name}</div>
+            <div style="font-size:11px;color:#9E9E9E;">${p.park}</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:12px;font-weight:800;color:#FF6B35;">$${p.price}</div>
+          </div>
+        </div>
+        <div style="background:#FFF3EE;border-radius:8px;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;">
+          <div style="font-size:11px;color:#FF6B35;font-weight:700;">⏰ Return Window</div>
+          <div style="font-size:12px;font-weight:800;color:var(--text-primary);">${p.returnTime}</div>
+        </div>
+        <button onclick="cancelPass(${i},this.closest('[style*=border-left]'))" style="margin-top:8px;background:none;border:1px solid #BDBDBD;border-radius:8px;padding:5px 12px;font-size:11px;color:#9E9E9E;cursor:pointer;font-family:'DM Sans',sans-serif;">Cancel Pass</button>
+      </div>`).join('')}
+  </div>`;
+  document.body.appendChild(el);
+}
+window.openMyQueues = openMyQueues;
+
+function cancelPass(idx, card) {
+  window._myQueues.splice(idx, 1);
+  saveQueues();
+  card?.remove();
+  const headerBtn = document.querySelector('#vqueue-overlay button[onclick*="openMyQueues"]');
+  if (headerBtn) headerBtn.textContent = window._myQueues.length > 0 ? `My Passes (${window._myQueues.length})` : 'My Passes';
+  renderVQueueList(window._queueFilter || 'all');
+  if (typeof showToast !== 'undefined') showToast('Pass cancelled');
+}
+window.cancelPass = cancelPass;
+</script>
+<script>
+/* ===== BLOCK CC2: Smart Packing List Generator ===== */
+const PACKING_CATEGORIES = {
+  essentials: { label:'Essentials', icon:'⚡', items:['Passport / ID','Credit cards','Travel insurance docs','Phone + charger','Portable battery pack','Earbuds / headphones','Prescription medications','Sunglasses'] },
+  clothing:   { label:'Clothing',   icon:'👕', items:['Comfortable walking shoes (2 pairs)','Moisture-wicking socks (7 pairs)','T-shirts / tank tops','Shorts / lightweight pants','Light jacket or hoodie','Swimsuit','Rain poncho','Hat / cap with brim'] },
+  park:       { label:'Park Gear',  icon:'🎢', items:['Sunscreen SPF 50+','Reusable water bottle','Small backpack / fanny pack','Snacks for the bag','Portable fan','Hand sanitizer','Blister pads','Park tickets (digital)'] },
+  hotel:      { label:'Hotel',      icon:'🏨', items:['Toiletry bag','Laundry bag','Plug adapter (international)','Packing cubes','Sleep mask','White noise app','Melatonin (jet lag)'] },
+  tech:       { label:'Tech',       icon:'📱', items:['Camera / extra SD cards','GoPro for rides','Car phone mount','Google Maps offline','Translation app','Orlando Guide app 😉','VPN app'] },
+  family:     { label:'Kids & Family',icon:'👨‍👩‍👧',items:['Stroller (or rent at park)','Diaper bag essentials','Kids sunscreen','Character autograph book & pen','Glow bracelets for nights','First aid mini kit','Change of clothes (kids)','Snacks kids love'] },
+  dining:     { label:'Dining',     icon:'🍽️', items:['Dining reservation confirmations','Restaurant wish list','OpenTable / Resy apps','Cash for tipping','Food allergy card (if needed)','Refillable mug (Disney)'] },
+};
+
+window._packingList = JSON.parse(localStorage.getItem('packingList') || 'null') || {};
+window._packingChecked = JSON.parse(localStorage.getItem('packingChecked') || '{}');
+
+function savePackingList() {
+  localStorage.setItem('packingList', JSON.stringify(window._packingList));
+  localStorage.setItem('packingChecked', JSON.stringify(window._packingChecked));
+}
+
+function openPackingList() {
+  const existing = document.getElementById('packing-overlay');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'packing-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;overflow-y:auto;max-width:430px;left:50%;transform:translateX(-50%);';
+
+  const totalItems = Object.values(window._packingList).flat().length;
+  const checkedCount = Object.values(window._packingChecked).filter(Boolean).length;
+
+  el.innerHTML = `
+    <div style="background:linear-gradient(135deg,#2E7D32,#66BB6A);padding:18px 16px 20px;position:sticky;top:0;z-index:1;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <button onclick="document.getElementById('packing-overlay').remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;">←</button>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;">🧳 Packing List</div>
+        <button onclick="generatePackingList()" style="background:rgba(255,255,255,.2);border:none;border-radius:10px;padding:5px 10px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">Generate</button>
+      </div>
+      ${totalItems > 0 ? `<div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px 12px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+          <span style="font-size:12px;color:rgba(255,255,255,.9);">${checkedCount} of ${totalItems} packed</span>
+          <span style="font-size:12px;color:rgba(255,255,255,.9);font-weight:700;">${totalItems>0?Math.round(checkedCount/totalItems*100):0}%</span>
+        </div>
+        <div style="height:6px;background:rgba(255,255,255,.2);border-radius:3px;overflow:hidden;">
+          <div style="height:100%;width:${totalItems>0?Math.round(checkedCount/totalItems*100):0}%;background:#fff;border-radius:3px;transition:width .5s;"></div>
+        </div>
+      </div>` : '<div style="font-size:13px;color:rgba(255,255,255,.8);">Tap Generate to build your list based on your trip</div>'}
+    </div>
+    <div id="packing-content" style="padding:16px 16px 80px;"></div>`;
+  document.body.appendChild(el);
+
+  if (totalItems === 0) {
+    generatePackingList();
+  } else {
+    renderPackingContent();
+  }
+}
+window.openPackingList = openPackingList;
+
+function generatePackingList() {
+  // Get trip context
+  const trip = JSON.parse(localStorage.getItem('tripManagerV2') || '{"trips":[]}').trips?.[0];
+  const personality = JSON.parse(localStorage.getItem('travelPersonality') || 'null');
+  const hasKids = window.appState?.user?.name?.includes('Family') || (trip?.places || []).some(p => typeof p === 'string' && (p.includes('Disney')||p.includes('Universal')));
+
+  const selected = ['essentials','clothing','park','hotel','tech'];
+  if (hasKids || personality?.type === 'Family Memory Maker') selected.push('family');
+  if (personality?.type === 'Culinary Adventurer') selected.push('dining');
+
+  window._packingList = {};
+  selected.forEach(cat => {
+    window._packingList[cat] = [...PACKING_CATEGORIES[cat].items];
+  });
+
+  // Add trip-specific items
+  if (trip?.dates?.start) {
+    const month = new Date(trip.dates.start).getMonth();
+    if (month >= 5 && month <= 8) {
+      window._packingList.essentials.push('Extra sunscreen (summer essential!)');
+      window._packingList.park.push('Cooling towel','Electrolyte packets');
+    } else if (month >= 11 || month <= 1) {
+      window._packingList.clothing.push('Light fleece for evenings');
+    }
+  }
+
+  window._packingChecked = {};
+  savePackingList();
+  renderPackingContent();
+  if (typeof showToast !== 'undefined') showToast('Packing list generated! 🧳');
+}
+window.generatePackingList = generatePackingList;
+
+function renderPackingContent() {
+  const el = document.getElementById('packing-content');
+  if (!el) return;
+
+  const cats = Object.keys(window._packingList);
+  if (!cats.length) { el.innerHTML = '<div style="text-align:center;padding:40px;color:#9E9E9E;">Tap Generate to create your list</div>'; return; }
+
+  el.innerHTML = cats.map(cat => {
+    const info = PACKING_CATEGORIES[cat] || { label:cat, icon:'📦' };
+    const items = window._packingList[cat] || [];
+    const catChecked = items.filter((_,i) => window._packingChecked[`${cat}_${i}`]).length;
+    return `<div style="background:var(--card-bg,#fff);border-radius:14px;padding:0;margin-bottom:12px;overflow:hidden;">
+      <div style="padding:12px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border,#F5F5F5);">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:20px;">${info.icon}</span>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--text-primary);">${info.label}</div>
+            <div style="font-size:11px;color:#9E9E9E;">${catChecked}/${items.length} packed</div>
+          </div>
+        </div>
+        <button onclick="addPackingItem('${cat}')" style="background:none;border:none;font-size:18px;cursor:pointer;color:#9E9E9E;">+</button>
+      </div>
+      <div style="padding:4px 0;">
+        ${items.map((item, i) => {
+          const key = `${cat}_${i}`;
+          const checked = !!window._packingChecked[key];
+          return `<label style="display:flex;align-items:center;gap:10px;padding:9px 14px;cursor:pointer;border-bottom:1px solid var(--border,#F9F9F9);">
+            <input type="checkbox" ${checked?'checked':''} onchange="togglePackItem('${cat}',${i},this)" style="width:18px;height:18px;accent-color:#2E7D32;flex-shrink:0;">
+            <span style="font-size:13px;color:var(--text-primary);${checked?'text-decoration:line-through;color:#9E9E9E;':''}">${item}</span>
+          </label>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }).join('') + `
+    <div style="display:flex;gap:8px;margin-top:4px;">
+      <button onclick="uncheckAllPacking()" style="flex:1;background:none;border:2px solid var(--border,#eee);border-radius:12px;padding:11px;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--text-primary);">Uncheck All</button>
+      <button onclick="sharePackingList()" style="flex:1;background:#2E7D32;border:none;border-radius:12px;padding:11px;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;color:#fff;">↗ Share List</button>
+    </div>`;
+}
+window.renderPackingContent = renderPackingContent;
+
+function togglePackItem(cat, idx, checkbox) {
+  const key = `${cat}_${idx}`;
+  window._packingChecked[key] = checkbox.checked;
+  savePackingList();
+  // Update progress bar
+  const totalItems = Object.values(window._packingList).flat().length;
+  const checkedCount = Object.values(window._packingChecked).filter(Boolean).length;
+  const pBar = document.querySelector('#packing-overlay [style*="width:"][style*="background:#fff"]');
+  if (pBar) pBar.style.width = (totalItems>0?Math.round(checkedCount/totalItems*100):0)+'%';
+  const pText = document.querySelector('#packing-overlay [style*="of"][style*="packed"]');
+  if (pText) pText.textContent = `${checkedCount} of ${totalItems} packed`;
+  // Update section count
+  const items = window._packingList[cat] || [];
+  const catChecked = items.filter((_,i) => window._packingChecked[`${cat}_${i}`]).length;
+  if (typeof showToast !== 'undefined' && checkedCount === totalItems) showToast('All packed! Have a great trip! ✈️');
+}
+window.togglePackItem = togglePackItem;
+
+function addPackingItem(cat) {
+  const item = prompt('Add item to ' + (PACKING_CATEGORIES[cat]?.label || cat) + ':');
+  if (!item?.trim()) return;
+  window._packingList[cat] = window._packingList[cat] || [];
+  window._packingList[cat].push(item.trim());
+  savePackingList();
+  renderPackingContent();
+}
+window.addPackingItem = addPackingItem;
+
+function uncheckAllPacking() {
+  window._packingChecked = {};
+  savePackingList();
+  renderPackingContent();
+}
+window.uncheckAllPacking = uncheckAllPacking;
+
+function sharePackingList() {
+  const items = Object.entries(window._packingList).map(([cat,items]) =>
+    `${PACKING_CATEGORIES[cat]?.icon||'📦'} ${PACKING_CATEGORIES[cat]?.label||cat}:\n${items.map(i=>'• '+i).join('\n')}`
+  ).join('\n\n');
+  const text = `🧳 My Orlando Packing List\n\n${items}`;
+  if (navigator.share) navigator.share({ title:'Orlando Packing List', text });
+  else if (navigator.clipboard) { navigator.clipboard.writeText(text); if (typeof showToast !== 'undefined') showToast('List copied! 📋'); }
+}
+window.sharePackingList = sharePackingList;
+</script>
+<script>
+/* ===== BLOCK CC3: Neighborhood Guide + Transportation Hub ===== */
+
+/* ---------- NEIGHBORHOOD GUIDE ---------- */
+const NEIGHBORHOODS = [
+  {
+    id:'idrive', name:'International Drive', emoji:'🎡', vibe:'Tourist Central',
+    desc:'The beating heart of Orlando tourism — 11 miles of hotels, restaurants, attractions, and shops. Perfect for first-timers who want everything walkable.',
+    highlights:['ICON Park & The Wheel','SeaWorld & Aquatica','Convention Center','Premium Outlets','I-Drive 360 complex'],
+    bestFor:'First-time visitors, families, convention-goers',
+    food:['Bahama Breeze','Crab Du Jour','Yard House','Mango\'s Tropical Cafe'],
+    transport:'Free I-Ride Trolley runs the full length · Rideshare widely available',
+    hotspot:'The ICON Wheel at sunset for the best views of Orlando',
+    priceLevel:'$$$', crowds:'Very High', parking:'Paid lots everywhere',
+    color:'linear-gradient(135deg,#FF6B35,#FFD700)',
+  },
+  {
+    id:'downtown', name:'Downtown Orlando', emoji:'🏙️', vibe:'City Life & Culture',
+    desc:'Lake Eola, Church Street, and Wall Street Plaza make up the real Orlando that locals love. Jazz bars, art galleries, and rooftop cocktails.',
+    highlights:['Lake Eola Park','Orange Avenue bar scene','Wall Street Plaza','Dr. Phillips Center','City Arts Factory'],
+    bestFor:'Adults, nightlife seekers, culture lovers, art enthusiasts',
+    food:['The Rusty Spoon','Reyes Mezcaleria','Cask & Larder','Soco Restaurant'],
+    transport:'LYMMO free bus loops downtown · SunRail station · Easy rideshare',
+    hotspot:'Sunday Farmers Market at Lake Eola — the most Orlando thing you can do',
+    priceLevel:'$$', crowds:'Moderate (weekdays) / High (weekends)',
+    parking:'Paid garages on Orange Ave · Some street parking',
+    color:'linear-gradient(135deg,#1565C0,#0097A7)',
+  },
+  {
+    id:'winterpark', name:'Winter Park', emoji:'🌳', vibe:'Upscale & Charming',
+    desc:'Park Avenue boutiques, museum row, and scenic boat tours. The most sophisticated neighborhood in the Orlando area with old-Florida charm.',
+    highlights:['Park Avenue shopping','Rollins College campus','Morse Museum','Scenic boat tour (Chain of Lakes)','Central Park'],
+    bestFor:'Couples, art lovers, upscale dining, boutique shopping',
+    food:['Prato','Luma on Park','Bosphorous Turkish','The Ravenous Pig'],
+    transport:'SunRail: Winter Park station · Rideshare from Orlando in 15min',
+    hotspot:'Scenic boat tour weaving through Winter Park\'s private lakefront estates',
+    priceLevel:'$$$$', crowds:'Low-Moderate', parking:'Free 3-hour on Park Ave',
+    color:'linear-gradient(135deg,#2E7D32,#66BB6A)',
+  },
+  {
+    id:'mills50', name:'Mills 50 / Ivanhoe', emoji:'🎨', vibe:'Hip & Artsy',
+    desc:'Orlando\'s arts district — vintage shops, Vietnamese restaurants, indie coffee shops, and murals around every corner. Very local, very cool.',
+    highlights:['Mills 50 Art District','Ivanhoe Village antiques','Vietnam Kitchen cluster','Stardust Video & Coffee','East End Market'],
+    bestFor:'Hipsters, foodies, locals, photographers, thrift shoppers',
+    food:['Hawkers Asian Street Fare','Ethos Vegan Kitchen','Hunger Street Tacos','Se7en Bites'],
+    transport:'Rideshare only · 10min from downtown · No direct transit',
+    hotspot:'East End Market — artisanal food hall with local vendors and rooftop seating',
+    priceLevel:'$', crowds:'Low', parking:'Free street parking on Mills Ave',
+    color:'linear-gradient(135deg,#9C27B0,#E91E63)',
+  },
+  {
+    id:'disney', name:'Disney Springs / Resort Area', emoji:'🏰', vibe:'Magical & Family',
+    desc:'Lake Buena Vista and the Disney Resort corridor — free to visit Disney Springs for shopping, dining, and entertainment without a park ticket.',
+    highlights:['Disney Springs (free entry)','Disney Boardwalk','Disney\'s Wilderness Lodge','Disney Springs Theatre','Character dining'],
+    bestFor:'Disney fans, families, resort guests, evening entertainment',
+    food:['The Edison','Morimoto Asia','Raglan Road Irish Pub','Homecomin\' Florida Kitchen'],
+    transport:'Disney Skyliner gondola · Resort buses · Free parking at Disney Springs',
+    hotspot:'Disney Springs at night — free Disney atmosphere, world-class dining, live entertainment',
+    priceLevel:'$$$', crowds:'High (evenings & weekends)', parking:'Free in Disney Springs garages',
+    color:'linear-gradient(135deg,#1A1A2E,#16213E)',
+  },
+];
+
+function openNeighborhoodGuide() {
+  const existing = document.getElementById('neighborhood-overlay');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'neighborhood-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;overflow-y:auto;max-width:430px;left:50%;transform:translateX(-50%);';
+  el.innerHTML = `
+    <div style="background:var(--card-bg,#fff);border-bottom:1px solid var(--border,#eee);padding:14px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:1;">
+      <button onclick="document.getElementById('neighborhood-overlay').remove()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-primary);">←</button>
+      <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--text-primary);">🗺️ Neighborhoods</div>
+    </div>
+    <div style="padding:12px 16px 8px;font-size:13px;color:#9E9E9E;">Tap any area to explore what makes it special.</div>
+    <div style="padding:0 16px 80px;">
+      ${NEIGHBORHOODS.map(n => `<div onclick="openNeighborhoodDetail('${n.id}')" style="background:${n.color};border-radius:16px;padding:18px;margin-bottom:12px;cursor:pointer;position:relative;overflow:hidden;transition:transform .15s;" ontouchstart="this.style.transform='scale(.98)'" ontouchend="this.style.transform=''">
+        <div style="font-size:32px;margin-bottom:8px;">${n.emoji}</div>
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:#fff;">${n.name}</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.8);margin-top:2px;font-weight:600;">${n.vibe}</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.75);margin-top:6px;line-height:1.4;">${n.desc.slice(0,100)}…</div>
+        <div style="position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:24px;color:rgba(255,255,255,.4);">›</div>
+      </div>`).join('')}
+    </div>`;
+  document.body.appendChild(el);
+}
+window.openNeighborhoodGuide = openNeighborhoodGuide;
+
+function openNeighborhoodDetail(id) {
+  const n = NEIGHBORHOODS.find(x => x.id === id);
+  if (!n) return;
+  const el = document.createElement('div');
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:8000;overflow-y:auto;max-width:430px;left:50%;transform:translateX(-50%);';
+  el.innerHTML = `
+    <div style="background:${n.color};padding:20px 16px 24px;">
+      <button onclick="this.closest('[style*=inset]').remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;margin-bottom:12px;">←</button>
+      <div style="font-size:40px;margin-bottom:8px;">${n.emoji}</div>
+      <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#fff;">${n.name}</div>
+      <div style="font-size:13px;color:rgba(255,255,255,.85);margin-top:4px;">${n.desc}</div>
+      <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
+        <span style="background:rgba(255,255,255,.2);color:#fff;border-radius:8px;padding:3px 10px;font-size:11px;font-weight:700;">${n.priceLevel}</span>
+        <span style="background:rgba(255,255,255,.2);color:#fff;border-radius:8px;padding:3px 10px;font-size:11px;font-weight:700;">👥 ${n.crowds}</span>
+      </div>
+    </div>
+    <div style="padding:16px 16px 80px;">
+      <div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:12px;border-left:4px solid #FF6B35;">
+        <div style="font-size:12px;font-weight:700;color:#9E9E9E;margin-bottom:6px;">LOCAL HOTSPOT</div>
+        <div style="font-size:13px;color:var(--text-primary);line-height:1.4;">⭐ ${n.hotspot}</div>
+      </div>
+      ${[['🎯 Highlights',n.highlights],['🍽️ Must-Eat Spots',n.food]].map(([title,items]) => `<div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:12px;">
+        <div style="font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:8px;">${title}</div>
+        ${items.map(item => `<div style="font-size:12px;color:var(--text-primary);padding:5px 0;border-bottom:1px solid var(--border,#F9F9F9);">• ${item}</div>`).join('')}
+      </div>`).join('')}
+      <div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:12px;">
+        <div style="font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:6px;">🚌 Getting There</div>
+        <div style="font-size:12px;color:#9E9E9E;line-height:1.5;">${n.transport}</div>
+        <div style="font-size:12px;color:#9E9E9E;margin-top:6px;">🅿️ ${n.parking}</div>
+      </div>
+      <div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:12px;">
+        <div style="font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:4px;">🎯 Best For</div>
+        <div style="font-size:12px;color:#9E9E9E;">${n.bestFor}</div>
+      </div>
+    </div>`;
+  document.body.appendChild(el);
+}
+window.openNeighborhoodDetail = openNeighborhoodDetail;
+
+/* ---------- TRANSPORTATION HUB ---------- */
+const TRANSPORT_OPTIONS = [
+  { name:'I-Ride Trolley', emoji:'🚎', desc:'Free & Paid routes along International Drive', price:'Free – $1.25', route:'International Drive full length', freq:'Every 20 min', tip:'Use the free Green Line for ICON Park area', color:'#4CAF50' },
+  { name:'SunRail Commuter Train', emoji:'🚆', desc:'Connects downtown to suburbs including Winter Park & Sanford', price:'$2.00–$4.25', route:'DeBary → Poinciana (35 stations)', freq:'Peak hours only (limited)', tip:'Great for Winter Park day trip from downtown', color:'#1565C0' },
+  { name:'Uber / Lyft', emoji:'🚗', desc:'Most convenient option for park-to-park travel', price:'$8–$45 per trip', route:'Door-to-door anywhere', freq:'On-demand (5–15 min wait)', tip:'Share rides (UberPool/Lyft Share) to save money', color:'#FF6B35' },
+  { name:'Disney Skyliner', emoji:'🚡', desc:'Free Disney gondola connecting resorts and parks', price:'Free (Disney guests)', route:'EPCOT ↔ Hollywood Studios ↔ Art of Animation', freq:'Continuous during park hours', tip:'Watch for EPCOT fireworks from the gondola', color:'#9C27B0' },
+  { name:'Disney Resort Bus', emoji:'🚌', desc:'Free buses connecting all Disney parks and resorts', price:'Free (Disney guests)', route:'All Disney Parks & Disney Springs', freq:'Every 20 min (varies)', tip:'Allow 45–60 min for bus transfers between parks', color:'#1A1A2E' },
+  { name:'MCO Airport Shuttle', emoji:'✈️', desc:'Getting to/from Orlando International Airport', price:'$25–$55 per person', route:'Airport ↔ I-Drive / Disney / Convention Center', freq:'Hourly departures', tip:'Book Mears Connect for Disney. Rideshare saves money for groups.', color:'#E53935' },
+  { name:'Rental Car', emoji:'🚙', desc:'Best option for flexibility exploring all of Orlando', price:'$35–$80/day + gas & parking', route:'Complete freedom', freq:'24/7', tip:'Disney & Universal parking ~$30/day. Free at Disney Springs.', color:'#607D8B' },
+];
+
+function openTransportHub() {
+  const existing = document.getElementById('transport-overlay');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'transport-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;overflow-y:auto;max-width:430px;left:50%;transform:translateX(-50%);';
+  el.innerHTML = `
+    <div style="background:var(--card-bg,#fff);border-bottom:1px solid var(--border,#eee);padding:14px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:1;">
+      <button onclick="document.getElementById('transport-overlay').remove()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-primary);">←</button>
+      <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--text-primary);">🚌 Getting Around Orlando</div>
+    </div>
+    <!-- Quick route finder -->
+    <div style="padding:12px 16px;background:linear-gradient(135deg,#1565C0,#0097A7);">
+      <div style="font-size:12px;font-weight:700;color:rgba(255,255,255,.8);margin-bottom:8px;">QUICK ROUTE FINDER</div>
+      <div style="display:flex;gap:8px;">
+        <select id="transport-from" style="flex:1;border:none;border-radius:8px;padding:8px;font-size:12px;font-family:'DM Sans',sans-serif;background:rgba(255,255,255,.9);color:#212121;">
+          <option>I-Drive / Convention</option><option>Disney Resort</option><option>Universal Area</option><option>Downtown Orlando</option><option>Airport (MCO)</option><option>Winter Park</option>
+        </select>
+        <span style="color:#fff;font-size:18px;line-height:2;">→</span>
+        <select id="transport-to" style="flex:1;border:none;border-radius:8px;padding:8px;font-size:12px;font-family:'DM Sans',sans-serif;background:rgba(255,255,255,.9);color:#212121;">
+          <option>Magic Kingdom</option><option>EPCOT</option><option>Universal Studios</option><option>I-Drive / Convention</option><option>Downtown Orlando</option><option>Winter Park</option><option>Airport (MCO)</option>
+        </select>
+      </div>
+      <button onclick="getTransportRoute()" style="width:100%;margin-top:8px;background:rgba(255,255,255,.2);border:none;border-radius:8px;padding:9px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">Find Best Route</button>
+    </div>
+    <div id="transport-route-result" style="padding:0 16px;"></div>
+    <div style="padding:8px 16px 80px;">
+      <div style="font-size:12px;font-weight:700;color:#9E9E9E;padding:10px 0 8px;">ALL TRANSPORT OPTIONS</div>
+      ${TRANSPORT_OPTIONS.map(t => `<div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:10px;border-left:4px solid ${t.color};">
+        <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;">
+          <span style="font-size:28px;">${t.emoji}</span>
+          <div style="flex:1;">
+            <div style="font-size:14px;font-weight:700;color:var(--text-primary);">${t.name}</div>
+            <div style="font-size:12px;color:#9E9E9E;margin-top:2px;">${t.desc}</div>
+          </div>
+          <div style="text-align:right;flex-shrink:0;">
+            <div style="font-size:12px;font-weight:700;color:${t.color};">${t.price}</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px;color:#9E9E9E;margin-bottom:8px;">
+          <div>🛣️ ${t.route.slice(0,30)}${t.route.length>30?'…':''}</div>
+          <div>⏱️ ${t.freq}</div>
+        </div>
+        <div style="background:#F9F9F9;border-radius:8px;padding:8px 10px;font-size:11px;color:#616161;line-height:1.4;">💡 ${t.tip}</div>
+      </div>`).join('')}
+    </div>`;
+  document.body.appendChild(el);
+}
+window.openTransportHub = openTransportHub;
+
+function getTransportRoute() {
+  const from = document.getElementById('transport-from')?.value;
+  const to = document.getElementById('transport-to')?.value;
+  const el = document.getElementById('transport-route-result');
+  if (!el) return;
+  const isDisney = to?.includes('Magic Kingdom') || to?.includes('EPCOT') || from?.includes('Disney');
+  const isUniversal = to?.includes('Universal') || from?.includes('Universal');
+  const isAirport = from?.includes('Airport') || to?.includes('Airport');
+  const est = isAirport ? '$35–55' : isDisney || isUniversal ? '$15–25' : '$8–18';
+  const time = isAirport ? '25–40 min' : '15–30 min';
+  const rec = isAirport ? '✈️ Mears Connect (Disney) or Rideshare' : isDisney ? '🚌 Disney Resort Bus (free) or Rideshare' : '🚗 Rideshare recommended';
+  el.innerHTML = `<div style="background:#E3F2FD;border-radius:12px;padding:12px 14px;margin:10px 0;border-left:4px solid #1565C0;">
+    <div style="font-size:12px;font-weight:700;color:#1565C0;margin-bottom:6px;">RECOMMENDED ROUTE</div>
+    <div style="font-size:13px;font-weight:600;color:var(--text-primary);">${rec}</div>
+    <div style="display:flex;gap:12px;margin-top:8px;font-size:12px;color:#9E9E9E;">
+      <span>💰 Est. ${est}</span><span>⏱️ ${time}</span>
+    </div>
+  </div>`;
+}
+window.getTransportRoute = getTransportRoute;
+</script>
+<style>
+/* ===== BLOCK CC CSS ===== */
+@keyframes slideUp{from{transform:translateX(-50%) translateY(20px);opacity:0}to{transform:translateX(-50%) translateY(0);opacity:1}}
+.vq-filter-btn{transition:all .15s;}
+</style>
+<script>
+/* ===== BLOCK CC: Wiring ===== */
+(function wireCCFeatures() {
+  const CC_QUICK_BTNS = [
+    { icon:'⚡', label:'Lightning Lane', fn: openVirtualQueue },
+    { icon:'🧳', label:'Pack List', fn: openPackingList },
+    { icon:'🏘️', label:'Areas', fn: openNeighborhoodGuide },
+    { icon:'🚌', label:'Transport', fn: openTransportHub },
+  ];
+
+  const _prevRH = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH) _prevRH.apply(this, arguments);
+    setTimeout(() => {
+      const row = document.getElementById('y-quick-row');
+      if (!row || row.querySelector('[data-cc-quick]')) return;
+      CC_QUICK_BTNS.forEach(b => {
+        const btn = document.createElement('button');
+        btn.setAttribute('data-cc-quick','1');
+        btn.style.cssText = "flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:5px;background:var(--card-bg,#fff);border:1px solid var(--border,#eee);border-radius:14px;padding:12px 14px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .15s;";
+        btn.innerHTML = `<span style="font-size:22px;">${b.icon}</span><span style="font-size:11px;font-weight:700;color:var(--text-primary,#212121);white-space:nowrap;">${b.label}</span>`;
+        btn.onclick = b.fn;
+        row.appendChild(btn);
+      });
+    }, 240);
+  };
+
+  const _prevRA = window.renderAccount;
+  window.renderAccount = function() {
+    if (_prevRA) _prevRA.apply(this, arguments);
+    setTimeout(() => {
+      const loggedIn = document.querySelector('.account-loggedin');
+      if (!loggedIn || loggedIn.querySelector('[data-cc-items]')) return;
+      const items = [
+        { icon:'⚡', label:'Lightning Lane', fn: openVirtualQueue },
+        { icon:'🧳', label:'Packing List', fn: openPackingList },
+        { icon:'🏘️', label:'Neighborhood Guide', fn: openNeighborhoodGuide },
+        { icon:'🚌', label:'Getting Around', fn: openTransportHub },
+      ];
+      const adminBtn = loggedIn.querySelector('.adm-account-btn');
+      items.forEach(item => {
+        const el = document.createElement('div');
+        el.setAttribute('data-cc-items','1');
+        el.className = 'account-menu-item';
+        el.innerHTML = `<span class="icon">${item.icon}</span><span>${item.label}</span><span class="arrow">›</span>`;
+        el.onclick = item.fn;
+        loggedIn.insertBefore(el, adminBtn || null);
+      });
+    }, 75);
+  };
+})();
+</script>
