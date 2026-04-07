@@ -25157,3 +25157,505 @@ window.deletePriceAlert = deletePriceAlert;
   };
 })();
 </script>
+<script>
+/* ===== BLOCK EE1: Language Phrasebook ===== */
+const PHRASEBOOK = {
+  es: {
+    label: 'Spanish', flag: '🇪🇸🇲🇽',
+    phrases: [
+      { cat:'Parks', en:'Where is the ride?', tr:'¿Dónde está la atracción?', pron:'DON-day es-TAH la ah-trak-SYON' },
+      { cat:'Parks', en:'How long is the wait?', tr:'¿Cuánto tiempo de espera?', pron:'KWAN-toh TYEM-poh day es-PAIR-ah' },
+      { cat:'Parks', en:'Where is the bathroom?', tr:'¿Dónde está el baño?', pron:'DON-day es-TAH el BAN-yo' },
+      { cat:'Dining', en:'I have a food allergy', tr:'Tengo alergia a la comida', pron:'TEN-go ah-LAIR-hee-ah ah la co-MEE-da' },
+      { cat:'Dining', en:'The check, please', tr:'La cuenta, por favor', pron:'la KWEN-tah por fah-VOR' },
+      { cat:'Dining', en:'This is delicious!', tr:'¡Esto está delicioso!', pron:'ES-toh es-TAH deh-lee-SYOH-so' },
+      { cat:'Hotel', en:'I have a reservation', tr:'Tengo una reservación', pron:'TEN-go OO-na reh-ser-vah-SYON' },
+      { cat:'Hotel', en:'My room key doesn\'t work', tr:'Mi llave no funciona', pron:'mee YAH-veh no foon-SYOH-nah' },
+      { cat:'Help', en:'Call 911 please', tr:'Llame al 911 por favor', pron:'YAH-meh al 9-1-1 por fah-VOR' },
+      { cat:'Help', en:'I need a doctor', tr:'Necesito un médico', pron:'neh-seh-SEE-toh oon MEH-dee-koh' },
+      { cat:'Basics', en:'Thank you', tr:'Gracias', pron:'GRAH-syahs' },
+      { cat:'Basics', en:'How much does it cost?', tr:'¿Cuánto cuesta?', pron:'KWAN-toh KWES-tah' },
+    ]
+  },
+  pt: {
+    label: 'Portuguese', flag: '🇧🇷🇵🇹',
+    phrases: [
+      { cat:'Parks', en:'Where is the ride?', tr:'Onde fica a atração?', pron:'ON-jee FEE-kah ah ah-trah-SOWN' },
+      { cat:'Parks', en:'How long is the wait?', tr:'Quanto tempo de espera?', pron:'KWAN-too TEM-poo jee es-PEH-rah' },
+      { cat:'Parks', en:'Where is the bathroom?', tr:'Onde fica o banheiro?', pron:'ON-jee FEE-kah oh ban-YEH-roo' },
+      { cat:'Dining', en:'I have a food allergy', tr:'Tenho alergia alimentar', pron:'TEN-yo ah-lair-JEE-ah ah-lee-men-TAR' },
+      { cat:'Dining', en:'The check, please', tr:'A conta, por favor', pron:'ah KON-tah poor fah-VOR' },
+      { cat:'Dining', en:'This is delicious!', tr:'Isso está delicioso!', pron:'EE-soo es-TAH deh-lee-SYOH-zoo' },
+      { cat:'Hotel', en:'I have a reservation', tr:'Tenho uma reserva', pron:'TEN-yo OO-mah heh-ZER-vah' },
+      { cat:'Help', en:'Call 911 please', tr:'Ligue para o 911 por favor', pron:'LEE-gee pah-rah oo 9-1-1 poor fah-VOR' },
+      { cat:'Help', en:'I need a doctor', tr:'Preciso de um médico', pron:'preh-SEE-zoo jee oom MEH-jee-koo' },
+      { cat:'Basics', en:'Thank you', tr:'Obrigado / Obrigada', pron:'oh-bree-GAH-doo / oh-bree-GAH-dah' },
+    ]
+  },
+  fr: {
+    label: 'French', flag: '🇫🇷🇨🇦',
+    phrases: [
+      { cat:'Parks', en:'Where is the ride?', tr:'Où est l\'attraction?', pron:'oo eh lah-trak-SYON' },
+      { cat:'Parks', en:'How long is the wait?', tr:"Combien de temps d'attente?", pron:'kom-BYAN duh tahn dah-TANT' },
+      { cat:'Parks', en:'Where is the bathroom?', tr:'Où sont les toilettes?', pron:'oo son lay twah-LET' },
+      { cat:'Dining', en:'I have a food allergy', tr:"J'ai une allergie alimentaire", pron:'jhay OON ah-lair-ZHEE ah-lee-mahn-TAIR' },
+      { cat:'Dining', en:'The check, please', tr:"L'addition, s'il vous plaît", pron:'lah-dee-SYON seel voo PLAY' },
+      { cat:'Hotel', en:'I have a reservation', tr:"J'ai une réservation", pron:'jhay OON ray-zair-vah-SYON' },
+      { cat:'Help', en:'Call 911 please', tr:'Appelez le 911 s\'il vous plaît', pron:'ah-play luh 9-1-1 seel voo PLAY' },
+      { cat:'Help', en:'I need a doctor', tr:"J'ai besoin d'un médecin", pron:"jhay buh-ZWAN dun may-duh-SAN" },
+      { cat:'Basics', en:'Thank you', tr:'Merci', pron:'mair-SEE' },
+      { cat:'Basics', en:'How much does it cost?', tr:'Combien ça coûte?', pron:'kom-BYAN sah KOOT' },
+    ]
+  },
+  de: {
+    label: 'German', flag: '🇩🇪🇦🇹',
+    phrases: [
+      { cat:'Parks', en:'Where is the ride?', tr:'Wo ist die Attraktion?', pron:'voh ist dee ah-trak-TSYON' },
+      { cat:'Parks', en:'How long is the wait?', tr:'Wie lange ist die Wartezeit?', pron:'vee LANG-uh ist dee VAR-tuh-tsyt' },
+      { cat:'Dining', en:'The check, please', tr:'Die Rechnung, bitte', pron:'dee REK-noong BIT-tuh' },
+      { cat:'Help', en:'I need a doctor', tr:'Ich brauche einen Arzt', pron:'ikh BROW-khuh INE-en artst' },
+      { cat:'Help', en:'Call 911 please', tr:'Rufen Sie bitte 911 an', pron:'ROO-fen zee BIT-tuh 9-1-1 an' },
+      { cat:'Basics', en:'Thank you', tr:'Danke schön', pron:'DAHN-kuh shern' },
+    ]
+  }
+};
+window._phraseLang = 'es';
+window._phraseCat = 'all';
+
+function openPhrasebook() {
+  const existing = document.getElementById('phrasebook-overlay');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'phrasebook-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;overflow-y:auto;max-width:430px;left:50%;transform:translateX(-50%);';
+  el.innerHTML = `
+    <div style="background:linear-gradient(135deg,#1565C0,#0097A7);padding:18px 16px 20px;position:sticky;top:0;z-index:1;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <button onclick="document.getElementById('phrasebook-overlay').remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;">←</button>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;">🗣️ Phrasebook</div>
+      </div>
+      <div style="display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;">
+        ${Object.entries(PHRASEBOOK).map(([code, lang]) =>
+          `<button class="phrase-lang-btn ${code==='es'?'active':''}" data-lang="${code}" onclick="setPhraseLang('${code}',this)" style="flex-shrink:0;padding:8px 14px;border-radius:12px;border:2px solid ${code==='es'?'#fff':'rgba(255,255,255,.3)'};background:${code==='es'?'rgba(255,255,255,.25)':'transparent'};color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">${lang.flag.slice(0,2)} ${lang.label}</button>`
+        ).join('')}
+      </div>
+    </div>
+    <div style="display:flex;gap:6px;padding:10px 16px;overflow-x:auto;scrollbar-width:none;">
+      ${['all','Parks','Dining','Hotel','Help','Basics'].map(c =>
+        `<button class="phrase-cat-btn ${c==='all'?'active':''}" data-cat="${c}" onclick="setPhraseCat('${c}',this)" style="flex-shrink:0;padding:5px 12px;border-radius:10px;border:2px solid ${c==='all'?'#1565C0':'var(--border,#eee)'};background:${c==='all'?'#E3F2FD':'var(--card-bg,#fff)'};color:${c==='all'?'#1565C0':'var(--text-primary)'};font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;">${c==='all'?'All':c}</button>`
+      ).join('')}
+    </div>
+    <div id="phrase-list" style="padding:0 16px 80px;"></div>`;
+  document.body.appendChild(el);
+  renderPhrases();
+}
+window.openPhrasebook = openPhrasebook;
+
+function setPhraseLang(code, btn) {
+  window._phraseLang = code;
+  document.querySelectorAll('.phrase-lang-btn').forEach(b => {
+    b.style.borderColor = b.dataset.lang===code?'#fff':'rgba(255,255,255,.3)';
+    b.style.background = b.dataset.lang===code?'rgba(255,255,255,.25)':'transparent';
+  });
+  renderPhrases();
+}
+window.setPhraseLang = setPhraseLang;
+
+function setPhraseCat(cat, btn) {
+  window._phraseCat = cat;
+  document.querySelectorAll('.phrase-cat-btn').forEach(b => {
+    b.style.borderColor = b.dataset.cat===cat?'#1565C0':'var(--border,#eee)';
+    b.style.background = b.dataset.cat===cat?'#E3F2FD':'var(--card-bg,#fff)';
+    b.style.color = b.dataset.cat===cat?'#1565C0':'var(--text-primary)';
+  });
+  renderPhrases();
+}
+window.setPhraseCat = setPhraseCat;
+
+function renderPhrases() {
+  const el = document.getElementById('phrase-list');
+  if (!el) return;
+  const lang = PHRASEBOOK[window._phraseLang];
+  if (!lang) return;
+  const phrases = window._phraseCat === 'all' ? lang.phrases : lang.phrases.filter(p => p.cat === window._phraseCat);
+  const catColors = { Parks:'#FF6B35', Dining:'#9C27B0', Hotel:'#1565C0', Help:'#E53935', Basics:'#2E7D32' };
+
+  el.innerHTML = phrases.map(p => `
+    <div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:10px;cursor:pointer;" onclick="speakPhrase('${p.tr.replace(/'/g,"\\'")}')">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+        <span style="font-size:10px;font-weight:700;background:${catColors[p.cat]||'#9E9E9E'}22;color:${catColors[p.cat]||'#9E9E9E'};border-radius:6px;padding:2px 7px;">${p.cat}</span>
+        <span style="font-size:18px;cursor:pointer;" title="Tap to hear pronunciation">🔊</span>
+      </div>
+      <div style="font-size:13px;color:#9E9E9E;margin-bottom:4px;">${p.en}</div>
+      <div style="font-size:16px;font-weight:700;color:var(--text-primary);margin-bottom:6px;">${p.tr}</div>
+      <div style="font-size:12px;color:#9E9E9E;font-style:italic;background:#F9F9F9;border-radius:8px;padding:6px 10px;">🗣️ ${p.pron}</div>
+    </div>`).join('');
+}
+window.renderPhrases = renderPhrases;
+
+function speakPhrase(text) {
+  if ('speechSynthesis' in window) {
+    const langMap = { es:'es-ES', pt:'pt-BR', fr:'fr-FR', de:'de-DE' };
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = langMap[window._phraseLang] || 'es-ES';
+    utter.rate = 0.85;
+    window.speechSynthesis.speak(utter);
+    if (typeof showToast !== 'undefined') showToast('🔊 Playing pronunciation...');
+  } else {
+    if (typeof showToast !== 'undefined') showToast('Speech not supported on this device');
+  }
+}
+window.speakPhrase = speakPhrase;
+</script>
+<script>
+/* ===== BLOCK EE2: Ride Height Guide ===== */
+const RIDE_GUIDE = [
+  { park:'Magic Kingdom',   name:'Seven Dwarfs Mine Train',   min:38, emoji:'⛏️', thrill:3, type:'Coaster',      access:'No loose articles, single rider avail', tags:['family','popular'] },
+  { park:'Magic Kingdom',   name:'Space Mountain',            min:44, emoji:'🚀', thrill:4, type:'Indoor Coaster',access:'No flash photography', tags:['classic','dark'] },
+  { park:'Magic Kingdom',   name:'Big Thunder Mountain',      min:40, emoji:'🏔️', thrill:3, type:'Coaster',      access:'Single rider not available', tags:['family','outdoor'] },
+  { park:'Magic Kingdom',   name:'Splash Mountain',           min:40, emoji:'💦', thrill:3, type:'Flume',         access:'Expect to get wet', tags:['family','water'] },
+  { park:'Magic Kingdom',   name:'Dumbo',                     min:0,  emoji:'🐘', thrill:1, type:'Spinner',       access:'Wheelchair accessible', tags:['toddler','classic'] },
+  { park:'Magic Kingdom',   name:'Haunted Mansion',           min:0,  emoji:'👻', thrill:2, type:'Dark Ride',     access:'Wheelchair accessible', tags:['classic','family'] },
+  { park:'EPCOT',           name:'Guardians of the Galaxy',   min:42, emoji:'🌌', thrill:5, type:'Launch Coaster',access:'No loose articles', tags:['thrill','new'] },
+  { park:'EPCOT',           name:'Test Track',                min:40, emoji:'🚗', thrill:3, type:'Simulator',     access:'Single rider available', tags:['family','interactive'] },
+  { park:'EPCOT',           name:'Frozen Ever After',         min:0,  emoji:'❄️', thrill:2, type:'Boat Ride',     access:'Wheelchair accessible', tags:['family','popular'] },
+  { park:'Hollywood Studios',name:'Slinky Dog Dash',          min:38, emoji:'🐕', thrill:3, type:'Coaster',       access:'No single rider', tags:['family','popular'] },
+  { park:'Hollywood Studios',name:'Tower of Terror',          min:40, emoji:'🏚️', thrill:5, type:'Drop Tower',   access:'Must be free of back/neck issues', tags:['thrill','classic'] },
+  { park:'Hollywood Studios',name:'Star Wars: Rise of Resistance',min:40,emoji:'⚔️',thrill:4,type:'Dark Ride',   access:'Long standing sections', tags:['immersive','popular'] },
+  { park:'Animal Kingdom',  name:'Avatar: Flight of Passage', min:44, emoji:'🦋', thrill:4, type:'Simulator',     access:'Straddle seat — not for all body types', tags:['immersive','popular'] },
+  { park:'Animal Kingdom',  name:'Expedition Everest',        min:44, emoji:'🏔️', thrill:5, type:'Coaster',      access:'Single rider available', tags:['thrill','outdoor'] },
+  { park:'Universal',       name:'VelociCoaster',             min:51, emoji:'🦖', thrill:5, type:'Launch Coaster',access:'No loose articles at all', tags:['thrill','top-ranked'] },
+  { park:'Universal',       name:'Hagrid\'s Motorbike',       min:48, emoji:'🏍️', thrill:4, type:'Dark Coaster', access:'Motorbike seat option (width limits)', tags:['immersive','popular'] },
+  { park:'Universal',       name:'Hollywood Rip Ride Rockit', min:51, emoji:'🎵', thrill:5, type:'Coaster',       access:'Pick your own soundtrack', tags:['thrill','unique'] },
+  { park:'Universal',       name:'Escape from Gringotts',     min:42, emoji:'🐉', thrill:4, type:'Dark Ride',     access:'3D glasses required', tags:['family','immersive'] },
+  { park:'SeaWorld',        name:'VelociCoaster (SW)',         min:54, emoji:'🌊', thrill:5, type:'Coaster',       access:'Tallest coaster in FL', tags:['thrill'] },
+  { park:'SeaWorld',        name:'Mako',                      min:54, emoji:'🦈', thrill:5, type:'Hypercoaster',  access:'Tallest, fastest in Orlando', tags:['thrill','record'] },
+  { park:'SeaWorld',        name:'Ice Breaker',               min:48, emoji:'🧊', thrill:4, type:'Launch Coaster',access:'Forward and backward launches', tags:['thrill','new'] },
+];
+
+window._rideHeightFilter = 'all';
+window._rideThrillFilter = 0;
+
+function openRideGuide() {
+  const existing = document.getElementById('ride-guide-overlay');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'ride-guide-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;overflow-y:auto;max-width:430px;left:50%;transform:translateX(-50%);';
+  el.innerHTML = `
+    <div style="background:linear-gradient(135deg,#E53935,#FF6B35);padding:18px 16px 20px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <button onclick="document.getElementById('ride-guide-overlay').remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;">←</button>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;">🎢 Ride Height Guide</div>
+      </div>
+      <!-- Height checker -->
+      <div style="background:rgba(255,255,255,.15);border-radius:14px;padding:14px;">
+        <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.8);margin-bottom:8px;">CHECK HEIGHT (inches)</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <input id="ride-height-input" type="number" min="20" max="80" placeholder="e.g. 42" oninput="filterByHeight(this.value)" style="flex:1;border:none;border-radius:8px;padding:10px;font-size:18px;font-weight:700;font-family:'DM Sans',sans-serif;background:rgba(255,255,255,.9);color:#212121;">
+          <span style="color:rgba(255,255,255,.9);font-size:13px;font-weight:700;">inches</span>
+        </div>
+        <div id="height-result" style="font-size:12px;color:rgba(255,255,255,.8);margin-top:8px;"></div>
+      </div>
+    </div>
+    <div style="padding:10px 16px;overflow-x:auto;display:flex;gap:6px;scrollbar-width:none;">
+      ${['all','Magic Kingdom','EPCOT','Hollywood Studios','Animal Kingdom','Universal','SeaWorld'].map(p =>
+        `<button class="ride-park-btn ${p==='all'?'active':''}" data-park="${p}" onclick="setRideParkFilter('${p}',this)" style="flex-shrink:0;padding:6px 12px;border-radius:10px;border:2px solid ${p==='all'?'#E53935':'var(--border,#eee)'};background:${p==='all'?'#FFEBEE':'var(--card-bg,#fff)'};color:${p==='all'?'#E53935':'var(--text-primary)'};font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;">${p==='all'?'All Parks':p.split(' ')[0]}</button>`
+      ).join('')}
+    </div>
+    <div id="ride-list" style="padding:4px 16px 80px;"></div>`;
+  document.body.appendChild(el);
+  window._rideHeightFilter = 'all';
+  renderRideList();
+}
+window.openRideGuide = openRideGuide;
+
+function filterByHeight(h) {
+  const height = parseInt(h);
+  const resultEl = document.getElementById('height-result');
+  if (isNaN(height) || height < 20) { if (resultEl) resultEl.textContent = ''; renderRideList(); return; }
+  const canRide = RIDE_GUIDE.filter(r => r.min <= height).length;
+  const total = RIDE_GUIDE.length;
+  if (resultEl) resultEl.textContent = `At ${height}" you can ride ${canRide} of ${total} attractions`;
+  renderRideList(height);
+}
+window.filterByHeight = filterByHeight;
+
+function setRideParkFilter(park, btn) {
+  window._rideHeightFilter = park;
+  document.querySelectorAll('.ride-park-btn').forEach(b => {
+    b.style.borderColor = b.dataset.park===park?'#E53935':'var(--border,#eee)';
+    b.style.background = b.dataset.park===park?'#FFEBEE':'var(--card-bg,#fff)';
+    b.style.color = b.dataset.park===park?'#E53935':'var(--text-primary)';
+  });
+  renderRideList(parseInt(document.getElementById('ride-height-input')?.value)||null);
+}
+window.setRideParkFilter = setRideParkFilter;
+
+function renderRideList(userHeight) {
+  const el = document.getElementById('ride-list');
+  if (!el) return;
+  let rides = RIDE_GUIDE;
+  if (window._rideHeightFilter !== 'all') rides = rides.filter(r => r.park === window._rideHeightFilter);
+  const thrillColors = [,'#4CAF50','#8BC34A','#FFC107','#FF5722','#E53935'];
+  const thrillLabels = [,'Easy','Mild','Moderate','Thrilling','Extreme'];
+
+  el.innerHTML = rides.map(r => {
+    const canRide = !userHeight || r.min <= userHeight;
+    const tooShort = userHeight && r.min > userHeight;
+    return `<div style="background:var(--card-bg,#fff);border-radius:14px;padding:13px;margin-bottom:8px;opacity:${tooShort?'.5':'1'};border-left:4px solid ${tooShort?'#BDBDBD':thrillColors[r.thrill]||'#FF6B35'};">
+      <div style="display:flex;align-items:flex-start;gap:10px;">
+        <span style="font-size:26px;flex-shrink:0;">${r.emoji}</span>
+        <div style="flex:1;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+            <div style="font-size:13px;font-weight:700;color:var(--text-primary);flex:1;">${r.name}</div>
+            ${tooShort ? `<span style="font-size:10px;background:#FFEBEE;color:#E53935;border-radius:6px;padding:2px 6px;font-weight:700;flex-shrink:0;">Too short</span>` : canRide && userHeight ? `<span style="font-size:10px;background:#E8F5E9;color:#2E7D32;border-radius:6px;padding:2px 6px;font-weight:700;flex-shrink:0;">✓ Can ride</span>` : ''}
+          </div>
+          <div style="font-size:11px;color:#9E9E9E;margin-top:2px;">${r.park} · ${r.type}</div>
+          <div style="display:flex;gap:6px;margin-top:6px;align-items:center;">
+            <span style="font-size:11px;font-weight:800;color:${r.min>0?'#E53935':'#4CAF50'};background:${r.min>0?'#FFEBEE':'#E8F5E9'};border-radius:6px;padding:2px 7px;">${r.min>0?'Min '+r.min+'"':'Any height'}</span>
+            <span style="font-size:10px;font-weight:700;color:${thrillColors[r.thrill]};background:${thrillColors[r.thrill]}22;border-radius:6px;padding:2px 6px;">${'★'.repeat(r.thrill)} ${thrillLabels[r.thrill]}</span>
+          </div>
+          <div style="font-size:11px;color:#9E9E9E;margin-top:5px;line-height:1.4;">💡 ${r.access}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+window.renderRideList = renderRideList;
+</script>
+<script>
+/* ===== BLOCK EE3: Annual Events + Currency Converter ===== */
+
+/* ---------- ANNUAL EVENTS TIMELINE ---------- */
+const ANNUAL_EVENTS = [
+  { month:1,  name:'Walt Disney World Marathon Weekend', emoji:'🏃', dates:'Jan 8–11', type:'Sports', desc:'40,000+ runners race through all 4 Disney parks. Spectators free. Incredible atmosphere.' },
+  { month:1,  name:'EPCOT International Festival of the Arts', emoji:'🎨', dates:'Jan–Feb', type:'Festival', desc:'Art installations, culinary art, and Broadway-style entertainment at EPCOT.' },
+  { month:2,  name:'Mardi Gras at Universal', emoji:'🎭', dates:'Feb–Apr', type:'Festival', desc:'Live concerts, parade with beads, Cajun food, and authentic New Orleans entertainment.' },
+  { month:3,  name:'EPCOT Flower & Garden Festival', emoji:'🌸', dates:'Mar–Jun', type:'Festival', desc:'Over 100 topiaries, outdoor kitchens with spring dishes, and live music on weekends.' },
+  { month:4,  name:'Star Wars Rival Run Weekend', emoji:'⚔️', dates:'Apr', type:'Sports', desc:'Half marathon through Hollywood Studios. Cosplay encouraged — thousands run in full costume.' },
+  { month:5,  name:'SeaWorld Seven Seas Food Festival', emoji:'🦞', dates:'Jan–May', type:'Festival', desc:'80+ food and drink dishes, live music on weekends, and craft beer garden.' },
+  { month:6,  name:'Gay Days at Walt Disney World', emoji:'🏳️‍🌈', dates:'Early Jun', type:'Community', desc:'One of the world\'s largest LGBTQ+ celebrations. First week of June, thousands wear red.' },
+  { month:7,  name:'Disney\'s Magic Kingdom July 4th', emoji:'🎆', dates:'Jul 4', type:'Holiday', desc:'Extended fireworks display over Cinderella Castle. Arrive by 8 AM for this one.' },
+  { month:8,  name:'Mickey\'s Not So Scary Halloween', emoji:'🎃', dates:'Aug–Oct', type:'Seasonal', desc:'Separate-ticket after-hours event at Magic Kingdom. Costume contests, trick-or-treating, Haunted Mansion overlays.' },
+  { month:9,  name:'EPCOT Food & Wine Festival', emoji:'🍷', dates:'Sep–Nov', type:'Festival', desc:'The most popular EPCOT event. 30+ global marketplaces, celebrity chefs, and Eat to the Beat concerts.' },
+  { month:10, name:'Halloween Horror Nights', emoji:'👹', dates:'Sep–Nov', type:'Seasonal', desc:'Universal\'s elite haunted house event. 10+ houses, scarezones, live entertainment. Very intense.' },
+  { month:11, name:'Mickey\'s Very Merry Christmas Party', emoji:'🎄', dates:'Nov–Dec', type:'Seasonal', desc:'Separate-ticket event: Castle lighting, snow on Main Street, exclusive parade and fireworks.' },
+  { month:12, name:'EPCOT International Festival of the Holidays', emoji:'🎅', dates:'Nov–Dec', type:'Festival', desc:'Holiday storytellers from 11 cultures, Candlelight Processional with celebrity narrators, cookie stroll.' },
+  { month:12, name:'New Year\'s Eve at Universal CityWalk', emoji:'🎆', dates:'Dec 31', type:'Holiday', desc:'Live DJs, dance party, countdown, and fireworks. Free for CityWalk visitors.' },
+];
+
+window._eventsMonthFilter = 0; // 0 = all
+
+function openAnnualEvents() {
+  const existing = document.getElementById('annual-events-overlay');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'annual-events-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;overflow-y:auto;max-width:430px;left:50%;transform:translateX(-50%);';
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  el.innerHTML = `
+    <div style="background:linear-gradient(135deg,#9C27B0,#E91E63);padding:18px 16px 20px;position:sticky;top:0;z-index:1;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <button onclick="document.getElementById('annual-events-overlay').remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;">←</button>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;">🗓️ Annual Events</div>
+      </div>
+      <div style="overflow-x:auto;display:flex;gap:5px;scrollbar-width:none;">
+        <button class="ev-month-btn active" data-month="0" onclick="setEventMonth(0,this)" style="flex-shrink:0;padding:5px 10px;border-radius:10px;border:2px solid #fff;background:rgba(255,255,255,.25);color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">All</button>
+        ${months.map((m,i) => `<button class="ev-month-btn" data-month="${i+1}" onclick="setEventMonth(${i+1},this)" style="flex-shrink:0;padding:5px 10px;border-radius:10px;border:2px solid rgba(255,255,255,.3);background:transparent;color:rgba(255,255,255,.8);font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">${m}</button>`).join('')}
+      </div>
+    </div>
+    <div id="annual-events-list" style="padding:12px 16px 80px;"></div>`;
+  document.body.appendChild(el);
+  renderAnnualEvents();
+}
+window.openAnnualEvents = openAnnualEvents;
+
+function setEventMonth(month, btn) {
+  window._eventsMonthFilter = month;
+  document.querySelectorAll('.ev-month-btn').forEach(b => {
+    const active = parseInt(b.dataset.month) === month;
+    b.style.borderColor = active ? '#fff' : 'rgba(255,255,255,.3)';
+    b.style.background = active ? 'rgba(255,255,255,.25)' : 'transparent';
+    b.style.color = active ? '#fff' : 'rgba(255,255,255,.8)';
+  });
+  renderAnnualEvents();
+}
+window.setEventMonth = setEventMonth;
+
+function renderAnnualEvents() {
+  const el = document.getElementById('annual-events-list');
+  if (!el) return;
+  const months = ['','January','February','March','April','May','June','July','August','September','October','November','December'];
+  const typeColors = { Festival:'#FF6B35', Sports:'#1565C0', Holiday:'#E53935', Seasonal:'#9C27B0', Community:'#2E7D32' };
+  const filter = window._eventsMonthFilter;
+  const events = filter === 0 ? ANNUAL_EVENTS : ANNUAL_EVENTS.filter(e => e.month === filter);
+  const grouped = {};
+  events.forEach(e => { if (!grouped[e.month]) grouped[e.month] = []; grouped[e.month].push(e); });
+
+  el.innerHTML = Object.entries(grouped).map(([month, evs]) => `
+    <div style="margin-bottom:20px;">
+      <div style="font-size:12px;font-weight:800;color:#9E9E9E;letter-spacing:.08em;margin-bottom:10px;">${months[parseInt(month)].toUpperCase()}</div>
+      ${evs.map(e => `<div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:8px;">
+        <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;">
+          <span style="font-size:28px;flex-shrink:0;">${e.emoji}</span>
+          <div style="flex:1;">
+            <div style="font-size:14px;font-weight:700;color:var(--text-primary);line-height:1.3;">${e.name}</div>
+            <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap;">
+              <span style="font-size:10px;font-weight:700;background:${typeColors[e.type]||'#9E9E9E'}22;color:${typeColors[e.type]||'#9E9E9E'};border-radius:6px;padding:2px 7px;">${e.type}</span>
+              <span style="font-size:10px;color:#9E9E9E;font-weight:600;">📅 ${e.dates}</span>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:12px;color:#9E9E9E;line-height:1.5;">${e.desc}</div>
+        <button onclick="addEventToCalendar('${e.name.replace(/'/g,"\\'")}','${e.month}')" style="margin-top:10px;background:none;border:2px solid #9C27B0;border-radius:8px;padding:6px 12px;color:#9C27B0;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">+ Add to Calendar</button>
+      </div>`).join('')}
+    </div>`).join('');
+}
+window.renderAnnualEvents = renderAnnualEvents;
+
+function addEventToCalendar(name, month) {
+  const year = new Date().getFullYear();
+  const dateStr = `${year}-${String(parseInt(month)).padStart(2,'0')}-01`;
+  window._calEvents = window._calEvents || [];
+  window._calEvents.push({ id:'ae_'+Date.now(), title:name, date:dateStr, time:'All day', color:'#9C27B0', icon:'🗓️' });
+  localStorage.setItem('calEvents', JSON.stringify(window._calEvents));
+  if (typeof showToast !== 'undefined') showToast(name + ' added to calendar! 📅');
+  if (typeof awardPoints !== 'undefined') awardPoints(5, 'Event added to calendar');
+}
+window.addEventToCalendar = addEventToCalendar;
+
+/* ---------- CURRENCY CONVERTER ---------- */
+const EXCHANGE_RATES = { USD:1, EUR:0.92, GBP:0.79, CAD:1.36, AUD:1.53, BRL:4.97, MXN:17.2, JPY:149.5, CNY:7.24, INR:83.1, KRW:1325, CHF:0.89 };
+const CURRENCY_FLAGS = { USD:'🇺🇸', EUR:'🇪🇺', GBP:'🇬🇧', CAD:'🇨🇦', AUD:'🇦🇺', BRL:'🇧🇷', MXN:'🇲🇽', JPY:'🇯🇵', CNY:'🇨🇳', INR:'🇮🇳', KRW:'🇰🇷', CHF:'🇨🇭' };
+const CURRENCY_NAMES = { USD:'US Dollar', EUR:'Euro', GBP:'British Pound', CAD:'Canadian Dollar', AUD:'Australian Dollar', BRL:'Brazilian Real', MXN:'Mexican Peso', JPY:'Japanese Yen', CNY:'Chinese Yuan', INR:'Indian Rupee', KRW:'South Korean Won', CHF:'Swiss Franc' };
+
+function openCurrencyConverter() {
+  const existing = document.getElementById('currency-overlay');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'currency-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;overflow-y:auto;max-width:430px;left:50%;transform:translateX(-50%);';
+  el.innerHTML = `
+    <div style="background:linear-gradient(135deg,#2E7D32,#66BB6A);padding:18px 16px 24px;position:sticky;top:0;z-index:1;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+        <button onclick="document.getElementById('currency-overlay').remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;">←</button>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;">💱 Currency Converter</div>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:14px;padding:16px;">
+        <div style="margin-bottom:12px;">
+          <div style="font-size:10px;color:rgba(255,255,255,.7);font-weight:700;margin-bottom:6px;">FROM</div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <select id="curr-from" onchange="convertCurrency()" style="flex:1;border:none;border-radius:8px;padding:8px;font-size:13px;font-family:'DM Sans',sans-serif;background:rgba(255,255,255,.9);color:#212121;">
+              ${Object.entries(CURRENCY_FLAGS).map(([code,flag]) => `<option value="${code}" ${code==='EUR'?'selected':''}>${flag} ${code} — ${CURRENCY_NAMES[code]}</option>`).join('')}
+            </select>
+            <input id="curr-amount" type="number" value="100" min="0" oninput="convertCurrency()" style="width:100px;border:none;border-radius:8px;padding:8px;font-size:18px;font-weight:700;text-align:right;font-family:'DM Sans',sans-serif;background:rgba(255,255,255,.9);color:#212121;">
+          </div>
+        </div>
+        <div style="text-align:center;color:rgba(255,255,255,.8);font-size:20px;margin-bottom:12px;">⇅</div>
+        <div>
+          <div style="font-size:10px;color:rgba(255,255,255,.7);font-weight:700;margin-bottom:6px;">TO (USD)</div>
+          <div id="curr-result" style="background:rgba(255,255,255,.9);border-radius:8px;padding:12px 14px;font-size:24px;font-weight:800;color:#2E7D32;text-align:right;"></div>
+        </div>
+        <div id="curr-rate" style="font-size:11px;color:rgba(255,255,255,.7);text-align:center;margin-top:8px;"></div>
+      </div>
+    </div>
+    <div style="padding:12px 16px 80px;">
+      <div style="font-size:12px;font-weight:700;color:#9E9E9E;margin-bottom:10px;">QUICK REFERENCE — AT A GLANCE</div>
+      <div id="curr-table"></div>
+      <div style="font-size:11px;color:#BDBDBD;text-align:center;margin-top:12px;">Rates are approximate. Check your bank for exact rates.</div>
+    </div>`;
+  document.body.appendChild(el);
+  convertCurrency();
+  renderCurrencyTable();
+}
+window.openCurrencyConverter = openCurrencyConverter;
+
+function convertCurrency() {
+  const fromCode = document.getElementById('curr-from')?.value || 'EUR';
+  const amount = parseFloat(document.getElementById('curr-amount')?.value || 100);
+  const resultEl = document.getElementById('curr-result');
+  const rateEl = document.getElementById('curr-rate');
+  if (!resultEl) return;
+  const fromRate = EXCHANGE_RATES[fromCode] || 1;
+  const usd = amount / fromRate;
+  resultEl.textContent = '$' + usd.toFixed(2) + ' USD';
+  if (rateEl) rateEl.textContent = `1 ${fromCode} = $${(1/fromRate).toFixed(4)} USD`;
+}
+window.convertCurrency = convertCurrency;
+
+function renderCurrencyTable() {
+  const el = document.getElementById('curr-table');
+  if (!el) return;
+  el.innerHTML = Object.entries(EXCHANGE_RATES).filter(([c]) => c !== 'USD').map(([code, rate]) => {
+    const usd10 = (10 / rate).toFixed(2);
+    const usd50 = (50 / rate).toFixed(2);
+    const usd100 = (100 / rate).toFixed(2);
+    return `<div style="background:var(--card-bg,#fff);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:20px;">${CURRENCY_FLAGS[code]}</span>
+        <div><div style="font-size:13px;font-weight:700;color:var(--text-primary);">${code}</div><div style="font-size:10px;color:#9E9E9E;">${CURRENCY_NAMES[code]}</div></div>
+      </div>
+      <div style="text-align:right;font-size:11px;color:#9E9E9E;">
+        <div>10 ${code} = <strong style="color:var(--text-primary);">$${usd10}</strong></div>
+        <div>100 ${code} = <strong style="color:#2E7D32;">$${usd100}</strong></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+</script>
+<style>
+/* ===== BLOCK EE CSS ===== */
+.phrase-lang-btn,.phrase-cat-btn{transition:all .15s;}
+.ride-park-btn{transition:all .15s;}
+.ev-month-btn{transition:all .15s;}
+#ride-height-input:focus{outline:none;}
+#curr-amount:focus{outline:none;}
+</style>
+<script>
+/* ===== BLOCK EE: Wiring ===== */
+(function wireEEFeatures() {
+  const EE_QUICK = [
+    { icon:'🗣️', label:'Phrasebook',  fn: openPhrasebook },
+    { icon:'🎢', label:'Ride Guide',  fn: openRideGuide },
+    { icon:'🗓️', label:'Events',      fn: openAnnualEvents },
+    { icon:'💱', label:'Currency',    fn: openCurrencyConverter },
+  ];
+
+  const _prevRH = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH) _prevRH.apply(this, arguments);
+    setTimeout(() => {
+      const row = document.getElementById('y-quick-row');
+      if (!row || row.querySelector('[data-ee-quick]')) return;
+      EE_QUICK.forEach(b => {
+        const btn = document.createElement('button');
+        btn.setAttribute('data-ee-quick','1');
+        btn.style.cssText = "flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:5px;background:var(--card-bg,#fff);border:1px solid var(--border,#eee);border-radius:14px;padding:12px 14px;cursor:pointer;font-family:'DM Sans',sans-serif;";
+        btn.innerHTML = `<span style="font-size:22px;">${b.icon}</span><span style="font-size:11px;font-weight:700;color:var(--text-primary,#212121);white-space:nowrap;">${b.label}</span>`;
+        btn.onclick = b.fn;
+        row.appendChild(btn);
+      });
+    }, 300);
+  };
+
+  const _prevRA = window.renderAccount;
+  window.renderAccount = function() {
+    if (_prevRA) _prevRA.apply(this, arguments);
+    setTimeout(() => {
+      const loggedIn = document.querySelector('.account-loggedin');
+      if (!loggedIn || loggedIn.querySelector('[data-ee-items]')) return;
+      const adminBtn = loggedIn.querySelector('.adm-account-btn');
+      const labels = { 'Phrasebook':'Language Phrasebook', 'Ride Guide':'Ride Height Guide', 'Events':'Annual Events Calendar', 'Currency':'Currency Converter' };
+      EE_QUICK.forEach(item => {
+        const el = document.createElement('div');
+        el.setAttribute('data-ee-items','1');
+        el.className = 'account-menu-item';
+        el.innerHTML = `<span class="icon">${item.icon}</span><span>${labels[item.label]||item.label}</span><span class="arrow">›</span>`;
+        el.onclick = item.fn;
+        loggedIn.insertBefore(el, adminBtn || null);
+      });
+    }, 100);
+  };
+})();
+</script>
