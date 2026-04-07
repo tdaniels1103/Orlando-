@@ -27130,3 +27130,303 @@ details[open] summary span:last-child{transform:rotate(90deg);}
   };
 })();
 </script>
+<script>
+/* ===== BLOCK JJ1: Ride Wishlist / Bucket List ===== */
+const ALL_RIDES = [
+  // Magic Kingdom
+  { id:'mk1',  name:'Seven Dwarfs Mine Train',      park:'Magic Kingdom',      thrill:3, icon:'💎', tags:['family','coaster'] },
+  { id:'mk2',  name:'Space Mountain',               park:'Magic Kingdom',      thrill:3, icon:'🚀', tags:['classic','coaster'] },
+  { id:'mk3',  name:'Big Thunder Mountain Railroad', park:'Magic Kingdom',     thrill:3, icon:'⛏️', tags:['classic','coaster'] },
+  { id:'mk4',  name:'Haunted Mansion',              park:'Magic Kingdom',      thrill:1, icon:'👻', tags:['classic','dark ride'] },
+  { id:'mk5',  name:'Pirates of the Caribbean',     park:'Magic Kingdom',      thrill:1, icon:'🏴‍☠️', tags:['classic','boat ride'] },
+  { id:'mk6',  name:'Tron Lightcycle Run',          park:'Magic Kingdom',      thrill:4, icon:'🌟', tags:['new','coaster'] },
+  // EPCOT
+  { id:'ep1',  name:'Guardians of the Galaxy: Cosmic Rewind', park:'EPCOT',   thrill:4, icon:'🌌', tags:['new','coaster','indoor'] },
+  { id:'ep2',  name:'Remy\'s Ratatouille Adventure',park:'EPCOT',             thrill:1, icon:'🐀', tags:['family','dark ride'] },
+  { id:'ep3',  name:'Soarin\' Around the World',    park:'EPCOT',             thrill:2, icon:'🌍', tags:['classic','simulator'] },
+  { id:'ep4',  name:'Test Track',                   park:'EPCOT',             thrill:3, icon:'🚗', tags:['classic','simulator'] },
+  { id:'ep5',  name:'Mission: SPACE',               park:'EPCOT',             thrill:4, icon:'🚀', tags:['intense','simulator'] },
+  // Hollywood Studios
+  { id:'hs1',  name:'Rise of the Resistance',       park:'Hollywood Studios',  thrill:3, icon:'⚔️', tags:['star wars','must-do'] },
+  { id:'hs2',  name:'Millennium Falcon: Smugglers Run',park:'Hollywood Studios',thrill:2,icon:'🚀', tags:['star wars','interactive'] },
+  { id:'hs3',  name:'Slinky Dog Dash',              park:'Hollywood Studios',  thrill:2, icon:'🐕', tags:['family','coaster'] },
+  { id:'hs4',  name:'Tower of Terror',              park:'Hollywood Studios',  thrill:4, icon:'🏨', tags:['classic','drop'] },
+  { id:'hs5',  name:'Rock \'n\' Roller Coaster',    park:'Hollywood Studios',  thrill:5, icon:'🎸', tags:['intense','coaster'] },
+  // Animal Kingdom
+  { id:'ak1',  name:'Avatar: Flight of Passage',    park:'Animal Kingdom',     thrill:4, icon:'🦋', tags:['must-do','simulator'] },
+  { id:'ak2',  name:'Expedition Everest',           park:'Animal Kingdom',     thrill:4, icon:'🏔️', tags:['classic','coaster'] },
+  { id:'ak3',  name:'Kilimanjaro Safaris',          park:'Animal Kingdom',     thrill:1, icon:'🦁', tags:['family','outdoor'] },
+  { id:'ak4',  name:'DINOSAUR',                     park:'Animal Kingdom',     thrill:3, icon:'🦕', tags:['classic','dark ride'] },
+  // Universal
+  { id:'un1',  name:'Hagrid\'s Motorbike Adventure',park:'Universal',          thrill:4, icon:'🏍️', tags:['must-do','new','coaster'] },
+  { id:'un2',  name:'VelociCoaster',                park:'Universal',          thrill:5, icon:'🦖', tags:['intense','coaster'] },
+  { id:'un3',  name:'Harry Potter and the Forbidden Journey',park:'Universal', thrill:3, icon:'⚡', tags:['must-do','dark ride'] },
+  { id:'un4',  name:'Revenge of the Mummy',         park:'Universal',          thrill:4, icon:'🧟', tags:['classic','coaster'] },
+  { id:'un5',  name:'Men in Black: Alien Attack',   park:'Universal',          thrill:2, icon:'👽', tags:['interactive','shooter'] },
+  // SeaWorld
+  { id:'sw1',  name:'Mako',                         park:'SeaWorld',           thrill:5, icon:'🦈', tags:['intense','coaster'] },
+  { id:'sw2',  name:'Manta',                        park:'SeaWorld',           thrill:4, icon:'🐟', tags:['coaster','flying'] },
+  { id:'sw3',  name:'Ice Breaker',                  park:'SeaWorld',           thrill:4, icon:'❄️', tags:['launch','coaster'] },
+];
+
+function openRideWishlist() {
+  const existing = document.getElementById('wishlist-overlay');
+  if (existing) existing.remove();
+  const saved = JSON.parse(localStorage.getItem('rideWishlist') || '{"wish":[],"done":[]}');
+  const el = document.createElement('div');
+  el.id = 'wishlist-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;display:flex;flex-direction:column;max-width:430px;left:50%;transform:translateX(-50%);';
+  const doneCount = saved.done.length;
+  const wishCount = saved.wish.length;
+  const totalPossible = ALL_RIDES.length;
+  el.innerHTML = `
+    <div style="background:linear-gradient(135deg,#880E4F,#C2185B,#F06292);padding:18px 16px 16px;flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <button onclick="document.getElementById('wishlist-overlay').remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;">←</button>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;">🎢 Ride Bucket List</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;">
+        <div style="background:rgba(255,255,255,.15);border-radius:12px;padding:10px;text-align:center;">
+          <div style="font-size:22px;font-weight:800;color:#fff;">${doneCount}</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.7);font-weight:700;">RIDDEN</div>
+        </div>
+        <div style="background:rgba(255,255,255,.15);border-radius:12px;padding:10px;text-align:center;">
+          <div style="font-size:22px;font-weight:800;color:#fff;">${wishCount}</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.7);font-weight:700;">WANT TO RIDE</div>
+        </div>
+        <div style="background:rgba(255,255,255,.15);border-radius:12px;padding:10px;text-align:center;">
+          <div style="font-size:22px;font-weight:800;color:#fff;">${totalPossible}</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.7);font-weight:700;">TOTAL RIDES</div>
+        </div>
+      </div>
+      <!-- Progress -->
+      <div style="background:rgba(255,255,255,.2);border-radius:6px;height:6px;overflow:hidden;">
+        <div style="width:${Math.round((doneCount/totalPossible)*100)}%;height:100%;background:#fff;border-radius:6px;"></div>
+      </div>
+      <div style="font-size:10px;color:rgba(255,255,255,.7);margin-top:5px;">${Math.round((doneCount/totalPossible)*100)}% of Orlando rides conquered</div>
+    </div>
+    <!-- Tabs -->
+    <div style="display:flex;border-bottom:2px solid var(--border,#eee);flex-shrink:0;">
+      <button id="wl-tab-all"   onclick="setWLTab('all')"  style="flex:1;padding:12px;border:none;background:var(--card-bg,#fff);font-size:12px;font-weight:700;color:#C2185B;border-bottom:2px solid #C2185B;margin-bottom:-2px;cursor:pointer;font-family:'DM Sans',sans-serif;">All Rides</button>
+      <button id="wl-tab-wish"  onclick="setWLTab('wish')" style="flex:1;padding:12px;border:none;background:var(--card-bg,#fff);font-size:12px;font-weight:700;color:#9E9E9E;cursor:pointer;font-family:'DM Sans',sans-serif;">Want (${wishCount})</button>
+      <button id="wl-tab-done"  onclick="setWLTab('done')" style="flex:1;padding:12px;border:none;background:var(--card-bg,#fff);font-size:12px;font-weight:700;color:#9E9E9E;cursor:pointer;font-family:'DM Sans',sans-serif;">Done (${doneCount})</button>
+    </div>
+    <div style="overflow-y:auto;padding:12px 16px 80px;" id="wl-list"></div>`;
+  document.body.appendChild(el);
+  window._wlTab = 'all';
+  renderWishlist();
+}
+window.openRideWishlist = openRideWishlist;
+
+function setWLTab(tab) {
+  window._wlTab = tab;
+  ['all','wish','done'].forEach(t => {
+    const btn = document.getElementById('wl-tab-'+t);
+    if (!btn) return;
+    if (t === tab) { btn.style.color='#C2185B'; btn.style.borderBottom='2px solid #C2185B'; btn.style.marginBottom='-2px'; }
+    else { btn.style.color='#9E9E9E'; btn.style.borderBottom='none'; btn.style.marginBottom='0'; }
+  });
+  renderWishlist();
+}
+window.setWLTab = setWLTab;
+
+function renderWishlist() {
+  const el = document.getElementById('wl-list');
+  if (!el) return;
+  const saved = JSON.parse(localStorage.getItem('rideWishlist') || '{"wish":[],"done":[]}');
+  const tab = window._wlTab || 'all';
+  let rides = ALL_RIDES;
+  if (tab === 'wish') rides = rides.filter(r => saved.wish.includes(r.id));
+  if (tab === 'done') rides = rides.filter(r => saved.done.includes(r.id));
+  if (!rides.length) { el.innerHTML='<div style="text-align:center;padding:40px;color:#BDBDBD;font-size:13px;">'+(tab==='wish'?'No rides on your wish list yet.':tab==='done'?'No rides checked off yet — get riding!':'')+'</div>'; return; }
+  const parks = [...new Set(rides.map(r => r.park))];
+  const thrillColors = ['','#4CAF50','#8BC34A','#FFC107','#FF9800','#E53935'];
+  el.innerHTML = parks.map(park => `
+    <div style="font-size:11px;font-weight:700;color:#9E9E9E;margin:10px 0 6px;">${park.toUpperCase()}</div>
+    ${rides.filter(r => r.park === park).map(r => {
+      const isDone = saved.done.includes(r.id);
+      const isWish = saved.wish.includes(r.id);
+      return `<div style="background:var(--card-bg,#fff);border-radius:12px;padding:12px 14px;margin-bottom:6px;display:flex;align-items:center;gap:10px;${isDone?'opacity:.65':''}">
+        <span style="font-size:22px;">${r.icon}</span>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:700;color:var(--text-primary);${isDone?'text-decoration:line-through':''}">${r.name}</div>
+          <div style="font-size:11px;color:${thrillColors[r.thrill]};font-weight:700;margin-top:2px;">Thrill: ${'★'.repeat(r.thrill)}${'☆'.repeat(5-r.thrill)}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end;">
+          <button onclick="toggleWLDone('${r.id}')" style="border-radius:8px;padding:4px 10px;border:none;background:${isDone?'#E8F5E9':'var(--bg,#F9F9F9)'};color:${isDone?'#2E7D32':'#9E9E9E'};font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">${isDone?'✓ Done':'Mark done'}</button>
+          <button onclick="toggleWLWish('${r.id}')" style="border-radius:8px;padding:4px 10px;border:none;background:${isWish?'#FCE4EC':'var(--bg,#F9F9F9)'};color:${isWish?'#C2185B':'#9E9E9E'};font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">${isWish?'♥ Saved':'+ Wish list'}</button>
+        </div>
+      </div>`;
+    }).join('')}`).join('');
+}
+window.renderWishlist = renderWishlist;
+
+function toggleWLDone(id) {
+  const d = JSON.parse(localStorage.getItem('rideWishlist') || '{"wish":[],"done":[]}');
+  if (d.done.includes(id)) { d.done = d.done.filter(x => x!==id); }
+  else { d.done.push(id); d.wish = d.wish.filter(x => x!==id); if (typeof awardPoints!=='undefined') awardPoints(15,'Ride checked off'); }
+  localStorage.setItem('rideWishlist', JSON.stringify(d));
+  document.getElementById('wishlist-overlay').remove(); openRideWishlist(); setWLTab(window._wlTab||'all');
+}
+window.toggleWLDone = toggleWLDone;
+
+function toggleWLWish(id) {
+  const d = JSON.parse(localStorage.getItem('rideWishlist') || '{"wish":[],"done":[]}');
+  if (d.wish.includes(id)) { d.wish = d.wish.filter(x => x!==id); }
+  else { d.wish.push(id); }
+  localStorage.setItem('rideWishlist', JSON.stringify(d));
+  document.getElementById('wishlist-overlay').remove(); openRideWishlist(); setWLTab(window._wlTab||'all');
+}
+window.toggleWLWish = toggleWLWish;
+</script>
+<script>
+/* ===== BLOCK JJ2: Photo Spot Guide ===== */
+const PHOTO_SPOTS = [
+  { park:'Magic Kingdom', name:'Cinderella Castle at Main Street Sunrise', location:'End of Main Street, USA', tip:'Arrive 30 min before park opens. Best light faces east — golden hour is magic.', tags:['iconic','sunrise','castle'], icon:'🏰' },
+  { park:'Magic Kingdom', name:'Main Street Confetti Shot', location:'Main Street, USA (center)', tip:'Aim up at 45° during parades — confetti creates dreamy shots. Burst mode!', tags:['parade','fun'], icon:'🎊' },
+  { park:'Magic Kingdom', name:'Tomorrowland Skyline', location:'Tomorrowland Terrace', tip:'Blue-hour shot with the PeopleMover in frame. Tripod recommended.', tags:['night','architecture'], icon:'🚀' },
+  { park:'Magic Kingdom', name:'Liberty Square River reflections', location:'Liberty Square waterfront', tip:'Morning mist over the Rivers of America gives a cinematic look.', tags:['scenic','morning'], icon:'🌊' },
+  { park:'EPCOT', name:'Spaceship Earth Golden Hour', location:'EPCOT entrance plaza', tip:'Stand at the fountain for the classic globe reflection shot.', tags:['iconic','reflection'], icon:'🌐' },
+  { park:'EPCOT', name:'World Showcase at Night', location:'Around World Showcase Lagoon', tip:'After IllumiNations/Harmonious, the pavilions glow. Walk the full loop.', tags:['night','fireworks'], icon:'🌏' },
+  { park:'EPCOT', name:'France Pavilion Archway', location:'France Pavilion', tip:'The Eiffel Tower replica peeks over the rooftops — très romantique.', tags:['architecture','date night'], icon:'🗼' },
+  { park:'Hollywood Studios', name:'Hollywood Blvd & Chinese Theater', location:'Hollywood Blvd entrance', tip:'Tilt your camera to include both the archway and the theater. Magic hour light is stunning.', tags:['iconic','architecture'], icon:'🎬' },
+  { park:'Hollywood Studios', name:'Galaxy\'s Edge Millennium Falcon', location:'Black Spire Outpost', tip:'Shoot from low angle at dawn — fewer crowds + dramatic sky.', tags:['star wars','iconic'], icon:'🚀' },
+  { park:'Hollywood Studios', name:'Tower of Terror Silhouette', location:'Sunset Blvd', tip:'Shoot at dusk with the tower against the orange sky. Lightning bolt moments!', tags:['sunset','dramatic'], icon:'🌆' },
+  { park:'Animal Kingdom', name:'Tree of Life Up-Close', location:'Discovery Island', tip:'Get close and look for animal carvings — there are 325 in the bark.', tags:['iconic','nature','detail'], icon:'🌳' },
+  { park:'Animal Kingdom', name:'Pandora at Night', location:'Pandora — The World of Avatar', tip:'Bioluminescent plants glow after dark. No flash needed — let the light lead.', tags:['night','glowing','dramatic'], icon:'🌌' },
+  { park:'Animal Kingdom', name:'Gorilla Falls Waterfall', location:'Gorilla Falls Exploration Trail', tip:'Hidden gem — lush greenery and real animals. Wide lens or phone portrait mode.', tags:['nature','animals'], icon:'🦍' },
+  { park:'Universal', name:'Hogsmeade Village Snowcapped Roofs', location:'Wizarding World of Harry Potter', tip:'Stand at the village entrance for the full rooftop panorama. Morning fog is extra magical.', tags:['harry potter','iconic','morning'], icon:'⚡' },
+  { park:'Universal', name:'Raptor Encounter (Jurassic World)', location:'Jurassic World area', tip:'Blue the raptor is surprisingly expressive — get your camera ready fast!', tags:['fun','animals'], icon:'🦖' },
+  { park:'Universal', name:'New York Street at Night', location:'Universal Studios Florida', tip:'The animated billboards + neon create a Times Square vibe. Great for wide shots.', tags:['night','cityscape'], icon:'🌆' },
+  { park:'SeaWorld', name:'Manta Ray Pool Reflection', location:'Manta Ray Bay', tip:'Overcast days are ideal — even, soft light and no glare on the water.', tags:['animals','reflection','nature'], icon:'🐟' },
+  { park:'Disney Springs', name:'The BOATHOUSE at Sunset', location:'The Landing, Disney Springs', tip:'The amphibicar fleet + sunlit lake = travel magazine worthy shots.', tags:['sunset','waterfront'], icon:'⚓' },
+];
+
+window._photoSpotPark = 'All';
+
+function openPhotoSpotGuide() {
+  const existing = document.getElementById('photo-spot-overlay');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'photo-spot-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;display:flex;flex-direction:column;max-width:430px;left:50%;transform:translateX(-50%);';
+  const parks = ['All','Magic Kingdom','EPCOT','Hollywood Studios','Animal Kingdom','Universal','SeaWorld','Disney Springs'];
+  el.innerHTML = `
+    <div style="background:linear-gradient(135deg,#1A237E,#283593,#5C6BC0);padding:18px 16px 14px;flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <button onclick="document.getElementById('photo-spot-overlay').remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;">←</button>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;">📸 Best Photo Spots</div>
+      </div>
+      <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;" id="ps-park-tabs">
+        ${parks.map(p => `<button onclick="setPSPark('${p}',this)" style="flex-shrink:0;border-radius:20px;padding:5px 11px;border:1.5px solid ${p==='All'?'#fff':'rgba(255,255,255,.4)'};background:${p==='All'?'rgba(255,255,255,.25)':'transparent'};color:#fff;font-size:10px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">${p==='All'?'All Parks':p.split(' ')[0]}</button>`).join('')}
+      </div>
+    </div>
+    <div style="overflow-y:auto;padding:12px 16px 80px;" id="ps-list"></div>`;
+  document.body.appendChild(el);
+  renderPhotoSpots();
+}
+window.openPhotoSpotGuide = openPhotoSpotGuide;
+
+function setPSPark(p, btn) {
+  window._photoSpotPark = p;
+  document.querySelectorAll('#ps-park-tabs button').forEach(b => { b.style.background='transparent'; b.style.borderColor='rgba(255,255,255,.4)'; });
+  btn.style.background='rgba(255,255,255,.25)'; btn.style.borderColor='#fff';
+  renderPhotoSpots();
+}
+window.setPSPark = setPSPark;
+
+function renderPhotoSpots() {
+  const el = document.getElementById('ps-list');
+  if (!el) return;
+  const park = window._photoSpotPark || 'All';
+  const spots = park === 'All' ? PHOTO_SPOTS : PHOTO_SPOTS.filter(s => s.park === park);
+  const saved = JSON.parse(localStorage.getItem('savedPhotoSpots') || '[]');
+  el.innerHTML = `<div style="font-size:12px;font-weight:700;color:#9E9E9E;margin-bottom:10px;">${spots.length} PHOTO SPOT${spots.length!==1?'S':''}</div>` +
+  spots.map((s,i) => {
+    const isSaved = saved.includes(i + '_' + s.name.slice(0,10));
+    const tagColors = { iconic:'#FF6B35',sunrise:'#FFC107',night:'#1565C0',nature:'#2E7D32',dramatic:'#6A1B9A',morning:'#0277BD' };
+    const primaryTag = s.tags[0];
+    return `
+    <div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:10px;position:relative;">
+      <div style="position:absolute;top:14px;right:14px;">
+        <button onclick="togglePSSaved('${i}_${s.name.slice(0,10)}')" style="background:none;border:none;font-size:20px;cursor:pointer;">${isSaved?'🔖':'🏷️'}</button>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;padding-right:30px;">
+        <span style="font-size:24px;">${s.icon}</span>
+        <div>
+          <div style="font-size:13px;font-weight:800;color:var(--text-primary);margin-bottom:2px;">${s.name}</div>
+          <div style="font-size:11px;color:#9E9E9E;">📍 ${s.location}</div>
+          <div style="font-size:10px;color:#9E9E9E;margin-top:2px;">🏞️ ${s.park}</div>
+        </div>
+      </div>
+      <div style="background:#F3F4FF;border-radius:10px;padding:8px 10px;margin-bottom:8px;">
+        <div style="font-size:11px;color:#283593;line-height:1.5;">📷 ${s.tip}</div>
+      </div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;">
+        ${s.tags.map(t => `<span style="background:${tagColors[t]||'#9E9E9E'}22;color:${tagColors[t]||'#9E9E9E'};border-radius:10px;padding:2px 8px;font-size:10px;font-weight:700;">#${t}</span>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+window.renderPhotoSpots = renderPhotoSpots;
+
+function togglePSSaved(key) {
+  const saved = JSON.parse(localStorage.getItem('savedPhotoSpots') || '[]');
+  const idx = saved.indexOf(key);
+  if (idx >= 0) saved.splice(idx,1); else { saved.push(key); if (typeof showToast!=='undefined') showToast('📸 Spot bookmarked!'); }
+  localStorage.setItem('savedPhotoSpots', JSON.stringify(saved));
+  renderPhotoSpots();
+}
+window.togglePSSaved = togglePSSaved;
+</script>
+<style>
+/* ===== BLOCK JJ CSS ===== */
+#ps-park-tabs::-webkit-scrollbar{display:none;}
+#ps-park-tabs{-ms-overflow-style:none;scrollbar-width:none;}
+#wl-tab-all,#wl-tab-wish,#wl-tab-done{transition:color .15s,border-bottom .15s;}
+</style>
+<script>
+/* ===== BLOCK JJ: Wiring ===== */
+(function wireJJFeatures() {
+  const JJ_QUICK = [
+    { icon:'🎢', label:'Bucket List', fn: openRideWishlist },
+    { icon:'📸', label:'Photo Spots', fn: openPhotoSpotGuide },
+  ];
+
+  const _prevRH = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH) _prevRH.apply(this, arguments);
+    setTimeout(() => {
+      const row = document.getElementById('y-quick-row');
+      if (!row || row.querySelector('[data-jj-quick]')) return;
+      JJ_QUICK.forEach(b => {
+        const btn = document.createElement('button');
+        btn.setAttribute('data-jj-quick','1');
+        btn.style.cssText = "flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:5px;background:var(--card-bg,#fff);border:1px solid var(--border,#eee);border-radius:14px;padding:12px 14px;cursor:pointer;font-family:'DM Sans',sans-serif;";
+        btn.innerHTML = `<span style="font-size:22px;">${b.icon}</span><span style="font-size:11px;font-weight:700;color:var(--text-primary,#212121);white-space:nowrap;">${b.label}</span>`;
+        btn.onclick = b.fn;
+        row.appendChild(btn);
+      });
+    }, 440);
+  };
+
+  const _prevRA = window.renderAccount;
+  window.renderAccount = function() {
+    if (_prevRA) _prevRA.apply(this, arguments);
+    setTimeout(() => {
+      const loggedIn = document.querySelector('.account-loggedin');
+      if (!loggedIn || loggedIn.querySelector('[data-jj-items]')) return;
+      const adminBtn = loggedIn.querySelector('.adm-account-btn');
+      const labels = { 'Bucket List':'Ride Bucket List', 'Photo Spots':'Best Photo Spots Guide' };
+      JJ_QUICK.forEach(item => {
+        const el = document.createElement('div');
+        el.setAttribute('data-jj-items','1');
+        el.className = 'account-menu-item';
+        el.innerHTML = `<span class="icon">${item.icon}</span><span>${labels[item.label]||item.label}</span><span class="arrow">›</span>`;
+        el.onclick = item.fn;
+        loggedIn.insertBefore(el, adminBtn || null);
+      });
+    }, 150);
+  };
+})();
+</script>
