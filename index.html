@@ -29091,3 +29091,594 @@ window.renderDayTrip = renderDayTrip;
   };
 })();
 </script>
+<script>
+/* ===== BLOCK PP1: Florida Food Guide ===== */
+const FLORIDA_FOODS = [
+  { name:'Grouper Sandwich', desc:'The quintessential Florida beach food. Fresh grouper (grilled or fried) on a toasted bun. Order it blackened for maximum flavor.', where:'Frenchy\'s Clearwater, Fish Camp on the Lake (Orlando), any waterfront restaurant', icon:'🐟', cat:'Seafood' },
+  { name:'Key Lime Pie', desc:'Florida\'s official state pie. Authentic version uses actual Key limes — pale yellow, not green. Creamy, tart, and served cold.', where:'The Polite Pig (Disney Springs), Keke\'s Breakfast Café, any Florida diner', icon:'🥧', cat:'Dessert' },
+  { name:'Cuban Sandwich', desc:'A Tampa institution: roasted pork, ham, Swiss cheese, pickles, and mustard on Cuban bread, pressed until crispy and flat.', where:'Cheddar\'s (has a decent version), Columbia Restaurant in Tampa (day trip), Bulla Gastrobar', icon:'🥪', cat:'Sandwich' },
+  { name:'Stone Crab Claws', desc:'Only available October–May. The claw is removed and the crab returned to the water — it regrows! Served cold with mustard sauce.', where:'Joe\'s Crab Shack, The BOATHOUSE (Disney Springs), any upscale seafood restaurant in season', icon:'🦀', cat:'Seafood' },
+  { name:'Conch Fritters', desc:'Chopped conch meat in a seasoned batter, deep fried. A Florida Keys specialty now found throughout Central FL. Crispy, chewy, delicious.', where:'Fish Camp on the Lake, Everglades Restaurant (Universal), many beach restaurants', icon:'🦪', cat:'Snack' },
+  { name:'Fresh-Squeezed OJ', desc:'Florida grows 70% of US orange juice. A glass of fresh-squeezed from a roadside stand is incomparably different from store bought.', where:'Lakeridge Winery stands, Showcase of Citrus (Clermont), any local farmers market', icon:'🍊', cat:'Drink' },
+  { name:'Gator Tail', desc:'Yes, really. Fried alligator tail tastes like a cross between chicken and fish. A true Florida experience tourists should try at least once.', where:'Everglades Restaurant (Universal CityWalk), The Boheme, Café Tu Tu Tango', icon:'🐊', cat:'Adventure Eating' },
+  { name:'Datil Pepper Hot Sauce', desc:'St. Augustine\'s secret weapon. Datil peppers are similar to habanero but fruitier. The local hot sauce is addictive and sold everywhere in NE Florida.', where:'Minorcan Mike\'s in St. Augustine, specialty food shops throughout Florida', icon:'🌶️', cat:'Condiment' },
+  { name:'Boiled Peanuts', desc:'A Southern/Florida roadside staple — raw peanuts slow-cooked in heavily salted water for hours until soft. Sold from roadside kettles.', where:'Any roadside stand on US-27, US-192, or US-441 near Orlando', icon:'🥜', cat:'Snack' },
+  { name:'Florida Craft Beer', desc:'Orlando has a booming craft scene. Orange Blossom Pilsner, Crooked Can Brewing, and Ivanhoe Park Brewing are standouts.', where:'Crooked Can (Plant Street Market, Winter Garden), Ivanhoe Park Brewing (Ivanhoe), 4 Rivers', icon:'🍺', cat:'Drink' },
+  { name:'Swamp Water / Gatorade Origin', desc:'Gatorade was literally invented in Florida — at UF in 1965 to hydrate Gator athletes. Today\'s neon green punch at Disney is a nod to this legacy.', where:'Fun fact — just know it was born here!', icon:'💚', cat:'Fun Fact' },
+  { name:'Malasada (Portuguese Doughnut)', desc:'Brought to Florida\'s Gulf coast by Portuguese fishermen. A soft, eggy doughnut without a hole, rolled in sugar. Incredible with café con leche.', where:'Ybor City bakeries (Tampa day trip), some specialty bakeries in Orlando', icon:'🍩', cat:'Dessert' },
+];
+
+window._foodCat = 'All';
+const FOOD_CATS = ['All',...new Set(FLORIDA_FOODS.map(f => f.cat))];
+
+function openFoodGuide() {
+  const existing = document.getElementById('food-overlay');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'food-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;display:flex;flex-direction:column;max-width:430px;left:50%;transform:translateX(-50%);';
+  el.innerHTML = `
+    <div style="background:linear-gradient(135deg,#BF360C,#D84315,#FF5722);padding:18px 16px 14px;flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <button onclick="document.getElementById('food-overlay').remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;">←</button>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;">🍊 Florida Foods to Try</div>
+      </div>
+      <div style="display:flex;gap:5px;overflow-x:auto;padding-bottom:4px;" id="food-cat-tabs">
+        ${FOOD_CATS.map(c => `<button onclick="setFoodCat('${c}',this)" style="flex-shrink:0;border-radius:20px;padding:5px 10px;border:1.5px solid ${c==='All'?'#fff':'rgba(255,255,255,.4)'};background:${c==='All'?'rgba(255,255,255,.25)':'transparent'};color:#fff;font-size:10px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">${c}</button>`).join('')}
+      </div>
+    </div>
+    <div style="overflow-y:auto;flex:1;padding:14px 16px 80px;" id="food-list"></div>`;
+  document.body.appendChild(el);
+  renderFoodList();
+}
+window.openFoodGuide = openFoodGuide;
+
+function setFoodCat(c, btn) {
+  window._foodCat = c;
+  document.querySelectorAll('#food-cat-tabs button').forEach(b => { b.style.background='transparent'; b.style.borderColor='rgba(255,255,255,.4)'; });
+  btn.style.background='rgba(255,255,255,.25)'; btn.style.borderColor='#fff';
+  renderFoodList();
+}
+window.setFoodCat = setFoodCat;
+
+function renderFoodList() {
+  const el = document.getElementById('food-list');
+  if (!el) return;
+  const cat = window._foodCat || 'All';
+  const items = cat === 'All' ? FLORIDA_FOODS : FLORIDA_FOODS.filter(f => f.cat === cat);
+  const tried = JSON.parse(localStorage.getItem('foodTried') || '[]');
+  el.innerHTML = `<div style="font-size:12px;font-weight:700;color:#9E9E9E;margin-bottom:10px;">${items.length} MUST-TRY FOODS · ${tried.length} tried so far</div>` +
+  items.map(f => {
+    const isTried = tried.includes(f.name);
+    return `<div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:10px;${isTried?'opacity:.7':''}">
+      <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;">
+        <span style="font-size:28px;">${f.icon}</span>
+        <div style="flex:1;">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;">
+            <div style="font-size:13px;font-weight:800;color:var(--text-primary);${isTried?'text-decoration:line-through':''}">${f.name}</div>
+            ${isTried ? '<span style="font-size:10px;background:#E8F5E9;color:#2E7D32;border-radius:8px;padding:1px 7px;font-weight:700;">✓ Tried!</span>' : ''}
+          </div>
+          <div style="font-size:10px;background:#FBE9E7;color:#BF360C;border-radius:8px;padding:2px 8px;display:inline-block;font-weight:700;margin-bottom:6px;">${f.cat}</div>
+          <div style="font-size:12px;color:#757575;line-height:1.4;margin-bottom:6px;">${f.desc}</div>
+          <div style="font-size:11px;color:#FF5722;font-weight:600;">📍 ${f.where}</div>
+        </div>
+      </div>
+      <button onclick="toggleFoodTried('${f.name}')" style="width:100%;border-radius:8px;padding:7px;border:1.5px solid ${isTried?'#4CAF50':'var(--border,#eee)'};background:${isTried?'#E8F5E9':'transparent'};color:${isTried?'#2E7D32':'#9E9E9E'};font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">${isTried?'✓ Tried it!':'Mark as tried'}</button>
+    </div>`;
+  }).join('');
+}
+window.renderFoodList = renderFoodList;
+
+function toggleFoodTried(name) {
+  const tried = JSON.parse(localStorage.getItem('foodTried') || '[]');
+  const idx = tried.indexOf(name);
+  if (idx >= 0) tried.splice(idx,1);
+  else { tried.push(name); if (typeof awardPoints!=='undefined') awardPoints(10,'Florida food tried!'); if (typeof showToast!=='undefined') showToast('🍽️ Marked as tried!'); }
+  localStorage.setItem('foodTried', JSON.stringify(tried));
+  renderFoodList();
+}
+window.toggleFoodTried = toggleFoodTried;
+</script>
+<script>
+/* ===== BLOCK PP2: Shopping Guide ===== */
+const SHOPPING_SPOTS = [
+  { name:'Disney Springs', area:'Disney Property', type:'Entertainment/Shopping', icon:'⭐', color:'#1565C0',
+    desc:'Disney\'s 120-store outdoor shopping and dining complex. No park ticket required.',
+    highlights:['Disney Character Warehouse (deep discounts on Disney merch)','World of Disney (largest Disney store on Earth)','LEGO Store with custom build stations','Marketplace Co-Op for unique local and artist goods','The Art of Disney gallery'],
+    tip:'Park free in the Disney Springs garages. Best prices on Disney merchandise here vs. inside parks.', hours:'10am–11pm daily' },
+  { name:'Premium Outlets — International Drive', area:'I-Drive', type:'Outlet Mall', icon:'🏷️', color:'#6A1B9A',
+    desc:'375+ stores including high-end brands at 25–65% off retail.',
+    highlights:['Coach, Kate Spade, Michael Kors at major discounts','Nike, Adidas, Under Armour factory stores','Saks Off Fifth and Neiman Marcus Last Call','Gap, Banana Republic, J.Crew outlets','Disney Character Warehouse (outlet prices on park merch)'],
+    tip:'Download the Simon app for additional coupons. Tax-free weekend in August is insane — go early.', hours:'10am–10pm (Sun–Thu) · 10am–11pm (Fri–Sat)' },
+  { name:'Premium Outlets — Vineland Ave', area:'Near Disney', type:'Outlet Mall', icon:'🏷️', color:'#AD1457',
+    desc:'The second Premium Outlets location — closer to Disney, slightly different store mix.',
+    highlights:['Burberry, Versace, Salvatore Ferragamo','Pottery Barn, Williams-Sonoma outlet','Tommy Hilfiger, Calvin Klein factories','Crate & Barrel Outlet for home goods','International food court with global cuisine'],
+    tip:'If time is tight, choose one Premium Outlets. Vineland skews more luxury; I-Drive is larger overall.', hours:'10am–10pm daily' },
+  { name:'Mall at Millenia', area:'Near I-4 / Universal', type:'Luxury Mall', icon:'💎', color:'#37474F',
+    desc:'Orlando\'s premier luxury mall — Chanel, Louis Vuitton, Apple, and more.',
+    highlights:['Chanel, Louis Vuitton, Gucci, Tiffany & Co.','Apple Store for tech support and purchases','Bloomingdale\'s and Macy\'s anchors','Tesla showroom','Top-tier food court + sit-down restaurants'],
+    tip:'If your luggage gets damaged at the airport, Tumi is here for replacements. Best Apple Store in Orlando.', hours:'10am–9pm (Mon–Sat) · 12pm–7pm (Sun)' },
+  { name:'Park Avenue (Winter Park)', area:'Winter Park', type:'Boutique Shopping Street', icon:'🌿', color:'#2E7D32',
+    desc:'Half-mile of independently owned boutiques, galleries, and sidewalk cafés.',
+    highlights:['Timothy\'s Gallery for fine art and glass','Rifle Paper Co. flagship store','Local clothing boutiques and jewelers','Pottery, ceramics, and handmade goods','Sunday farmers market (10am–3pm)'],
+    tip:'Park for free on side streets. Best experienced on a Sunday morning when the market is running.', hours:'Varies by store (generally 10am–8pm)' },
+  { name:'Disney Character Warehouse', area:'I-Drive Premium Outlets', type:'Disney Outlet', icon:'🐭', color:'#E53935',
+    desc:'The best-kept secret for Disney merchandise at outlet prices. Same items as the parks, 30–70% off.',
+    highlights:['Plush toys, pins, and clothing at steep discounts','Disney home goods and kitchenware','Seasonal items from recent events','Limited edition items occasionally show up','Great for stocking up on gifts'],
+    tip:'Go when you FIRST arrive in Orlando before the parks — prices are vastly lower than inside Disney. Restock on your last day too.', hours:'10am–10pm daily (inside Premium Outlets)' },
+];
+
+function openShoppingGuide() {
+  const existing = document.getElementById('shop-overlay');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'shop-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;display:flex;flex-direction:column;max-width:430px;left:50%;transform:translateX(-50%);';
+  el.innerHTML = `
+    <div style="background:linear-gradient(135deg,#880E4F,#AD1457,#E91E63);padding:18px 16px 14px;flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <button onclick="document.getElementById('shop-overlay').remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;">←</button>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;">🛍️ Orlando Shopping</div>
+      </div>
+      <div style="font-size:12px;color:rgba(255,255,255,.8);">6 shopping destinations with insider tips</div>
+    </div>
+    <div style="overflow-y:auto;flex:1;padding:14px 16px 80px;">
+      ${SHOPPING_SPOTS.map(s => `
+        <div style="background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;">
+          <div style="background:${s.color};padding:14px 16px;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
+              <div>
+                <div style="font-size:16px;font-weight:800;color:#fff;">${s.icon} ${s.name}</div>
+                <div style="font-size:10px;color:rgba(255,255,255,.8);margin-top:2px;">${s.type} · ${s.area}</div>
+              </div>
+            </div>
+            <div style="font-size:11px;color:rgba(255,255,255,.85);margin-top:6px;">${s.desc}</div>
+          </div>
+          <div style="padding:12px 14px;">
+            <div style="font-size:11px;font-weight:700;color:#9E9E9E;margin-bottom:6px;">HIGHLIGHTS</div>
+            ${s.highlights.map(h => `<div style="font-size:11px;color:var(--text-primary);padding:3px 0;display:flex;gap:6px;align-items:flex-start;"><span style="color:${s.color};">•</span>${h}</div>`).join('')}
+            <div style="background:${s.color}11;border-left:3px solid ${s.color};border-radius:0 8px 8px 0;padding:8px 10px;margin-top:10px;">
+              <div style="font-size:11px;color:${s.color};line-height:1.4;">💡 ${s.tip}</div>
+            </div>
+            <div style="font-size:10px;color:#9E9E9E;margin-top:8px;">⏰ ${s.hours}</div>
+          </div>
+        </div>`).join('')}
+    </div>`;
+  document.body.appendChild(el);
+}
+window.openShoppingGuide = openShoppingGuide;
+</script>
+<script>
+/* ===== BLOCK QQ1: Essential Apps Guide ===== */
+const APP_LIST = [
+  { name:'My Disney Experience', platform:'iOS & Android', icon:'🏰', color:'#1565C0', category:'Disney',
+    uses:['Book Lightning Lane and Genie+ selections','View live wait times for all Disney attractions','Mobile order food at quick-service restaurants','Access your park tickets and reservations','Virtual queue for select attractions (Tiana\'s, etc.)','Photo pass and Disney PhotoPass management'],
+    tip:'Download and set up BEFORE your trip. Link your tickets, hotel reservation, and dining bookings in advance. Enable notifications for virtual queue openings.' },
+  { name:'Universal Orlando', platform:'iOS & Android', icon:'🎭', color:'#1B5E20', category:'Universal',
+    uses:['Virtual Line reservations for popular rides','Live wait times for all Universal attractions','Mobile food ordering at select locations','Park maps with real-time crowd levels','Express Pass redemption','Show times and schedules'],
+    tip:'The Virtual Line in the app is free and essential — reserve time slots for Hagrid\'s and VelociCoaster the moment you enter the park.' },
+  { name:'Google Maps', platform:'iOS & Android', icon:'🗺️', color:'#E53935', category:'Navigation',
+    uses:['Satellite and street view of theme park areas','Restaurant ratings and hours near parks','Orlando traffic overview','Nearby parking lots with pricing','Distance and drive time estimates'],
+    tip:'Download offline maps for the Orlando area before your trip in case of poor data signal inside parks.' },
+  { name:'Waze', platform:'iOS & Android', icon:'🚗', color:'#4CAF50', category:'Navigation',
+    uses:['Real-time I-4 traffic alerts (essential in Orlando)','Police and accident reporting from other drivers','Best route to parks avoiding construction','Parking lot suggestions near destinations'],
+    tip:'Use Waze over Google Maps specifically for I-4 and resort-area driving — it\'s dramatically more accurate for live Orlando traffic.' },
+  { name:'Touring Plans', platform:'iOS & Android', icon:'📊', color:'#6A1B9A', category:'Planning',
+    uses:['Crowd calendar with predicted wait times by date','Optimized touring plans for every Disney/Universal park','Live wait times often more accurate than official apps','Dining reservation finder for hard-to-get spots','Lines app companion with detailed ride stats'],
+    tip:'The subscription (~$15/year) pays for itself on one trip. The Crowd Calendar is invaluable for choosing your park days.' },
+  { name:'MouseWait', platform:'iOS & Android', icon:'🐭', color:'#E91E63', category:'Disney',
+    uses:['Community-sourced wait times','Genie+ and Lightning Lane tracking','Crowd meter for each park','Notes and tips from other park visitors'],
+    tip:'Especially useful for getting crowd-sourced data that may be faster to update than the official Disney app.' },
+  { name:'Lyft / Uber', platform:'iOS & Android', icon:'🚗', color:'#FF6B35', category:'Transport',
+    uses:['Rideshare to/from parks and hotels','Price comparison between apps','Airport pickup scheduling','Shared ride options for groups'],
+    tip:'Have BOTH apps installed. Compare prices for each trip — one is often 20–30% cheaper depending on surge pricing.' },
+  { name:'OpenTable / Resy', platform:'iOS & Android', icon:'🍽️', color:'#FF5722', category:'Dining',
+    uses:['Last-minute restaurant reservations throughout Orlando','Real-time availability for top restaurants','Confirmed booking with SMS reminders','Discovery of new local restaurants'],
+    tip:'For Disney restaurants, use the My Disney Experience app (opens 60 days out). OpenTable/Resy covers all non-Disney Orlando dining.' },
+  { name:'Weather Channel', platform:'iOS & Android', icon:'⛈️', color:'#0277BD', category:'Weather',
+    uses:['Hour-by-hour precipitation forecast essential for park days','Lightning alerts — parks clear attractions immediately','Humidity and heat index for hydration planning','Hourly wind speed (affects outdoor shows and fireworks)'],
+    tip:'Check the hourly forecast each morning. Orlando afternoon thunderstorms are short but intense — plan indoor attractions from 2–4pm daily in summer.' },
+  { name:'Capital One / Chase Travel', platform:'iOS & Android', icon:'💳', color:'#37474F', category:'Finance',
+    uses:['Monitor spending and card transactions in real time','Freeze/unfreeze cards if misplaced','Travel notifications to prevent card blocks','Cash back or points tracking for park purchases'],
+    tip:'Notify your bank BEFORE travel — card blocks mid-vacation are a nightmare. Enable international transactions if visiting Canadian theme park guests.' },
+];
+
+window._appCat = 'All';
+const APP_CATS = ['All',...new Set(APP_LIST.map(a => a.category))];
+
+function openAppsGuide() {
+  const existing = document.getElementById('apps-overlay');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'apps-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;display:flex;flex-direction:column;max-width:430px;left:50%;transform:translateX(-50%);';
+  el.innerHTML = `
+    <div style="background:linear-gradient(135deg,#1A237E,#283593,#3949AB);padding:18px 16px 14px;flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <button onclick="document.getElementById('apps-overlay').remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;">←</button>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;">📱 Essential Apps</div>
+      </div>
+      <div style="display:flex;gap:5px;overflow-x:auto;padding-bottom:4px;" id="app-cat-tabs">
+        ${APP_CATS.map(c => `<button onclick="setAppCat('${c}',this)" style="flex-shrink:0;border-radius:20px;padding:5px 10px;border:1.5px solid ${c==='All'?'#fff':'rgba(255,255,255,.4)'};background:${c==='All'?'rgba(255,255,255,.25)':'transparent'};color:#fff;font-size:10px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">${c}</button>`).join('')}
+      </div>
+    </div>
+    <div style="overflow-y:auto;flex:1;padding:12px 16px 80px;" id="apps-list"></div>`;
+  document.body.appendChild(el);
+  renderAppsList();
+}
+window.openAppsGuide = openAppsGuide;
+
+function setAppCat(c, btn) {
+  window._appCat = c;
+  document.querySelectorAll('#app-cat-tabs button').forEach(b => { b.style.background='transparent'; b.style.borderColor='rgba(255,255,255,.4)'; });
+  btn.style.background='rgba(255,255,255,.25)'; btn.style.borderColor='#fff';
+  renderAppsList();
+}
+window.setAppCat = setAppCat;
+
+function renderAppsList() {
+  const el = document.getElementById('apps-list');
+  if (!el) return;
+  const cat = window._appCat || 'All';
+  const apps = cat === 'All' ? APP_LIST : APP_LIST.filter(a => a.category === cat);
+  el.innerHTML = `<div style="font-size:12px;font-weight:700;color:#9E9E9E;margin-bottom:10px;">${apps.length} APP${apps.length!==1?'S':''}</div>` +
+  apps.map(a => `
+    <div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:10px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <div style="width:44px;height:44px;border-radius:12px;background:${a.color};display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">${a.icon}</div>
+        <div>
+          <div style="font-size:13px;font-weight:800;color:var(--text-primary);">${a.name}</div>
+          <div style="display:flex;gap:5px;margin-top:2px;">
+            <span style="font-size:10px;background:${a.color}22;color:${a.color};border-radius:6px;padding:1px 7px;font-weight:700;">${a.category}</span>
+            <span style="font-size:10px;color:#9E9E9E;">${a.platform}</span>
+          </div>
+        </div>
+      </div>
+      <div style="font-size:11px;font-weight:700;color:#9E9E9E;margin-bottom:5px;">KEY USES</div>
+      ${a.uses.map(u => `<div style="font-size:11px;color:var(--text-primary);padding:2px 0;display:flex;gap:6px;"><span style="color:${a.color};">•</span>${u}</div>`).join('')}
+      <div style="background:${a.color}11;border-left:3px solid ${a.color};border-radius:0 8px 8px 0;padding:8px 10px;margin-top:10px;">
+        <div style="font-size:11px;color:${a.color};line-height:1.4;">💡 ${a.tip}</div>
+      </div>
+    </div>`).join('');
+}
+window.renderAppsList = renderAppsList;
+</script>
+<script>
+/* ===== BLOCK QQ2: Health & Safety Guide ===== */
+const HEALTH_SECTIONS = {
+  heat: {
+    title: 'Heat & Sun Safety',
+    icon: '☀️',
+    color: '#FF6F00',
+    items: [
+      { title:'Heat Exhaustion vs. Heat Stroke', detail:'Heat exhaustion: heavy sweating, weakness, cold/pale skin, weak pulse, nausea. Move to A/C and drink water immediately. Heat stroke: hot/red/dry skin, rapid strong pulse, confusion. THIS IS AN EMERGENCY — call 911 or alert a Cast Member.', urgent:true },
+      { title:'Hydration Rules', detail:'Drink 16–24oz of water per hour in summer heat. Don\'t wait until you\'re thirsty — by then you\'re already mildly dehydrated. Avoid alcohol and excess caffeine during park days.', urgent:false },
+      { title:'Free Water at Disney', detail:'Every Disney quick-service restaurant is required by law to provide free cups of water. Just ask at the counter — no purchase required.', urgent:false },
+      { title:'Sunscreen Protocol', detail:'Apply SPF 50+ 20 minutes before going outside. Reapply every 90 minutes or after water rides. Don\'t forget ears, back of neck, and tops of feet.', urgent:false },
+      { title:'Cooling Stations', detail:'All Disney parks have cooling misting stations. Many merchandise carts sell cooling fans and misters. Wet a bandana and wear it around your neck.', urgent:false },
+    ]
+  },
+  medical: {
+    title: 'Medical Resources',
+    icon: '🏥',
+    color: '#E53935',
+    items: [
+      { title:'First Aid Stations', detail:'Every theme park has a fully staffed First Aid station with registered nurses. At Disney parks: Magic Kingdom (next to Crystal Palace), EPCOT (near World Showcase), Hollywood Studios (entrance area), Animal Kingdom (Discovery Island). Free to use.', urgent:false },
+      { title:'Nearest Hospital (ER)', detail:'AdventHealth Celebration: 400 Celebration Place, Celebration — ~10 min from Disney. (407) 303-4000. Orlando Health: 52 W Underwood St, Downtown Orlando.', urgent:true },
+      { title:'Urgent Care', detail:'Centra Care Walk-In near I-Drive: multiple locations. CareSpot Urgent Care (multiple locations). Both open 7 days/week, typically 8am–8pm.', urgent:false },
+      { title:'Prescription Medication', detail:'CVS and Walgreens have 24-hour pharmacy locations in the Orlando area. Nearest to Disney: CVS on US-192, Walgreens on Apopka-Vineland Rd.', urgent:false },
+      { title:'Cast Member Assistance', detail:'Any Cast Member can call for a wheelchair, medical cart, or First Aid for you. Don\'t hesitate to ask — they\'re trained to handle medical situations quickly and discreetly.', urgent:false },
+    ]
+  },
+  safety: {
+    title: 'Personal Safety',
+    icon: '🛡️',
+    color: '#1565C0',
+    items: [
+      { title:'Child Identification', detail:'Write your cell phone number on your child\'s wrist with permanent marker every morning. If separated, they can show any park employee. Program the hotel number in older kids\' phones.', urgent:true },
+      { title:'If a Child is Lost', detail:'Immediately alert the nearest Cast Member/Team Member. Disney activates "Code 1000" — every Cast Member in the park starts looking. Universal and SeaWorld have similar protocols. Parks take this extremely seriously.', urgent:true },
+      { title:'Phone Charging', detail:'Bring a portable battery pack — phone dies are common after 8+ hours of navigation, photos, and app use. 20,000mAh banks last 2+ full park days. Charging stations inside parks cost $1–2/hr.', urgent:false },
+      { title:'Valuables on Rides', detail:'Use the free lockers outside major coasters (they\'re timed — 90 min free at most). Don\'t keep valuables in back pockets on spinning or inverting rides.', urgent:false },
+      { title:'Scam Awareness', detail:'Timeshare touts on I-Drive and near Disney offer "free tickets" for attending a presentation. The tickets have massive strings attached. Legitimate Disney/Universal tickets are only sold through official channels.', urgent:false },
+    ]
+  },
+  mobility: {
+    title: 'Mobility & Physical Tips',
+    icon: '👟',
+    color: '#2E7D32',
+    items: [
+      { title:'Foot Care', detail:'8–12 miles per day in the parks is brutal on feet. Break in new shoes at home for 2+ weeks. Bring blister bandages (Compeed brand is best). Change socks mid-day.', urgent:false },
+      { title:'Back & Joint Protection', detail:'Many rides have significant jolts (DINOSAUR, Test Track, Slinky Dog). If you have back or neck issues, check the health warning boards at each attraction entrance.', urgent:false },
+      { title:'Sensory Sensitivities', detail:'All Disney parks offer free sensory guides (maps with quiet areas, intense sensory experiences marked). Universal has a similar guide on their website. Ask Guest Relations.', urgent:false },
+      { title:'Rest & Pacing', detail:'The "two-park days" strategy (morning at one park, afternoon rest at hotel, evening at another) dramatically reduces exhaustion. Hotels with good pools make afternoon rest feel like a vacation within the vacation.', urgent:false },
+    ]
+  },
+};
+
+window._healthSection = 'heat';
+
+function openHealthGuide() {
+  const existing = document.getElementById('health-overlay');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'health-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;display:flex;flex-direction:column;max-width:430px;left:50%;transform:translateX(-50%);';
+  const secs = Object.keys(HEALTH_SECTIONS);
+  el.innerHTML = `
+    <div style="background:linear-gradient(135deg,#B71C1C,#C62828,#E53935);padding:18px 16px 14px;flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <button onclick="document.getElementById('health-overlay').remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;">←</button>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;">⚕️ Health & Safety Guide</div>
+      </div>
+      <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;" id="health-tabs">
+        ${secs.map(s => `<button onclick="setHealthSection('${s}',this)" style="flex-shrink:0;border-radius:20px;padding:5px 11px;border:1.5px solid ${s==='heat'?'#fff':'rgba(255,255,255,.4)'};background:${s==='heat'?'rgba(255,255,255,.25)':'transparent'};color:#fff;font-size:10px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">${HEALTH_SECTIONS[s].icon} ${HEALTH_SECTIONS[s].title.split(' ')[0]}</button>`).join('')}
+      </div>
+    </div>
+    <div style="overflow-y:auto;flex:1;padding:14px 16px 80px;" id="health-content"></div>`;
+  document.body.appendChild(el);
+  renderHealthSection();
+}
+window.openHealthGuide = openHealthGuide;
+
+function setHealthSection(s, btn) {
+  window._healthSection = s;
+  document.querySelectorAll('#health-tabs button').forEach(b => { b.style.background='transparent'; b.style.borderColor='rgba(255,255,255,.4)'; });
+  btn.style.background='rgba(255,255,255,.25)'; btn.style.borderColor='#fff';
+  renderHealthSection();
+}
+window.setHealthSection = setHealthSection;
+
+function renderHealthSection() {
+  const el = document.getElementById('health-content');
+  if (!el) return;
+  const sec = HEALTH_SECTIONS[window._healthSection || 'heat'];
+  el.innerHTML = `<div style="background:${sec.color};border-radius:14px;padding:14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;">
+    <span style="font-size:32px;">${sec.icon}</span>
+    <div style="font-size:16px;font-weight:800;color:#fff;">${sec.title}</div>
+  </div>` +
+  sec.items.map(item => `
+    <div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:10px;border-left:4px solid ${item.urgent?'#E53935':sec.color};">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        ${item.urgent ? '<span style="background:#FFEBEE;color:#E53935;border-radius:6px;padding:2px 8px;font-size:10px;font-weight:700;">⚠️ IMPORTANT</span>' : ''}
+        <div style="font-size:13px;font-weight:800;color:var(--text-primary);">${item.title}</div>
+      </div>
+      <div style="font-size:12px;color:#757575;line-height:1.5;">${item.detail}</div>
+    </div>`).join('');
+}
+window.renderHealthSection = renderHealthSection;
+</script>
+<script>
+/* ===== BLOCK RR1: Trip Summary Dashboard ===== */
+function openTripSummary() {
+  const existing = document.getElementById('summary-overlay');
+  if (existing) existing.remove();
+
+  // Collect all data
+  const countdown   = JSON.parse(localStorage.getItem('tripCountdown') || '{}');
+  const budget      = JSON.parse(localStorage.getItem('tripBudget') || '{"total":0,"spent":0,"categories":[]}');
+  const packing     = JSON.parse(localStorage.getItem('packingList') || '[]');
+  const packingDone = JSON.parse(localStorage.getItem('packingChecked') || '[]');
+  const wishlist    = JSON.parse(localStorage.getItem('rideWishlist') || '{"wish":[],"done":[]}');
+  const souvenir    = JSON.parse(localStorage.getItem('souvenirData') || '{"budget":200,"purchases":[]}');
+  const parking     = JSON.parse(localStorage.getItem('parkingSpot') || 'null');
+  const splitData   = JSON.parse(localStorage.getItem('groupSplitter') || '{"people":[],"items":[],"tip":18}');
+  const photoJournal= JSON.parse(localStorage.getItem('photoJournal') || '[]');
+  const foodTried   = JSON.parse(localStorage.getItem('foodTried') || '[]');
+  const photoSpots  = JSON.parse(localStorage.getItem('savedPhotoSpots') || '[]');
+  const userStr     = localStorage.getItem('currentUser');
+  const user        = userStr ? JSON.parse(userStr) : null;
+  const points      = parseInt(localStorage.getItem('userPoints') || '0');
+  const calEvents   = JSON.parse(localStorage.getItem('calendarEvents') || '[]');
+  const reservations= JSON.parse(localStorage.getItem('reservations') || '[]');
+
+  // Countdown calc
+  let daysLeft = null, tripName = '';
+  if (countdown.tripDate) {
+    daysLeft = Math.ceil((new Date(countdown.tripDate) - new Date()) / 86400000);
+    tripName = countdown.tripName || 'My Orlando Trip';
+  }
+
+  // Budget
+  const budgetTotal = parseFloat(budget.total) || 0;
+  const budgetSpent = parseFloat(budget.spent) || (budget.categories||[]).reduce((s,c) => s + (parseFloat(c.spent)||0), 0);
+  const budgetPct   = budgetTotal > 0 ? Math.min(100, Math.round((budgetSpent/budgetTotal)*100)) : 0;
+
+  // Packing
+  const packTotal = packing.length;
+  const packDone  = packingDone.length;
+
+  // Souvenir
+  const svSpent = (souvenir.purchases||[]).reduce((s,p) => s + p.amount, 0);
+
+  // Plans
+  const plans = countdown.plans || {};
+  const planDays = Object.entries(plans).filter(([,v]) => v).length;
+
+  const el = document.createElement('div');
+  el.id = 'summary-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;overflow-y:auto;max-width:430px;left:50%;transform:translateX(-50%);';
+
+  const statCard = (icon, label, value, sub, color) =>
+    `<div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px;">
+      <div style="width:44px;height:44px;border-radius:12px;background:${color}22;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">${icon}</div>
+      <div>
+        <div style="font-size:18px;font-weight:800;color:${color};">${value}</div>
+        <div style="font-size:12px;font-weight:700;color:var(--text-primary);">${label}</div>
+        ${sub ? `<div style="font-size:10px;color:#9E9E9E;">${sub}</div>` : ''}
+      </div>
+    </div>`;
+
+  el.innerHTML = `
+    <!-- Header -->
+    <div style="background:linear-gradient(160deg,#FF6B35,#FFC107);padding:24px 16px 28px;position:relative;overflow:hidden;">
+      <button onclick="document.getElementById('summary-overlay').remove()" style="position:absolute;top:18px;left:16px;background:rgba(255,255,255,.2);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;">←</button>
+      <div style="text-align:center;padding-top:4px;">
+        <div style="font-size:40px;margin-bottom:8px;">🌟</div>
+        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#fff;">${tripName || 'My Orlando Trip'}</div>
+        ${daysLeft !== null ? `<div style="font-size:14px;color:rgba(255,255,255,.9);margin-top:6px;">${daysLeft > 0 ? daysLeft+' days to go!' : daysLeft === 0 ? '🎉 Today is the day!' : 'Trip in progress!'}</div>` : '<div style="font-size:13px;color:rgba(255,255,255,.8);margin-top:6px;">Set your trip date in the Countdown section</div>'}
+        ${user ? `<div style="margin-top:10px;background:rgba(255,255,255,.2);border-radius:20px;padding:4px 16px;display:inline-block;font-size:12px;font-weight:700;color:#fff;">👋 ${user.name || user.email || 'Traveler'} · ⭐ ${points} pts</div>` : ''}
+      </div>
+    </div>
+
+    <div style="padding:16px 16px 80px;">
+      <!-- Countdown & Plans -->
+      ${countdown.tripDate ? `
+      <div style="font-size:12px;font-weight:700;color:#9E9E9E;margin-bottom:8px;">TRIP PLANNING</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
+        ${statCard('⏳','Days Until Trip', daysLeft > 0 ? daysLeft : daysLeft === 0 ? 'Today!' : 'Arrived!', countdown.tripDate, '#7B1FA2')}
+        ${statCard('📅','Days Planned', planDays+'/7', 'park days assigned', '#0277BD')}
+      </div>` : ''}
+
+      <!-- Budget -->
+      <div style="font-size:12px;font-weight:700;color:#9E9E9E;margin-bottom:8px;">BUDGET</div>
+      <div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:8px;">
+          <div><div style="font-size:12px;color:#9E9E9E;">Spent</div><div style="font-size:22px;font-weight:800;color:${budgetPct>=100?'#E53935':budgetPct>=75?'#FF9800':'#4CAF50'};">$${budgetSpent.toFixed(0)}</div></div>
+          <div style="text-align:right;"><div style="font-size:12px;color:#9E9E9E;">Budget</div><div style="font-size:18px;font-weight:700;color:var(--text-primary);">$${budgetTotal.toFixed(0)}</div></div>
+        </div>
+        <div style="background:var(--border,#eee);border-radius:6px;height:8px;overflow:hidden;margin-bottom:6px;">
+          <div style="width:${budgetPct}%;height:100%;background:${budgetPct>=100?'#E53935':budgetPct>=75?'#FF9800':'#4CAF50'};border-radius:6px;transition:width .4s;"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;">
+          <div style="text-align:center;background:#FFF8E1;border-radius:10px;padding:8px;"><div style="font-size:15px;font-weight:800;color:#E65100;">$${svSpent.toFixed(0)}</div><div style="font-size:9px;color:#9E9E9E;font-weight:700;">SOUVENIRS</div></div>
+          <div style="text-align:center;background:#E8F5E9;border-radius:10px;padding:8px;"><div style="font-size:15px;font-weight:800;color:#2E7D32;">${splitData.people.length}</div><div style="font-size:9px;color:#9E9E9E;font-weight:700;">GROUP SIZE</div></div>
+          <div style="text-align:center;background:#E3F2FD;border-radius:10px;padding:8px;"><div style="font-size:15px;font-weight:800;color:#0277BD;">${reservations.length}</div><div style="font-size:9px;color:#9E9E9E;font-weight:700;">RESERVATIONS</div></div>
+        </div>
+      </div>
+
+      <!-- Rides & Activities -->
+      <div style="font-size:12px;font-weight:700;color:#9E9E9E;margin-bottom:8px;">RIDES & ACTIVITIES</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
+        ${statCard('🎢','Rides Done', wishlist.done.length, `of 27 total · ${wishlist.wish.length} on wish list`, '#C2185B')}
+        ${statCard('🍊','Foods Tried', foodTried.length, 'Florida must-tries', '#FF6B35')}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
+        ${statCard('📸','Photo Spots Saved', photoSpots.length, 'bookmarked spots', '#1A237E')}
+        ${statCard('🗒️','Journal Entries', photoJournal.length, 'memories captured', '#4A148C')}
+      </div>
+
+      <!-- Packing -->
+      ${packTotal > 0 ? `
+      <div style="font-size:12px;font-weight:700;color:#9E9E9E;margin-bottom:8px;">PACKING</div>
+      <div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <div style="font-size:14px;font-weight:700;color:var(--text-primary);">Packing List</div>
+          <div style="font-size:13px;font-weight:800;color:${packDone===packTotal?'#4CAF50':'#FF9800'};">${packDone}/${packTotal} packed</div>
+        </div>
+        <div style="background:var(--border,#eee);border-radius:6px;height:6px;overflow:hidden;">
+          <div style="width:${packTotal>0?Math.round((packDone/packTotal)*100):0}%;height:100%;background:${packDone===packTotal?'#4CAF50':'#FF9800'};border-radius:6px;"></div>
+        </div>
+      </div>` : ''}
+
+      <!-- Parking -->
+      ${parking ? `
+      <div style="font-size:12px;font-weight:700;color:#9E9E9E;margin-bottom:8px;">SAVED PARKING SPOT</div>
+      <div style="background:#37474F;border-radius:14px;padding:14px;margin-bottom:16px;cursor:pointer;" onclick="openParkingTracker()">
+        <div style="font-size:16px;font-weight:800;color:#fff;">${parking.park} — ${parking.lot}</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.8);">Section ${parking.section} · ${parking.level}${parking.notes?' · '+parking.notes:''}</div>
+      </div>` : ''}
+
+      <!-- Quick Launch -->
+      <div style="font-size:12px;font-weight:700;color:#9E9E9E;margin-bottom:10px;">QUICK ACCESS</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;">
+        ${[
+          ['⏳','Countdown',openTripCountdown],['💰','Budget',null],['🎢','Bucket List',openRideWishlist],
+          ['🚗','Parking',openParkingTracker],['🛍️','Souvenirs',openSouvenirTracker],['📅','Planner',openTripCountdown],
+        ].map(([icon,label,fn]) => `<button onclick="${fn?fn.name+'()':'document.getElementById(\'summary-overlay\').remove()'}" style="background:var(--card-bg,#fff);border:1px solid var(--border,#eee);border-radius:12px;padding:12px 6px;cursor:pointer;font-family:'DM Sans',sans-serif;">
+          <div style="font-size:22px;margin-bottom:4px;">${icon}</div>
+          <div style="font-size:10px;font-weight:700;color:var(--text-primary);">${label}</div>
+        </button>`).join('')}
+      </div>
+
+      <!-- Points Banner -->
+      <div style="background:linear-gradient(135deg,#FF6B35,#FFC107);border-radius:16px;padding:16px;text-align:center;">
+        <div style="font-size:28px;font-weight:800;color:#fff;margin-bottom:4px;">⭐ ${points} Points</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.85);">Earned from planning activities, rides, and exploring!</div>
+      </div>
+    </div>`;
+  document.body.appendChild(el);
+}
+window.openTripSummary = openTripSummary;
+</script>
+<style>
+/* ===== BLOCKS PP/QQ/RR CSS ===== */
+#food-cat-tabs::-webkit-scrollbar,#app-cat-tabs::-webkit-scrollbar,#health-tabs::-webkit-scrollbar{display:none;}
+#food-cat-tabs,#app-cat-tabs,#health-tabs{-ms-overflow-style:none;scrollbar-width:none;}
+</style>
+<script>
+/* ===== BLOCKS PP/QQ/RR: Wiring ===== */
+(function wireFinalFeatures() {
+  const FINAL_QUICK = [
+    { icon:'🍊', label:'FL Foods',   fn: openFoodGuide },
+    { icon:'🛍️', label:'Shopping',  fn: openShoppingGuide },
+    { icon:'📱', label:'Apps',       fn: openAppsGuide },
+    { icon:'⚕️', label:'Safety',    fn: openHealthGuide },
+    { icon:'🌟', label:'My Trip',   fn: openTripSummary },
+  ];
+
+  const _prevRH = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH) _prevRH.apply(this, arguments);
+    setTimeout(() => {
+      const row = document.getElementById('y-quick-row');
+      if (!row || row.querySelector('[data-final-quick]')) return;
+      FINAL_QUICK.forEach(b => {
+        const btn = document.createElement('button');
+        btn.setAttribute('data-final-quick','1');
+        btn.style.cssText = "flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:5px;background:var(--card-bg,#fff);border:1px solid var(--border,#eee);border-radius:14px;padding:12px 14px;cursor:pointer;font-family:'DM Sans',sans-serif;";
+        btn.innerHTML = `<span style="font-size:22px;">${b.icon}</span><span style="font-size:11px;font-weight:700;color:var(--text-primary,#212121);white-space:nowrap;">${b.label}</span>`;
+        btn.onclick = b.fn;
+        row.appendChild(btn);
+      });
+    }, 560);
+  };
+
+  const _prevRA = window.renderAccount;
+  window.renderAccount = function() {
+    if (_prevRA) _prevRA.apply(this, arguments);
+    setTimeout(() => {
+      const loggedIn = document.querySelector('.account-loggedin');
+      if (!loggedIn || loggedIn.querySelector('[data-final-items]')) return;
+      const adminBtn = loggedIn.querySelector('.adm-account-btn');
+      const labels = {
+        'FL Foods':'Florida Food Bucket List',
+        'Shopping':'Orlando Shopping Guide',
+        'Apps':'Essential Apps Guide',
+        'Safety':'Health & Safety Guide',
+        'My Trip':'Trip Summary Dashboard',
+      };
+      FINAL_QUICK.forEach(item => {
+        const el = document.createElement('div');
+        el.setAttribute('data-final-items','1');
+        el.className = 'account-menu-item';
+        el.innerHTML = `<span class="icon">${item.icon}</span><span>${labels[item.label]||item.label}</span><span class="arrow">›</span>`;
+        el.onclick = item.fn;
+        loggedIn.insertBefore(el, adminBtn || null);
+      });
+    }, 210);
+  };
+
+  // Add "My Trip" summary button to home screen hero
+  const _prevSS4 = window.showScreen;
+  window.showScreen = function(name, navEl) {
+    if (_prevSS4) _prevSS4(name, navEl);
+    if (name === 'home') {
+      setTimeout(() => {
+        if (document.getElementById('final-summary-fab')) return;
+        const fab = document.createElement('button');
+        fab.id = 'final-summary-fab';
+        fab.onclick = openTripSummary;
+        fab.title = 'My Trip Summary';
+        fab.style.cssText = 'position:fixed;bottom:80px;right:16px;z-index:6000;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#FF6B35,#FFC107);border:none;box-shadow:0 4px 16px rgba(255,107,53,.4);cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;';
+        fab.innerHTML = '🌟';
+        document.body.appendChild(fab);
+      }, 300);
+    }
+  };
+})();
+</script>
+<!-- ============================================================
+     ORLANDO TRAVEL GUIDE — COMPLETE
+     Blocks A through RR
+     Built with ❤️ block by block
+     ============================================================ -->
