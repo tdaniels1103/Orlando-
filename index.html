@@ -28688,3 +28688,406 @@ window.renderFactList = renderFactList;
   };
 })();
 </script>
+<script>
+/* ===== BLOCK OO1: Water Park Guide ===== */
+const WATER_PARKS = [
+  {
+    name: 'Typhoon Lagoon',
+    operator: 'Disney',
+    icon: '🌊',
+    color: '#0277BD',
+    tagline: 'Disney\'s surf-themed water park with the world\'s largest surf pool',
+    tip: 'Get there at rope drop — Miss Adventure Falls and Crush \'n\' Gusher fill up fast.',
+    hours: 'Typically 10am–5pm (seasonal)',
+    price: '$109 adult / $93 child (or included with some resort packages)',
+    highlights: [
+      { name:'Crush \'n\' Gusher', type:'Water Coaster', thrill:4, note:'Uphill water coaster. 3 different tube runs. Best of the park.' },
+      { name:'Humunga Kowabunga', type:'Speed Slide', thrill:5, note:'5-story near-vertical drop. Not for the faint of heart.' },
+      { name:'Bay Slides', type:'Speed Slides', thrill:3, note:'Less intense than Humunga — great for working up courage.' },
+      { name:'Miss Adventure Falls', type:'Family Raft', thrill:2, note:'Longest ride in the park. Great for all ages.' },
+      { name:'Typhoon Lagoon Surf Pool', type:'Wave Pool', thrill:2, note:'World\'s largest inland surf pool — massive 6-foot waves on the hour.' },
+      { name:'Shark Reef', type:'Snorkel', thrill:1, note:'Swim with real sharks (small species). Snorkel gear included.' },
+      { name:'Castaway Creek', type:'Lazy River', thrill:1, note:'0.5-mile lazy river — grab a tube and drift for 30 min.' },
+    ],
+    tips:['Arrive 30 min before open — the wave pool fills with prime spots early.','Bring water shoes — the pavement gets scorching in summer.','Lockers near the entrance cost $10–15. Use them to keep valuables dry.','Reef-safe sunscreen only in Shark Reef.'],
+  },
+  {
+    name: 'Blizzard Beach',
+    operator: 'Disney',
+    icon: '❄️',
+    color: '#1565C0',
+    tagline: 'Ski-resort themed park with the world\'s tallest water slide',
+    tip: 'Summit Plummet opens after a soft start — ride it first before lines hit 60+ min.',
+    hours: 'Typically 10am–5pm (seasonal, often closed for refurb in winter)',
+    price: '$109 adult / $93 child',
+    highlights: [
+      { name:'Summit Plummet', type:'Free-Fall Speed Slide', thrill:5, note:'120-foot drop at 60 mph. One of the world\'s tallest and fastest water slides.' },
+      { name:'Slush Gusher', type:'Speed Slide', thrill:4, note:'Almost as intense as Summit Plummet. Airtime bumps mid-slide.' },
+      { name:'Teamboat Springs', type:'Family Raft', thrill:2, note:'Longest family white-water raft ride in the world.' },
+      { name:'Cross Country Creek', type:'Lazy River', thrill:1, note:'Goes THROUGH an ice cave — one of Disney\'s best lazy river theming moments.' },
+      { name:'Melt-Away Bay', type:'Wave Pool', thrill:1, note:'Gentler than Typhoon Lagoon. Great for families with small kids.' },
+      { name:'Tike\'s Peak', type:'Kids Area', thrill:1, note:'Mini slides and splash areas perfect for toddlers.' },
+    ],
+    tips:['Chair Lift to the top of the mountain is a must-ride just for the view.','Ski Patrol Training Camp is a great intermediate option for older kids.','The theming here is Disney\'s most creative — a ski resort that melted.'],
+  },
+  {
+    name: 'Volcano Bay',
+    operator: 'Universal',
+    icon: '🌋',
+    color: '#E65100',
+    tagline: 'Universal\'s Polynesian-themed park with a virtual queue system',
+    tip: 'Use the TapuTapu virtual queue from your wristband — no physical lines for most slides.',
+    hours: 'Typically 9am–5pm or 9am–9pm in summer',
+    price: '$89–$109/day',
+    highlights: [
+      { name:'Krakatau Aqua Coaster', type:'Water Coaster', thrill:4, note:'Signature ride inside the volcano. Uphill coaster thrills with a surprise drop.' },
+      { name:'Ko\'okiri Body Plunge', type:'Trap Door Drop', thrill:5, note:'70-degree drop through the floor of a trap door pod. Terror-inducing.' },
+      { name:'Kala & Tai Nui Serpentine Body Slides', type:'Speed Slides', thrill:4, note:'Two racing slides that intertwine as they drop 124 feet.' },
+      { name:'Honu ika Moana', type:'Family Raft', thrill:2, note:'Multi-person raft ride through the Honu and ika Moana slides.' },
+      { name:'The Reef', type:'Snorkel/Swim', thrill:1, note:'Swim alongside rays and tropical fish in a non-wave pool.' },
+      { name:'Puka Uli Lagoon', type:'Wave Pool', thrill:2, note:'Gentle wave pool — ideal for families and relaxing afternoons.' },
+    ],
+    tips:['The TapuTapu wristband is magic — reserve ride times from your towel.','Peak season waits can be 2+ hours even with virtual queue. Arrive at open.','Private cabanas can be rented for $200–600/day — includes reserved lounge area.'],
+  },
+  {
+    name: 'Aquatica',
+    operator: 'SeaWorld',
+    icon: '🐬',
+    color: '#006064',
+    tagline: 'SeaWorld\'s water park — best value in Orlando',
+    tip: 'Frequently the least-crowded major water park. Combine with a SeaWorld visit for savings.',
+    hours: 'Typically 10am–5pm (seasonal)',
+    price: '$60–$85/day (best deals with SeaWorld combo tickets)',
+    highlights: [
+      { name:'Ihu\'s Breakaway Falls', type:'Trap Door Drop', thrill:5, note:'4-story trap door — some enclosed, some open. Total free-fall sensation.' },
+      { name:'Omaka Rocka', type:'Body Slide', thrill:3, note:'4-person tube through a half-pipe. Great group ride.' },
+      { name:'Tassie\'s Twisters', type:'Speed Bowl', thrill:4, note:'Spinning funnel ride with intense G-forces.' },
+      { name:'Walkabout Waters', type:'Kids Area', thrill:1, note:'Best kids water play area of any Orlando water park — 4 stories tall.' },
+      { name:'Loggerhead Lane', type:'Lazy River', thrill:1, note:'Unique — floats through a tank with real stingrays and fish visible above.' },
+      { name:'Big Surf Shores', type:'Wave Pool', thrill:2, note:'Large wave pool — less intense than Typhoon Lagoon.' },
+    ],
+    tips:['Often 40–50% cheaper than Disney water parks.','The lazy river through the fish tank is one of Orlando\'s most unique experiences.','Combo tickets with SeaWorld can drop prices to ~$40/park.'],
+  },
+];
+
+window._wpIdx = 0;
+
+function openWaterParkGuide() {
+  const existing = document.getElementById('waterpark-overlay');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'waterpark-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;display:flex;flex-direction:column;max-width:430px;left:50%;transform:translateX(-50%);';
+  el.innerHTML = `
+    <div style="background:linear-gradient(135deg,#01579B,#0288D1,#29B6F6);padding:18px 16px 14px;flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <button onclick="document.getElementById('waterpark-overlay').remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;">←</button>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;">💦 Water Parks</div>
+      </div>
+      <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;" id="wp-tabs">
+        ${WATER_PARKS.map((p,i) => `<button onclick="setWPIdx(${i},this)" style="flex-shrink:0;border-radius:20px;padding:5px 12px;border:1.5px solid ${i===0?'#fff':'rgba(255,255,255,.4)'};background:${i===0?'rgba(255,255,255,.25)':'transparent'};color:#fff;font-size:10px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">${p.icon} ${p.name.split(' ')[0]}</button>`).join('')}
+      </div>
+    </div>
+    <div style="overflow-y:auto;flex:1;padding:14px 16px 80px;" id="wp-content"></div>`;
+  document.body.appendChild(el);
+  renderWaterPark(0);
+}
+window.openWaterParkGuide = openWaterParkGuide;
+
+function setWPIdx(i, btn) {
+  window._wpIdx = i;
+  document.querySelectorAll('#wp-tabs button').forEach(b => { b.style.background='transparent'; b.style.borderColor='rgba(255,255,255,.4)'; });
+  btn.style.background='rgba(255,255,255,.25)'; btn.style.borderColor='#fff';
+  renderWaterPark(i);
+}
+window.setWPIdx = setWPIdx;
+
+function renderWaterPark(i) {
+  const el = document.getElementById('wp-content');
+  if (!el) return;
+  const p = WATER_PARKS[i];
+  const thrillColors = ['','#4CAF50','#8BC34A','#FFC107','#FF9800','#E53935'];
+  el.innerHTML = `
+    <div style="background:${p.color};border-radius:16px;padding:16px;margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+        <div>
+          <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.7);">${p.operator.toUpperCase()} WATER PARK</div>
+          <div style="font-size:20px;font-weight:800;color:#fff;">${p.name}</div>
+        </div>
+        <span style="font-size:36px;">${p.icon}</span>
+      </div>
+      <div style="font-size:12px;color:rgba(255,255,255,.85);margin-bottom:10px;">${p.tagline}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+        <div style="background:rgba(255,255,255,.15);border-radius:8px;padding:6px 8px;">
+          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.7);">HOURS</div>
+          <div style="font-size:10px;color:#fff;">${p.hours}</div>
+        </div>
+        <div style="background:rgba(255,255,255,.15);border-radius:8px;padding:6px 8px;">
+          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.7);">TICKET</div>
+          <div style="font-size:10px;color:#fff;">${p.price.split('/')[0]}</div>
+        </div>
+      </div>
+    </div>
+    <div style="background:#FFF8E1;border:1px solid #FFD54F;border-radius:12px;padding:10px 12px;margin-bottom:14px;">
+      <div style="font-size:11px;color:#E65100;line-height:1.4;">⭐ <strong>Pro Tip:</strong> ${p.tip}</div>
+    </div>
+    <div style="font-size:12px;font-weight:700;color:#9E9E9E;margin-bottom:8px;">ATTRACTIONS</div>
+    ${p.highlights.map(h => `
+      <div style="background:var(--card-bg,#fff);border-radius:12px;padding:12px 14px;margin-bottom:8px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
+          <div style="font-size:13px;font-weight:800;color:var(--text-primary);">${h.name}</div>
+          <span style="background:${thrillColors[h.thrill]}22;color:${thrillColors[h.thrill]};border-radius:8px;padding:2px 8px;font-size:10px;font-weight:700;white-space:nowrap;">${h.type}</span>
+        </div>
+        <div style="font-size:11px;color:#9E9E9E;line-height:1.4;">${h.note}</div>
+      </div>`).join('')}
+    <div style="font-size:12px;font-weight:700;color:#9E9E9E;margin:12px 0 8px;">INSIDER TIPS</div>
+    ${p.tips.map(t => `<div style="background:var(--card-bg,#fff);border-radius:12px;padding:10px 14px;margin-bottom:6px;display:flex;align-items:flex-start;gap:8px;">
+      <span style="font-size:14px;">💡</span>
+      <div style="font-size:12px;color:var(--text-primary);line-height:1.4;">${t}</div>
+    </div>`).join('')}`;
+}
+window.renderWaterPark = renderWaterPark;
+</script>
+<script>
+/* ===== BLOCK OO2: Day Trip Guide ===== */
+const DAY_TRIPS = [
+  {
+    name: 'Kennedy Space Center',
+    distance: '60 miles east of Orlando',
+    driveTime: '~1 hour via SR-528',
+    icon: '🚀',
+    color: '#1A237E',
+    tagline: 'America\'s legendary space launch facility — live rocket launches possible!',
+    bestFor: 'Space fans, families, anyone with a sense of wonder',
+    price: '$75 adult / $65 child (3–11)',
+    hours: '9am–6pm daily',
+    highlights: [
+      'Atlantis Space Shuttle — full orbiter on display with incredible 3D film intro',
+      'Launch Pad 39A bus tour — where SpaceX Falcon 9 launches happen today',
+      'Apollo/Saturn V Center — 363-foot Saturn V rocket lying on its side',
+      'Astronaut Hall of Fame — multi-axis trainer simulator, real spacesuits',
+      'Rocket Garden — walk among actual Mercury, Gemini, and Atlas rockets',
+    ],
+    tips: [
+      'Check the SpaceX/NASA launch schedule — witnessing a real launch is life-changing.',
+      'Arrive at 9am sharp — lines for the bus tour to the launch pads get very long.',
+      'Budget a full day — most visitors spend 6–8 hours and don\'t see everything.',
+    ]
+  },
+  {
+    name: 'St. Augustine',
+    distance: '110 miles northeast',
+    driveTime: '~1.5 hours via I-95',
+    icon: '🏰',
+    color: '#4A148C',
+    tagline: 'America\'s oldest city — cobblestone streets, Spanish forts, and ghost tours',
+    bestFor: 'History lovers, couples, architecture enthusiasts',
+    price: 'Free to wander; fort $15/person; trolley tours $30',
+    hours: 'Castillo de San Marcos: 9am–5pm daily',
+    highlights: [
+      'Castillo de San Marcos — 350-year-old coquina stone fort overlooking the bay',
+      'St. George Street — pedestrian shopping district with artisan shops',
+      'Flagler College — stunning Ponce de León Hotel turned university campus (free tours)',
+      'Old Jail & Ripley\'s — classic tourist fun in historic buildings',
+      'Lightner Museum — antiques, art glass, and a café in a former hotel ballroom',
+    ],
+    tips: [
+      'Ghost tours at night are wildly popular — book the Old Jail ghost tour in advance.',
+      'The Old Town Trolley is the best way to navigate — hop on/off all day.',
+      'Eat at Columbia Restaurant — 100-year-old Cuban institution on St. George Street.',
+    ]
+  },
+  {
+    name: 'Clearwater Beach',
+    distance: '110 miles west',
+    driveTime: '~1.5 hours via I-4 West to I-275',
+    icon: '🏖️',
+    color: '#00838F',
+    tagline: 'Consistently ranked America\'s #1 beach — white sugar sand, crystal water',
+    bestFor: 'Beach lovers, families, sunset seekers',
+    price: 'Free beach access; parking $3–5/hour',
+    hours: 'Beach open 24/7; pier 7am–10pm',
+    highlights: [
+      'Clearwater Beach — 35 acres of white quartz sand, ultra-clear Gulf water',
+      'Pier 60 Sunset Celebration — nightly street performers and artisans at sunset',
+      'Dolphin Watching Cruises — multiple operators offer 90-min tours',
+      'Caladesi Island State Park — boat to an untouched barrier island (ferry $16)',
+      'Captain Memo\'s Pirate Cruise — fun pirate sailing cruise for all ages',
+    ],
+    tips: [
+      'Go on a weekday — Clearwater is wildly crowded on weekends in season.',
+      'The Gulf of Mexico water is typically 80°F in summer — warmer than the Atlantic.',
+      'Frenchy\'s Rockaway Grill on the beach is the most famous local seafood spot.',
+    ]
+  },
+  {
+    name: 'Busch Gardens Tampa',
+    distance: '80 miles west',
+    driveTime: '~1 hour 15 min via I-4 West',
+    icon: '🦁',
+    color: '#2E7D32',
+    tagline: 'Africa-themed park with some of Florida\'s best roller coasters',
+    bestFor: 'Thrill seekers, coaster fans, families',
+    price: '$109 adult / $99 child; combo deals with Adventure Island',
+    hours: '10am–6pm (seasonal variations)',
+    highlights: [
+      'Iron Gwazi — #1 steel hybrid coaster in North America. 206-foot drop, 76 mph.',
+      'Serengeti Express Steam Train — 2.5-mile scenic train through animal savanna',
+      'Cheetah Hunt — triple-launch coaster through ravines and over bridges',
+      'Montu — classic inverted coaster; still one of the best in Florida',
+      'Animal Encounters — up-close giraffe, rhino, cheetah viewing areas',
+    ],
+    tips: [
+      'Iron Gwazi is a bucket-list coaster — ride it multiple times while there.',
+      'Buy tickets online for 20–30% off gate price.',
+      'The Quick Queue (Express Pass) is worth it on busy days — lines get very long.',
+    ]
+  },
+  {
+    name: 'New Smyrna Beach',
+    distance: '55 miles east',
+    driveTime: '~55 min via I-4 to US-44',
+    icon: '🌊',
+    color: '#006064',
+    tagline: 'Charming surf town — the anti-Daytona. Artsy, laid-back, local',
+    bestFor: 'Surfers, foodies, anyone wanting a real Florida beach town',
+    price: 'Free beach; $10 parking/day',
+    hours: 'Beach open daily',
+    highlights: [
+      'Flagler Avenue — the main drag with great restaurants, surf shops, galleries',
+      'Smyrna Dunes Park — 1.5-mile boardwalk loop through a maritime hammock',
+      'Third Wave Café — famous local breakfast/brunch spot',
+      'Surfing — NSB is one of Florida\'s best surf breaks',
+      'Ponce Inlet Lighthouse — just south; climb for panoramic Atlantic views',
+    ],
+    tips: [
+      'This is a real local beach town — far less crowded than Daytona or Cocoa Beach.',
+      'The north end of Flagler Ave has free beach access and metered parking.',
+      'Great white shark sightings are more common here than anywhere in FL — don\'t panic, just be aware.',
+    ]
+  },
+];
+
+window._dtIdx = 0;
+
+function openDayTripGuide() {
+  const existing = document.getElementById('daytrip-overlay');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'daytrip-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;display:flex;flex-direction:column;max-width:430px;left:50%;transform:translateX(-50%);';
+  el.innerHTML = `
+    <div style="background:linear-gradient(135deg,#33691E,#558B2F,#7CB342);padding:18px 16px 14px;flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <button onclick="document.getElementById('daytrip-overlay').remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;">←</button>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;">🗺️ Day Trips from Orlando</div>
+      </div>
+      <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;" id="dt-tabs">
+        ${DAY_TRIPS.map((t,i) => `<button onclick="setDTIdx(${i},this)" style="flex-shrink:0;border-radius:20px;padding:5px 12px;border:1.5px solid ${i===0?'#fff':'rgba(255,255,255,.4)'};background:${i===0?'rgba(255,255,255,.25)':'transparent'};color:#fff;font-size:10px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">${t.icon} ${t.name.split(' ')[0]}</button>`).join('')}
+      </div>
+    </div>
+    <div style="overflow-y:auto;flex:1;padding:14px 16px 80px;" id="dt-content"></div>`;
+  document.body.appendChild(el);
+  renderDayTrip(0);
+}
+window.openDayTripGuide = openDayTripGuide;
+
+function setDTIdx(i, btn) {
+  window._dtIdx = i;
+  document.querySelectorAll('#dt-tabs button').forEach(b => { b.style.background='transparent'; b.style.borderColor='rgba(255,255,255,.4)'; });
+  btn.style.background='rgba(255,255,255,.25)'; btn.style.borderColor='#fff';
+  renderDayTrip(i);
+}
+window.setDTIdx = setDTIdx;
+
+function renderDayTrip(i) {
+  const el = document.getElementById('dt-content');
+  if (!el) return;
+  const t = DAY_TRIPS[i];
+  el.innerHTML = `
+    <div style="background:${t.color};border-radius:16px;padding:16px;margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+        <div>
+          <div style="font-size:20px;font-weight:800;color:#fff;">${t.name}</div>
+          <div style="font-size:12px;color:rgba(255,255,255,.85);margin-top:2px;">${t.tagline}</div>
+        </div>
+        <span style="font-size:36px;">${t.icon}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px;">
+        <div style="background:rgba(255,255,255,.15);border-radius:8px;padding:6px 8px;">
+          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.7);">🚗 DRIVE TIME</div>
+          <div style="font-size:11px;color:#fff;">${t.driveTime}</div>
+        </div>
+        <div style="background:rgba(255,255,255,.15);border-radius:8px;padding:6px 8px;">
+          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.7);">💰 PRICE</div>
+          <div style="font-size:11px;color:#fff;">${t.price.split(';')[0]}</div>
+        </div>
+      </div>
+    </div>
+    <div style="background:#E8F5E9;border-radius:12px;padding:10px 12px;margin-bottom:14px;font-size:12px;color:#2E7D32;">
+      <strong>Best for:</strong> ${t.bestFor}
+    </div>
+    <div style="font-size:12px;font-weight:700;color:#9E9E9E;margin-bottom:8px;">TOP HIGHLIGHTS</div>
+    ${t.highlights.map((h,idx) => `
+      <div style="background:var(--card-bg,#fff);border-radius:12px;padding:12px 14px;margin-bottom:6px;display:flex;align-items:flex-start;gap:10px;">
+        <span style="background:${t.color};color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;">${idx+1}</span>
+        <div style="font-size:12px;color:var(--text-primary);line-height:1.4;">${h}</div>
+      </div>`).join('')}
+    <div style="font-size:12px;font-weight:700;color:#9E9E9E;margin:12px 0 8px;">INSIDER TIPS</div>
+    ${t.tips.map(tip => `<div style="background:var(--card-bg,#fff);border-radius:12px;padding:10px 14px;margin-bottom:6px;display:flex;align-items:flex-start;gap:8px;">
+      <span style="font-size:14px;">💡</span>
+      <div style="font-size:12px;color:var(--text-primary);line-height:1.5;">${tip}</div>
+    </div>`).join('')}`;
+}
+window.renderDayTrip = renderDayTrip;
+</script>
+<style>
+/* ===== BLOCK OO CSS ===== */
+#wp-tabs::-webkit-scrollbar,#dt-tabs::-webkit-scrollbar{display:none;}
+#wp-tabs,#dt-tabs{-ms-overflow-style:none;scrollbar-width:none;}
+</style>
+<script>
+/* ===== BLOCK OO: Wiring ===== */
+(function wireOOFeatures() {
+  const OO_QUICK = [
+    { icon:'💦', label:'Water Parks', fn: openWaterParkGuide },
+    { icon:'🗺️', label:'Day Trips',   fn: openDayTripGuide },
+  ];
+
+  const _prevRH = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH) _prevRH.apply(this, arguments);
+    setTimeout(() => {
+      const row = document.getElementById('y-quick-row');
+      if (!row || row.querySelector('[data-oo-quick]')) return;
+      OO_QUICK.forEach(b => {
+        const btn = document.createElement('button');
+        btn.setAttribute('data-oo-quick','1');
+        btn.style.cssText = "flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:5px;background:var(--card-bg,#fff);border:1px solid var(--border,#eee);border-radius:14px;padding:12px 14px;cursor:pointer;font-family:'DM Sans',sans-serif;";
+        btn.innerHTML = `<span style="font-size:22px;">${b.icon}</span><span style="font-size:11px;font-weight:700;color:var(--text-primary,#212121);white-space:nowrap;">${b.label}</span>`;
+        btn.onclick = b.fn;
+        row.appendChild(btn);
+      });
+    }, 540);
+  };
+
+  const _prevRA = window.renderAccount;
+  window.renderAccount = function() {
+    if (_prevRA) _prevRA.apply(this, arguments);
+    setTimeout(() => {
+      const loggedIn = document.querySelector('.account-loggedin');
+      if (!loggedIn || loggedIn.querySelector('[data-oo-items]')) return;
+      const adminBtn = loggedIn.querySelector('.adm-account-btn');
+      const labels = { 'Water Parks':'Water Park Guide', 'Day Trips':'Day Trips from Orlando' };
+      OO_QUICK.forEach(item => {
+        const el = document.createElement('div');
+        el.setAttribute('data-oo-items','1');
+        el.className = 'account-menu-item';
+        el.innerHTML = `<span class="icon">${item.icon}</span><span>${labels[item.label]||item.label}</span><span class="arrow">›</span>`;
+        el.onclick = item.fn;
+        loggedIn.insertBefore(el, adminBtn || null);
+      });
+    }, 200);
+  };
+})();
+</script>
