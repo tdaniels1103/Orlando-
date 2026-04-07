@@ -27430,3 +27430,291 @@ window.togglePSSaved = togglePSSaved;
   };
 })();
 </script>
+<script>
+/* ===== BLOCK KK1: Show & Entertainment Guide ===== */
+const SHOWS_DATA = {
+  'Magic Kingdom': [
+    { name:'Festival of Fantasy Parade', time:'3:00 PM', duration:'12 min', type:'Parade', tip:'Stake out a Main Street spot 45–60 min early. Shade is on the right side.', icon:'🎪' },
+    { name:'Mickey\'s Magical Friendship Faire', time:'11am, 1pm, 3pm, 5pm', duration:'20 min', type:'Stage Show', tip:'Cinderella Castle stage. Great photo of all characters together.', icon:'🎭' },
+    { name:'Happily Ever After Fireworks', time:'9:00 PM (seasonal)', duration:'18 min', type:'Fireworks', tip:'Best view from the Main Street hub. Arrive 45 min early.', icon:'🎆' },
+    { name:'Move It! Shake It! MousekeDance It!', time:'12pm, 2pm, 4pm', duration:'15 min', type:'Dance Party', tip:'Kids get to parade with characters. Stay near the hub.', icon:'💃' },
+    { name:'The Muppets Present... Great Moments in American History', time:'Hourly', duration:'8 min', type:'Window Show', tip:'Funny and free — the Liberty Square balcony show is often missed.', icon:'🐸' },
+  ],
+  'EPCOT': [
+    { name:'EPCOT Forever / Luminous Fireworks', time:'9:00 PM', duration:'12 min', type:'Fireworks', tip:'World Showcase lagoon — any spot works. UK pavilion area is less crowded.', icon:'🎆' },
+    { name:'Voices of Liberty', time:'Every 30 min, 11am–4pm', duration:'10 min', type:'A Cappella', tip:'Inside the American Adventure rotunda. Stunning acoustics.', icon:'🎤' },
+    { name:'Bijutsu-kan Gallery', time:'All day', duration:'Self-paced', type:'Exhibition', tip:'Japan Pavilion rotating art exhibit — often overlooked gem.', icon:'🎨' },
+    { name:'Off Kilter / World Showcase performers', time:'Various', duration:'20–30 min', type:'Live Music', tip:'Check the EPCOT app for roving live music schedule throughout World Showcase.', icon:'🎶' },
+  ],
+  'Hollywood Studios': [
+    { name:'Indiana Jones Epic Stunt Spectacular', time:'12pm, 3pm, 5pm', duration:'30 min', type:'Stunt Show', tip:'Audience members get picked. Volunteer enthusiastically near the exit.', icon:'🎬' },
+    { name:'Star Wars: A Galaxy Far, Far Away', time:'Multiple daily', duration:'12 min', type:'Stage Show', tip:'Chinese Theater stage show with characters and pyrotechnics.', icon:'⭐' },
+    { name:'For the First Time in Forever: A Frozen Sing-Along', time:'Multiple daily', duration:'30 min', type:'Sing-Along', tip:'Air-conditioned theater. Great for mid-day heat break.', icon:'❄️' },
+    { name:'Disney Junior Play & Dance!', time:'Multiple daily', duration:'25 min', type:'Kids Show', tip:'Huge hit with toddlers. Hands-on dancing and characters.', icon:'🎠' },
+    { name:'Fantasmic!', time:'8:30pm & 10pm (select nights)', duration:'30 min', type:'Nighttime Show', tip:'Book the Fantasmic! dining package for guaranteed reserved seating.', icon:'🌟' },
+  ],
+  'Animal Kingdom': [
+    { name:'Festival of the Lion King', time:'Multiple daily', duration:'30 min', type:'Stage Show', tip:'One of Disney\'s best live shows. Get there 30 min early.', icon:'🦁' },
+    { name:'Finding Nemo: The Big Blue… and Beyond!', time:'Multiple daily', duration:'25 min', type:'Stage Show', tip:'New version with live singers + puppets. Great for all ages.', icon:'🐠' },
+    { name:'UP! A Great Bird Adventure', time:'Multiple daily', duration:'25 min', type:'Bird Show', tip:'Unexpected tearjerker + amazing bird demonstrations.', icon:'🐦' },
+    { name:'Rivers of Light', time:'8pm select nights', duration:'18 min', type:'Nighttime Show', tip:'Water screens + floating lanterns. Book dining package for seats.', icon:'🏮' },
+  ],
+  'Universal': [
+    { name:'Universal\'s Cinematic Spectacular', time:'9:00 PM select nights', duration:'20 min', type:'Fireworks', tip:'Central Park lagoon — Premium seating dining packages available.', icon:'🎆' },
+    { name:'The Bourne Stuntacular', time:'Multiple daily', duration:'25 min', type:'Stunt Show', tip:'Mind-bending live + screen hybrid. Watch how they switch seamlessly.', icon:'🎬' },
+    { name:'Animal Actors on Location!', time:'Multiple daily', duration:'20 min', type:'Animal Show', tip:'Live trained animal show — kids love the dogs.', icon:'🐕' },
+    { name:'Ollivanders Wand Experience', time:'Every 30 min', duration:'10 min', type:'Interactive', tip:'One child gets selected as the wand chooses them. Bring kids!', icon:'⚡' },
+  ],
+  'SeaWorld': [
+    { name:'Orca Encounter', time:'11am, 1pm, 3pm', duration:'25 min', type:'Educational Show', tip:'No splashing — it\'s a behavior demo. Front rows stay dry.', icon:'🐋' },
+    { name:'Dolphin Days', time:'12pm, 2pm', duration:'25 min', type:'Animal Show', tip:'Inspiring dolphin behavior show. One of SeaWorld\'s best.', icon:'🐬' },
+    { name:'Sea Lions Live', time:'11am, 1:30pm', duration:'25 min', type:'Comedy Show', tip:'Hilarious — the sea lion performers steal the show.', icon:'🦭' },
+    { name:'Elmo Rocks!', time:'Multiple daily', duration:'20 min', type:'Kids Show', tip:'Perfect for toddlers. The Sesame Street characters rock out.', icon:'🎸' },
+  ],
+};
+
+window._showPark = 'Magic Kingdom';
+
+function openShowGuide() {
+  const existing = document.getElementById('show-overlay');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'show-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;display:flex;flex-direction:column;max-width:430px;left:50%;transform:translateX(-50%);';
+  const parks = Object.keys(SHOWS_DATA);
+  const typeColors = { 'Parade':'#FF6B35','Stage Show':'#9C27B0','Fireworks':'#1565C0','Stunt Show':'#E53935','Sing-Along':'#00ACC1','Kids Show':'#FFC107','Nighttime Show':'#37474F','A Cappella':'#2E7D32','Live Music':'#558B2F','Interactive':'#FF6B35','Educational Show':'#0277BD','Animal Show':'#2E7D32','Comedy Show':'#FF8F00','Dance Party':'#C62828','Exhibition':'#4A148C','Bird Show':'#558B2F','Window Show':'#6D4C41' };
+  el.innerHTML = `
+    <div style="background:linear-gradient(135deg,#4A148C,#7B1FA2,#AB47BC);padding:18px 16px 14px;flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <button onclick="document.getElementById('show-overlay').remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;">←</button>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;">🎭 Shows & Entertainment</div>
+      </div>
+      <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;" id="show-park-tabs">
+        ${parks.map(p => `<button onclick="setShowPark('${p}',this)" style="flex-shrink:0;border-radius:20px;padding:5px 11px;border:1.5px solid ${p===window._showPark?'#fff':'rgba(255,255,255,.4)'};background:${p===window._showPark?'rgba(255,255,255,.25)':'transparent'};color:#fff;font-size:10px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">${p.split(' ')[0]}</button>`).join('')}
+      </div>
+    </div>
+    <div style="overflow-y:auto;padding:14px 16px 80px;" id="show-list"></div>`;
+  document.body.appendChild(el);
+  renderShowList(typeColors);
+  window._showTypeColors = typeColors;
+}
+window.openShowGuide = openShowGuide;
+
+function setShowPark(p, btn) {
+  window._showPark = p;
+  document.querySelectorAll('#show-park-tabs button').forEach(b => { b.style.background='transparent'; b.style.borderColor='rgba(255,255,255,.4)'; });
+  btn.style.background='rgba(255,255,255,.25)'; btn.style.borderColor='#fff';
+  renderShowList(window._showTypeColors||{});
+}
+window.setShowPark = setShowPark;
+
+function renderShowList(typeColors) {
+  const el = document.getElementById('show-list');
+  if (!el) return;
+  const park = window._showPark || 'Magic Kingdom';
+  const shows = SHOWS_DATA[park] || [];
+  el.innerHTML = `<div style="font-size:12px;font-weight:700;color:#9E9E9E;margin-bottom:10px;">${shows.length} SHOWS & EXPERIENCES</div>` +
+  shows.map(s => {
+    const col = (typeColors||{})[s.type] || '#9E9E9E';
+    return `<div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:10px;">
+      <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;">
+        <span style="font-size:26px;">${s.icon}</span>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:800;color:var(--text-primary);">${s.name}</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:4px;flex-wrap:wrap;">
+            <span style="background:${col}22;color:${col};border-radius:8px;padding:2px 8px;font-size:10px;font-weight:700;">${s.type}</span>
+            <span style="font-size:11px;color:#9E9E9E;">⏰ ${s.time}</span>
+            <span style="font-size:11px;color:#9E9E9E;">⏱ ${s.duration}</span>
+          </div>
+        </div>
+      </div>
+      <div style="background:#F8F4FF;border-radius:10px;padding:8px 10px;">
+        <div style="font-size:11px;color:#6A1B9A;line-height:1.5;">💡 ${s.tip}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+window.renderShowList = renderShowList;
+</script>
+<script>
+/* ===== BLOCK KK2: Baby & Toddler Guide ===== */
+const BABY_INFO = {
+  'Baby Care Centers': [
+    { park:'Magic Kingdom',      location:'Next to the Crystal Palace restaurant, Main Street USA', features:'Nursing rooms, changing tables, microwave, high chairs, baby food/supplies for purchase' },
+    { park:'EPCOT',              location:'Near the Odyssey Events Pavilion, Future World', features:'Full nursing lounge, changing stations, feeding area, first aid adjacent' },
+    { park:'Hollywood Studios',  location:'Near the Guest Services building at the park entrance', features:'Nursing rooms, changing tables, family restroom' },
+    { park:'Animal Kingdom',     location:'Discovery Island, near Creature Comforts', features:'Nursing area, changing tables, high chairs, microwave' },
+    { park:'Universal',          location:'Inside the park near Guest Services (both parks)', features:'Nursing/feeding rooms, changing stations, stroller parking nearby' },
+    { park:'SeaWorld',           location:'Near the main entrance / Welcome Center', features:'Nursing rooms, changing tables, baby supplies at retail shop' },
+  ],
+  'Rider Swap': {
+    desc: 'Disney calls it "Rider Switch" — Universal calls it "Child Swap". Both let one adult wait with a non-riding child while the rest of the group rides, then swap WITHOUT going back in the main queue.',
+    disney: [
+      'Ask a Cast Member at the ride entrance for a Rider Switch pass',
+      'Party A rides while Party B waits with child',
+      'Party B gets to ride with up to 2 additional guests using the LL/Rider Switch entrance',
+      'No time limit on the pass — use it when ready',
+    ],
+    universal: [
+      'Ask the Team Member at the ride entrance',
+      'Up to 3 guests can return via the Child Swap entrance after first group rides',
+      'Works at all height-restricted attractions',
+    ],
+  },
+  'Best Rides for Toddlers': [
+    { name:'Dumbo the Flying Elephant',    park:'Magic Kingdom', note:'Classic — the #1 toddler pick!', icon:'🐘' },
+    { name:'The Many Adventures of Winnie the Pooh', park:'Magic Kingdom', note:'Gentle dark ride. Perfect for little ones.', icon:'🍯' },
+    { name:'It\'s a Small World',          park:'Magic Kingdom', note:'No height requirement, very gentle boat ride.', icon:'🌍' },
+    { name:'Buzz Lightyear\'s Space Ranger Spin', park:'Magic Kingdom', note:'Interactive — toddlers love shooting targets.', icon:'🚀' },
+    { name:'Walt Disney\'s Carousel of Progress', park:'Magic Kingdom', note:'Rotating theater — great A/C break with no wait.', icon:'🎠' },
+    { name:'Remy\'s Ratatouille Adventure',park:'EPCOT', note:'Very gentle trackless ride. Huge toddler hit.', icon:'🐀' },
+    { name:'Disney Junior Play & Dance!',  park:'Hollywood Studios', note:'Hands-on show with favorite characters.', icon:'🎪' },
+    { name:'Triceratops Spin',             park:'Universal', note:'Like Dumbo — spinning dino ride.', icon:'🦕' },
+    { name:'Curious George Goes to Town',  park:'Universal', note:'Water play area — toddlers get soaked.', icon:'🐒' },
+    { name:'Sesame Street Party Parade',   park:'SeaWorld', note:'Characters wave right at kids at ground level.', icon:'🎈' },
+  ],
+  'Stroller Tips': [
+    { tip:'Disney parks require strollers to be no wider than 31" and no longer than 52".', icon:'📏' },
+    { tip:'Stroller parking areas are outside every attraction — Cast Members may move your stroller, mark it with a colorful tag.', icon:'🏷️' },
+    { tip:'Rent a stroller inside the park ($15/day single, $31/day double) or from third-party companies with resort delivery.', icon:'💰' },
+    { tip:'Strollers are not allowed on Disney Skyliner gondolas — fold and carry.', icon:'🚡' },
+    { tip:'Many attractions have a separate "stroller as wheelchair" policy — ask Cast Members.', icon:'♿' },
+    { tip:'Bring a rain cover and sun shade for summer months. Park bags get wet from splash rides.', icon:'☂️' },
+    { tip:'Universal has stroller parking at every ride too — follow Team Member instructions.', icon:'🎭' },
+  ],
+};
+
+function openBabyGuide() {
+  const existing = document.getElementById('baby-overlay');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'baby-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;display:flex;flex-direction:column;max-width:430px;left:50%;transform:translateX(-50%);';
+  el.innerHTML = `
+    <div style="background:linear-gradient(135deg,#F06292,#EC407A,#AD1457);padding:18px 16px 14px;flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <button onclick="document.getElementById('baby-overlay').remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;">←</button>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;">👶 Baby & Toddler Guide</div>
+      </div>
+      <!-- Section tabs -->
+      <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;" id="baby-tabs">
+        ${[['care','🏥 Baby Care'],['swap','🔄 Rider Swap'],['rides','🎢 Best Rides'],['stroller','🛒 Strollers']].map(([id,label],i) => `
+          <button onclick="setBabyTab('${id}',this)" style="flex-shrink:0;border-radius:20px;padding:5px 11px;border:1.5px solid ${i===0?'#fff':'rgba(255,255,255,.4)'};background:${i===0?'rgba(255,255,255,.25)':'transparent'};color:#fff;font-size:10px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">${label}</button>`).join('')}
+      </div>
+    </div>
+    <div style="overflow-y:auto;padding:14px 16px 80px;" id="baby-content"></div>`;
+  document.body.appendChild(el);
+  window._babyTab = 'care';
+  renderBabyTab();
+}
+window.openBabyGuide = openBabyGuide;
+
+function setBabyTab(tab, btn) {
+  window._babyTab = tab;
+  document.querySelectorAll('#baby-tabs button').forEach(b => { b.style.background='transparent'; b.style.borderColor='rgba(255,255,255,.4)'; });
+  btn.style.background='rgba(255,255,255,.25)'; btn.style.borderColor='#fff';
+  renderBabyTab();
+}
+window.setBabyTab = setBabyTab;
+
+function renderBabyTab() {
+  const el = document.getElementById('baby-content');
+  if (!el) return;
+  const tab = window._babyTab || 'care';
+  if (tab === 'care') {
+    el.innerHTML = `<div style="font-size:12px;font-weight:700;color:#9E9E9E;margin-bottom:10px;">BABY CARE CENTERS</div>` +
+    BABY_INFO['Baby Care Centers'].map(b => `
+      <div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:10px;">
+        <div style="font-size:13px;font-weight:800;color:var(--text-primary);margin-bottom:4px;">🏥 ${b.park}</div>
+        <div style="font-size:11px;color:#EC407A;font-weight:600;margin-bottom:6px;">📍 ${b.location}</div>
+        <div style="font-size:11px;color:#9E9E9E;line-height:1.5;">${b.features}</div>
+      </div>`).join('');
+  } else if (tab === 'swap') {
+    const d = BABY_INFO['Rider Swap'];
+    el.innerHTML = `
+      <div style="background:#FCE4EC;border-radius:14px;padding:14px;margin-bottom:14px;">
+        <div style="font-size:13px;font-weight:800;color:#AD1457;margin-bottom:6px;">🔄 What is Rider Swap?</div>
+        <div style="font-size:12px;color:#C2185B;line-height:1.5;">${d.desc}</div>
+      </div>
+      <div style="font-size:12px;font-weight:700;color:#9E9E9E;margin-bottom:8px;">DISNEY "RIDER SWITCH"</div>
+      ${d.disney.map((s,i) => `<div style="background:var(--card-bg,#fff);border-radius:12px;padding:12px 14px;margin-bottom:6px;display:flex;align-items:flex-start;gap:10px;">
+        <span style="background:#FCE4EC;color:#AD1457;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;">${i+1}</span>
+        <div style="font-size:12px;color:var(--text-primary);line-height:1.4;">${s}</div>
+      </div>`).join('')}
+      <div style="font-size:12px;font-weight:700;color:#9E9E9E;margin:14px 0 8px;">UNIVERSAL "CHILD SWAP"</div>
+      ${d.universal.map((s,i) => `<div style="background:var(--card-bg,#fff);border-radius:12px;padding:12px 14px;margin-bottom:6px;display:flex;align-items:flex-start;gap:10px;">
+        <span style="background:#E3F2FD;color:#1565C0;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;">${i+1}</span>
+        <div style="font-size:12px;color:var(--text-primary);line-height:1.4;">${s}</div>
+      </div>`).join('')}`;
+  } else if (tab === 'rides') {
+    el.innerHTML = `<div style="font-size:12px;font-weight:700;color:#9E9E9E;margin-bottom:10px;">BEST RIDES FOR TODDLERS (no height req.)</div>` +
+    BABY_INFO['Best Rides for Toddlers'].map(r => `
+      <div style="background:var(--card-bg,#fff);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px;">
+        <span style="font-size:24px;">${r.icon}</span>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--text-primary);">${r.name}</div>
+          <div style="font-size:10px;color:#EC407A;font-weight:700;">${r.park}</div>
+          <div style="font-size:11px;color:#9E9E9E;margin-top:2px;">${r.note}</div>
+        </div>
+      </div>`).join('');
+  } else if (tab === 'stroller') {
+    el.innerHTML = `<div style="font-size:12px;font-weight:700;color:#9E9E9E;margin-bottom:10px;">STROLLER TIPS</div>` +
+    BABY_INFO['Stroller Tips'].map(s => `
+      <div style="background:var(--card-bg,#fff);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:flex-start;gap:10px;">
+        <span style="font-size:20px;">${s.icon}</span>
+        <div style="font-size:12px;color:var(--text-primary);line-height:1.5;">${s.tip}</div>
+      </div>`).join('');
+  }
+}
+window.renderBabyTab = renderBabyTab;
+</script>
+<style>
+/* ===== BLOCK KK CSS ===== */
+#show-park-tabs::-webkit-scrollbar,#baby-tabs::-webkit-scrollbar{display:none;}
+#show-park-tabs,#baby-tabs{-ms-overflow-style:none;scrollbar-width:none;}
+</style>
+<script>
+/* ===== BLOCK KK: Wiring ===== */
+(function wireKKFeatures() {
+  const KK_QUICK = [
+    { icon:'🎭', label:'Shows',    fn: openShowGuide },
+    { icon:'👶', label:'Baby/Tots',fn: openBabyGuide },
+  ];
+
+  const _prevRH = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH) _prevRH.apply(this, arguments);
+    setTimeout(() => {
+      const row = document.getElementById('y-quick-row');
+      if (!row || row.querySelector('[data-kk-quick]')) return;
+      KK_QUICK.forEach(b => {
+        const btn = document.createElement('button');
+        btn.setAttribute('data-kk-quick','1');
+        btn.style.cssText = "flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:5px;background:var(--card-bg,#fff);border:1px solid var(--border,#eee);border-radius:14px;padding:12px 14px;cursor:pointer;font-family:'DM Sans',sans-serif;";
+        btn.innerHTML = `<span style="font-size:22px;">${b.icon}</span><span style="font-size:11px;font-weight:700;color:var(--text-primary,#212121);white-space:nowrap;">${b.label}</span>`;
+        btn.onclick = b.fn;
+        row.appendChild(btn);
+      });
+    }, 460);
+  };
+
+  const _prevRA = window.renderAccount;
+  window.renderAccount = function() {
+    if (_prevRA) _prevRA.apply(this, arguments);
+    setTimeout(() => {
+      const loggedIn = document.querySelector('.account-loggedin');
+      if (!loggedIn || loggedIn.querySelector('[data-kk-items]')) return;
+      const adminBtn = loggedIn.querySelector('.adm-account-btn');
+      const labels = { 'Shows':'Shows & Entertainment Guide', 'Baby/Tots':'Baby & Toddler Guide' };
+      KK_QUICK.forEach(item => {
+        const el = document.createElement('div');
+        el.setAttribute('data-kk-items','1');
+        el.className = 'account-menu-item';
+        el.innerHTML = `<span class="icon">${item.icon}</span><span>${labels[item.label]||item.label}</span><span class="arrow">›</span>`;
+        el.onclick = item.fn;
+        loggedIn.insertBefore(el, adminBtn || null);
+      });
+    }, 160);
+  };
+})();
+</script>
