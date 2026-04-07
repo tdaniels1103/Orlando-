@@ -25659,3 +25659,514 @@ function renderCurrencyTable() {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK FF1: Weather Widget ===== */
+const ORLANDO_MONTHS = [
+  { m:'January',   avg_hi:72, avg_lo:51, rain:2.3, humidity:68, tip:'Coolest month — pack a light jacket for evenings.' },
+  { m:'February',  avg_hi:74, avg_lo:53, rain:2.8, humidity:68, tip:'Still mild. Great park weather, lower crowds.' },
+  { m:'March',     avg_hi:78, avg_lo:57, rain:3.5, humidity:69, tip:'Spring break crowds arrive. Warm days, cool nights.' },
+  { m:'April',     avg_hi:83, avg_lo:62, rain:2.3, humidity:69, tip:'Beautiful weather. Afternoon storms possible.' },
+  { m:'May',       avg_hi:88, avg_lo:68, rain:3.5, humidity:73, tip:'Getting hot. Hydrate constantly at parks.' },
+  { m:'June',      avg_hi:91, avg_lo:73, rain:7.4, humidity:80, tip:'Rainy season begins. Afternoon storms nearly daily.' },
+  { m:'July',      avg_hi:92, avg_lo:74, rain:7.3, humidity:81, tip:'Hottest month. Visit parks early, rest midday.' },
+  { m:'August',    avg_hi:92, avg_lo:74, rain:6.5, humidity:81, tip:'Same as July — brutal heat. Water parks are great.' },
+  { m:'September', avg_hi:89, avg_lo:73, rain:5.9, humidity:80, tip:'Still hot but crowds drop. Hurricane season.' },
+  { m:'October',   avg_hi:84, avg_lo:67, rain:3.8, humidity:75, tip:'Great weather returns! Halloween events in full swing.' },
+  { m:'November',  avg_hi:78, avg_lo:59, rain:2.2, humidity:70, tip:'Excellent park weather. Holiday décor appears.' },
+  { m:'December',  avg_hi:73, avg_lo:53, rain:2.5, humidity:68, tip:'Cool and festive. Lightest crowds of the year.' },
+];
+
+const HEAT_TIPS = [
+  { min:85, max:90, level:'Warm',     color:'#FFC107', icon:'☀️',  tip:'Stay hydrated. Reapply sunscreen every 90 min.' },
+  { min:90, max:95, level:'Hot',      color:'#FF9800', icon:'🌡️', tip:'Take breaks in A/C. Freeze treats help!' },
+  { min:95, max:100,level:'Very Hot', color:'#FF5722', icon:'🔥', tip:'Plan indoor rides midday. Wet towel on neck.' },
+  { min:100,max:999,level:'Extreme',  color:'#E53935', icon:'🚨', tip:'Limit outdoor exposure. Early entry or evening only.' },
+];
+
+function openWeatherWidget() {
+  const existing = document.getElementById('weather-overlay');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'weather-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;overflow-y:auto;max-width:430px;left:50%;transform:translateX(-50%);';
+  const now = new Date();
+  const curMonth = now.getMonth();
+  const curData = ORLANDO_MONTHS[curMonth];
+  const heatIndex = Math.round(curData.avg_hi * 0.9 + curData.humidity * 0.15);
+  const heatInfo = HEAT_TIPS.find(h => heatIndex >= h.min && heatIndex < h.max) || HEAT_TIPS[0];
+
+  el.innerHTML = `
+    <div style="background:linear-gradient(160deg,#0277BD,#29B6F6,#80DEEA);padding:20px 16px 28px;position:relative;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
+        <button onclick="document.getElementById('weather-overlay').remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;">←</button>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;">🌤️ Orlando Weather</div>
+      </div>
+      <!-- Current Month Card -->
+      <div style="text-align:center;color:#fff;margin-bottom:16px;">
+        <div style="font-size:13px;opacity:.8;font-weight:600;letter-spacing:.08em;">${curData.m.toUpperCase()} • ORLANDO, FL</div>
+        <div style="font-size:72px;font-weight:800;line-height:1;margin:8px 0;">${curData.avg_hi}°</div>
+        <div style="font-size:13px;opacity:.8;">Avg High · Low ${curData.avg_lo}°F · Rain ${curData.rain}"</div>
+      </div>
+      <!-- Heat Index Card -->
+      <div style="background:${heatInfo.color}33;border:1px solid ${heatInfo.color}66;border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:12px;">
+        <span style="font-size:28px;">${heatInfo.icon}</span>
+        <div>
+          <div style="font-size:12px;font-weight:800;color:#fff;">${heatInfo.level.toUpperCase()} HEAT</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.85);line-height:1.4;">${heatInfo.tip}</div>
+        </div>
+      </div>
+    </div>
+    <!-- Month Selector -->
+    <div style="padding:14px 16px 6px;">
+      <div style="font-size:12px;font-weight:700;color:#9E9E9E;margin-bottom:10px;">MONTH-BY-MONTH FORECAST</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;" id="month-grid"></div>
+    </div>
+    <!-- Packing Tips -->
+    <div style="padding:12px 16px 12px;">
+      <div id="month-detail-card"></div>
+    </div>
+    <!-- Packing Checklist -->
+    <div style="padding:0 16px 80px;">
+      <div style="font-size:12px;font-weight:700;color:#9E9E9E;margin-bottom:10px;">WHAT TO PACK</div>
+      <div id="packing-suggestions"></div>
+    </div>`;
+  document.body.appendChild(el);
+  renderMonthGrid(curMonth);
+  renderMonthDetail(curMonth);
+  renderPackingSuggestions(curMonth);
+}
+window.openWeatherWidget = openWeatherWidget;
+
+function renderMonthGrid(selected) {
+  const grid = document.getElementById('month-grid');
+  if (!grid) return;
+  const abbr = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const rainColors = ['#4FC3F7','#4FC3F7','#29B6F6','#29B6F6','#0288D1','#01579B','#01579B','#01579B','#0277BD','#0288D1','#4FC3F7','#4FC3F7'];
+  grid.innerHTML = ORLANDO_MONTHS.map((m,i) => `
+    <button onclick="selectWeatherMonth(${i})" data-wm="${i}" style="border-radius:10px;padding:8px 4px;border:2px solid ${i===selected?'#0277BD':'var(--border,#eee)'};background:${i===selected?'#E1F5FE':'var(--card-bg,#fff)'};cursor:pointer;font-family:'DM Sans',sans-serif;">
+      <div style="font-size:10px;font-weight:700;color:${i===selected?'#0277BD':'#9E9E9E'};">${abbr[i]}</div>
+      <div style="font-size:14px;font-weight:800;color:${i===selected?'#0277BD':'var(--text-primary)'};">${m.avg_hi}°</div>
+      <div style="font-size:9px;color:#9E9E9E;">${m.rain}"</div>
+    </button>`).join('');
+}
+window.renderMonthGrid = renderMonthGrid;
+
+function selectWeatherMonth(idx) {
+  renderMonthGrid(idx);
+  renderMonthDetail(idx);
+  renderPackingSuggestions(idx);
+}
+window.selectWeatherMonth = selectWeatherMonth;
+
+function renderMonthDetail(idx) {
+  const el = document.getElementById('month-detail-card');
+  if (!el) return;
+  const m = ORLANDO_MONTHS[idx];
+  el.innerHTML = `<div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:10px;">
+    <div style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:8px;">${m.m}</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;">
+      <div style="text-align:center;background:#E3F2FD;border-radius:10px;padding:8px;">
+        <div style="font-size:18px;font-weight:800;color:#0277BD;">${m.avg_hi}°</div>
+        <div style="font-size:9px;color:#9E9E9E;font-weight:700;">AVG HIGH</div>
+      </div>
+      <div style="text-align:center;background:#E8F5E9;border-radius:10px;padding:8px;">
+        <div style="font-size:18px;font-weight:800;color:#2E7D32;">${m.avg_lo}°</div>
+        <div style="font-size:9px;color:#9E9E9E;font-weight:700;">AVG LOW</div>
+      </div>
+      <div style="text-align:center;background:#E1F5FE;border-radius:10px;padding:8px;">
+        <div style="font-size:18px;font-weight:800;color:#0097A7;">${m.rain}"</div>
+        <div style="font-size:9px;color:#9E9E9E;font-weight:700;">RAINFALL</div>
+      </div>
+    </div>
+    <div style="font-size:12px;color:#9E9E9E;line-height:1.5;">💡 ${m.tip}</div>
+  </div>`;
+}
+window.renderMonthDetail = renderMonthDetail;
+
+function renderPackingSuggestions(idx) {
+  const el = document.getElementById('packing-suggestions');
+  if (!el) return;
+  const m = ORLANDO_MONTHS[idx];
+  const hot = m.avg_hi >= 88;
+  const rainy = m.rain >= 5;
+  const cool = m.avg_lo <= 57;
+  const items = [
+    { always:true, icon:'🧴', label:'Sunscreen SPF 50+', note:'Reapply every 90 min' },
+    { always:true, icon:'💧', label:'Reusable water bottle', note:'Stay hydrated in FL heat' },
+    { always:true, icon:'👟', label:'Comfortable walking shoes', note:'You\'ll walk 8–12 miles/day' },
+    { cond:hot,     icon:'🧢', label:'Wide-brim hat', note:'Essential in summer heat' },
+    { cond:hot,     icon:'😎', label:'UV-protection sunglasses', note:'Protect against FL sun' },
+    { cond:rainy,   icon:'☂️', label:'Compact poncho', note:'Daily afternoon storms' },
+    { cond:rainy,   icon:'👟', label:'Water-resistant shoes', note:'Puddles everywhere after storms' },
+    { cond:cool,    icon:'🧥', label:'Light jacket', note:'Evenings can be chilly' },
+    { cond:cool,    icon:'🧣', label:'Scarf or shawl', note:'Great for A/C indoors too' },
+    { cond:!hot,    icon:'👖', label:'Jeans or long pants', note:'Comfortable for cooler days' },
+  ];
+  const filtered = items.filter(i => i.always || i.cond);
+  el.innerHTML = filtered.map(i => `
+    <div style="display:flex;align-items:center;gap:10px;background:var(--card-bg,#fff);border-radius:12px;padding:10px 12px;margin-bottom:6px;">
+      <span style="font-size:22px;">${i.icon}</span>
+      <div><div style="font-size:13px;font-weight:700;color:var(--text-primary);">${i.label}</div>
+      <div style="font-size:11px;color:#9E9E9E;">${i.note}</div></div>
+    </div>`).join('');
+}
+window.renderPackingSuggestions = renderPackingSuggestions;
+</script>
+<script>
+/* ===== BLOCK FF2: Parking Tracker ===== */
+const PARK_LOTS = {
+  'Magic Kingdom': {
+    lots: ['Simba','Pluto','Goofy','Chip','Dale','Donald','Minnie','Mickey'],
+    sections: ['A','B','C','D','E'],
+    levels: ['Ground','Level 1','Level 2','Level 3','Level 4'],
+    note: 'Take the monorail or ferry to the park entrance. Tram runs from parking to ticket area.',
+    color:'#E53935', icon:'🏰'
+  },
+  'EPCOT': {
+    lots: ['Lot A','Lot B','Lot C','Lot D','Lot E','Lot F'],
+    sections: ['1','2','3','4','5','6'],
+    levels: ['Surface'],
+    note: 'EPCOT has surface parking only. Note your row letter and section number.',
+    color:'#0277BD', icon:'🌍'
+  },
+  'Hollywood Studios': {
+    lots: ['Lot A','Lot B','Lot C','Lot D'],
+    sections: ['101','102','103','104','105'],
+    levels: ['Surface'],
+    note: 'Lots fill quickly on busy days. Arrive 60–90 min before park open.',
+    color:'#6A1B9A', icon:'🎬'
+  },
+  'Animal Kingdom': {
+    lots: ['Unicorn','Peacock','Butterfly','Giraffe','Elephant','Gator','Parrot','Macaw'],
+    sections: ['1','2','3','4'],
+    levels: ['Surface'],
+    note: 'Largest parking area. Tram is a must. Note your row carefully!',
+    color:'#2E7D32', icon:'🦁'
+  },
+  'Universal Studios': {
+    lots: ['Jurassic Park','Marvel','Simpsons','ET','Jaws'],
+    sections: ['A','B','C','D'],
+    levels: ['Level 1','Level 2','Level 3','Level 4','Level 5'],
+    note: 'Parking garages. Walk to CityWalk then to each park.',
+    color:'#1565C0', icon:'🎭'
+  },
+  'SeaWorld': {
+    lots: ['Shamu','Penguin','Orca','Dolphin'],
+    sections: ['1','2','3'],
+    levels: ['Surface'],
+    note: 'Smaller lot — easier to find your car. Note the row color.',
+    color:'#006064', icon:'🐋'
+  },
+};
+
+function openParkingTracker() {
+  const existing = document.getElementById('parking-overlay');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'parking-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;overflow-y:auto;max-width:430px;left:50%;transform:translateX(-50%);';
+  const saved = JSON.parse(localStorage.getItem('parkingSpot') || 'null');
+  el.innerHTML = `
+    <div style="background:linear-gradient(135deg,#37474F,#546E7A);padding:18px 16px 24px;position:sticky;top:0;z-index:1;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+        <button onclick="document.getElementById('parking-overlay').remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;">←</button>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;">🚗 Parking Tracker</div>
+      </div>
+      ${saved ? `
+      <div style="background:rgba(255,255,255,.15);border-radius:14px;padding:14px;">
+        <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.7);margin-bottom:6px;">MY SAVED SPOT</div>
+        <div style="font-size:20px;font-weight:800;color:#fff;margin-bottom:4px;">${saved.park} ${saved.lot}</div>
+        <div style="font-size:13px;color:rgba(255,255,255,.85);">Section ${saved.section} · ${saved.level}${saved.notes ? ' · '+saved.notes : ''}</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.6);margin-top:4px;">Saved ${new Date(saved.time).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div>
+        <button onclick="clearParking()" style="margin-top:10px;background:rgba(229,57,53,.8);border:none;border-radius:8px;padding:6px 14px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;">Clear Spot</button>
+      </div>` : `<div style="background:rgba(255,255,255,.1);border-radius:14px;padding:12px;text-align:center;color:rgba(255,255,255,.7);font-size:13px;">No spot saved yet. Save below!</div>`}
+    </div>
+    <div style="padding:14px 16px 80px;">
+      <div style="font-size:12px;font-weight:700;color:#9E9E9E;margin-bottom:10px;">SAVE MY PARKING SPOT</div>
+      <!-- Park Select -->
+      <div style="margin-bottom:12px;">
+        <div style="font-size:11px;font-weight:700;color:#9E9E9E;margin-bottom:6px;">PARK</div>
+        <select id="park-select" onchange="updateParkingLots()" style="width:100%;border:1px solid var(--border,#eee);border-radius:10px;padding:10px;font-size:13px;font-family:'DM Sans',sans-serif;background:var(--card-bg,#fff);color:var(--text-primary);">
+          ${Object.keys(PARK_LOTS).map(p => `<option value="${p}">${PARK_LOTS[p].icon} ${p}</option>`).join('')}
+        </select>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+        <div>
+          <div style="font-size:11px;font-weight:700;color:#9E9E9E;margin-bottom:6px;">LOT / AREA</div>
+          <select id="lot-select" style="width:100%;border:1px solid var(--border,#eee);border-radius:10px;padding:10px;font-size:13px;font-family:'DM Sans',sans-serif;background:var(--card-bg,#fff);color:var(--text-primary);"></select>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:700;color:#9E9E9E;margin-bottom:6px;">SECTION / ROW</div>
+          <select id="section-select" style="width:100%;border:1px solid var(--border,#eee);border-radius:10px;padding:10px;font-size:13px;font-family:'DM Sans',sans-serif;background:var(--card-bg,#fff);color:var(--text-primary);"></select>
+        </div>
+      </div>
+      <div style="margin-bottom:12px;">
+        <div style="font-size:11px;font-weight:700;color:#9E9E9E;margin-bottom:6px;">LEVEL (if applicable)</div>
+        <select id="level-select" style="width:100%;border:1px solid var(--border,#eee);border-radius:10px;padding:10px;font-size:13px;font-family:'DM Sans',sans-serif;background:var(--card-bg,#fff);color:var(--text-primary);"></select>
+      </div>
+      <div style="margin-bottom:16px;">
+        <div style="font-size:11px;font-weight:700;color:#9E9E9E;margin-bottom:6px;">NOTES (optional)</div>
+        <input id="parking-notes" type="text" placeholder="e.g. Row 5, near elevator" style="width:100%;border:1px solid var(--border,#eee);border-radius:10px;padding:10px;font-size:13px;font-family:'DM Sans',sans-serif;background:var(--card-bg,#fff);color:var(--text-primary);box-sizing:border-box;">
+      </div>
+      <button onclick="saveParking()" style="width:100%;background:linear-gradient(135deg,#37474F,#546E7A);border:none;border-radius:12px;padding:14px;color:#fff;font-size:14px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;">💾 Save My Spot</button>
+      <!-- Park notes -->
+      <div id="park-tip-card" style="margin-top:14px;"></div>
+    </div>`;
+  document.body.appendChild(el);
+  updateParkingLots();
+}
+window.openParkingTracker = openParkingTracker;
+
+function updateParkingLots() {
+  const park = document.getElementById('park-select')?.value;
+  if (!park || !PARK_LOTS[park]) return;
+  const data = PARK_LOTS[park];
+  const lotSel = document.getElementById('lot-select');
+  const secSel = document.getElementById('section-select');
+  const lvlSel = document.getElementById('level-select');
+  if (lotSel) lotSel.innerHTML = data.lots.map(l => `<option>${l}</option>`).join('');
+  if (secSel) secSel.innerHTML = data.sections.map(s => `<option>${s}</option>`).join('');
+  if (lvlSel) lvlSel.innerHTML = data.levels.map(l => `<option>${l}</option>`).join('');
+  const tipCard = document.getElementById('park-tip-card');
+  if (tipCard) tipCard.innerHTML = `<div style="background:${data.color}11;border:1px solid ${data.color}33;border-radius:12px;padding:12px 14px;">
+    <div style="font-size:12px;font-weight:700;color:${data.color};margin-bottom:4px;">${data.icon} ${park} Parking Tip</div>
+    <div style="font-size:12px;color:#9E9E9E;line-height:1.5;">${data.note}</div>
+  </div>`;
+}
+window.updateParkingLots = updateParkingLots;
+
+function saveParking() {
+  const park = document.getElementById('park-select')?.value;
+  const lot = document.getElementById('lot-select')?.value;
+  const section = document.getElementById('section-select')?.value;
+  const level = document.getElementById('level-select')?.value;
+  const notes = document.getElementById('parking-notes')?.value;
+  if (!park) return;
+  const spot = { park, lot, section, level, notes, time: Date.now() };
+  localStorage.setItem('parkingSpot', JSON.stringify(spot));
+  if (typeof showToast !== 'undefined') showToast('🚗 Parking spot saved!');
+  if (typeof awardPoints !== 'undefined') awardPoints(5, 'Parking spot saved');
+  document.getElementById('parking-overlay').remove();
+  openParkingTracker();
+}
+window.saveParking = saveParking;
+
+function clearParking() {
+  localStorage.removeItem('parkingSpot');
+  if (typeof showToast !== 'undefined') showToast('Parking spot cleared');
+  document.getElementById('parking-overlay').remove();
+  openParkingTracker();
+}
+window.clearParking = clearParking;
+</script>
+<script>
+/* ===== BLOCK FF3: Souvenir Budget Tracker ===== */
+function openSouvenirTracker() {
+  const existing = document.getElementById('souvenir-overlay');
+  if (existing) existing.remove();
+  const data = JSON.parse(localStorage.getItem('souvenirData') || '{"budget":200,"people":[],"purchases":[]}');
+  const el = document.createElement('div');
+  el.id = 'souvenir-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;overflow-y:auto;max-width:430px;left:50%;transform:translateX(-50%);';
+  const total = data.purchases.reduce((s,p) => s + p.amount, 0);
+  const pct = Math.min(100, Math.round((total / (data.budget||200)) * 100));
+  const barColor = pct >= 100 ? '#E53935' : pct >= 75 ? '#FF9800' : '#4CAF50';
+  el.innerHTML = `
+    <div style="background:linear-gradient(135deg,#FF6B35,#FFC107);padding:18px 16px 24px;position:sticky;top:0;z-index:1;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+        <button onclick="document.getElementById('souvenir-overlay').remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;">←</button>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;">🛍️ Souvenir Budget</div>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:14px;padding:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:8px;">
+          <div>
+            <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.75);">SPENT</div>
+            <div style="font-size:28px;font-weight:800;color:#fff;">$${total.toFixed(2)}</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.75);">BUDGET</div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <div style="font-size:18px;font-weight:700;color:rgba(255,255,255,.9);">$</div>
+              <input id="sv-budget" type="number" value="${data.budget||200}" min="0" oninput="updateSouvenirBudget(this.value)" style="width:80px;background:rgba(255,255,255,.2);border:none;border-radius:8px;padding:4px 8px;font-size:18px;font-weight:700;color:#fff;font-family:'DM Sans',sans-serif;text-align:right;">
+            </div>
+          </div>
+        </div>
+        <div style="background:rgba(255,255,255,.2);border-radius:6px;height:8px;overflow:hidden;">
+          <div style="width:${pct}%;height:100%;background:${barColor};border-radius:6px;transition:width .4s;"></div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.75);margin-top:6px;">${pct}% of budget used · $${Math.max(0, (data.budget||200)-total).toFixed(2)} remaining</div>
+      </div>
+    </div>
+    <div style="padding:12px 16px 80px;">
+      <!-- Add Purchase -->
+      <div style="font-size:12px;font-weight:700;color:#9E9E9E;margin-bottom:10px;">ADD PURCHASE</div>
+      <div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:16px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+          <div>
+            <div style="font-size:11px;font-weight:700;color:#9E9E9E;margin-bottom:5px;">ITEM</div>
+            <input id="sv-item" type="text" placeholder="e.g. Mickey ears" style="width:100%;border:1px solid var(--border,#eee);border-radius:8px;padding:8px;font-size:13px;font-family:'DM Sans',sans-serif;background:var(--bg,#F9F9F9);color:var(--text-primary);box-sizing:border-box;">
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:700;color:#9E9E9E;margin-bottom:5px;">AMOUNT ($)</div>
+            <input id="sv-amount" type="number" min="0" step="0.01" placeholder="0.00" style="width:100%;border:1px solid var(--border,#eee);border-radius:8px;padding:8px;font-size:13px;font-family:'DM Sans',sans-serif;background:var(--bg,#F9F9F9);color:var(--text-primary);box-sizing:border-box;">
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+          <div>
+            <div style="font-size:11px;font-weight:700;color:#9E9E9E;margin-bottom:5px;">FOR WHOM</div>
+            <input id="sv-person" type="text" placeholder="e.g. Self, Kids" style="width:100%;border:1px solid var(--border,#eee);border-radius:8px;padding:8px;font-size:13px;font-family:'DM Sans',sans-serif;background:var(--bg,#F9F9F9);color:var(--text-primary);box-sizing:border-box;">
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:700;color:#9E9E9E;margin-bottom:5px;">PARK</div>
+            <select id="sv-park" style="width:100%;border:1px solid var(--border,#eee);border-radius:8px;padding:8px;font-size:12px;font-family:'DM Sans',sans-serif;background:var(--bg,#F9F9F9);color:var(--text-primary);box-sizing:border-box;">
+              <option>Magic Kingdom</option><option>EPCOT</option><option>Hollywood Studios</option>
+              <option>Animal Kingdom</option><option>Universal</option><option>SeaWorld</option><option>Disney Springs</option><option>CityWalk</option><option>Other</option>
+            </select>
+          </div>
+        </div>
+        <button onclick="addSouvenirPurchase()" style="width:100%;background:linear-gradient(135deg,#FF6B35,#FFC107);border:none;border-radius:10px;padding:11px;color:#fff;font-size:13px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;">+ Add Purchase</button>
+      </div>
+      <!-- Purchase List -->
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div style="font-size:12px;font-weight:700;color:#9E9E9E;">PURCHASES (${data.purchases.length})</div>
+        ${data.purchases.length ? `<button onclick="clearSouvenirs()" style="background:none;border:none;font-size:11px;color:#E53935;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">Clear All</button>` : ''}
+      </div>
+      <div id="sv-list">
+        ${data.purchases.length === 0 ? '<div style="text-align:center;padding:30px;color:#BDBDBD;font-size:13px;">No purchases yet. Add your first souvenir!</div>' :
+          data.purchases.slice().reverse().map((p,i) => `
+          <div style="background:var(--card-bg,#fff);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--text-primary);">${p.item}</div>
+              <div style="font-size:11px;color:#9E9E9E;">${p.person ? p.person + ' · ' : ''}${p.park}</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="font-size:15px;font-weight:800;color:#FF6B35;">$${p.amount.toFixed(2)}</div>
+              <button onclick="removeSouvenirPurchase(${data.purchases.length-1-i})" style="background:none;border:none;font-size:14px;cursor:pointer;color:#BDBDBD;">✕</button>
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+  document.body.appendChild(el);
+}
+window.openSouvenirTracker = openSouvenirTracker;
+
+function updateSouvenirBudget(val) {
+  const data = JSON.parse(localStorage.getItem('souvenirData') || '{"budget":200,"people":[],"purchases":[]}');
+  data.budget = parseFloat(val) || 200;
+  localStorage.setItem('souvenirData', JSON.stringify(data));
+}
+window.updateSouvenirBudget = updateSouvenirBudget;
+
+function addSouvenirPurchase() {
+  const item = document.getElementById('sv-item')?.value?.trim();
+  const amount = parseFloat(document.getElementById('sv-amount')?.value);
+  const person = document.getElementById('sv-person')?.value?.trim();
+  const park = document.getElementById('sv-park')?.value;
+  if (!item || isNaN(amount) || amount <= 0) {
+    if (typeof showToast !== 'undefined') showToast('Enter item name and amount');
+    return;
+  }
+  const data = JSON.parse(localStorage.getItem('souvenirData') || '{"budget":200,"people":[],"purchases":[]}');
+  data.purchases.push({ item, amount, person, park, time: Date.now() });
+  localStorage.setItem('souvenirData', JSON.stringify(data));
+  if (typeof showToast !== 'undefined') showToast('🛍️ ' + item + ' added!');
+  if (typeof awardPoints !== 'undefined') awardPoints(3, 'Souvenir logged');
+  document.getElementById('souvenir-overlay').remove();
+  openSouvenirTracker();
+}
+window.addSouvenirPurchase = addSouvenirPurchase;
+
+function removeSouvenirPurchase(idx) {
+  const data = JSON.parse(localStorage.getItem('souvenirData') || '{"budget":200,"people":[],"purchases":[]}');
+  data.purchases.splice(idx, 1);
+  localStorage.setItem('souvenirData', JSON.stringify(data));
+  document.getElementById('souvenir-overlay').remove();
+  openSouvenirTracker();
+}
+window.removeSouvenirPurchase = removeSouvenirPurchase;
+
+function clearSouvenirs() {
+  const data = JSON.parse(localStorage.getItem('souvenirData') || '{"budget":200,"people":[],"purchases":[]}');
+  data.purchases = [];
+  localStorage.setItem('souvenirData', JSON.stringify(data));
+  document.getElementById('souvenir-overlay').remove();
+  openSouvenirTracker();
+}
+window.clearSouvenirs = clearSouvenirs;
+</script>
+<style>
+/* ===== BLOCK FF CSS ===== */
+#sv-budget:focus,#sv-item:focus,#sv-amount:focus,#sv-person:focus{outline:none;}
+#parking-notes:focus{outline:none;}
+#park-select:focus,#lot-select:focus,#section-select:focus,#level-select:focus,#sv-park:focus{outline:none;}
+</style>
+<script>
+/* ===== BLOCK FF: Wiring ===== */
+(function wireFFFeatures() {
+  const FF_QUICK = [
+    { icon:'🌤️', label:'Weather',   fn: openWeatherWidget },
+    { icon:'🚗', label:'Parking',   fn: openParkingTracker },
+    { icon:'🛍️', label:'Souvenirs', fn: openSouvenirTracker },
+  ];
+
+  const _prevRH = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH) _prevRH.apply(this, arguments);
+    setTimeout(() => {
+      const row = document.getElementById('y-quick-row');
+      if (!row || row.querySelector('[data-ff-quick]')) return;
+      FF_QUICK.forEach(b => {
+        const btn = document.createElement('button');
+        btn.setAttribute('data-ff-quick','1');
+        btn.style.cssText = "flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:5px;background:var(--card-bg,#fff);border:1px solid var(--border,#eee);border-radius:14px;padding:12px 14px;cursor:pointer;font-family:'DM Sans',sans-serif;";
+        btn.innerHTML = `<span style="font-size:22px;">${b.icon}</span><span style="font-size:11px;font-weight:700;color:var(--text-primary,#212121);white-space:nowrap;">${b.label}</span>`;
+        btn.onclick = b.fn;
+        row.appendChild(btn);
+      });
+    }, 350);
+  };
+
+  const _prevRA = window.renderAccount;
+  window.renderAccount = function() {
+    if (_prevRA) _prevRA.apply(this, arguments);
+    setTimeout(() => {
+      const loggedIn = document.querySelector('.account-loggedin');
+      if (!loggedIn || loggedIn.querySelector('[data-ff-items]')) return;
+      const adminBtn = loggedIn.querySelector('.adm-account-btn');
+      const labels = { 'Weather':'Orlando Weather Guide', 'Parking':'Parking Spot Tracker', 'Souvenirs':'Souvenir Budget' };
+      FF_QUICK.forEach(item => {
+        const el = document.createElement('div');
+        el.setAttribute('data-ff-items','1');
+        el.className = 'account-menu-item';
+        el.innerHTML = `<span class="icon">${item.icon}</span><span>${labels[item.label]||item.label}</span><span class="arrow">›</span>`;
+        el.onclick = item.fn;
+        loggedIn.insertBefore(el, adminBtn || null);
+      });
+    }, 110);
+  };
+
+  // Inject parking saved-spot chip on home screen
+  const _prevSS = window.showScreen;
+  window.showScreen = function(name, navEl) {
+    if (_prevSS) _prevSS(name, navEl);
+    if (name === 'home') {
+      setTimeout(() => {
+        const spot = JSON.parse(localStorage.getItem('parkingSpot') || 'null');
+        const existing = document.getElementById('ff-parking-chip');
+        if (existing) existing.remove();
+        if (spot) {
+          const hdr = document.querySelector('#screen-home .screen-header');
+          if (!hdr) return;
+          const chip = document.createElement('button');
+          chip.id = 'ff-parking-chip';
+          chip.setAttribute('onclick','openParkingTracker()');
+          chip.style.cssText = 'position:absolute;right:12px;top:50%;transform:translateY(-50%);background:#37474F;border:none;border-radius:20px;padding:4px 10px;color:#fff;font-size:10px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px;z-index:1;';
+          chip.innerHTML = `🚗 ${spot.park.split(' ')[0]} ${spot.lot}`;
+          hdr.style.position = 'relative';
+          hdr.appendChild(chip);
+        }
+      }, 150);
+    }
+  };
+})();
+</script>
