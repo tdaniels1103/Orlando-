@@ -24578,3 +24578,582 @@ window.getTransportRoute = getTransportRoute;
   };
 })();
 </script>
+<script>
+/* ===== BLOCK DD1: Emergency & Safety Hub ===== */
+const EMERGENCY_CONTACTS = [
+  { name:'Emergency Services', number:'911', desc:'Police, Fire, Ambulance', emoji:'🚨', color:'#E53935', priority:1 },
+  { name:'Poison Control', number:'1-800-222-1222', desc:'24/7 poison emergency hotline', emoji:'☠️', color:'#9C27B0', priority:2 },
+  { name:'Non-Emergency Police', number:'(407) 836-4357', desc:'Orange County Sheriff non-emergency', emoji:'👮', color:'#1565C0', priority:3 },
+  { name:'Florida Poison Info', number:'1-800-282-3171', desc:'FL-specific poison information', emoji:'🏥', color:'#2E7D32', priority:4 },
+  { name:'US Consulate (General)', number:'1-202-501-4444', desc:'For international travelers needing consular help', emoji:'🌐', color:'#607D8B', priority:5 },
+  { name:'Disney Security', number:'(407) 560-7959', desc:'Walt Disney World Resort security', emoji:'🏰', color:'#1A1A2E', priority:6 },
+  { name:'Universal Security', number:'(407) 363-8000', desc:'Universal Orlando Resort security', emoji:'🎢', color:'#FF6B35', priority:6 },
+];
+const NEARBY_HOSPITALS = [
+  { name:'Orlando Health – Dr. P. Phillips Hospital', dist:'1.2 mi', type:'Hospital', address:'9400 Turkey Lake Rd, Orlando', phone:'(407) 351-8500', emoji:'🏥', trauma:true },
+  { name:'AdventHealth Orlando', dist:'3.4 mi', type:'Level I Trauma Center', address:'601 E Rollins St, Orlando', phone:'(407) 303-5600', emoji:'🏥', trauma:true },
+  { name:'CareNow Urgent Care – I-Drive', dist:'0.8 mi', type:'Urgent Care', address:'7025 International Dr', phone:'(407) 248-9590', emoji:'⚕️', trauma:false },
+  { name:'Concentra Urgent Care', dist:'1.1 mi', type:'Urgent Care', address:'5885 Caravan Ct, Orlando', phone:'(407) 355-8020', emoji:'⚕️', trauma:false },
+  { name:'CVS Pharmacy MinuteClinic', dist:'0.5 mi', type:'Walk-in Clinic', address:'7400 International Dr', phone:'(407) 351-8811', emoji:'💊', trauma:false },
+];
+const SAFETY_TIPS = [
+  { icon:'☀️', title:'Sun & Heat', tip:'Orlando summer heat index can reach 110°F. Drink water every 15-20 min in parks. Watch for heat exhaustion signs: dizziness, nausea, pale skin.' },
+  { icon:'⛈️', title:'Afternoon Thunderstorms', tip:'Florida gets thunderstorms daily June–September, usually 3–5 PM. Parks evacuate pools and metal rides. Head indoors and wait 30 min after last thunder.' },
+  { icon:'🐊', title:'Wildlife', tip:'Never approach alligators — they\'re in every Florida body of water. Keep children away from lake edges. If bitten, call 911 immediately.' },
+  { icon:'🌀', title:'Hurricane Season', tip:'June 1 – November 30. Monitor the National Hurricane Center. Disney/Universal close early if a storm approaches. Purchase travel insurance.' },
+  { icon:'💊', title:'Medications', tip:'Bring more medication than needed. Florida pharmacies need a local doctor prescription. AdventHealth and urgent cares can help in emergencies.' },
+  { icon:'🔒', title:'Theme Park Safety', tip:'Memorize the park security number. Disney has First Aid stations at every park entrance. Tell kids to find a cast member if lost — they\'re trained for this.' },
+];
+
+function openEmergencyHub() {
+  const existing = document.getElementById('emergency-overlay');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'emergency-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:8000;overflow-y:auto;max-width:430px;left:50%;transform:translateX(-50%);';
+  el.innerHTML = `
+    <div style="background:#E53935;padding:18px 16px 20px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <button onclick="document.getElementById('emergency-overlay').remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;">←</button>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;">🚨 Emergency & Safety</div>
+      </div>
+      <!-- Big 911 button -->
+      <button onclick="callNumber('911')" style="width:100%;background:#fff;border:none;border-radius:14px;padding:16px;font-size:18px;font-weight:800;color:#E53935;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 16px rgba(0,0,0,.2);">
+        📞 CALL 911
+      </button>
+      <div style="font-size:11px;color:rgba(255,255,255,.8);text-align:center;margin-top:8px;">Police · Fire · Ambulance — Tap to call</div>
+    </div>
+
+    <div style="padding:12px 16px 80px;">
+      <div style="font-size:12px;font-weight:700;color:#9E9E9E;margin:8px 0 10px;">EMERGENCY CONTACTS</div>
+      ${EMERGENCY_CONTACTS.map(c => `<div style="background:var(--card-bg,#fff);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px;cursor:pointer;border-left:4px solid ${c.color};" onclick="callNumber('${c.number}')">
+        <span style="font-size:22px;">${c.emoji}</span>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:700;color:var(--text-primary);">${c.name}</div>
+          <div style="font-size:11px;color:#9E9E9E;">${c.desc}</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:12px;font-weight:800;color:${c.color};">${c.number}</div>
+          <div style="font-size:10px;color:#9E9E9E;">📞 Tap to call</div>
+        </div>
+      </div>`).join('')}
+
+      <div style="font-size:12px;font-weight:700;color:#9E9E9E;margin:16px 0 10px;">NEARBY MEDICAL</div>
+      ${NEARBY_HOSPITALS.map(h => `<div style="background:var(--card-bg,#fff);border-radius:12px;padding:12px 14px;margin-bottom:8px;">
+        <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:6px;">
+          <span style="font-size:22px;">${h.emoji}</span>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:700;color:var(--text-primary);">${h.name}</div>
+            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:3px;">
+              <span style="font-size:10px;background:${h.trauma?'#FFEBEE':'#E8F5E9'};color:${h.trauma?'#E53935':'#2E7D32'};border-radius:6px;padding:2px 6px;font-weight:700;">${h.type}</span>
+              <span style="font-size:11px;color:#9E9E9E;">📍 ${h.dist}</span>
+            </div>
+            <div style="font-size:11px;color:#9E9E9E;margin-top:2px;">${h.address}</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;">
+          <button onclick="callNumber('${h.phone}')" style="flex:1;background:#E53935;border:none;border-radius:8px;padding:8px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">📞 Call</button>
+          <button onclick="if(typeof showToast!=='undefined')showToast('Directions to ${h.name.replace(/'/g,"\\'")} 🗺️')" style="flex:1;background:#F5F5F5;border:none;border-radius:8px;padding:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--text-primary);">🗺️ Directions</button>
+        </div>
+      </div>`).join('')}
+
+      <div style="font-size:12px;font-weight:700;color:#9E9E9E;margin:16px 0 10px;">SAFETY TIPS FOR ORLANDO</div>
+      ${SAFETY_TIPS.map(t => `<div style="background:var(--card-bg,#fff);border-radius:12px;padding:12px 14px;margin-bottom:8px;">
+        <div style="font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:4px;">${t.icon} ${t.title}</div>
+        <div style="font-size:12px;color:#9E9E9E;line-height:1.5;">${t.tip}</div>
+      </div>`).join('')}
+    </div>`;
+  document.body.appendChild(el);
+}
+window.openEmergencyHub = openEmergencyHub;
+
+function callNumber(num) {
+  const cleaned = num.replace(/[^0-9+]/g,'');
+  window.location.href = 'tel:' + cleaned;
+}
+window.callNumber = callNumber;
+</script>
+<script>
+/* ===== BLOCK DD2: Tip & Bill Splitter ===== */
+function openTipCalculator() {
+  const existing = document.getElementById('tip-calc-overlay');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'tip-calc-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;overflow-y:auto;max-width:430px;left:50%;transform:translateX(-50%);';
+  el.innerHTML = `
+    <div style="background:linear-gradient(135deg,#9C27B0,#E91E63);padding:18px 16px 20px;position:sticky;top:0;z-index:1;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <button onclick="document.getElementById('tip-calc-overlay').remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;">←</button>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;">💰 Tip & Bill Splitter</div>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:14px;padding:16px;text-align:center;">
+        <div style="font-size:11px;color:rgba(255,255,255,.7);margin-bottom:4px;">TOTAL TO PAY</div>
+        <div id="tip-total-display" style="font-size:40px;font-weight:800;color:#fff;font-family:'DM Sans',sans-serif;">$0.00</div>
+        <div id="tip-per-person-display" style="font-size:14px;color:rgba(255,255,255,.85);margin-top:4px;"></div>
+      </div>
+    </div>
+    <div style="padding:16px 16px 80px;">
+      <!-- Bill amount -->
+      <div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:12px;">
+        <div style="font-size:11px;font-weight:700;color:#9E9E9E;margin-bottom:8px;">BILL AMOUNT</div>
+        <div style="display:flex;align-items:center;gap:4px;">
+          <span style="font-size:24px;font-weight:700;color:#9E9E9E;">$</span>
+          <input id="tip-bill-amount" type="number" min="0" step="0.01" placeholder="0.00" oninput="updateTipCalc()" style="flex:1;border:none;border-bottom:2px solid #9C27B0;font-size:28px;font-weight:700;font-family:'DM Sans',sans-serif;background:transparent;color:var(--text-primary);padding:4px 0;outline:none;">
+        </div>
+      </div>
+      <!-- Tip percentage -->
+      <div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <div style="font-size:11px;font-weight:700;color:#9E9E9E;">TIP PERCENTAGE</div>
+          <div id="tip-pct-display" style="font-size:14px;font-weight:800;color:#9C27B0;">18%</div>
+        </div>
+        <input id="tip-pct-slider" type="range" min="0" max="30" value="18" oninput="updateTipCalc()" style="width:100%;accent-color:#9C27B0;height:6px;">
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:#BDBDBD;margin-top:4px;"><span>0%</span><span>15%</span><span>18%</span><span>20%</span><span>25%</span><span>30%</span></div>
+        <div style="display:flex;gap:6px;margin-top:10px;">
+          ${[10,15,18,20,25].map(p => `<button onclick="setTipPct(${p})" style="flex:1;padding:6px 0;border-radius:8px;border:2px solid var(--border,#eee);background:var(--card-bg,#fff);font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--text-primary);transition:all .15s;" class="tip-quick-btn" data-pct="${p}">${p}%</button>`).join('')}
+        </div>
+      </div>
+      <!-- Split options -->
+      <div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:12px;">
+        <div style="font-size:11px;font-weight:700;color:#9E9E9E;margin-bottom:10px;">SPLIT BETWEEN</div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <button onclick="changeSplit(-1)" style="width:40px;height:40px;border-radius:50%;border:2px solid var(--border,#eee);background:var(--card-bg,#fff);font-size:20px;cursor:pointer;font-weight:700;color:var(--text-primary);">−</button>
+          <div style="flex:1;text-align:center;">
+            <div id="split-count-display" style="font-size:28px;font-weight:800;color:var(--text-primary);">1</div>
+            <div style="font-size:11px;color:#9E9E9E;">person</div>
+          </div>
+          <button onclick="changeSplit(1)" style="width:40px;height:40px;border-radius:50%;border:2px solid var(--border,#eee);background:var(--card-bg,#fff);font-size:20px;cursor:pointer;font-weight:700;color:var(--text-primary);">+</button>
+        </div>
+      </div>
+      <!-- Breakdown -->
+      <div id="tip-breakdown" style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:12px;"></div>
+      <!-- Custom items -->
+      <div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <div style="font-size:11px;font-weight:700;color:#9E9E9E;">ITEMIZE BILL</div>
+          <button onclick="addBillItem()" style="font-size:12px;font-weight:700;color:#9C27B0;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;">+ Add Item</button>
+        </div>
+        <div id="bill-items-list"></div>
+      </div>
+      <!-- Share button -->
+      <button onclick="shareTipResult()" style="width:100%;background:linear-gradient(135deg,#9C27B0,#E91E63);border:none;border-radius:14px;padding:14px;color:#fff;font-size:14px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;">↗ Share Split with Group</button>
+    </div>`;
+  document.body.appendChild(el);
+  window._tipSplit = 1;
+  window._billItems = [];
+  updateTipCalc();
+  document.getElementById('tip-bill-amount')?.focus();
+}
+window.openTipCalculator = openTipCalculator;
+
+function setTipPct(pct) {
+  const slider = document.getElementById('tip-pct-slider');
+  if (slider) slider.value = pct;
+  updateTipCalc();
+}
+window.setTipPct = setTipPct;
+
+function changeSplit(delta) {
+  window._tipSplit = Math.max(1, Math.min(20, (window._tipSplit || 1) + delta));
+  const el = document.getElementById('split-count-display');
+  const lbl = el?.nextElementSibling;
+  if (el) el.textContent = window._tipSplit;
+  if (lbl) lbl.textContent = window._tipSplit === 1 ? 'person' : 'people';
+  updateTipCalc();
+}
+window.changeSplit = changeSplit;
+
+function updateTipCalc() {
+  const billEl = document.getElementById('tip-bill-amount');
+  const sliderEl = document.getElementById('tip-pct-slider');
+  const bill = parseFloat(billEl?.value || 0);
+  const pct = parseInt(sliderEl?.value || 18);
+  const split = window._tipSplit || 1;
+  const itemsTotal = (window._billItems || []).reduce((s, i) => s + (i.price || 0), 0);
+  const base = bill || itemsTotal;
+  const tip = base * pct / 100;
+  const total = base + tip;
+  const perPerson = split > 0 ? total / split : total;
+
+  const pctDisplay = document.getElementById('tip-pct-display');
+  if (pctDisplay) pctDisplay.textContent = pct + '%';
+
+  const totalDisplay = document.getElementById('tip-total-display');
+  if (totalDisplay) totalDisplay.textContent = '$' + total.toFixed(2);
+
+  const perDisplay = document.getElementById('tip-per-person-display');
+  if (perDisplay) perDisplay.textContent = split > 1 ? `$${perPerson.toFixed(2)} per person` : '';
+
+  // Highlight quick tip buttons
+  document.querySelectorAll('.tip-quick-btn').forEach(b => {
+    const match = parseInt(b.dataset.pct) === pct;
+    b.style.borderColor = match ? '#9C27B0' : 'var(--border,#eee)';
+    b.style.background = match ? '#F3E5F5' : 'var(--card-bg,#fff)';
+    b.style.color = match ? '#9C27B0' : 'var(--text-primary)';
+  });
+
+  const bkEl = document.getElementById('tip-breakdown');
+  if (!bkEl) return;
+  bkEl.innerHTML = base > 0 ? `
+    <div style="font-size:11px;font-weight:700;color:#9E9E9E;margin-bottom:10px;">BREAKDOWN</div>
+    <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text-primary);margin-bottom:6px;"><span>Subtotal</span><span>$${base.toFixed(2)}</span></div>
+    <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text-primary);margin-bottom:6px;"><span>Tip (${pct}%)</span><span style="color:#9C27B0;">$${tip.toFixed(2)}</span></div>
+    <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:800;color:var(--text-primary);padding-top:8px;border-top:1px solid var(--border,#eee);"><span>Total</span><span>$${total.toFixed(2)}</span></div>
+    ${split > 1 ? `<div style="display:flex;justify-content:space-between;font-size:13px;font-weight:700;color:#9C27B0;margin-top:6px;"><span>Each person pays</span><span>$${perPerson.toFixed(2)}</span></div>` : ''}
+    <div style="font-size:11px;color:#9E9E9E;margin-top:8px;">
+      ${pct >= 20 ? '⭐ Excellent tip — your server will love you!' : pct >= 18 ? '✓ Standard tip for good service' : pct >= 15 ? '✓ Acceptable for average service' : pct < 10 && pct > 0 ? '⚠️ Low tip — consider if service was poor' : ''}
+    </div>` : '<div style="text-align:center;color:#9E9E9E;font-size:13px;">Enter bill amount above</div>';
+}
+window.updateTipCalc = updateTipCalc;
+
+function addBillItem() {
+  const name = prompt('Item name:');
+  if (!name) return;
+  const price = parseFloat(prompt('Price ($):') || '0');
+  if (isNaN(price) || price < 0) return;
+  window._billItems = window._billItems || [];
+  window._billItems.push({ name, price });
+  const listEl = document.getElementById('bill-items-list');
+  if (listEl) {
+    const total = window._billItems.reduce((s,i) => s+i.price, 0);
+    listEl.innerHTML = window._billItems.map((item, i) =>
+      `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border,#F9F9F9);">
+        <span style="font-size:13px;color:var(--text-primary);">${item.name}</span>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:13px;font-weight:700;color:var(--text-primary);">$${item.price.toFixed(2)}</span>
+          <button onclick="removeBillItem(${i})" style="background:none;border:none;font-size:14px;cursor:pointer;color:#9E9E9E;">×</button>
+        </div>
+      </div>`).join('') + `<div style="display:flex;justify-content:space-between;font-size:13px;font-weight:700;color:var(--text-primary);padding:8px 0;"><span>Items total</span><span>$${total.toFixed(2)}</span></div>`;
+    const billInput = document.getElementById('tip-bill-amount');
+    if (billInput && !billInput.value) billInput.value = total.toFixed(2);
+  }
+  updateTipCalc();
+}
+window.addBillItem = addBillItem;
+
+function removeBillItem(idx) {
+  window._billItems.splice(idx, 1);
+  addBillItem.call(null);  // Re-render
+}
+window.removeBillItem = removeBillItem;
+
+function shareTipResult() {
+  const total = document.getElementById('tip-total-display')?.textContent || '$0.00';
+  const pp = document.getElementById('tip-per-person-display')?.textContent || '';
+  const text = `💰 Bill Split\nTotal: ${total}${pp ? '\n' + pp : ''}\n\nCalculated with Orlando Guide`;
+  if (navigator.share) navigator.share({ title:'Bill Split', text });
+  else if (navigator.clipboard) { navigator.clipboard.writeText(text); if (typeof showToast !== 'undefined') showToast('Split copied! 📋'); }
+}
+window.shareTipResult = shareTipResult;
+</script>
+<script>
+/* ===== BLOCK DD3: Kids Activity Finder + Price Alert System ===== */
+
+/* ---------- KIDS ACTIVITY FINDER ---------- */
+const KIDS_ACTIVITIES = [
+  { name:'LEGOLAND Florida', ages:[2,12], emoji:'🧱', price:'$$', duration:'Full day', desc:'Built for kids 2–12. LEGO-themed rides, water park, interactive building areas. Parents enjoy it too!', tags:['thrill','creative','water'] },
+  { name:'Give Kids The World Village', ages:[3,17], emoji:'🌟', price:'Free', duration:'1–2 hrs', desc:'Magical nonprofit resort for children with critical illnesses. Open for tours and charity visits.', tags:['family','charity'] },
+  { name:'Disney\'s Magic Kingdom', ages:[0,99], emoji:'🏰', price:'$$$', duration:'Full day', desc:'The most magical place on Earth. Under-7 rides: Dumbo, Carousel, It\'s a Small World. Toddler-friendly.', tags:['thrill','character','iconic'] },
+  { name:'Crayola Experience', ages:[3,12], emoji:'🖍️', price:'$$', duration:'3–4 hrs', desc:'25+ hands-on coloring experiences. Kids create custom crayons, melting art, and digital experiences.', tags:['creative','indoor','rainy-day'] },
+  { name:'SEA LIFE Orlando Aquarium', ages:[2,10], emoji:'🐠', price:'$$', duration:'2 hrs', desc:'Underwater tunnels, touch pools, and 5,000 sea creatures. Perfect for toddlers and young kids.', tags:['animals','indoor','educational'] },
+  { name:'Andretti Indoor Karting', ages:[4,16], emoji:'🏎️', price:'$$', duration:'2–3 hrs', desc:'Multi-story go-kart track (min heights vary), laser tag, arcade. Teens and tweens love it.', tags:['thrill','indoor','teens'] },
+  { name:'TreeUmph! Adventure Course', ages:[5,99], emoji:'🌳', price:'$$', duration:'2–3 hrs', desc:'Aerial obstacle courses through the forest. Multiple difficulty levels for different ages.', tags:['outdoor','thrill','adventure'] },
+  { name:'Fun Spot America', ages:[3,15], emoji:'🎡', price:'$$', duration:'3–4 hrs', desc:'Go-karts, classic rides, and roller coasters. Very family-friendly and affordable alternative to big parks.', tags:['thrill','value','classic'] },
+  { name:'Orlando Science Center', ages:[5,14], emoji:'🔬', price:'$', duration:'3–4 hrs', desc:'Four floors of interactive science. Planetarium shows, dinosaur fossils, and live science demos.', tags:['educational','indoor','rainy-day'] },
+  { name:'Gatorland', ages:[4,99], emoji:'🐊', price:'$$', duration:'3–4 hrs', desc:'Florida\'s iconic alligator park. Zipline over 100+ gators, nature trails, exotic bird feeding.', tags:['animals','outdoor','unique'] },
+  { name:'Disney Junior Play Zone', ages:[2,6], emoji:'🧸', price:'Free (with park)', duration:'1–2 hrs', desc:'Inside Hollywood Studios. Soft play, character meet & greets for the youngest Disney fans.', tags:['toddler','character','indoor'] },
+  { name:'Chocolate Kingdom', ages:[5,14], emoji:'🍫', price:'$', duration:'1–2 hrs', desc:'Factory tour showing how chocolate is made. Interactive, educational, and delicious for kids.', tags:['educational','indoor','food'] },
+];
+
+window._kidsAgeFilter = 'all';
+window._kidsTagFilter = 'all';
+
+function openKidsActivityFinder() {
+  const existing = document.getElementById('kids-overlay');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'kids-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;overflow-y:auto;max-width:430px;left:50%;transform:translateX(-50%);';
+  el.innerHTML = `
+    <div style="background:linear-gradient(135deg,#FF6B35,#FFD700);padding:18px 16px 20px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <button onclick="document.getElementById('kids-overlay').remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;">←</button>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;">👨‍👩‍👧 Kids Activity Finder</div>
+      </div>
+      <div style="font-size:12px;font-weight:700;color:rgba(255,255,255,.8);margin-bottom:8px;">CHILD AGE GROUP</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        ${[['all','All Ages'],['toddler','Toddler (0–3)'],['little','Little Kids (4–6)'],['kids','Kids (7–10)'],['tween','Tweens (11–14)'],['teen','Teens (14+)']].map(([v,l],i) =>
+          `<button class="kids-age-btn ${v==='all'?'active':''}" data-age="${v}" onclick="setKidsAge('${v}',this)" style="padding:6px 10px;border-radius:10px;border:2px solid ${v==='all'?'#fff':'rgba(255,255,255,.4)'};background:${v==='all'?'rgba(255,255,255,.25)':'transparent'};color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;">${l}</button>`
+        ).join('')}
+      </div>
+      <div style="display:flex;gap:6px;margin-top:8px;overflow-x:auto;scrollbar-width:none;">
+        ${['all','thrill','creative','educational','animals','indoor','outdoor','rainy-day','character','value'].map(t =>
+          `<button class="kids-tag-btn ${t==='all'?'active':''}" data-tag="${t}" onclick="setKidsTag('${t}',this)" style="flex-shrink:0;padding:5px 10px;border-radius:10px;border:2px solid ${t==='all'?'rgba(255,255,255,.8)':'rgba(255,255,255,.3)'};background:transparent;color:${t==='all'?'#fff':'rgba(255,255,255,.7)'};font-size:10px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;">${t==='all'?'All':t.charAt(0).toUpperCase()+t.slice(1)}</button>`
+        ).join('')}
+      </div>
+    </div>
+    <div id="kids-activity-list" style="padding:12px 16px 80px;"></div>`;
+  document.body.appendChild(el);
+  renderKidsActivities();
+}
+window.openKidsActivityFinder = openKidsActivityFinder;
+
+const AGE_RANGES = { toddler:[0,3], little:[4,6], kids:[7,10], tween:[11,14], teen:[14,99] };
+function setKidsAge(val, btn) {
+  window._kidsAgeFilter = val;
+  document.querySelectorAll('.kids-age-btn').forEach(b => {
+    b.style.borderColor = b.dataset.age===val?'#fff':'rgba(255,255,255,.4)';
+    b.style.background = b.dataset.age===val?'rgba(255,255,255,.25)':'transparent';
+  });
+  renderKidsActivities();
+}
+window.setKidsAge = setKidsAge;
+
+function setKidsTag(val, btn) {
+  window._kidsTagFilter = val;
+  document.querySelectorAll('.kids-tag-btn').forEach(b => {
+    b.style.borderColor = b.dataset.tag===val?'rgba(255,255,255,.8)':'rgba(255,255,255,.3)';
+    b.style.color = b.dataset.tag===val?'#fff':'rgba(255,255,255,.7)';
+  });
+  renderKidsActivities();
+}
+window.setKidsTag = setKidsTag;
+
+function renderKidsActivities() {
+  const el = document.getElementById('kids-activity-list');
+  if (!el) return;
+  const ageFilter = window._kidsAgeFilter;
+  const tagFilter = window._kidsTagFilter;
+  let activities = KIDS_ACTIVITIES;
+  if (ageFilter !== 'all') {
+    const [minAge, maxAge] = AGE_RANGES[ageFilter] || [0,99];
+    activities = activities.filter(a => a.ages[0] <= maxAge && a.ages[1] >= minAge);
+  }
+  if (tagFilter !== 'all') activities = activities.filter(a => a.tags.includes(tagFilter));
+  if (!activities.length) { el.innerHTML = '<div style="text-align:center;padding:32px;color:#9E9E9E;font-size:13px;">No activities match — try different filters</div>'; return; }
+  el.innerHTML = activities.map(a => `<div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.05);">
+    <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;">
+      <span style="font-size:30px;flex-shrink:0;">${a.emoji}</span>
+      <div style="flex:1;">
+        <div style="font-size:14px;font-weight:700;color:var(--text-primary);">${a.name}</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;">
+          <span style="font-size:10px;background:#FFF3EE;color:#FF6B35;border-radius:6px;padding:2px 7px;font-weight:700;">Ages ${a.ages[0]}–${a.ages[1]}</span>
+          <span style="font-size:10px;background:#F5F5F5;color:#616161;border-radius:6px;padding:2px 7px;font-weight:700;">${a.price}</span>
+          <span style="font-size:10px;background:#F5F5F5;color:#616161;border-radius:6px;padding:2px 7px;font-weight:700;">⏱ ${a.duration}</span>
+        </div>
+        <div style="font-size:12px;color:#9E9E9E;margin-top:6px;line-height:1.4;">${a.desc}</div>
+        <div style="display:flex;gap:4px;margin-top:6px;flex-wrap:wrap;">
+          ${a.tags.map(t => `<span style="font-size:9px;background:#E8F5E9;color:#2E7D32;border-radius:4px;padding:2px 5px;font-weight:700;">${t}</span>`).join('')}
+        </div>
+      </div>
+    </div>
+    <button onclick="if(typeof showToast!=='undefined')showToast('Adding ${a.name.replace(/'/g,"\\'")} to trip...')" style="width:100%;background:none;border:2px solid #FF6B35;border-radius:10px;padding:8px;color:#FF6B35;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">+ Add to Trip</button>
+  </div>`).join('');
+}
+window.renderKidsActivities = renderKidsActivities;
+
+/* ---------- PRICE ALERT SYSTEM ---------- */
+window._priceAlerts = JSON.parse(localStorage.getItem('priceAlerts') || '[]');
+function savePriceAlerts() { localStorage.setItem('priceAlerts', JSON.stringify(window._priceAlerts)); }
+
+function openPriceAlerts() {
+  const existing = document.getElementById('price-alerts-overlay');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'price-alerts-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;overflow-y:auto;max-width:430px;left:50%;transform:translateX(-50%);';
+  el.innerHTML = `
+    <div style="background:var(--card-bg,#fff);border-bottom:1px solid var(--border,#eee);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:1;">
+      <button onclick="document.getElementById('price-alerts-overlay').remove()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-primary);">←</button>
+      <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--text-primary);">🔔 Price Alerts</div>
+      <button onclick="addPriceAlert()" style="background:#FF6B35;border:none;border-radius:10px;padding:6px 12px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">+ Set Alert</button>
+    </div>
+    <div style="padding:12px 16px 8px;">
+      <div style="background:#FFF3EE;border-radius:10px;padding:10px 12px;font-size:12px;color:#FF6B35;font-weight:600;">
+        💡 We'll notify you when prices drop on your watchlist items
+      </div>
+    </div>
+    <div id="price-alerts-list" style="padding:8px 16px 80px;"></div>`;
+  document.body.appendChild(el);
+  renderPriceAlerts();
+  // Simulate a price drop notification after 5s (demo)
+  if (window._priceAlerts.length > 0) {
+    setTimeout(() => {
+      const alert = window._priceAlerts[0];
+      if (alert && !alert.triggered) {
+        alert.triggered = true;
+        const drop = Math.floor(Math.random()*20)+5;
+        alert.currentPrice = (alert.targetPrice || alert.price) - drop;
+        savePriceAlerts();
+        renderPriceAlerts();
+        if (typeof pushNotif !== 'undefined') pushNotif('deal', '🔔', 'Price Drop Alert!', `${alert.name}: Now $${alert.currentPrice} (was $${alert.price})`);
+      }
+    }, 5000);
+  }
+}
+window.openPriceAlerts = openPriceAlerts;
+
+const ALERT_PRESETS = [
+  { name:'Magic Kingdom Tickets', price:119, category:'park', emoji:'🏰' },
+  { name:'Universal 2-Park Pass', price:179, category:'park', emoji:'🎢' },
+  { name:'SeaWorld Single Day', price:79, category:'park', emoji:'🐬' },
+  { name:'Rosen Inn Standard Room', price:89, category:'hotel', emoji:'🏨' },
+  { name:'CityPASS Orlando', price:299, category:'bundle', emoji:'⭐' },
+];
+
+function addPriceAlert() {
+  const el = document.createElement('div');
+  el.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9000;display:flex;align-items:flex-end;max-width:430px;left:50%;transform:translateX(-50%);';
+  el.innerHTML = `<div style="background:var(--card-bg,#fff);border-radius:20px 20px 0 0;width:100%;padding:20px 16px 32px;">
+    <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--text-primary);margin-bottom:14px;">Set Price Alert</div>
+    <div style="font-size:11px;font-weight:700;color:#9E9E9E;margin-bottom:8px;">QUICK SELECT</div>
+    <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px;">
+      ${ALERT_PRESETS.map(p => `<button onclick="createAlertFromPreset('${p.name}',${p.price},'${p.emoji}');this.closest('[style*=inset]').remove();" style="background:#F9F9F9;border:1px solid var(--border,#eee);border-radius:10px;padding:10px 12px;text-align:left;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:8px;">
+        <span style="font-size:18px;">${p.emoji}</span>
+        <div style="flex:1;"><div style="font-size:13px;font-weight:600;color:var(--text-primary);">${p.name}</div><div style="font-size:11px;color:#9E9E9E;">Current: $${p.price}</div></div>
+        <span style="font-size:12px;font-weight:700;color:#FF6B35;">Track ›</span>
+      </button>`).join('')}
+    </div>
+    <div style="font-size:11px;font-weight:700;color:#9E9E9E;margin-bottom:8px;">CUSTOM ALERT</div>
+    <input id="alert-name-input" placeholder="Item name (e.g. Disney Annual Pass)" style="width:100%;border:1px solid var(--border,#eee);border-radius:10px;padding:10px;font-size:13px;font-family:'DM Sans',sans-serif;background:var(--card-bg,#fff);color:var(--text-primary);box-sizing:border-box;margin-bottom:8px;">
+    <input id="alert-price-input" type="number" placeholder="Current / max price ($)" style="width:100%;border:1px solid var(--border,#eee);border-radius:10px;padding:10px;font-size:13px;font-family:'DM Sans',sans-serif;background:var(--card-bg,#fff);color:var(--text-primary);box-sizing:border-box;margin-bottom:12px;">
+    <div style="display:flex;gap:8px;">
+      <button onclick="createCustomAlert()" style="flex:1;background:#FF6B35;border:none;border-radius:12px;padding:13px;color:#fff;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">Set Alert</button>
+      <button onclick="this.closest('[style*=inset]').remove()" style="flex:1;background:#F5F5F5;border:none;border-radius:12px;padding:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--text-primary);">Cancel</button>
+    </div>
+  </div>`;
+  el.onclick = e => { if (e.target === el) el.remove(); };
+  document.body.appendChild(el);
+}
+window.addPriceAlert = addPriceAlert;
+
+function createAlertFromPreset(name, price, emoji) {
+  window._priceAlerts.push({ id:'pa_'+Date.now(), name, price, emoji, targetPrice: price * 0.85, triggered:false, createdAt:Date.now() });
+  savePriceAlerts();
+  renderPriceAlerts();
+  if (typeof showToast !== 'undefined') showToast('Alert set for ' + name + ' 🔔');
+}
+window.createAlertFromPreset = createAlertFromPreset;
+
+function createCustomAlert() {
+  const name = document.getElementById('alert-name-input')?.value?.trim();
+  const price = parseFloat(document.getElementById('alert-price-input')?.value);
+  if (!name || isNaN(price)) { if (typeof showToast !== 'undefined') showToast('Please fill in all fields'); return; }
+  window._priceAlerts.push({ id:'pa_'+Date.now(), name, price, emoji:'🎯', targetPrice: price * 0.9, triggered:false, createdAt:Date.now() });
+  savePriceAlerts();
+  document.querySelector('[style*=inset]')?.remove();
+  renderPriceAlerts();
+  if (typeof showToast !== 'undefined') showToast('Alert set! We\'ll notify you of price drops 🔔');
+}
+window.createCustomAlert = createCustomAlert;
+
+function renderPriceAlerts() {
+  const el = document.getElementById('price-alerts-list');
+  if (!el) return;
+  if (!window._priceAlerts.length) { el.innerHTML = '<div style="text-align:center;padding:40px;color:#9E9E9E;font-size:13px;"><div style="font-size:40px;margin-bottom:12px;">🔔</div>No alerts set yet<br><span style="font-size:11px;">Tap + Set Alert to track prices</span></div>'; return; }
+  el.innerHTML = window._priceAlerts.map((a,i) => {
+    const hasDrop = a.triggered && a.currentPrice;
+    const savings = hasDrop ? (a.price - a.currentPrice) : 0;
+    return `<div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:10px;border-left:4px solid ${hasDrop?'#4CAF50':'#FF6B35'};">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <span style="font-size:24px;">${a.emoji}</span>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:700;color:var(--text-primary);">${a.name}</div>
+          <div style="font-size:11px;color:#9E9E9E;">Alert at: $${(a.targetPrice||a.price).toFixed(0)}</div>
+        </div>
+        <button onclick="deletePriceAlert(${i})" style="background:none;border:none;font-size:16px;cursor:pointer;color:#9E9E9E;">×</button>
+      </div>
+      ${hasDrop
+        ? `<div style="background:#E8F5E9;border-radius:10px;padding:10px;display:flex;justify-content:space-between;align-items:center;">
+            <div><div style="font-size:11px;font-weight:700;color:#2E7D32;">🎉 PRICE DROP!</div><div style="font-size:18px;font-weight:800;color:#2E7D32;">$${a.currentPrice}</div><div style="font-size:11px;color:#9E9E9E;text-decoration:line-through;">was $${a.price}</div></div>
+            <div style="text-align:right;"><div style="font-size:14px;font-weight:800;color:#2E7D32;">Save $${savings}!</div><button onclick="if(typeof showToast!=='undefined')showToast('Opening deal...')" style="margin-top:6px;background:#2E7D32;border:none;border-radius:8px;padding:6px 12px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">Book Now →</button></div>
+          </div>`
+        : `<div style="background:#F9F9F9;border-radius:10px;padding:8px 10px;display:flex;justify-content:space-between;font-size:12px;color:#9E9E9E;">
+            <span>Current: $${a.price}</span><span>Watching for drops below $${(a.targetPrice||a.price).toFixed(0)}</span>
+          </div>`}
+    </div>`;
+  }).join('');
+}
+window.renderPriceAlerts = renderPriceAlerts;
+
+function deletePriceAlert(idx) {
+  window._priceAlerts.splice(idx, 1);
+  savePriceAlerts();
+  renderPriceAlerts();
+}
+window.deletePriceAlert = deletePriceAlert;
+</script>
+<style>
+/* ===== BLOCK DD CSS ===== */
+.kids-age-btn,.kids-tag-btn{transition:all .15s;}
+.tip-quick-btn{transition:all .15s;}
+#tip-pct-slider{cursor:pointer;}
+</style>
+<script>
+/* ===== BLOCK DD: Wiring ===== */
+(function wireDDFeatures() {
+  const DD_QUICK = [
+    { icon:'🚨', label:'Emergency', fn: openEmergencyHub },
+    { icon:'💵', label:'Tip Calc', fn: openTipCalculator },
+    { icon:'👧', label:'Kids Fun', fn: openKidsActivityFinder },
+    { icon:'🔔', label:'Price Alerts', fn: openPriceAlerts },
+  ];
+
+  const _prevRH = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH) _prevRH.apply(this, arguments);
+    setTimeout(() => {
+      const row = document.getElementById('y-quick-row');
+      if (!row || row.querySelector('[data-dd-quick]')) return;
+      DD_QUICK.forEach(b => {
+        const btn = document.createElement('button');
+        btn.setAttribute('data-dd-quick','1');
+        btn.style.cssText = "flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:5px;background:var(--card-bg,#fff);border:1px solid var(--border,#eee);border-radius:14px;padding:12px 14px;cursor:pointer;font-family:'DM Sans',sans-serif;";
+        btn.innerHTML = `<span style="font-size:22px;">${b.icon}</span><span style="font-size:11px;font-weight:700;color:var(--text-primary,#212121);white-space:nowrap;">${b.label}</span>`;
+        btn.onclick = b.fn;
+        row.appendChild(btn);
+      });
+    }, 250);
+  };
+
+  const _prevRA = window.renderAccount;
+  window.renderAccount = function() {
+    if (_prevRA) _prevRA.apply(this, arguments);
+    setTimeout(() => {
+      const loggedIn = document.querySelector('.account-loggedin');
+      if (!loggedIn || loggedIn.querySelector('[data-dd-items]')) return;
+      const adminBtn = loggedIn.querySelector('.adm-account-btn');
+      DD_QUICK.forEach(item => {
+        const el = document.createElement('div');
+        el.setAttribute('data-dd-items','1');
+        el.className = 'account-menu-item';
+        el.innerHTML = `<span class="icon">${item.icon}</span><span>${item.label === 'Emergency' ? 'Emergency & Safety' : item.label === 'Tip Calc' ? 'Tip & Bill Splitter' : item.label === 'Kids Fun' ? 'Kids Activity Finder' : 'Price Alerts'}</span><span class="arrow">›</span>`;
+        el.onclick = item.fn;
+        loggedIn.insertBefore(el, adminBtn || null);
+      });
+    }, 80);
+  };
+
+  // Add emergency button to home header
+  const _prevSS = window.showScreen;
+  window.showScreen = function(name, navEl) {
+    if (_prevSS) _prevSS(name, navEl);
+    if (name === 'home') {
+      setTimeout(() => {
+        const hdr = document.querySelector('#screen-home .screen-header');
+        if (hdr && !hdr.querySelector('[data-sos-btn]')) {
+          const sosBtn = document.createElement('button');
+          sosBtn.setAttribute('data-sos-btn','1');
+          sosBtn.style.cssText = 'position:absolute;left:12px;top:50%;transform:translateY(-50%);background:#E53935;border:none;border-radius:50%;width:30px;height:30px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:1;';
+          sosBtn.innerHTML = '🚨';
+          sosBtn.title = 'Emergency & Safety';
+          sosBtn.onclick = openEmergencyHub;
+          hdr.style.position = 'relative';
+          hdr.appendChild(sosBtn);
+        }
+      }, 120);
+    }
+  };
+})();
+</script>
