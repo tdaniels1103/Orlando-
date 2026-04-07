@@ -29682,3 +29682,918 @@ window.openTripSummary = openTripSummary;
      Blocks A through RR
      Built with ❤️ block by block
      ============================================================ -->
+<script>
+/* ===== BLOCK SS1: Nightlife & Adult Experiences ===== */
+const NIGHTLIFE = [
+  {
+    cat: 'Dinner Shows',
+    icon: '🎪',
+    color: '#6A1B9A',
+    venues: [
+      { name:'Hoop-Dee-Doo Musical Revue', loc:'Disney\'s Fort Wilderness Resort', price:'$79–$99/adult', desc:'Disney\'s longest-running show (since 1974). All-you-can-eat BBQ + comedy western variety show. Book 60 days out — sells out constantly.', hours:'6pm & 8:15pm nightly' },
+      { name:'Spirit of Aloha Dinner Show', loc:'Disney\'s Polynesian Resort', price:'$79–$99/adult', desc:'Polynesian-themed luau with fire dancers, hula, and all-you-can-eat island feast overlooking Seven Seas Lagoon.', hours:'5:15pm & 8pm (Tue, Thu, Sat)' },
+      { name:'Medieval Times', loc:'US-192, Kissimmee', price:'$67/adult', desc:'Knights on real horses jousting while you eat a 4-course feast with your hands. Wildly fun. Pick your knight!', hours:'Various — check website' },
+      { name:'Capone\'s Dinner & Show', loc:'US-192, Kissimmee', price:'$64/adult', desc:'1920s Chicago mob-themed show with unlimited food and open bar. Campy, fun, and affordable.', hours:'7:30pm shows' },
+      { name:'Pirates Dinner Adventure', loc:'Buena Vista Drive', price:'$70/adult', desc:'Swashbuckling pirates on a full-scale ship inside a theater. High-energy acrobatic show.', hours:'6pm & 8:30pm select nights' },
+    ]
+  },
+  {
+    cat: 'Comedy & Entertainment',
+    icon: '🎭',
+    color: '#1565C0',
+    venues: [
+      { name:'SAK Comedy Lab', loc:'Downtown Orlando', price:'$15–$22', desc:'Orlando\'s original improv comedy club. Two stages: adult-friendly and all-ages. Shows every weekend.', hours:'Fri–Sat 7:30pm & 9:30pm' },
+      { name:'Copper Rocket Pub', loc:'Maitland', price:'Free–$10', desc:'Live music venue — local bands every weekend. Great draft beer selection. Very local feel.', hours:'4pm–2am daily' },
+      { name:'Howl at the Moon', loc:'Universal CityWalk', price:'$10 cover after 9pm', desc:'Dueling piano bar with live requests. Incredibly fun for groups. Gets rowdy in the best way.', hours:'7pm–2am Thu–Sat' },
+      { name:'The Courtesy Bar', loc:'Downtown Orlando', price:'$$', desc:'James Beard semifinalist craft cocktail bar. Pre-Prohibition classics, inventive seasonal drinks. No-fuss vibe.', hours:'5pm–2am daily' },
+      { name:'Dr. Phillips Center Broadway', loc:'Downtown Orlando', price:'$50–$200', desc:'World-class touring Broadway productions. Check schedule for Hamilton, Wicked, Lion King returns.', hours:'Varies by show' },
+    ]
+  },
+  {
+    cat: 'Bars & Lounges',
+    icon: '🍸',
+    color: '#AD1457',
+    venues: [
+      { name:'Trader Sam\'s Grog Grotto', loc:'Disney\'s Polynesian Resort', price:'$$', desc:'Disney\'s most magical bar. Order the Krakatoa Punch — the whole bar goes NUTS. Intimate, theatrical, and unforgettable. Waits can be 2 hours.', hours:'3pm–12am daily (21+ after 8pm)' },
+      { name:'Oga\'s Cantina', loc:'Galaxy\'s Edge, Hollywood Studios', price:'$$', desc:'Star Wars-themed bar with DJ R-3X spinning hits. Limited menu of themed cocktails and non-alcoholic drinks. Virtual queue or book in My Disney Experience.', hours:'Park hours' },
+      { name:'Top of the Hub / California Grill Lounge', loc:'Contemporary Resort', price:'$$$', desc:'Fireworks viewing from the 15th floor lounge. Order a cocktail and watch Magic Kingdom fireworks from above.', hours:'From 4:30pm daily' },
+      { name:'Wine Bar George', loc:'Disney Springs', price:'$$', desc:'150+ wines by the glass. James Beard-nominated sommelier George Miliotes. Great for wine lovers.', hours:'12pm–11pm daily' },
+      { name:'LAVA Lounge', loc:'EPCOT — Islands of the World', price:'$$', desc:'Outdoor bar between Morocco and France pavilions. Best kept secret in EPCOT. No wait, great views of the lagoon.', hours:'Park hours' },
+    ]
+  },
+  {
+    cat: 'Adults-Only Experiences',
+    icon: '✨',
+    color: '#E65100',
+    venues: [
+      { name:'Disney After Hours', loc:'Magic Kingdom / Hollywood Studios', price:'$135–$179', desc:'After-park-close event: 3 hours with essentially no waits on major rides. Complimentary ice cream and popcorn. Worth every penny on a busy trip.', hours:'10pm–1am select nights' },
+      { name:'EPCOT Food & Wine Festival', loc:'EPCOT', price:'Park admission + food kiosks ($5–$15 each)', desc:'October through November. World Showcase becomes a global food and wine fair with 30+ countries represented. One of Orlando\'s best annual events.', hours:'Park hours during the festival' },
+      { name:'Keys to the Kingdom Tour', loc:'Magic Kingdom', price:'$109/person', desc:'5-hour guided tour of Magic Kingdom including the underground utilidors. Must be 16+. Books out months in advance.', hours:'Most mornings, 8:30am–1:30pm' },
+      { name:'Illuminations Cruise / Fireworks Cruise', loc:'Various Disney Resorts', price:'$399–$599/boat', desc:'Private pontoon boat with your group — watch Happily Ever After or Harmonious fireworks from the water. Includes snacks and drinks.', hours:'Evening fireworks nights' },
+    ]
+  },
+];
+
+window._nightCat = 0;
+
+function openNightlifeGuide() {
+  const existing = document.getElementById('night-overlay');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'night-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;display:flex;flex-direction:column;max-width:430px;left:50%;transform:translateX(-50%);';
+  el.innerHTML = `
+    <div style="background:linear-gradient(135deg,#1A237E,#283593,#4527A0);padding:18px 16px 14px;flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <button onclick="document.getElementById('night-overlay').remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;">←</button>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;">🌙 Nightlife & Adult Experiences</div>
+      </div>
+      <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;" id="night-tabs">
+        ${NIGHTLIFE.map((n,i) => `<button onclick="setNightCat(${i},this)" style="flex-shrink:0;border-radius:20px;padding:5px 11px;border:1.5px solid ${i===0?'#fff':'rgba(255,255,255,.4)'};background:${i===0?'rgba(255,255,255,.25)':'transparent'};color:#fff;font-size:10px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">${n.icon} ${n.cat.split(' ')[0]}</button>`).join('')}
+      </div>
+    </div>
+    <div style="overflow-y:auto;flex:1;padding:14px 16px 80px;" id="night-content"></div>`;
+  document.body.appendChild(el);
+  window._nightCat = 0;
+  renderNightlife();
+}
+window.openNightlifeGuide = openNightlifeGuide;
+
+function setNightCat(i, btn) {
+  window._nightCat = i;
+  document.querySelectorAll('#night-tabs button').forEach(b => { b.style.background='transparent'; b.style.borderColor='rgba(255,255,255,.4)'; });
+  btn.style.background='rgba(255,255,255,.25)'; btn.style.borderColor='#fff';
+  renderNightlife();
+}
+window.setNightCat = setNightCat;
+
+function renderNightlife() {
+  const el = document.getElementById('night-content');
+  if (!el) return;
+  const cat = NIGHTLIFE[window._nightCat || 0];
+  el.innerHTML = `<div style="background:${cat.color};border-radius:14px;padding:14px;margin-bottom:14px;display:flex;align-items:center;gap:12px;">
+    <span style="font-size:32px;">${cat.icon}</span>
+    <div><div style="font-size:16px;font-weight:800;color:#fff;">${cat.cat}</div>
+    <div style="font-size:11px;color:rgba(255,255,255,.8);">${cat.venues.length} venues</div></div>
+  </div>` +
+  cat.venues.map(v => `
+    <div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:10px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+        <div style="font-size:13px;font-weight:800;color:var(--text-primary);flex:1;padding-right:8px;">${v.name}</div>
+        <span style="font-size:11px;font-weight:700;color:${cat.color};background:${cat.color}22;border-radius:8px;padding:2px 8px;white-space:nowrap;">${v.price}</span>
+      </div>
+      <div style="font-size:11px;color:#9E9E9E;margin-bottom:6px;">📍 ${v.loc} · ⏰ ${v.hours}</div>
+      <div style="font-size:12px;color:#757575;line-height:1.5;">${v.desc}</div>
+    </div>`).join('');
+}
+window.renderNightlife = renderNightlife;
+</script>
+<script>
+/* ===== BLOCK SS2: Annual Pass Comparison ===== */
+const ANNUAL_PASSES = {
+  Disney: {
+    color: '#1565C0', icon: '🏰',
+    tiers: [
+      { name:'Disney Incredi-Pass', price:'$1,399/yr', monthly:'$116/mo', color:'#212121',
+        perks:['Access to all 4 parks + water parks','No blockout dates','20% dining discount','20% merchandise discount','Free standard parking','PhotoPass included'],
+        blockouts:'None — full access 365 days', best:'Locals or frequent visitors (5+ trips/year)' },
+      { name:'Disney Sorcerer Pass', price:'$849/yr', monthly:'$71/mo', color:'#6A1B9A',
+        perks:['All 4 parks access','Select blockout dates (peak holidays)','15% dining discount','15% merchandise discount','Free standard parking'],
+        blockouts:'Major holidays blocked (Christmas, spring break, 4th of July)', best:'Florida residents visiting 3–4 times/year' },
+      { name:'Disney Pirate Pass', price:'$699/yr', monthly:'$58/mo', color:'#1565C0',
+        perks:['All 4 parks access','More blockout dates','10% dining discount','10% merchandise discount','Parking discounted'],
+        blockouts:'Weekends + all major holidays blocked', best:'FL residents with flexible weekday schedules' },
+      { name:'Disney Pixie Dust Pass', price:'$399/yr', monthly:'$33/mo', color:'#2E7D32',
+        perks:['All 4 parks access (limited days)','Significant blockout dates','10% dining discount'],
+        blockouts:'Weekends, holidays, and many peak days blocked', best:'FL residents who only visit off-peak weekdays' },
+    ]
+  },
+  Universal: {
+    color: '#E65100', icon: '🎭',
+    tiers: [
+      { name:'Power Annual Pass', price:'$1,099/yr', monthly:'$92/mo', color:'#212121',
+        perks:['All 3 parks (Studios, Islands, Epic Universe)','No blockout dates','Free parking','50% off hotels','15% dining + merchandise discount','Bring-a-Friend tickets'],
+        blockouts:'None', best:'Frequent visitors — best value when Epic Universe opens' },
+      { name:'Preferred Annual Pass', price:'$749/yr', monthly:'$62/mo', color:'#6A1B9A',
+        perks:['All 3 parks','Select blockout dates','Free parking','50% hotel discount','15% dining discount'],
+        blockouts:'Peak dates blocked (~15 days/year)', best:'Regular visitors (3–4 times/year)' },
+      { name:'Seasonal Annual Pass', price:'$399/yr', monthly:'$33/mo', color:'#1565C0',
+        perks:['All 3 parks','Significant blockouts','Discounted parking','10% dining + merch'],
+        blockouts:'Peak periods blocked (~60+ days/year)', best:'FL residents visiting off-season only' },
+    ]
+  },
+  SeaWorld: {
+    color: '#006064', icon: '🐋',
+    tiers: [
+      { name:'Platinum Pass', price:'$359/yr', monthly:'$30/mo', color:'#006064',
+        perks:['SeaWorld + Busch Gardens + Aquatica + Adventure Island access','No blockout dates','Free parking','50% off food + merch','All-day dining option'],
+        blockouts:'None', best:'Anyone visiting multiple SeaWorld Entertainment parks' },
+      { name:'Gold Pass', price:'$229/yr', monthly:'$19/mo', color:'#00838F',
+        perks:['SeaWorld Orlando only','No blockout dates','Discounted parking','15% dining + merch'],
+        blockouts:'None — best value single-park pass in Orlando', best:'Families who want a SeaWorld alternative to Disney' },
+    ]
+  },
+};
+
+window._apOperator = 'Disney';
+
+function openAnnualPassGuide() {
+  const existing = document.getElementById('ap-overlay');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'ap-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;display:flex;flex-direction:column;max-width:430px;left:50%;transform:translateX(-50%);';
+  const ops = Object.keys(ANNUAL_PASSES);
+  el.innerHTML = `
+    <div style="background:linear-gradient(135deg,#37474F,#455A64,#607D8B);padding:18px 16px 14px;flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <button onclick="document.getElementById('ap-overlay').remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;">←</button>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;">🎫 Annual Pass Guide</div>
+      </div>
+      <div style="display:flex;gap:8px;" id="ap-op-tabs">
+        ${ops.map(o => `<button onclick="setAPOp('${o}',this)" style="flex:1;border-radius:20px;padding:8px;border:1.5px solid ${o==='Disney'?'#fff':'rgba(255,255,255,.4)'};background:${o==='Disney'?'rgba(255,255,255,.25)':'transparent'};color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">${ANNUAL_PASSES[o].icon} ${o}</button>`).join('')}
+      </div>
+    </div>
+    <!-- Break-even calculator -->
+    <div style="padding:12px 16px 0;flex-shrink:0;">
+      <div style="background:var(--card-bg,#fff);border-radius:14px;padding:12px 14px;">
+        <div style="font-size:11px;font-weight:700;color:#9E9E9E;margin-bottom:8px;">BREAK-EVEN CALCULATOR</div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <div style="font-size:12px;color:var(--text-primary);">Visits/year:</div>
+          ${[1,2,3,4,5,6,8,10].map(n => `<button onclick="calcAPBreakeven(${n},this)" style="border-radius:8px;padding:4px 10px;border:1.5px solid var(--border,#eee);background:var(--bg,#F9F9F9);font-size:12px;font-weight:700;color:#9E9E9E;cursor:pointer;font-family:'DM Sans',sans-serif;">${n}</button>`).join('')}
+        </div>
+        <div id="ap-calc-result" style="margin-top:8px;font-size:12px;color:#9E9E9E;">Select number of visits to see when an annual pass pays off.</div>
+      </div>
+    </div>
+    <div style="overflow-y:auto;flex:1;padding:12px 16px 80px;" id="ap-content"></div>`;
+  document.body.appendChild(el);
+  renderAnnualPasses();
+}
+window.openAnnualPassGuide = openAnnualPassGuide;
+
+function setAPOp(op, btn) {
+  window._apOperator = op;
+  document.querySelectorAll('#ap-op-tabs button').forEach(b => { b.style.background='transparent'; b.style.borderColor='rgba(255,255,255,.4)'; });
+  btn.style.background='rgba(255,255,255,.25)'; btn.style.borderColor='#fff';
+  renderAnnualPasses();
+}
+window.setAPOp = setAPOp;
+
+function calcAPBreakeven(n, btn) {
+  document.querySelectorAll('#ap-calc-result').forEach(()=>{});
+  document.querySelectorAll('[onclick^="calcAPBreakeven"]').forEach(b => { b.style.background='var(--bg,#F9F9F9)'; b.style.color='#9E9E9E'; b.style.borderColor='var(--border,#eee)'; });
+  btn.style.background='#FF6B35'; btn.style.color='#fff'; btn.style.borderColor='#FF6B35';
+  const ticketPrice = { Disney: 109, Universal: 109, SeaWorld: 99 };
+  const op = window._apOperator || 'Disney';
+  const daily = ticketPrice[op];
+  const oop = daily * n;
+  const data = ANNUAL_PASSES[op];
+  const cheapest = Math.min(...data.tiers.map(t => parseInt(t.price.replace(/\D/g,''))));
+  const el = document.getElementById('ap-calc-result');
+  if (el) {
+    if (oop >= cheapest) {
+      el.innerHTML = `<span style="color:#4CAF50;font-weight:700;">✓ ${n} visits × $${daily} = $${oop} — the ${data.tiers[data.tiers.length-1].name} ($${cheapest}/yr) pays off!</span>`;
+    } else {
+      const needed = Math.ceil(cheapest / daily);
+      el.innerHTML = `<span style="color:#9E9E9E;">At ${n} visits you spend ~$${oop}. Annual pass breaks even at <strong>${needed} visits</strong>.</span>`;
+    }
+  }
+}
+window.calcAPBreakeven = calcAPBreakeven;
+
+function renderAnnualPasses() {
+  const el = document.getElementById('ap-content');
+  if (!el) return;
+  const op = window._apOperator || 'Disney';
+  const data = ANNUAL_PASSES[op];
+  el.innerHTML = data.tiers.map(t => `
+    <div style="background:var(--card-bg,#fff);border-radius:16px;margin-bottom:12px;overflow:hidden;border-top:4px solid ${t.color};">
+      <div style="padding:14px 14px 10px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+          <div style="font-size:14px;font-weight:800;color:var(--text-primary);">${t.name}</div>
+          <div style="text-align:right;"><div style="font-size:16px;font-weight:800;color:${data.color};">${t.price}</div>
+          <div style="font-size:10px;color:#9E9E9E;">${t.monthly}</div></div>
+        </div>
+        <div style="font-size:11px;font-weight:700;color:#9E9E9E;margin-bottom:6px;">PERKS INCLUDED</div>
+        ${t.perks.map(p => `<div style="font-size:11px;color:var(--text-primary);padding:2px 0;display:flex;gap:6px;"><span style="color:${data.color};">✓</span>${p}</div>`).join('')}
+        <div style="margin-top:10px;background:#FFF8E1;border-radius:10px;padding:8px 10px;">
+          <div style="font-size:10px;font-weight:700;color:#E65100;margin-bottom:2px;">BLOCKOUT DATES</div>
+          <div style="font-size:11px;color:#757575;">${t.blockouts}</div>
+        </div>
+        <div style="margin-top:8px;background:#E8F5E9;border-radius:10px;padding:6px 10px;">
+          <div style="font-size:11px;color:#2E7D32;">👤 Best for: ${t.best}</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+window.renderAnnualPasses = renderAnnualPasses;
+</script>
+<script>
+/* ===== BLOCK TT1: VIP Tours Guide ===== */
+const VIP_TOURS = [
+  { name:'Keys to the Kingdom', park:'Magic Kingdom', price:'$109/person', duration:'5 hours', min_age:16, icon:'🔑',
+    desc:'The ultimate Magic Kingdom backstage experience. Walk the underground utilidors, visit backstage areas, and learn the real history and secrets of the park.',
+    includes:['Underground utilidors (tunnels) tour','Backstage look at parade floats','Lunch included','Limited to 12 guests per tour','Audio guide headsets'],
+    tip:'Books out months in advance. Call Disney reservations at 407-WDW-TOUR the day it opens for your travel window (60 days out).' },
+  { name:'Disney\'s Family Magic Tour', park:'Magic Kingdom', price:'$39/person', duration:'2 hours', min_age:0, icon:'🪄',
+    desc:'A scavenger hunt–style guided tour of Magic Kingdom for families with young children. Interactive storytelling with characters.',
+    includes:['Guided interactive adventure','Character interactions','Ages 3+ welcome','Morning departure'],
+    tip:'Great warm-up activity on your first park morning. Gets kids excited before the crowds arrive.' },
+  { name:'Behind the Seeds', park:'EPCOT', price:'$30/adult, $25/child', duration:'75 min', min_age:0, icon:'🌱',
+    desc:'Walk-through tour of the greenhouses and aquaculture labs beneath The Land pavilion. See how Disney grows food for its restaurants.',
+    includes:['Walk-through greenhouse access','Fish and produce labs','Educational guide','All ages welcome'],
+    tip:'Available multiple times daily — no advance booking needed at Guest Relations. Much less well-known than it deserves to be.' },
+  { name:'Wonders of Life Science Tour', park:'Animal Kingdom', price:'$89/person', duration:'3 hours', min_age:12, icon:'🦎',
+    desc:'Get behind the scenes at Animal Kingdom — see how Disney cares for over 2,000 animals, visit non-public veterinary areas.',
+    includes:['Backstage animal care areas','Veterinary facility visit','Animal nutrition kitchen','Conservation stories from keepers'],
+    tip:'Absolutely transformative for animal lovers. Limited to 10 guests. Book exactly 60 days out.' },
+  { name:'The Magic Behind Our Steam Trains', park:'Magic Kingdom', price:'$54/person', duration:'3 hours', min_age:10, icon:'🚂',
+    desc:'Go backstage with the steam train engineers before the park opens. Learn the history of the Walt Disney World Railroad.',
+    includes:['Backstage roundhouse access','Ride in locomotive cab','Park entry included','Early morning before rope drop'],
+    tip:'Starts at 7:30am — perfect for early risers. One of the most underrated Disney tours.' },
+  { name:'Universal\'s VIP Experience', park:'Universal (both parks)', price:'$299–$389/person', duration:'8 hours', min_age:0, icon:'⭐',
+    desc:'Universal\'s elite tour: private guide, skip ALL lines via the VIP entrance at every attraction, front-row show seats, and gourmet lunch.',
+    includes:['Skip-the-line access ALL day','Private guide','Gourmet lunch included','Early park admission','Both parks included'],
+    tip:'The most pure "money-buys-happiness" experience at Universal. Worth it if budget allows — lines simply don\'t exist for you.' },
+  { name:'Dolphin Swim Experience', park:'SeaWorld', price:'$229/person', duration:'90 min', min_age:10, icon:'🐬',
+    desc:'Wade into the dolphin lagoon for a guided interaction, feed and train real dolphins alongside SeaWorld animal trainers.',
+    includes:['Hands-on dolphin interaction','Trainer for your group','Wetsuit and equipment','Photos included','Park admission required'],
+    tip:'Must-book weeks ahead. Minimum 48" height for participants in the water.' },
+];
+
+function openVIPToursGuide() {
+  const existing = document.getElementById('vip-overlay');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'vip-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;display:flex;flex-direction:column;max-width:430px;left:50%;transform:translateX(-50%);';
+  const saved = JSON.parse(localStorage.getItem('savedVIPTours') || '[]');
+  el.innerHTML = `
+    <div style="background:linear-gradient(135deg,#F57F17,#F9A825,#FBC02D);padding:18px 16px 14px;flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="document.getElementById('vip-overlay').remove()" style="background:rgba(0,0,0,.1);border:none;border-radius:50%;width:32px;height:32px;color:#5D4037;font-size:16px;cursor:pointer;">←</button>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#5D4037;">⭐ VIP Tours & Backstage</div>
+      </div>
+      <div style="font-size:12px;color:rgba(93,64,55,.8);">${VIP_TOURS.length} exclusive experiences across all parks</div>
+    </div>
+    <div style="overflow-y:auto;flex:1;padding:14px 16px 80px;">
+      ${VIP_TOURS.map((t,i) => {
+        const isSaved = saved.includes(t.name);
+        return `<div style="background:var(--card-bg,#fff);border-radius:16px;margin-bottom:12px;overflow:hidden;">
+          <div style="background:linear-gradient(135deg,#37474F,#546E7A);padding:14px 14px 12px;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+              <div style="flex:1;">
+                <div style="font-size:15px;font-weight:800;color:#fff;margin-bottom:2px;">${t.icon} ${t.name}</div>
+                <div style="font-size:11px;color:rgba(255,255,255,.8);">${t.park} · ${t.duration} · ${t.price}</div>
+                ${t.min_age > 0 ? `<div style="font-size:10px;color:#FFD54F;margin-top:2px;">Min age: ${t.min_age}+</div>` : ''}
+              </div>
+              <button onclick="toggleVIPSaved('${t.name}')" style="background:none;border:none;font-size:22px;cursor:pointer;padding:0;margin-left:8px;">${isSaved?'⭐':'☆'}</button>
+            </div>
+          </div>
+          <div style="padding:12px 14px;">
+            <div style="font-size:12px;color:#757575;line-height:1.5;margin-bottom:10px;">${t.desc}</div>
+            <div style="font-size:11px;font-weight:700;color:#9E9E9E;margin-bottom:5px;">WHAT'S INCLUDED</div>
+            ${t.includes.map(inc => `<div style="font-size:11px;color:var(--text-primary);padding:2px 0;display:flex;gap:6px;"><span style="color:#F9A825;">•</span>${inc}</div>`).join('')}
+            <div style="background:#FFF8E1;border-left:3px solid #F9A825;border-radius:0 8px 8px 0;padding:8px 10px;margin-top:10px;">
+              <div style="font-size:11px;color:#E65100;line-height:1.4;">💡 ${t.tip}</div>
+            </div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  document.body.appendChild(el);
+}
+window.openVIPToursGuide = openVIPToursGuide;
+
+function toggleVIPSaved(name) {
+  const saved = JSON.parse(localStorage.getItem('savedVIPTours') || '[]');
+  const idx = saved.indexOf(name);
+  if (idx >= 0) saved.splice(idx,1);
+  else { saved.push(name); if (typeof showToast!=='undefined') showToast('⭐ Tour saved!'); }
+  localStorage.setItem('savedVIPTours', JSON.stringify(saved));
+  document.getElementById('vip-overlay').remove(); openVIPToursGuide();
+}
+window.toggleVIPSaved = toggleVIPSaved;
+</script>
+<script>
+/* ===== BLOCK TT2: Lost & Found Guide ===== */
+const LOST_FOUND = [
+  { park:'Magic Kingdom', icon:'🏰', color:'#E53935',
+    location:'Town Square Theater, Main Street USA (near entrance)',
+    phone:'407-824-4521',
+    online:'disneyworld.com/lostandfound',
+    hours:'Park hours + 1 hour after close',
+    process:['Report immediately to nearest Cast Member','Items turned in throughout the day are brought to the main Lost & Found at close','Call the number above after 24 hours if not found same day','Disney keeps items for 30 days','Highly valuable items (phones, cameras, wallets) are logged immediately'],
+    tips:['AirTags are permitted and recommended inside parks','For lost strollers, check Disney\'s stroller parking zones first — CMs move them','Lost PhotoPass cards: call PhotoPass support separately'] },
+  { park:'EPCOT', icon:'🌍', color:'#0277BD',
+    location:'Odyssey Events Pavilion, Future World West',
+    phone:'407-560-7500',
+    online:'disneyworld.com/lostandfound',
+    hours:'Park hours + 1 hour after close',
+    process:['Report to any Cast Member immediately','Items consolidated at main Lost & Found at end of day','Call after 24 hours for items not found same day','30-day holding policy'],
+    tips:['EPCOT has two entrances — specify which side of the park you lost the item','Lost items on the monorail: contact Monorail Cast Members directly'] },
+  { park:'Hollywood Studios', icon:'🎬', color:'#6A1B9A',
+    location:'Hollywood Junction near park entrance',
+    phone:'407-560-4668',
+    online:'disneyworld.com/lostandfound',
+    hours:'Park hours + 1 hour after close',
+    process:['Report to nearest Cast Member','Call within 24 hours','Items retained 30 days'],
+    tips:['For items lost on a specific ride: ask the attraction Cast Member — they check ride vehicles regularly','Star Wars gear is commonly left behind — Lost & Found is well-stocked'] },
+  { park:'Animal Kingdom', icon:'🦁', color:'#2E7D32',
+    location:'Entrance area near Guest Relations',
+    phone:'407-938-2785',
+    online:'disneyworld.com/lostandfound',
+    hours:'Park hours + 1 hour after close',
+    process:['Report to Cast Member or Guest Relations immediately','Large park — report the specific land/area where item was lost','Items held 30 days'],
+    tips:['Items left on Kilimanjaro Safaris go to Africa\'s Cast Member area — ask specifically','Hats blown off by wind on DINOSAUR are routinely found and turned in'] },
+  { park:'Universal Studios / Islands of Adventure', icon:'🎭', color:'#1565C0',
+    location:'Each park has Lost & Found at the main entrance near Guest Services',
+    phone:'407-224-4233',
+    online:'universalorlando.com — Guest Services section',
+    hours:'Park hours + 30 min after close',
+    process:['Report to Team Member or Guest Services immediately','CityWalk has a separate Lost & Found','Items held for 30 days','Online claim form available'],
+    tips:['Lockers outside every major ride are free for the ride duration — USE THEM','Loose articles are very commonly confiscated before rides — pick up at exit locker'] },
+  { park:'SeaWorld', icon:'🐋', color:'#006064',
+    location:'Main Entrance / Guest Services building',
+    phone:'407-545-5550',
+    online:'seaworld.com/orlando/guest-services',
+    hours:'Park hours',
+    process:['Report to any Team Member','Guest Services holds items','Lost items held 14 days (shorter than Disney)'],
+    tips:['Wet items (from water rides) are bagged separately — ask specifically','Aquatica (connected water park) has its own separate Lost & Found'] },
+];
+
+function openLostFoundGuide() {
+  const existing = document.getElementById('lf-overlay');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'lf-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;display:flex;flex-direction:column;max-width:430px;left:50%;transform:translateX(-50%);';
+  const parks = LOST_FOUND.map(p => p.park);
+  el.innerHTML = `
+    <div style="background:linear-gradient(135deg,#BF360C,#E64A19,#FF5722);padding:18px 16px 14px;flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <button onclick="document.getElementById('lf-overlay').remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;">←</button>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;">🔍 Lost & Found Guide</div>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:12px;padding:10px 12px;margin-bottom:10px;">
+        <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.8);margin-bottom:4px;">UNIVERSAL FIRST STEP</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.9);line-height:1.4;">Report to the nearest Cast/Team Member IMMEDIATELY. The sooner you report, the better your chances. Don't wait until the end of the day.</div>
+      </div>
+      <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;" id="lf-tabs">
+        ${LOST_FOUND.map((p,i) => `<button onclick="setLFPark(${i},this)" style="flex-shrink:0;border-radius:20px;padding:5px 10px;border:1.5px solid ${i===0?'#fff':'rgba(255,255,255,.4)'};background:${i===0?'rgba(255,255,255,.25)':'transparent'};color:#fff;font-size:10px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">${p.icon} ${p.park.split(' ')[0]}</button>`).join('')}
+      </div>
+    </div>
+    <div style="overflow-y:auto;flex:1;padding:14px 16px 80px;" id="lf-content"></div>`;
+  document.body.appendChild(el);
+  window._lfPark = 0;
+  renderLostFound();
+}
+window.openLostFoundGuide = openLostFoundGuide;
+
+function setLFPark(i, btn) {
+  window._lfPark = i;
+  document.querySelectorAll('#lf-tabs button').forEach(b => { b.style.background='transparent'; b.style.borderColor='rgba(255,255,255,.4)'; });
+  btn.style.background='rgba(255,255,255,.25)'; btn.style.borderColor='#fff';
+  renderLostFound();
+}
+window.setLFPark = setLFPark;
+
+function renderLostFound() {
+  const el = document.getElementById('lf-content');
+  if (!el) return;
+  const p = LOST_FOUND[window._lfPark || 0];
+  el.innerHTML = `
+    <div style="background:${p.color};border-radius:14px;padding:14px;margin-bottom:12px;">
+      <div style="font-size:18px;font-weight:800;color:#fff;margin-bottom:8px;">${p.icon} ${p.park}</div>
+      <div style="display:grid;grid-template-columns:1fr;gap:6px;">
+        <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;">
+          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.7);margin-bottom:3px;">📍 LOCATION</div>
+          <div style="font-size:12px;color:#fff;">${p.location}</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+          <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;">
+            <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.7);margin-bottom:3px;">📞 PHONE</div>
+            <a href="tel:${p.phone.replace(/-/g,'')}" style="font-size:11px;color:#fff;text-decoration:none;">${p.phone}</a>
+          </div>
+          <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;">
+            <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.7);margin-bottom:3px;">⏰ HOURS</div>
+            <div style="font-size:11px;color:#fff;">${p.hours}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="font-size:12px;font-weight:700;color:#9E9E9E;margin-bottom:8px;">STEP-BY-STEP PROCESS</div>
+    ${p.process.map((s,i) => `<div style="background:var(--card-bg,#fff);border-radius:12px;padding:10px 14px;margin-bottom:6px;display:flex;gap:10px;align-items:flex-start;">
+      <span style="background:${p.color};color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;">${i+1}</span>
+      <div style="font-size:12px;color:var(--text-primary);line-height:1.4;">${s}</div>
+    </div>`).join('')}
+    <div style="font-size:12px;font-weight:700;color:#9E9E9E;margin:12px 0 8px;">INSIDER TIPS</div>
+    ${p.tips.map(t => `<div style="background:var(--card-bg,#fff);border-radius:12px;padding:10px 14px;margin-bottom:6px;display:flex;gap:8px;">
+      <span>💡</span><div style="font-size:12px;color:var(--text-primary);line-height:1.5;">${t}</div>
+    </div>`).join('')}`;
+}
+window.renderLostFound = renderLostFound;
+</script>
+<script>
+/* ===== BLOCK UU1: Crowd Calendar ===== */
+const CROWD_DATA = [
+  { month:'January',   level:2, label:'Low',       color:'#4CAF50', peak:'MLK Weekend (3)', low:'Early Jan (1–12)', tip:'Best month for low crowds after New Year\'s. Mild weather. Book now — local secret is out.', avoid:'Martin Luther King Jr. weekend' },
+  { month:'February',  level:2, label:'Low',       color:'#4CAF50', peak:'Presidents\' Week (2)', low:'Early Feb', tip:'Second best month. School still in session for most states. Excellent park weather.', avoid:'Presidents\' Week school break' },
+  { month:'March',     level:4, label:'Very Busy', color:'#FF9800', peak:'Spring Break (1–31)', low:'First week only', tip:'Spring break month — expect large crowds throughout. Early March is best if you must go.', avoid:'Spring break weeks — especially weeks 2 and 3' },
+  { month:'April',     level:3, label:'Moderate',  color:'#FFC107', peak:'Easter (varies)', low:'Post-Easter', tip:'Crowds drop sharply after Easter. Late April is a hidden gem — great weather, fewer people.', avoid:'Easter week' },
+  { month:'May',       level:2, label:'Low',       color:'#4CAF50', peak:'Memorial Day (last week)', low:'Weeks 1–3', tip:'One of the best months. Schools still in session most of the country. Hot but manageable.', avoid:'Memorial Day weekend' },
+  { month:'June',      level:4, label:'Very Busy', color:'#FF9800', peak:'All month', low:'Weekdays only', tip:'Summer begins — families flood in. Weekdays are better than weekends. Rainy season starts.', avoid:'Entire month if crowd-sensitive' },
+  { month:'July',      level:5, label:'Peak',      color:'#E53935', peak:'All month + 4th of July', low:'Nothing', tip:'Absolute peak. Hottest temps, biggest crowds, longest waits. The 4th of July week is legendary chaos.', avoid:'Entire month if possible' },
+  { month:'August',    level:4, label:'Very Busy', color:'#FF9800', peak:'First 2 weeks', low:'Late August', tip:'Europeans arrive in force. Late August improves as US schools return. Still very hot.', avoid:'First two weeks' },
+  { month:'September', level:2, label:'Low',       color:'#4CAF50', peak:'Labor Day (1st week)', low:'Rest of month', tip:'Hidden gem month. Schools back in session. Parks nearly empty on weekdays. Hot but stormy.', avoid:'Labor Day weekend' },
+  { month:'October',   level:3, label:'Moderate',  color:'#FFC107', peak:'Halloween events, last week', low:'Early October', tip:'Halloween season brings crowds — but it\'s magical. MNSSHP and EPCOT Food & Wine are running.', avoid:'Last week of October and Halloween night' },
+  { month:'November',  level:3, label:'Moderate',  color:'#FFC107', peak:'Thanksgiving week', low:'Weeks 1–3', tip:'Early November is excellent. Post-Thanksgiving is good. Thanksgiving week itself is one of the busiest of the year.', avoid:'Thanksgiving week (among the 5 busiest days of the year)' },
+  { month:'December',  level:5, label:'Peak',      color:'#E53935', peak:'Dec 22–Jan 2', low:'Dec 1–21', tip:'Early December is lovely with holiday décor and light crowds. After Dec 22 is the single most crowded stretch of the year.', avoid:'Dec 22–Jan 1 at all costs' },
+];
+
+const DAY_CROWDS = [
+  { day:'Monday',    level:2, note:'Often the lightest day — families arrive Tuesday–Thursday' },
+  { day:'Tuesday',   level:2, note:'Second best day — most visitors skip Mon/Tue travel' },
+  { day:'Wednesday', level:3, note:'Middle of the week sees moderate bump' },
+  { day:'Thursday',  level:3, note:'Similar to Wednesday' },
+  { day:'Friday',    level:4, note:'Local day-trippers + arriving weekend visitors' },
+  { day:'Saturday',  level:5, note:'Busiest day of the week almost universally' },
+  { day:'Sunday',    level:4, note:'Still busy — many families try to get one last day' },
+];
+
+function openCrowdCalendar() {
+  const existing = document.getElementById('crowd-overlay');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'crowd-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;overflow-y:auto;max-width:430px;left:50%;transform:translateX(-50%);';
+  const curMonth = new Date().getMonth();
+  el.innerHTML = `
+    <div style="background:linear-gradient(135deg,#004D40,#00695C,#00897B);padding:18px 16px 14px;position:sticky;top:0;z-index:1;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <button onclick="document.getElementById('crowd-overlay').remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;">←</button>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;">📊 Crowd Calendar</div>
+      </div>
+      <div style="display:flex;justify-content:center;gap:12px;">
+        ${[{l:'Low',c:'#4CAF50'},{l:'Moderate',c:'#FFC107'},{l:'Very Busy',c:'#FF9800'},{l:'Peak',c:'#E53935'}].map(x=>`<div style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:50%;background:${x.c};display:inline-block;"></span><span style="font-size:10px;color:rgba(255,255,255,.8);">${x.l}</span></div>`).join('')}
+      </div>
+    </div>
+    <div style="padding:14px 16px;">
+      <!-- Best days of the week -->
+      <div style="font-size:12px;font-weight:700;color:#9E9E9E;margin-bottom:8px;">BEST DAYS OF THE WEEK</div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:16px;">
+        ${DAY_CROWDS.map(d => `<div title="${d.note}" style="background:var(--card-bg,#fff);border-radius:10px;padding:8px 4px;text-align:center;border-top:3px solid ${['','#4CAF50','#4CAF50','#FFC107','#FFC107','#FF9800','#E53935','#FF9800'][d.level]};">
+          <div style="font-size:9px;font-weight:700;color:#9E9E9E;">${d.day.slice(0,3).toUpperCase()}</div>
+          <div style="font-size:18px;margin:4px 0;">${['','😊','😊','😐','😐','😬','😤','😬'][d.level]}</div>
+        </div>`).join('')}
+      </div>
+      <!-- Month-by-month -->
+      <div style="font-size:12px;font-weight:700;color:#9E9E9E;margin-bottom:8px;">MONTH-BY-MONTH GUIDE</div>
+      ${CROWD_DATA.map((m,i) => `
+        <div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:8px;border-left:4px solid ${m.color};">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <div style="font-size:14px;font-weight:800;color:var(--text-primary);">${m.month} ${i===curMonth?'<span style="font-size:10px;background:#FF6B35;color:#fff;border-radius:6px;padding:1px 6px;margin-left:4px;">THIS MONTH</span>':''}</div>
+            <span style="background:${m.color}22;color:${m.color};border-radius:8px;padding:3px 10px;font-size:11px;font-weight:800;">${m.label}</span>
+          </div>
+          <div style="font-size:11px;color:#757575;line-height:1.5;margin-bottom:6px;">${m.tip}</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+            <div style="background:#E8F5E9;border-radius:8px;padding:6px 8px;">
+              <div style="font-size:9px;font-weight:700;color:#2E7D32;">BEST TIME</div>
+              <div style="font-size:10px;color:#2E7D32;">${m.low}</div>
+            </div>
+            <div style="background:#FFEBEE;border-radius:8px;padding:6px 8px;">
+              <div style="font-size:9px;font-weight:700;color:#C62828;">AVOID</div>
+              <div style="font-size:10px;color:#C62828;">${m.avoid}</div>
+            </div>
+          </div>
+        </div>`).join('')}
+    </div>`;
+  document.body.appendChild(el);
+}
+window.openCrowdCalendar = openCrowdCalendar;
+</script>
+<script>
+/* ===== BLOCK UU2: Budget Travel Tips ===== */
+const BUDGET_TIPS = [
+  { cat:'Tickets', icon:'🎫', color:'#1565C0', tips:[
+    { title:'Buy tickets in advance online', detail:'Gate prices are always the highest. Disney and Universal both charge $10–30 more at the gate. Always buy online at least a few days ahead.', save:'$10–30/ticket' },
+    { title:'Undercover Tourist', detail:'undercovertourtist.com consistently has the lowest authorized Disney and Universal ticket prices — sometimes $20+ cheaper per ticket than buying direct.', save:'$15–25/ticket' },
+    { title:'Visit during value season', detail:'January–February and September are Disney\'s value pricing periods. A 1-day ticket can be $20–40 cheaper than the same park on a July weekend.', save:'$20–40/ticket' },
+    { title:'Florida Resident discounts', detail:'Both Disney and Universal offer significant Florida Resident discounts — up to 40% off tickets. Requires FL ID at the gate.', save:'30–40% off' },
+    { title:'SeaWorld + Aquatica combo', detail:'SeaWorld regularly runs "buy 1 day get the rest of the year free" promotions. Best value single-day deal in Orlando.', save:'$60–100 per person' },
+  ]},
+  { cat:'Dining', icon:'🍽️', color:'#E65100', tips:[
+    { title:'Mobile order for no wait', detail:'Disney and Universal both offer mobile ordering for quick-service restaurants. Skip the line and get your food faster — use the app.', save:'30–60 min of queue time' },
+    { title:'Counter service vs. Table service', detail:'A counter-service meal at Disney is $12–18/person. A table-service lunch/dinner is $35–60/person. Counter service is often equal or better quality.', save:'$20–40/meal' },
+    { title:'Bring your own snacks', detail:'Outside food (non-alcoholic) is allowed at all Orlando theme parks. Pack granola bars, fruit, and water bottles. Save $30–50/day for a family of 4.', save:'$10–50/day' },
+    { title:'Free water everywhere', detail:'Disney quick-service restaurants give free cups of water by law. Universal water fountains are throughout the parks. Stay hydrated for free.', save:'$3–5 per person per refill' },
+    { title:'Eat lunch, not dinner at table service', detail:'Same menu, same food, prices are 10–20% lower at lunch. Plus shorter waits for reservations.', save:'$10–20 per person' },
+    { title:'EPCOT Food & Wine strategy', detail:'Share tasting portions ($5–12 each) between the group. You eat more variety and spend less than at a sit-down restaurant.', save:'$20–30 per person' },
+  ]},
+  { cat:'Hotels', icon:'🏨', color:'#6A1B9A', tips:[
+    { title:'Stay off-site + Uber in', detail:'A Marriott or Holiday Inn 10 min from Disney can be 50–60% cheaper than on-site resorts. Uber to/from parks costs $8–15. Do the math — off-site often wins.', save:'$100–300/night' },
+    { title:'Airbnb near Disney', detail:'Homes in Kissimmee/Celebration with pools for families of 4–6 can be $80–150/night — less than a single Disney Value room.', save:'$50–200/night' },
+    { title:'Book resort stays as short as possible', detail:'Disney\'s early park entry perk requires only 1 night on-site. Book 1 Disney resort night strategically for the perk, then stay off-site.', save:'Hundreds over a week-long trip' },
+    { title:'Use hotel points', detail:'Chase Sapphire, Marriott Bonvoy, Hilton Honors — many near-Disney hotels are chain properties where points can cover entire stays.', save:'Full room cost' },
+  ]},
+  { cat:'Free & Cheap', icon:'💚', color:'#2E7D32', tips:[
+    { title:'Disney Resort hopping', detail:'Disney resort public areas are free to visit — no park ticket needed. Walk through Grand Floridian, Polynesian, and Contemporary. Take the free monorail between them.', save:'Free full day of activity' },
+    { title:'Disney Springs', detail:'No admission fee. Free entertainment, world-class dining, and the best Disney merchandise prices. Spend a full day here for $0 admission.', save:'$100+ in park admission' },
+    { title:'CityWalk at Universal', detail:'Universal\'s entertainment district has free live music nightly and great dining without a park ticket.', save:'$100+ in park admission' },
+    { title:'Leu Gardens', detail:'6 miles from I-Drive: 50-acre botanical garden for $15. Beautiful and serene escape from theme park chaos.', save:'Alternative to $100+ park day' },
+    { title:'Lake Eola Park', detail:'Downtown Orlando\'s crown jewel — free to walk, $15 to rent a swan boat. Farmers market Sundays.', save:'Free entertainment' },
+    { title:'International Drive on foot', detail:'ICON Park, restaurants, mini-golf, and entertainment all within walking distance on I-Drive. A full evening of entertainment without a theme park.', save:'$50–100 vs. a park day' },
+  ]},
+];
+
+window._budgetCat = 0;
+
+function openBudgetGuide() {
+  const existing = document.getElementById('budget-tips-overlay');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'budget-tips-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;display:flex;flex-direction:column;max-width:430px;left:50%;transform:translateX(-50%);';
+  el.innerHTML = `
+    <div style="background:linear-gradient(135deg,#1B5E20,#2E7D32,#388E3C);padding:18px 16px 14px;flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <button onclick="document.getElementById('budget-tips-overlay').remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;">←</button>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;">💚 Budget Travel Tips</div>
+      </div>
+      <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;" id="bdg-tabs">
+        ${BUDGET_TIPS.map((b,i) => `<button onclick="setBudgetCat(${i},this)" style="flex-shrink:0;border-radius:20px;padding:5px 11px;border:1.5px solid ${i===0?'#fff':'rgba(255,255,255,.4)'};background:${i===0?'rgba(255,255,255,.25)':'transparent'};color:#fff;font-size:10px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">${b.icon} ${b.cat}</button>`).join('')}
+      </div>
+    </div>
+    <div style="overflow-y:auto;flex:1;padding:14px 16px 80px;" id="bdg-content"></div>`;
+  document.body.appendChild(el);
+  window._budgetCat = 0;
+  renderBudgetTips();
+}
+window.openBudgetGuide = openBudgetGuide;
+
+function setBudgetCat(i, btn) {
+  window._budgetCat = i;
+  document.querySelectorAll('#bdg-tabs button').forEach(b => { b.style.background='transparent'; b.style.borderColor='rgba(255,255,255,.4)'; });
+  btn.style.background='rgba(255,255,255,.25)'; btn.style.borderColor='#fff';
+  renderBudgetTips();
+}
+window.setBudgetCat = setBudgetCat;
+
+function renderBudgetTips() {
+  const el = document.getElementById('bdg-content');
+  if (!el) return;
+  const cat = BUDGET_TIPS[window._budgetCat || 0];
+  el.innerHTML = `<div style="background:${cat.color};border-radius:14px;padding:14px;margin-bottom:14px;display:flex;align-items:center;gap:12px;">
+    <span style="font-size:32px;">${cat.icon}</span>
+    <div><div style="font-size:16px;font-weight:800;color:#fff;">${cat.cat} Money-Savers</div>
+    <div style="font-size:11px;color:rgba(255,255,255,.8);">${cat.tips.length} tips</div></div>
+  </div>` +
+  cat.tips.map(t => `
+    <div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:8px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+        <div style="font-size:13px;font-weight:800;color:var(--text-primary);flex:1;padding-right:8px;">${t.title}</div>
+        <span style="background:#E8F5E9;color:#2E7D32;border-radius:8px;padding:2px 8px;font-size:10px;font-weight:700;white-space:nowrap;">Save ${t.save}</span>
+      </div>
+      <div style="font-size:12px;color:#757575;line-height:1.5;">${t.detail}</div>
+    </div>`).join('');
+}
+window.renderBudgetTips = renderBudgetTips;
+</script>
+<script>
+/* ===== BLOCK VV1: Fireworks & Nighttime Shows Guide ===== */
+const FIREWORKS_SHOWS = [
+  { name:'Happily Ever After', park:'Magic Kingdom', icon:'🏰', color:'#1565C0',
+    time:'Typically 9pm (seasonal variations — check app)', duration:'18 min',
+    desc:'Disney\'s signature Magic Kingdom fireworks show with projection mapping on Cinderella Castle, original music, and a full pyrotechnic display.',
+    viewingSpots:[
+      { spot:'Main Street Hub (center)', rating:5, note:'The classic spot. Stand at the Partners statue for the unobstructed castle projection view. Get there 45–60 min early.' },
+      { spot:'Main Street USA (anywhere)', rating:4, note:'Good view down the full street with castle backdrop. Closer to the exit for fast post-show escape.' },
+      { spot:'Tomorrowland Terrace', rating:4, note:'Slightly elevated — slightly offset angle. Tables sometimes available. Less crowded than the hub.' },
+      { spot:'Polynesian Resort Beach', rating:5, note:'Watch from the beach with the Seven Seas Lagoon between you and the castle. Magical and uncrowded. Free resort access.' },
+      { spot:'Grand Floridian Resort', rating:4, note:'Rooftop garden view. Have dinner at the resort, then stay for fireworks.' },
+      { spot:'Contemporary Resort (Outer Deck)', rating:3, note:'Good angle but further away. The monorail blocks some views momentarily.' },
+    ],
+    tips:['The projection mapping is only visible from the Main Street side — avoid the far sides of the hub.','Drone shots are prohibited but Disney\'s own drone light shows occasionally appear as a bonus.','Post-show crowd exits via Main Street — duck into a shop, wait 20 min, and walk out smoothly.'] },
+  { name:'EPCOT Forever / Luminous', park:'EPCOT', icon:'🌍', color:'#0277BD',
+    time:'Typically 9pm', duration:'12 min',
+    desc:'World Showcase Lagoon fireworks and projection show. Kites, drones, and pyrotechnics choreographed to beloved EPCOT music.',
+    viewingSpots:[
+      { spot:'World Showcase Promenade (any point)', rating:4, note:'The entire lagoon perimeter has a great view. No single "best" spot — just be close to the water.' },
+      { spot:'Japan/Morocco Pavilion Area', rating:5, note:'Less crowded side of the lagoon. Excellent full view and quick escape after.' },
+      { spot:'Canada Pavilion Waterfront', rating:4, note:'Near the Canada pavilion — good view, quieter than the American pavilion side.' },
+      { spot:'BoardWalk Inn (for guests)', rating:4, note:'Watch from the waterway between EPCOT and Hollywood Studios. Unique vantage point.' },
+      { spot:'IllumiNations Cruise (private boat)', rating:5, note:'Private pontoon boat on the lagoon. Ask at the marina near the International Gateway.' },
+    ],
+    tips:['The show runs rain or shine unless there\'s lightning within a few miles.','EPCOT International Food & Wine Festival adds live music to the plaza before the show.','La Nuit Crêpes in the France Pavilion makes a great pre-show dinner spot.'] },
+  { name:'Fantasmic!', park:'Hollywood Studios', icon:'🎬', color:'#6A1B9A',
+    time:'8:30pm & 10pm (select nights)', duration:'30 min',
+    desc:'Mickey\'s dream / nightmare comes to life in a water, fire, and projection spectacular in Hollywood Hills Amphitheater. One of Disney\'s most beloved nighttime shows.',
+    viewingSpots:[
+      { spot:'Center amphitheater seats', rating:5, note:'Best view of all projection effects on the water screens. Arrive 45+ min early.' },
+      { spot:'Side seats (either side)', rating:3, note:'You miss some projection content but fewer crowds. Faster exit.' },
+      { spot:'Fantasmic! Dining Package', rating:5, note:'Book a dinner at Hollywood & Vine or Mama Melrose\'s — includes a guaranteed reserved section in the theater.' },
+    ],
+    tips:['The theater holds 9,000 people but still fills up — arrive early.','Late shows (10pm) are often less crowded.','The water cannons DO reach the front rows on occasion — a bonus, not a warning.'] },
+  { name:'Universal Cinematic Spectacular', park:'Universal Studios Florida', icon:'🎭', color:'#E65100',
+    time:'Typically 9pm (select nights)', duration:'20 min',
+    desc:'Projection mapping on Universal\'s Central Park lagoon with iconic film music and fireworks. Less frequent than Disney — check the schedule.',
+    viewingSpots:[
+      { spot:'Central Park Lagoon (anywhere)', rating:4, note:'The entire lagoon area has good views. No single dramatically better spot.' },
+      { spot:'Premium Viewing Area', rating:5, note:'Purchase a premium viewing spot via the Universal app for guaranteed front-center placement.' },
+    ],
+    tips:['Check the Universal app — this show doesn\'t run every night.','CityWalk restaurants near the lagoon offer dining-with-a-view options.'] },
+];
+
+window._fwShow = 0;
+
+function openFireworksGuide() {
+  const existing = document.getElementById('fw-overlay');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'fw-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;display:flex;flex-direction:column;max-width:430px;left:50%;transform:translateX(-50%);';
+  el.innerHTML = `
+    <div style="background:linear-gradient(135deg,#0D47A1,#1565C0,#1E88E5);padding:18px 16px 14px;flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <button onclick="document.getElementById('fw-overlay').remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;">←</button>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;">🎆 Fireworks & Night Shows</div>
+      </div>
+      <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;" id="fw-tabs">
+        ${FIREWORKS_SHOWS.map((s,i) => `<button onclick="setFWShow(${i},this)" style="flex-shrink:0;border-radius:20px;padding:5px 11px;border:1.5px solid ${i===0?'#fff':'rgba(255,255,255,.4)'};background:${i===0?'rgba(255,255,255,.25)':'transparent'};color:#fff;font-size:10px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">${s.icon} ${s.name.split(' ')[0]}</button>`).join('')}
+      </div>
+    </div>
+    <div style="overflow-y:auto;flex:1;padding:14px 16px 80px;" id="fw-content"></div>`;
+  document.body.appendChild(el);
+  window._fwShow = 0;
+  renderFireworks();
+}
+window.openFireworksGuide = openFireworksGuide;
+
+function setFWShow(i, btn) {
+  window._fwShow = i;
+  document.querySelectorAll('#fw-tabs button').forEach(b => { b.style.background='transparent'; b.style.borderColor='rgba(255,255,255,.4)'; });
+  btn.style.background='rgba(255,255,255,.25)'; btn.style.borderColor='#fff';
+  renderFireworks();
+}
+window.setFWShow = setFWShow;
+
+function renderFireworks() {
+  const el = document.getElementById('fw-content');
+  if (!el) return;
+  const s = FIREWORKS_SHOWS[window._fwShow || 0];
+  const stars = n => '⭐'.repeat(n) + '☆'.repeat(5-n);
+  el.innerHTML = `
+    <div style="background:${s.color};border-radius:16px;padding:16px;margin-bottom:14px;">
+      <div style="font-size:20px;font-weight:800;color:#fff;margin-bottom:4px;">${s.icon} ${s.name}</div>
+      <div style="font-size:11px;color:rgba(255,255,255,.85);margin-bottom:8px;">${s.park} · ${s.duration}</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.9);line-height:1.5;">${s.desc}</div>
+      <div style="margin-top:8px;background:rgba(255,255,255,.15);border-radius:8px;padding:8px 10px;">
+        <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.7);">TYPICAL SHOWTIME</div>
+        <div style="font-size:12px;color:#fff;">${s.time}</div>
+      </div>
+    </div>
+    <div style="font-size:12px;font-weight:700;color:#9E9E9E;margin-bottom:8px;">BEST VIEWING SPOTS</div>
+    ${s.viewingSpots.map(v => `
+      <div style="background:var(--card-bg,#fff);border-radius:14px;padding:12px 14px;margin-bottom:8px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
+          <div style="font-size:13px;font-weight:800;color:var(--text-primary);flex:1;">${v.spot}</div>
+          <div style="font-size:12px;color:#FFC107;white-space:nowrap;">${stars(v.rating)}</div>
+        </div>
+        <div style="font-size:11px;color:#757575;line-height:1.4;">${v.note}</div>
+      </div>`).join('')}
+    <div style="font-size:12px;font-weight:700;color:#9E9E9E;margin:12px 0 8px;">PRO TIPS</div>
+    ${s.tips.map(t => `<div style="background:var(--card-bg,#fff);border-radius:12px;padding:10px 14px;margin-bottom:6px;display:flex;gap:8px;">
+      <span>💡</span><div style="font-size:12px;color:var(--text-primary);line-height:1.5;">${t}</div>
+    </div>`).join('')}`;
+}
+window.renderFireworks = renderFireworks;
+</script>
+<script>
+/* ===== BLOCK VV2: Mobile Ordering Guide + Solo/Senior Travel Tips ===== */
+const MOBILE_ORDER_TIPS = [
+  { platform:'Disney', icon:'🏰', color:'#1565C0',
+    steps:['Open My Disney Experience app','Tap "Order Food" from the bottom menu','Select your park and restaurant','Browse the full menu and customize items','Select your arrival window (30-min slots)','Pay in-app with card or Disney gift card','When you arrive, tap "I\'m here" to start your order','Get a notification when ready — skip the entire counter line'],
+    tips:['Mobile order windows fill up by 11am on busy days — open the app at park open and pre-order lunch immediately.','Many items are only available via mobile order (special dietary options, etc.)','You can cancel orders before they\'re started — no penalty','Gift cards can be used in the app — great for budgeting'] },
+  { platform:'Universal', icon:'🎭', color:'#E65100',
+    steps:['Open Universal Orlando app','Tap the food icon','Select your location and restaurant','Build your order','Choose pickup time','Pay in-app','Arrive and show your mobile order receipt at the express window'],
+    tips:['Universal\'s mobile order is available at most CityWalk and in-park quick-service spots.','Leaky Cauldron and Three Broomsticks (Harry Potter restaurants) are very popular — mobile order is essential.','App can be slow on park Wi-Fi — order on cellular data.'] },
+  { platform:'SeaWorld', icon:'🐋', color:'#006064',
+    steps:['SeaWorld uses a simpler in-app or in-person ordering system','Pre-load your All-Day Dining plan in the app if purchased','Show your digital pass at any participating restaurant','No time-window system — walk up with the dining pass'],
+    tips:['All-Day Dining at SeaWorld is the best dining value in Orlando — $40 for unlimited meals.','The app tracks your dining pass usage and shows participating restaurants on the map.'] },
+];
+
+const SOLO_TIPS = [
+  { icon:'🎢', tip:'Request single rider at attractions that offer it — Expedition Everest, Test Track, Millennium Falcon, Revenge of the Mummy, Animal Actors. You\'ll get on much faster.' },
+  { icon:'🍽️', tip:'Solo dining at the bar/counter of table-service restaurants is completely normal and often doesn\'t require a reservation. Easier to get a seat and great for meeting people.' },
+  { icon:'📸', tip:'Ask any Cast Member or nearby family to take your photo — people are almost universally willing and you\'ll get better shots than selfies.' },
+  { icon:'⏰', tip:'You can move faster and more flexibly than groups. Use this! Change plans on the fly, ride the same thing twice, leave a park early without negotiating.' },
+  { icon:'🎧', tip:'Download the Play Disney Parks app — it has interactive queue games, trivia, and music that makes waiting alone much more enjoyable.' },
+  { icon:'🤝', tip:'Solo travelers often bond with other solos in queues. Disney parks in particular attract friendly, enthusiastic fans who love chatting.' },
+  { icon:'🏨', tip:'Request a room close to the elevator when staying solo — easier with luggage, and you tend to be assigned quieter rooms anyway.' },
+  { icon:'💰', tip:'Solo travel actually saves money on dining (no table minimums) and can save on hotels (single occupancy rate when available).' },
+];
+
+const SENIOR_TIPS = [
+  { icon:'♿', tip:'Request a Disney/Universal accessibility guide at Guest Relations. DAS (Disney) and AAP (Universal) are life-changing for guests who can\'t stand in long queues.' },
+  { icon:'🛵', tip:'ECV (electric conveyance vehicle) rentals are available at all parks — limited quantity, arrive early or reserve from a third-party company for resort delivery.' },
+  { icon:'🌡️', tip:'Heat is the #1 challenge for seniors in Orlando. Plan to be inside (museum/A/C attraction) from 11am–3pm daily in summer. Avoid the peak heat entirely.' },
+  { icon:'🪑', tip:'Every park has benches, but some lands are bench-poor. Tomorrowland, Galaxy\'s Edge, and Pandora have limited seating — identify rest spots before your legs give out.' },
+  { icon:'🚌', tip:'Disney buses have priority seating and wheelchair ramps. Universal\'s parking garages have elevators — never take the stairs with mobility concerns.' },
+  { icon:'🩺', tip:'First Aid stations at every park have nurses who can take blood pressure, help with minor medical issues, and provide a quiet place to rest and recover.' },
+  { icon:'🎭', tip:'Shows and presentations are the senior-friendly sweet spot — Festival of the Lion King, Voices of Liberty, Burt of the Bird Adventure. Less walking, deeply rewarding.' },
+  { icon:'📅', tip:'Consider arriving when parks open (rope drop) and leaving by 2pm. Best rides with shortest waits, avoid midday heat, and rest before an optional evening return.' },
+  { icon:'🍽️', tip:'Make dining reservations 60 days out — table-service restaurants provide much-needed rest and air conditioning. Sit-down meals are part of the pacing strategy.' },
+  { icon:'💊', tip:'Pack all medications in carry-on/day bag with a note of what they are. First Aid stations have basic over-the-counter remedies but not prescriptions.' },
+];
+
+function openMobileOrderGuide() {
+  const existing = document.getElementById('mo-overlay');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'mo-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;display:flex;flex-direction:column;max-width:430px;left:50%;transform:translateX(-50%);';
+  el.innerHTML = `
+    <div style="background:linear-gradient(135deg,#006064,#00838F,#00ACC1);padding:18px 16px 14px;flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <button onclick="document.getElementById('mo-overlay').remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;">←</button>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;">📱 Mobile Ordering Guide</div>
+      </div>
+      <div style="font-size:12px;color:rgba(255,255,255,.85);">Skip the counter line — order ahead on your phone</div>
+    </div>
+    <div style="overflow-y:auto;flex:1;padding:14px 16px 80px;">
+      ${MOBILE_ORDER_TIPS.map(p => `
+        <div style="background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border-top:4px solid ${p.color};">
+          <div style="padding:14px;">
+            <div style="font-size:15px;font-weight:800;color:var(--text-primary);margin-bottom:10px;">${p.icon} ${p.platform}</div>
+            <div style="font-size:11px;font-weight:700;color:#9E9E9E;margin-bottom:6px;">HOW IT WORKS</div>
+            ${p.steps.map((s,i) => `<div style="font-size:11px;color:var(--text-primary);padding:3px 0;display:flex;gap:8px;"><span style="color:${p.color};font-weight:800;">${i+1}.</span>${s}</div>`).join('')}
+            <div style="margin-top:10px;">
+              ${p.tips.map(t => `<div style="background:${p.color}11;border-radius:10px;padding:8px 10px;margin-bottom:5px;font-size:11px;color:${p.color};line-height:1.4;">💡 ${t}</div>`).join('')}
+            </div>
+          </div>
+        </div>`).join('')}
+    </div>`;
+  document.body.appendChild(el);
+}
+window.openMobileOrderGuide = openMobileOrderGuide;
+
+function openSoloSeniorGuide() {
+  const existing = document.getElementById('solosenior-overlay');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'solosenior-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;display:flex;flex-direction:column;max-width:430px;left:50%;transform:translateX(-50%);';
+  el.innerHTML = `
+    <div style="background:linear-gradient(135deg,#4A148C,#6A1B9A,#7B1FA2);padding:18px 16px 14px;flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <button onclick="document.getElementById('solosenior-overlay').remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;">←</button>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;">🧳 Solo & Senior Travel</div>
+      </div>
+      <div style="display:flex;gap:6px;" id="ss-tabs2">
+        <button onclick="setSoloSeniorTab('solo',this)" style="flex:1;border-radius:20px;padding:8px;border:1.5px solid #fff;background:rgba(255,255,255,.25);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">🎒 Solo Travel</button>
+        <button onclick="setSoloSeniorTab('senior',this)" style="flex:1;border-radius:20px;padding:8px;border:1.5px solid rgba(255,255,255,.4);background:transparent;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">👴 Senior Travel</button>
+      </div>
+    </div>
+    <div style="overflow-y:auto;flex:1;padding:14px 16px 80px;" id="solosenior-content"></div>`;
+  document.body.appendChild(el);
+  window._ssTab = 'solo';
+  renderSoloSenior();
+}
+window.openSoloSeniorGuide = openSoloSeniorGuide;
+
+function setSoloSeniorTab(tab, btn) {
+  window._ssTab = tab;
+  document.querySelectorAll('#ss-tabs2 button').forEach(b => { b.style.background='transparent'; b.style.borderColor='rgba(255,255,255,.4)'; });
+  btn.style.background='rgba(255,255,255,.25)'; btn.style.borderColor='#fff';
+  renderSoloSenior();
+}
+window.setSoloSeniorTab = setSoloSeniorTab;
+
+function renderSoloSenior() {
+  const el = document.getElementById('solosenior-content');
+  if (!el) return;
+  const tab = window._ssTab || 'solo';
+  const tips = tab === 'solo' ? SOLO_TIPS : SENIOR_TIPS;
+  const title = tab === 'solo' ? 'Solo Traveler Tips' : 'Senior Traveler Tips';
+  const color = tab === 'solo' ? '#6A1B9A' : '#7B1FA2';
+  el.innerHTML = `<div style="font-size:12px;font-weight:700;color:#9E9E9E;margin-bottom:10px;">${tips.length} ${title.toUpperCase()}</div>` +
+  tips.map(t => `
+    <div style="background:var(--card-bg,#fff);border-radius:14px;padding:13px 14px;margin-bottom:8px;display:flex;align-items:flex-start;gap:12px;">
+      <span style="font-size:24px;flex-shrink:0;">${t.icon}</span>
+      <div style="font-size:12px;color:var(--text-primary);line-height:1.5;">${t.tip}</div>
+    </div>`).join('');
+}
+window.renderSoloSenior = renderSoloSenior;
+</script>
+<style>
+/* ===== BLOCKS SS-VV CSS ===== */
+#night-tabs::-webkit-scrollbar,#lf-tabs::-webkit-scrollbar,#fw-tabs::-webkit-scrollbar,#bdg-tabs::-webkit-scrollbar{display:none;}
+#night-tabs,#lf-tabs,#fw-tabs,#bdg-tabs{-ms-overflow-style:none;scrollbar-width:none;}
+</style>
+<script>
+/* ===== BLOCKS SS–VV: Final Wiring ===== */
+(function wireFinalBlocks() {
+  const FINAL2_QUICK = [
+    { icon:'🌙', label:'Nightlife',   fn: openNightlifeGuide },
+    { icon:'🎫', label:'Annual Pass', fn: openAnnualPassGuide },
+    { icon:'⭐', label:'VIP Tours',   fn: openVIPToursGuide },
+    { icon:'🔍', label:'Lost & Found',fn: openLostFoundGuide },
+    { icon:'📊', label:'Crowd Cal',   fn: openCrowdCalendar },
+    { icon:'💚', label:'Budget Tips', fn: openBudgetGuide },
+    { icon:'🎆', label:'Fireworks',   fn: openFireworksGuide },
+    { icon:'📱', label:'Mob. Order',  fn: openMobileOrderGuide },
+    { icon:'🧳', label:'Solo/Senior', fn: openSoloSeniorGuide },
+  ];
+
+  const _prevRH = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH) _prevRH.apply(this, arguments);
+    setTimeout(() => {
+      const row = document.getElementById('y-quick-row');
+      if (!row || row.querySelector('[data-ww-quick]')) return;
+      FINAL2_QUICK.forEach(b => {
+        const btn = document.createElement('button');
+        btn.setAttribute('data-ww-quick','1');
+        btn.style.cssText = "flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:5px;background:var(--card-bg,#fff);border:1px solid var(--border,#eee);border-radius:14px;padding:12px 14px;cursor:pointer;font-family:'DM Sans',sans-serif;";
+        btn.innerHTML = `<span style="font-size:22px;">${b.icon}</span><span style="font-size:11px;font-weight:700;color:var(--text-primary,#212121);white-space:nowrap;">${b.label}</span>`;
+        btn.onclick = b.fn;
+        row.appendChild(btn);
+      });
+    }, 580);
+  };
+
+  const _prevRA = window.renderAccount;
+  window.renderAccount = function() {
+    if (_prevRA) _prevRA.apply(this, arguments);
+    setTimeout(() => {
+      const loggedIn = document.querySelector('.account-loggedin');
+      if (!loggedIn || loggedIn.querySelector('[data-ww-items]')) return;
+      const adminBtn = loggedIn.querySelector('.adm-account-btn');
+      const labels = {
+        'Nightlife':'Nightlife & Adult Experiences',
+        'Annual Pass':'Annual Pass Comparison',
+        'VIP Tours':'VIP Tours & Backstage',
+        'Lost & Found':'Lost & Found Guide',
+        'Crowd Cal':'Crowd Calendar',
+        'Budget Tips':'Budget Travel Tips',
+        'Fireworks':'Fireworks & Night Shows',
+        'Mob. Order':'Mobile Ordering Guide',
+        'Solo/Senior':'Solo & Senior Travel',
+      };
+      FINAL2_QUICK.forEach(item => {
+        const el = document.createElement('div');
+        el.setAttribute('data-ww-items','1');
+        el.className = 'account-menu-item';
+        el.innerHTML = `<span class="icon">${item.icon}</span><span>${labels[item.label]||item.label}</span><span class="arrow">›</span>`;
+        el.onclick = item.fn;
+        loggedIn.insertBefore(el, adminBtn || null);
+      });
+    }, 220);
+  };
+})();
+</script>
+<!-- ============================================================
+     ORLANDO TRAVEL GUIDE — TRULY COMPLETE
+     All Blocks A through WW
+     Every feature a traveler could need, in one HTML file.
+     ============================================================ -->
