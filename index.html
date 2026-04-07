@@ -30597,3 +30597,761 @@ window.renderSoloSenior = renderSoloSenior;
      All Blocks A through WW
      Every feature a traveler could need, in one HTML file.
      ============================================================ -->
+<script>
+/* ===================================================
+   ORLANDO DATE AND TIME SYSTEM
+   Uses America/New_York (Eastern Time) — handles DST automatically
+   =================================================== */
+
+(function initOrlandoTimeSystem() {
+  const TZ = 'America/New_York';
+
+  /* ── Helpers ── */
+  function getOrlandoParts() {
+    const now = new Date();
+    const fmt = (opts) => new Intl.DateTimeFormat('en-US', { timeZone: TZ, ...opts });
+    const hour    = parseInt(fmt({ hour: 'numeric', hour12: false }).format(now));
+    const minute  = fmt({ minute: '2-digit' }).format(now);
+    const ampm    = fmt({ hour: 'numeric', hour12: true }).format(now).slice(-2);
+    const hour12  = fmt({ hour: 'numeric', hour12: true }).format(now).replace(/\s?[APap][Mm]/, '').trim();
+    const weekday = fmt({ weekday: 'long' }).format(now);
+    const day     = fmt({ weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).format(now);
+    return { hour, minute, ampm, hour12, weekday, day, now };
+  }
+
+  function getTimeOfDay(hour) {
+    if (hour >= 6  && hour < 12) return 'morning';
+    if (hour >= 12 && hour < 17) return 'afternoon';
+    if (hour >= 17 && hour < 21) return 'evening';
+    return 'night';
+  }
+
+  const GREETINGS = {
+    morning:   { emoji:'🌅', text:'Good Morning, Explorer!' },
+    afternoon: { emoji:'☀️',  text:'Good Afternoon, Explorer!' },
+    evening:   { emoji:'🌆', text:'Good Evening, Explorer!' },
+    night:     { emoji:'🌙', text:'Good Night, Explorer!' },
+  };
+
+  const GRADIENTS = {
+    morning:   'linear-gradient(160deg,#1a1a3e 0%,#FF6B35 60%,#FFC107 100%)',
+    afternoon: 'linear-gradient(160deg,#1a1a3e 0%,#FF6B35 55%,#FFC107 100%)',
+    evening:   'linear-gradient(160deg,#0d0d1a 0%,#c2185b 50%,#FF6B35 100%)',
+    night:     'linear-gradient(160deg,#050510 0%,#0a0a2e 60%,#1a1a4e 100%)',
+  };
+
+  /* ── Inject CSS for hero transition ── */
+  const transStyle = document.createElement('style');
+  transStyle.textContent = `
+    .home-hero, #screen-home .screen-hero, [data-orlando-hero] {
+      transition: background 2s ease !important;
+    }
+    @keyframes orlandoSpin {
+      to { transform: rotate(360deg); }
+    }
+    .orlando-spin { display:inline-block; animation: orlandoSpin 1.2s linear infinite; }
+  `;
+  document.head.appendChild(transStyle);
+
+  /* ── Clock element builder ── */
+  function buildClockEl() {
+    const wrap = document.createElement('div');
+    wrap.id = 'orlando-clock-wrap';
+    wrap.style.cssText = 'position:absolute;top:16px;right:16px;text-align:right;z-index:5;';
+    wrap.innerHTML = `
+      <div id="orlando-clock" style="font-family:'DM Sans',sans-serif;font-size:22px;font-weight:800;color:#fff;letter-spacing:.03em;text-shadow:0 2px 8px rgba(0,0,0,.4);"></div>
+      <div style="font-family:'DM Sans',sans-serif;font-size:9px;font-weight:600;color:rgba(255,255,255,.55);letter-spacing:.08em;margin-top:1px;">ORLANDO, FL TIME</div>`;
+    return wrap;
+  }
+
+  /* ── Greeting element builder ── */
+  function buildGreetingEl() {
+    const el = document.createElement('div');
+    el.id = 'orlando-greeting';
+    el.style.cssText = 'font-family:"DM Sans",sans-serif;font-size:15px;color:rgba(255,255,255,.85);margin-top:6px;font-weight:600;';
+    return el;
+  }
+
+  /* ── Date element builder ── */
+  function buildDateEl() {
+    const el = document.createElement('div');
+    el.id = 'orlando-date';
+    el.style.cssText = 'font-family:"DM Sans",sans-serif;font-size:12px;color:rgba(255,255,255,.65);margin-top:3px;';
+    return el;
+  }
+
+  /* ── Main update function ── */
+  function updateTimeUI() {
+    const { hour, hour12, minute, ampm, weekday, day } = getOrlandoParts();
+    const tod = getTimeOfDay(hour);
+    const g   = GREETINGS[tod];
+
+    /* Clock */
+    const clockEl = document.getElementById('orlando-clock');
+    if (clockEl) clockEl.textContent = `${hour12}:${minute} ${ampm}`;
+
+    /* Greeting */
+    const greetEl = document.getElementById('orlando-greeting');
+    if (greetEl) greetEl.textContent = `${g.emoji} ${g.text}`;
+
+    /* Date */
+    const dateEl = document.getElementById('orlando-date');
+    if (dateEl) dateEl.textContent = day;
+
+    /* Hero gradient */
+    const hero = document.querySelector('#screen-home .screen-hero, #screen-home [class*="hero"], .home-hero, [data-orlando-hero]');
+    if (hero) hero.style.background = GRADIENTS[tod];
+
+    /* Expose current state globally */
+    window._orlandoTOD = tod;
+    window._orlandoHour = hour;
+    window._orlandoWeekday = weekday;
+    window._orlandoIsWeekend = (weekday === 'Saturday' || weekday === 'Sunday');
+
+    /* Update time-based content section */
+    if (typeof updateTimedContent === 'function') updateTimedContent();
+  }
+
+  /* ── Inject elements into hero once available ── */
+  function injectIntoHero() {
+    const hero = document.querySelector('#screen-home .screen-hero, #screen-home [class*="hero"], .home-hero, [data-orlando-hero]');
+    if (!hero) return false;
+
+    if (!document.getElementById('orlando-clock-wrap')) {
+      hero.style.position = 'relative';
+      hero.appendChild(buildClockEl());
+    }
+
+    /* Find a subtitle / tagline area to inject greeting + date */
+    if (!document.getElementById('orlando-greeting')) {
+      const sub = hero.querySelector('p, [class*="sub"], [class*="tagline"], h3');
+      const greet = buildGreetingEl();
+      const dateEl = buildDateEl();
+      if (sub) {
+        sub.insertAdjacentElement('afterend', dateEl);
+        sub.insertAdjacentElement('afterend', greet);
+      } else {
+        hero.appendChild(greet);
+        hero.appendChild(dateEl);
+      }
+    }
+    return true;
+  }
+
+  /* ── Start clock interval (stored globally so it can be cleared) ── */
+  let heroReady = false;
+  window.clockInterval = setInterval(() => {
+    if (!heroReady) heroReady = injectIntoHero();
+    updateTimeUI();
+  }, 1000);
+
+  /* Initial call */
+  setTimeout(() => { heroReady = injectIntoHero(); updateTimeUI(); }, 500);
+
+  /* Re-inject whenever home screen is shown */
+  const _prevSS_time = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_time) _prevSS_time(name, el);
+    if (name === 'home') {
+      setTimeout(() => { heroReady = injectIntoHero(); updateTimeUI(); }, 200);
+    }
+  };
+
+  window._orlandoUpdateTime = updateTimeUI;
+})();
+</script>
+<script>
+/* ===== BLOCK WX2: Holiday & Seasonal Banners ===== */
+(function initOrlandoBanners() {
+
+  const HOLIDAYS = [
+    { month:1,  day:1,  emoji:'🎆', text:'Happy New Year! Magic Kingdom\'s first day is packed — arrive at rope drop.' },
+    { month:2,  day:14, emoji:'💕', text:'Happy Valentine\'s Day! EPCOT\'s Italy & France pavilions are romantic tonight.' },
+    { month:3,  day:17, emoji:'☘️', text:'Happy St. Patrick\'s Day! CityWalk and I-Drive bars are celebrating all day.' },
+    { month:4,  start:1, end:30, emoji:'🌸', text:'Spring Break Season — parks at peak capacity. Arrive early, buy Lightning Lane.' },
+    { month:5,  day:null, nth:2, weekday:0, emoji:'💐', text:'Happy Mother\'s Day! Character dining is the perfect Mother\'s Day treat.' },
+    { month:7,  day:4,  emoji:'🎇', text:'Happy 4th of July! Magic Kingdom\'s fireworks are extra spectacular tonight.' },
+    { month:9,  day:1,  start:1, end:30, emoji:'🎃', text:'Mickey\'s Not-So-Scary Halloween Party season has begun at Magic Kingdom!' },
+    { month:10, day:31, emoji:'🎃', text:'Happy Halloween! Trick-or-treat trails open throughout all parks today.' },
+    { month:11, day:null, nth:4, weekday:4, emoji:'🦃', text:'Happy Thanksgiving! Mickey\'s Very Merry Christmas Party season starts this week.' },
+    { month:11, day:1,  start:1, end:30, emoji:'🎄', text:'Holiday season is here! Mickey\'s Very Merry Christmas Party and EPCOT Festival of the Holidays.' },
+    { month:12, day:25, emoji:'🎄', text:'Merry Christmas! Parks close early today — check the schedule and plan accordingly.' },
+    { month:12, day:31, emoji:'🎆', text:'New Year\'s Eve! Magic Kingdom\'s midnight fireworks are legendary. Get there by 4pm.' },
+  ];
+
+  const SEASONAL = [
+    { months:[12,1,2], emoji:'❄️', text:'Winter travel tip: Florida winters are mild (65–75°F). Perfect outdoor weather — best time to visit!' },
+    { months:[3,4,5], emoji:'🌸', text:'Spring is beautiful in Orlando — warm, lower humidity. Watch for Spring Break crowds in March–April.' },
+    { months:[6,7,8], emoji:'☀️', text:'Summer tip: afternoon thunderstorms are daily from June–August. Plan indoor activities 3–5pm.' },
+    { months:[9,10,11], emoji:'🍂', text:'Fall is Orlando\'s best-kept secret — smaller crowds, lower prices, and Halloween/holiday events.' },
+  ];
+
+  function getNthWeekdayOfMonth(year, month, nth, weekday) {
+    // weekday: 0=Sun,1=Mon,...,4=Thu,5=Fri,6=Sat
+    const first = new Date(year, month - 1, 1);
+    let count = 0;
+    for (let d = 1; d <= 31; d++) {
+      const date = new Date(year, month - 1, d);
+      if (date.getMonth() !== month - 1) break;
+      if (date.getDay() === weekday) {
+        count++;
+        if (count === nth) return date.getDate();
+      }
+    }
+    return null;
+  }
+
+  function getActiveBanner() {
+    const now = new Date();
+    const tz = 'America/New_York';
+    const fmt = o => new Intl.DateTimeFormat('en-US', { timeZone: tz, ...o });
+    const month   = parseInt(fmt({ month: 'numeric' }).format(now));
+    const day     = parseInt(fmt({ day: 'numeric' }).format(now));
+    const year    = parseInt(fmt({ year: 'numeric' }).format(now));
+    const weekday = fmt({ weekday: 'long' }).format(now);
+    const isWeekend = (weekday === 'Saturday' || weekday === 'Sunday');
+
+    /* Check holiday rules */
+    for (const h of HOLIDAYS) {
+      if (h.month !== month) continue;
+      if (h.day && h.day === day) return { emoji: h.emoji, text: h.text, type: 'holiday' };
+      if (h.start && h.end && day >= h.start && day <= h.end) return { emoji: h.emoji, text: h.text, type: 'season' };
+      if (h.nth !== undefined && h.weekday !== undefined) {
+        const nthDay = getNthWeekdayOfMonth(year, month, h.nth, h.weekday);
+        if (nthDay && day === nthDay) return { emoji: h.emoji, text: h.text, type: 'holiday' };
+      }
+    }
+
+    /* Check seasonal */
+    for (const s of SEASONAL) {
+      if (s.months.includes(month)) return { emoji: s.emoji, text: s.text, type: 'season' };
+    }
+
+    /* Fallback weekend/weekday */
+    if (isWeekend) return { emoji: '🎉', text: 'Weekend at Orlando parks! Expect higher crowds — use Lightning Lane and arrive at rope drop.', type: 'weekend' };
+    return { emoji: '📅', text: 'Weekday visits mean shorter wait times. Best days: Tuesday and Wednesday throughout the year.', type: 'weekday' };
+  }
+
+  function renderBanner() {
+    const banner = getActiveBanner();
+    const el = document.getElementById('orlando-banner');
+    if (!el) return;
+    const colors = {
+      holiday: 'linear-gradient(135deg,#c62828,#e53935)',
+      season:  'linear-gradient(135deg,#1565C0,#1976D2)',
+      weekend: 'linear-gradient(135deg,#E65100,#FF6D00)',
+      weekday: 'linear-gradient(135deg,#2E7D32,#388E3C)',
+    };
+    el.style.background = colors[banner.type] || colors.weekday;
+    el.style.display = 'flex';
+    el.querySelector('.banner-emoji').textContent = banner.emoji;
+    el.querySelector('.banner-text').textContent = banner.text;
+  }
+
+  function buildBannerEl() {
+    const el = document.createElement('div');
+    el.id = 'orlando-banner';
+    el.style.cssText = 'display:none;align-items:flex-start;gap:10px;padding:10px 14px;border-radius:12px;margin:10px 14px 0;';
+    el.innerHTML = `
+      <span class="banner-emoji" style="font-size:20px;flex-shrink:0;margin-top:1px;"></span>
+      <span class="banner-text" style="font-family:\'DM Sans\',sans-serif;font-size:12px;color:#fff;line-height:1.5;font-weight:600;"></span>`;
+    return el;
+  }
+
+  function injectBanner() {
+    if (document.getElementById('orlando-banner')) { renderBanner(); return true; }
+    const hero = document.querySelector('#screen-home .screen-hero, #screen-home [class*="hero"], .home-hero, [data-orlando-hero]');
+    if (!hero) return false;
+    const after = hero.nextElementSibling;
+    if (after) {
+      after.parentNode.insertBefore(buildBannerEl(), after);
+    } else {
+      hero.parentNode.appendChild(buildBannerEl());
+    }
+    renderBanner();
+    return true;
+  }
+
+  let bannerReady = false;
+  const _bannerInterval = setInterval(() => {
+    if (!bannerReady) bannerReady = injectBanner();
+  }, 1500);
+
+  setTimeout(() => { bannerReady = injectBanner(); }, 700);
+
+  const _prevSS_banner = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_banner) _prevSS_banner(name, el);
+    if (name === 'home') setTimeout(() => { bannerReady = injectBanner(); }, 300);
+  };
+
+  window._orlandoRenderBanner = renderBanner;
+  window._orlandoGetBanner = getActiveBanner;
+})();
+</script>
+<script>
+/* ===== BLOCK WX3: Weather Data System (OpenWeatherMap + Simulated Fallback) ===== */
+(function initOrlandoWeatherSystem() {
+
+  /* ── Config ── */
+  const OWM_KEY = 'YOUR_OPENWEATHERMAP_API_KEY_HERE';
+  const OWM_CITY = 'Orlando,us';
+  const OWM_UNITS = 'imperial';
+  const REFRESH_MS = 30 * 60 * 1000; // 30 minutes
+
+  /* ── Condition maps ── */
+  const WX_ICON = {
+    'Clear': '☀️', 'Clouds': '⛅', 'Rain': '🌧️', 'Drizzle': '🌦️',
+    'Thunderstorm': '⛈️', 'Snow': '❄️', 'Mist': '🌫️', 'Fog': '🌫️',
+    'Haze': '🌁', 'Smoke': '🌫️', 'Dust': '💨', 'Tornado': '🌪️',
+  };
+  const WX_GRADIENT = {
+    'Clear':       'linear-gradient(135deg,#1565C0,#42A5F5,#FFF176)',
+    'Clouds':      'linear-gradient(135deg,#455A64,#78909C,#B0BEC5)',
+    'Rain':        'linear-gradient(135deg,#1A237E,#283593,#3949AB)',
+    'Drizzle':     'linear-gradient(135deg,#1565C0,#1976D2,#42A5F5)',
+    'Thunderstorm':'linear-gradient(135deg,#212121,#424242,#616161)',
+    'Snow':        'linear-gradient(135deg,#546E7A,#78909C,#CFD8DC)',
+    'Mist':        'linear-gradient(135deg,#455A64,#607D8B,#90A4AE)',
+    'Fog':         'linear-gradient(135deg,#455A64,#607D8B,#90A4AE)',
+  };
+  const WX_TIP = {
+    'Clear':       'Perfect theme park weather! Apply sunscreen (SPF 50+) and stay hydrated — Orlando sun is intense.',
+    'Clouds':      'Great park day! Overcast keeps temperatures down. Still bring sunscreen — UV penetrates clouds.',
+    'Rain':        'Pack ponchos ($1 at Dollar Tree, $12 in the parks). Crowds thin out dramatically in rain — use it!',
+    'Drizzle':     'Light rain often passes quickly in Orlando. A $1 poncho keeps you dry and parks are less crowded.',
+    'Thunderstorm':'Afternoon storms are normal in Orlando. Plan indoor attractions from 2–5pm, then back outside by evening.',
+    'Snow':        'Historic event! Everything is magical but some outdoor attractions may have reduced hours.',
+    'Mist':        'Mild conditions — a light layer in the morning, then switch to a t-shirt by 10am.',
+    'Fog':         'Morning fog burns off by 9-10am. Perfect excuse to sleep in and hit parks after fog clears.',
+    'Haze':        'Hazy but still a great park day. UV levels can still be high — sunscreen recommended.',
+  };
+
+  /* ── Simulated fallback using date seed ── */
+  function getSimulatedWeather() {
+    const now = new Date();
+    const seed = now.getFullYear() * 10000 + (now.getMonth()+1) * 100 + now.getDate();
+    const conditions = ['Clear','Clear','Clear','Clouds','Clouds','Rain','Drizzle','Thunderstorm','Haze'];
+    const cond = conditions[seed % conditions.length];
+    const baseTemp = [72,74,76,78,80,88,90,92,85,82];
+    const temp = baseTemp[seed % baseTemp.length];
+    const feelsLike = temp + (cond === 'Thunderstorm' ? -4 : cond === 'Clear' ? 3 : 0);
+    const humidity = cond === 'Rain' || cond === 'Thunderstorm' ? 85 : cond === 'Clear' ? 55 : 70;
+    const wind = 5 + (seed % 10);
+    const forecast = [];
+    for (let i = 1; i <= 5; i++) {
+      const h = (now.getHours() + i * 2) % 24;
+      const c2 = conditions[(seed + i) % conditions.length];
+      forecast.push({ hour: h, icon: WX_ICON[c2] || '🌤️', temp: temp + (i % 3) - 1 });
+    }
+    return {
+      simulated: true,
+      condition: cond,
+      description: cond === 'Clear' ? 'Clear skies' : cond === 'Clouds' ? 'Partly cloudy' : cond,
+      icon: WX_ICON[cond] || '🌤️',
+      gradient: WX_GRADIENT[cond] || WX_GRADIENT['Clear'],
+      tip: WX_TIP[cond] || WX_TIP['Clear'],
+      temp: temp,
+      feelsLike: feelsLike,
+      humidity: humidity,
+      wind: wind,
+      lo: temp - 8,
+      hi: temp + 6,
+      forecast: forecast,
+      updatedAt: Date.now(),
+    };
+  }
+
+  /* ── OpenWeatherMap fetch ── */
+  async function fetchLiveWeather() {
+    if (!OWM_KEY || OWM_KEY === 'YOUR_OPENWEATHERMAP_API_KEY_HERE') {
+      console.log('[Orlando WX] No API key — using simulated weather.');
+      return null;
+    }
+    try {
+      const [cur, fore] = await Promise.all([
+        fetch(`https://api.openweathermap.org/data/2.5/weather?q=${OWM_CITY}&units=${OWM_UNITS}&appid=${OWM_KEY}`).then(r => r.json()),
+        fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${OWM_CITY}&units=${OWM_UNITS}&cnt=5&appid=${OWM_KEY}`).then(r => r.json()),
+      ]);
+      if (cur.cod !== 200) throw new Error('OWM error: ' + cur.message);
+      const cond = cur.weather[0].main;
+      const forecast = (fore.list || []).slice(0,5).map(f => {
+        const h = new Date(f.dt * 1000);
+        const hr = parseInt(new Intl.DateTimeFormat('en-US', { timeZone:'America/New_York', hour:'numeric', hour12:false }).format(h));
+        const c2 = f.weather[0].main;
+        return { hour: hr, icon: WX_ICON[c2] || '🌤️', temp: Math.round(f.main.temp) };
+      });
+      return {
+        simulated: false,
+        condition: cond,
+        description: cur.weather[0].description,
+        icon: WX_ICON[cond] || '🌤️',
+        gradient: WX_GRADIENT[cond] || WX_GRADIENT['Clear'],
+        tip: WX_TIP[cond] || WX_TIP['Clear'],
+        temp: Math.round(cur.main.temp),
+        feelsLike: Math.round(cur.main.feels_like),
+        humidity: cur.main.humidity,
+        wind: Math.round(cur.wind.speed),
+        lo: Math.round(cur.main.temp_min),
+        hi: Math.round(cur.main.temp_max),
+        forecast: forecast,
+        updatedAt: Date.now(),
+      };
+    } catch(e) {
+      console.warn('[Orlando WX] API error, using simulation:', e.message);
+      return null;
+    }
+  }
+
+  /* ── Store weather in appState ── */
+  function storeWeather(wx) {
+    if (!window.appState) window.appState = {};
+    window.appState.weather = wx;
+    if (typeof window._orlandoRenderWeatherWidget === 'function') window._orlandoRenderWeatherWidget(wx);
+    if (typeof window._orlandoRenderWeatherBanner === 'function') window._orlandoRenderWeatherBanner(wx);
+  }
+
+  /* ── Main refresh ── */
+  async function refreshWeather() {
+    const live = await fetchLiveWeather();
+    storeWeather(live || getSimulatedWeather());
+  }
+
+  /* ── Init ── */
+  refreshWeather();
+  window.weatherInterval = setInterval(refreshWeather, REFRESH_MS);
+  window._orlandoRefreshWeather = refreshWeather;
+  window._orlandoGetSimulatedWeather = getSimulatedWeather;
+  window._orlandoWxIcon = WX_ICON;
+  window._orlandoWxGradient = WX_GRADIENT;
+  window._orlandoWxTip = WX_TIP;
+})();
+</script>
+<script>
+/* ===== BLOCK WX4: Weather Widget UI ===== */
+
+function buildWeatherWidgetEl() {
+  const el = document.createElement('div');
+  el.id = 'orlando-wx-widget';
+  el.style.cssText = 'margin:10px 14px 0;border-radius:16px;overflow:hidden;';
+  el.innerHTML = `
+    <div id="orlando-wx-inner" style="padding:14px 16px;">
+      <div style="display:flex;justify-content:center;align-items:center;padding:20px 0;">
+        <span class="orlando-spin" style="font-size:28px;">⏳</span>
+      </div>
+    </div>`;
+  return el;
+}
+
+function formatHour(h) {
+  if (h === 0) return '12am';
+  if (h === 12) return '12pm';
+  return h < 12 ? h + 'am' : (h-12) + 'pm';
+}
+
+window._orlandoRenderWeatherWidget = function(wx) {
+  let el = document.getElementById('orlando-wx-widget');
+  if (!el) return;
+  const inner = document.getElementById('orlando-wx-inner');
+  if (!inner) return;
+
+  const simTag = wx.simulated
+    ? '<span style="font-size:9px;color:rgba(255,255,255,.6);margin-left:6px;">SIMULATED</span>'
+    : '<span style="font-size:9px;color:rgba(255,255,255,.6);margin-left:6px;">LIVE</span>';
+
+  const forecastHTML = (wx.forecast || []).map(f => `
+    <div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;min-width:44px;">
+      <div style="font-size:9px;color:rgba(255,255,255,.7);font-weight:600;">${formatHour(f.hour)}</div>
+      <div style="font-size:18px;">${f.icon}</div>
+      <div style="font-size:11px;font-weight:800;color:#fff;">${f.temp}°</div>
+    </div>`).join('');
+
+  inner.style.background = wx.gradient || 'linear-gradient(135deg,#1565C0,#42A5F5)';
+  inner.innerHTML = `
+    <!-- Main row -->
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;">
+      <div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="font-size:11px;font-weight:700;color:rgba(255,255,255,.8);letter-spacing:.05em;">ORLANDO, FL</span>
+          ${simTag}
+        </div>
+        <div style="display:flex;align-items:flex-end;gap:6px;margin-top:2px;">
+          <span style="font-size:52px;font-weight:800;color:#fff;line-height:1;">${wx.temp}°</span>
+          <span style="font-size:14px;color:rgba(255,255,255,.8);margin-bottom:8px;">F</span>
+        </div>
+        <div style="font-size:13px;color:rgba(255,255,255,.9);text-transform:capitalize;">${wx.description}</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:2px;">Feels like ${wx.feelsLike}° · Lo ${wx.lo}° Hi ${wx.hi}°</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:56px;line-height:1;">${wx.icon}</div>
+      </div>
+    </div>
+    <!-- Stat row -->
+    <div style="display:flex;gap:8px;margin-bottom:12px;">
+      <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;">
+        <div style="font-size:9px;color:rgba(255,255,255,.7);font-weight:700;">HUMIDITY</div>
+        <div style="font-size:16px;font-weight:800;color:#fff;">${wx.humidity}%</div>
+      </div>
+      <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;">
+        <div style="font-size:9px;color:rgba(255,255,255,.7);font-weight:700;">WIND</div>
+        <div style="font-size:16px;font-weight:800;color:#fff;">${wx.wind} mph</div>
+      </div>
+      <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;">
+        <div style="font-size:9px;color:rgba(255,255,255,.7);font-weight:700;">CONDITION</div>
+        <div style="font-size:13px;font-weight:800;color:#fff;">${wx.condition}</div>
+      </div>
+    </div>
+    <!-- Forecast strip -->
+    <div style="display:flex;gap:4px;background:rgba(255,255,255,.1);border-radius:12px;padding:10px 8px;margin-bottom:12px;overflow-x:auto;">
+      ${forecastHTML}
+    </div>
+    <!-- Tip -->
+    <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px 12px;display:flex;gap:8px;align-items:flex-start;">
+      <span style="font-size:16px;flex-shrink:0;">💡</span>
+      <div style="font-size:11px;color:#fff;line-height:1.5;">${wx.tip}</div>
+    </div>`;
+};
+
+function injectWeatherWidget() {
+  if (document.getElementById('orlando-wx-widget')) return true;
+  const banner = document.getElementById('orlando-banner');
+  if (banner) {
+    banner.insertAdjacentElement('afterend', buildWeatherWidgetEl());
+    const wx = window.appState && window.appState.weather;
+    if (wx) window._orlandoRenderWeatherWidget(wx);
+    return true;
+  }
+  const hero = document.querySelector('#screen-home .screen-hero, #screen-home [class*="hero"], .home-hero, [data-orlando-hero]');
+  if (!hero) return false;
+  const ref = hero.nextElementSibling;
+  if (ref) ref.parentNode.insertBefore(buildWeatherWidgetEl(), ref.nextSibling);
+  else hero.parentNode.appendChild(buildWeatherWidgetEl());
+  const wx = window.appState && window.appState.weather;
+  if (wx) window._orlandoRenderWeatherWidget(wx);
+  return true;
+}
+
+let _wxWidgetReady = false;
+const _wxWidgetInterval = setInterval(() => {
+  if (!_wxWidgetReady) _wxWidgetReady = injectWeatherWidget();
+}, 2000);
+setTimeout(() => { _wxWidgetReady = injectWeatherWidget(); }, 900);
+
+const _prevSS_wx4 = window.showScreen;
+window.showScreen = function(name, el) {
+  if (_prevSS_wx4) _prevSS_wx4(name, el);
+  if (name === 'home') setTimeout(() => { _wxWidgetReady = injectWeatherWidget(); }, 400);
+};
+</script>
+<script>
+/* ===== BLOCK WX5: Weather-Based Banner + Time-Based Content + AI Planner Weather Awareness ===== */
+
+/* ── Weather-Based Content Banner ── */
+window._orlandoRenderWeatherBanner = function(wx) {
+  let el = document.getElementById('orlando-wx-banner');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'orlando-wx-banner';
+    el.style.cssText = 'margin:10px 14px 0;border-radius:12px;padding:10px 14px;display:flex;align-items:flex-start;gap:10px;';
+    const widget = document.getElementById('orlando-wx-widget');
+    if (widget) widget.insertAdjacentElement('afterend', el);
+    else {
+      const hero = document.querySelector('#screen-home .screen-hero,#screen-home [class*="hero"],.home-hero,[data-orlando-hero]');
+      if (hero && hero.parentNode) hero.parentNode.appendChild(el);
+      else return;
+    }
+  }
+
+  const cond = wx.condition || 'Clear';
+  const temp = wx.temp || 80;
+
+  let state = 'sunny';
+  if (cond === 'Rain' || cond === 'Drizzle') state = 'rainy';
+  else if (cond === 'Thunderstorm') state = 'storm';
+  else if (temp >= 95) state = 'hot';
+  else if (cond === 'Clear') state = 'sunny';
+  else state = 'cloudy';
+
+  const banners = {
+    rainy:  { bg:'linear-gradient(135deg,#1A237E,#1565C0)', icon:'☔', text:'Rain tip: Pick up a poncho at Dollar Tree before the park — $1 vs. $12 inside. Crowds thin in the rain!' },
+    storm:  { bg:'linear-gradient(135deg,#1a1a1a,#37474F)', icon:'⛈️', text:'Storm alert: All outdoor attractions close during lightning. Head to indoor rides and gift shops — queues will be short!' },
+    hot:    { bg:'linear-gradient(135deg,#BF360C,#E64A19)', icon:'🌡️', text:'Heat advisory: 95°F+ today. Freeze water bottles overnight, carry electrolytes, and use resort pools 11am–3pm.' },
+    sunny:  { bg:'linear-gradient(135deg,#F57F17,#F9A825)', icon:'☀️', text:'Perfect park day! Apply SPF 50+ before leaving your hotel — Orlando UV index is extreme in summer.' },
+    cloudy: { bg:'linear-gradient(135deg,#455A64,#607D8B)', icon:'⛅', text:'Overcast = comfortable. Great day for outdoor lands — no harsh sun, cooler temps, and softer photos too.' },
+  };
+
+  const b = banners[state];
+  el.style.background = b.bg;
+  el.innerHTML = `<span style="font-size:20px;flex-shrink:0;">${b.icon}</span>
+    <span style="font-family:'DM Sans',sans-serif;font-size:12px;color:#fff;line-height:1.5;font-weight:600;">${b.text}</span>`;
+};
+
+/* ── Time-Based Content Section ── */
+const TIME_CONTENT = {
+  morning: {
+    title: '🌅 Start Your Morning Strong',
+    subtitle: 'Best parks for rope-drop: Magic Kingdom, Hollywood Studios, Animal Kingdom',
+    tip: 'Morning tip: Arrive 30–45 min before official park open. Cast Members often let guests in 10–15 min early.',
+  },
+  afternoon: {
+    title: '☀️ Afternoon Strategy',
+    subtitle: 'Beat the midday crowds with a resort pool break or indoor attractions',
+    tip: 'Afternoon tip: Park crowds peak 11am–3pm. Use this time for table-service lunch, a resort break, or indoor rides.',
+  },
+  evening: {
+    title: '🌆 Evening Magic Awaits',
+    subtitle: 'Best time for fireworks, parades, and character meets',
+    tip: 'Evening tip: Crowds thin after 7pm. Return for night shows, fireworks, and lower wait times on headliners.',
+  },
+  night: {
+    title: '🌙 Night Owls & Late Parks',
+    subtitle: 'Extended evenings and After Hours events worth knowing',
+    tip: 'Night tip: Disney After Hours events ($150–175) give 3 hours in the park with virtually no waits. Worth it for thrill-seekers.',
+  },
+};
+
+function buildTimeContentEl() {
+  const el = document.createElement('div');
+  el.id = 'orlando-time-content';
+  el.style.cssText = 'margin:10px 14px 0;background:var(--card-bg,#fff);border-radius:16px;padding:14px;border-left:4px solid var(--primary,#FF6B35);';
+  return el;
+}
+
+function updateTimedContent() {
+  const tod = window._orlandoTOD || 'morning';
+  const c = TIME_CONTENT[tod];
+  let el = document.getElementById('orlando-time-content');
+  if (!el) return;
+  el.innerHTML = `
+    <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:4px;">${c.title}</div>
+    <div style="font-size:11px;color:var(--primary,#FF6B35);font-weight:600;margin-bottom:8px;">${c.subtitle}</div>
+    <div style="font-size:12px;color:var(--text-secondary,#757575);line-height:1.5;">${c.tip}</div>`;
+}
+window.updateTimedContent = updateTimedContent;
+
+function injectTimeContent() {
+  if (document.getElementById('orlando-time-content')) { updateTimedContent(); return true; }
+  const wxBanner = document.getElementById('orlando-wx-banner');
+  if (wxBanner) {
+    wxBanner.insertAdjacentElement('afterend', buildTimeContentEl());
+    updateTimedContent();
+    return true;
+  }
+  const widget = document.getElementById('orlando-wx-widget');
+  if (widget) {
+    widget.insertAdjacentElement('afterend', buildTimeContentEl());
+    updateTimedContent();
+    return true;
+  }
+  return false;
+}
+
+let _tcReady = false;
+setInterval(() => { if (!_tcReady) _tcReady = injectTimeContent(); }, 2500);
+setTimeout(() => { _tcReady = injectTimeContent(); }, 1100);
+
+const _prevSS_wx5 = window.showScreen;
+window.showScreen = function(name, el) {
+  if (_prevSS_wx5) _prevSS_wx5(name, el);
+  if (name === 'home') setTimeout(() => { _tcReady = injectTimeContent(); }, 500);
+};
+
+/* ── AI Planner Weather Awareness ── */
+const _origAIPlan = window.generateAIPlan;
+window.generateAIPlan = function(query, cb) {
+  const wx = window.appState && window.appState.weather;
+  let weatherCtx = '';
+  if (wx) {
+    weatherCtx = `\n\nCurrent Orlando weather: ${wx.temp}°F, ${wx.description}. Feels like ${wx.feelsLike}°F. Wind ${wx.wind}mph. Humidity ${wx.humidity}%. Consider this when recommending outdoor activities.`;
+  }
+  const tod = window._orlandoTOD || 'morning';
+  const weekday = window._orlandoWeekday || 'Monday';
+  const timeCtx = `\nCurrent Orlando time of day: ${tod}. Day: ${weekday}. Plan accordingly.`;
+  const enhancedQuery = query + weatherCtx + timeCtx;
+  if (typeof _origAIPlan === 'function') {
+    return _origAIPlan(enhancedQuery, cb);
+  }
+};
+
+/* ── Outdoor Location Weather Row ── */
+window._orlandoAddWeatherToDetail = function(containerEl) {
+  if (!containerEl) return;
+  if (containerEl.querySelector('[data-wx-row]')) return;
+  const wx = window.appState && window.appState.weather;
+  if (!wx) return;
+  const row = document.createElement('div');
+  row.setAttribute('data-wx-row', '1');
+  row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--card-bg,#fff);border-radius:10px;margin:8px 0;';
+  row.innerHTML = `<span style="font-size:20px;">${wx.icon}</span>
+    <div style="font-size:12px;color:var(--text-primary,#212121);">
+      <strong>${wx.temp}°F</strong> · ${wx.description} · Feels like ${wx.feelsLike}°F
+    </div>`;
+  containerEl.prepend(row);
+};
+</script>
+<style>
+/* ===== WEATHER SYSTEM LOADING SPINNER ===== */
+@keyframes orlandoSpinWx { to { transform: rotate(360deg); } }
+.orlando-spin { display:inline-block; animation: orlandoSpinWx 1.2s linear infinite; }
+#orlando-wx-widget { transition: all 0.4s ease; }
+#orlando-banner, #orlando-wx-banner, #orlando-time-content { transition: opacity 0.3s ease; }
+</style>
+<script>
+/* ===== WX WIRE: Tie weather system into renderHome + account menu ===== */
+(function wireWeatherSystem() {
+
+  /* Patch renderHome to reinject all weather/time elements */
+  const _prevRH_wx = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_wx) _prevRH_wx.apply(this, arguments);
+    setTimeout(() => {
+      /* Clock is managed by initOrlandoTimeSystem — just trigger update */
+      if (typeof window._orlandoUpdateTime === 'function') window._orlandoUpdateTime();
+      if (typeof window._orlandoRenderBanner === 'function') window._orlandoRenderBanner();
+      /* Weather widget */
+      const wx = window.appState && window.appState.weather;
+      if (wx) {
+        if (typeof window._orlandoRenderWeatherWidget === 'function') window._orlandoRenderWeatherWidget(wx);
+        if (typeof window._orlandoRenderWeatherBanner === 'function') window._orlandoRenderWeatherBanner(wx);
+      }
+      if (typeof window.updateTimedContent === 'function') window.updateTimedContent();
+    }, 600);
+  };
+
+  /* Add weather refresh button to account menu */
+  const _prevRA_wx = window.renderAccount;
+  window.renderAccount = function() {
+    if (_prevRA_wx) _prevRA_wx.apply(this, arguments);
+    setTimeout(() => {
+      const loggedIn = document.querySelector('.account-loggedin');
+      if (!loggedIn || loggedIn.querySelector('[data-wx-acct]')) return;
+      const adminBtn = loggedIn.querySelector('.adm-account-btn');
+      const el = document.createElement('div');
+      el.setAttribute('data-wx-acct', '1');
+      el.className = 'account-menu-item';
+      el.innerHTML = `<span class="icon">🌤️</span><span>Refresh Orlando Weather</span><span class="arrow">›</span>`;
+      el.onclick = function() {
+        if (typeof window._orlandoRefreshWeather === 'function') {
+          window._orlandoRefreshWeather();
+          el.querySelector('span:first-child').textContent = '⏳';
+          setTimeout(() => { el.querySelector('span:first-child').textContent = '🌤️'; }, 3000);
+        }
+      };
+      loggedIn.insertBefore(el, adminBtn || null);
+    }, 640);
+  };
+
+  /* Expose status summary for debug */
+  window._orlandoWxStatus = function() {
+    const wx = window.appState && window.appState.weather;
+    if (!wx) return 'No weather data yet.';
+    return `${wx.icon} ${wx.temp}°F ${wx.description} (${wx.simulated ? 'simulated' : 'live'}) — updated ${Math.round((Date.now()-wx.updatedAt)/1000)}s ago`;
+  };
+
+  console.log('[Orlando] Weather + Time system initialized. Call window._orlandoWxStatus() to check.');
+})();
+</script>
+<!-- ============================================================
+     ORLANDO TRAVEL GUIDE — COMPLETE WITH LIVE TIME + WEATHER
+     All Blocks A through WX
+     ============================================================ -->
