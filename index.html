@@ -26170,3 +26170,301 @@ window.clearSouvenirs = clearSouvenirs;
   };
 })();
 </script>
+<script>
+/* ===== BLOCK GG1: Character Meet & Greet Finder ===== */
+const CHARACTER_MEETS = [
+  { name:'Mickey Mouse',     park:'Magic Kingdom',      location:'Town Square Theater',        time:'10am–6pm', tip:'Get Lightning Lane — line can hit 90 min.',  icon:'🐭', tags:['Disney Classic'] },
+  { name:'Cinderella',       park:'Magic Kingdom',      location:'Princess Fairytale Hall',     time:'9am–7pm',  tip:'Share the hall with another princess.',       icon:'👸', tags:['Princess'] },
+  { name:'Rapunzel',         park:'Magic Kingdom',      location:'Princess Fairytale Hall',     time:'9am–7pm',  tip:'Rotating princess partner — check app.',      icon:'👸', tags:['Princess'] },
+  { name:'Tiana',            park:'Magic Kingdom',      location:'Princess Fairytale Hall',     time:'9am–5pm',  tip:'Typically pairs with another princess.',       icon:'👸', tags:['Princess'] },
+  { name:'Buzz Lightyear',   park:'Magic Kingdom',      location:'Tomorrowland near Buzz ride',  time:'11am–5pm', tip:'Great for Toy Story fans.',                   icon:'🚀', tags:['Pixar'] },
+  { name:'Goofy & Pluto',    park:'Magic Kingdom',      location:'Pete\'s Silly Sideshow',      time:'10am–6pm', tip:'Two meets in one — great value!',             icon:'🐶', tags:['Disney Classic'] },
+  { name:'Minnie & Daisy',   park:'Magic Kingdom',      location:'Pete\'s Silly Sideshow',      time:'10am–6pm', tip:'Circus theme costumes.',                      icon:'🐭', tags:['Disney Classic'] },
+  { name:'Elsa & Anna',      park:'EPCOT',              location:'Royal Sommerhus (Norway)',     time:'9am–7pm',  tip:'Indoor meet — great even on rainy days.',     icon:'❄️', tags:['Princess','Frozen'] },
+  { name:'Remy',             park:'EPCOT',              location:'Near Remy\'s Ratatouille Adventure',time:'11am–5pm',tip:'Popular new character — shorter early.',  icon:'🐀', tags:['Pixar'] },
+  { name:'Baymax',           park:'EPCOT',              location:'Near Guardians of the Galaxy', time:'12pm–5pm', tip:'Big Hero 6 character, great photo op.',       icon:'🤖', tags:['Marvel adjacent'] },
+  { name:'Moana',            park:'EPCOT',              location:'Near Journey of Water',        time:'11am–4pm', tip:'New attraction area meet.',                   icon:'🌺', tags:['Princess'] },
+  { name:'Goofy & Pluto',    park:'EPCOT',              location:'World Discovery area',         time:'10am–3pm', tip:'Check My Disney Experience for times.',       icon:'🐶', tags:['Disney Classic'] },
+  { name:'Woody & Jessie',   park:'Hollywood Studios',  location:'Toy Story Land',               time:'10am–5pm', tip:'Outdoor — arrive early in summer.',           icon:'🤠', tags:['Pixar','Toy Story'] },
+  { name:'Chewbacca',        park:'Hollywood Studios',  location:'Galaxy\'s Edge',               time:'Variable', tip:'Roaming meet — look for a crowd forming.',   icon:'🚀', tags:['Star Wars'] },
+  { name:'Rey',              park:'Hollywood Studios',  location:'Galaxy\'s Edge',               time:'Variable', tip:'Roaming — ask a CM for schedule.',            icon:'⚔️', tags:['Star Wars'] },
+  { name:'Spider-Man',       park:'Hollywood Studios',  location:'Launch Bay',                   time:'10am–5pm', tip:'Shares Launch Bay with other heroes.',        icon:'🕷️', tags:['Marvel'] },
+  { name:'Iron Man',         park:'Hollywood Studios',  location:'Launch Bay',                   time:'10am–5pm', tip:'Rotating Marvel heroes — check app.',         icon:'🦸', tags:['Marvel'] },
+  { name:'Baloo & King Louie',park:'Animal Kingdom',    location:'Asia area',                    time:'10am–4pm', tip:'Less crowded meet in a quieter area.',        icon:'🐻', tags:['Disney Classic'] },
+  { name:'Russell & Dug',    park:'Animal Kingdom',     location:'Discovery Island',              time:'11am–5pm', tip:'UP! characters — popular with kids.',         icon:'🐶', tags:['Pixar'] },
+  { name:'Kevin the Bird',   park:'Animal Kingdom',     location:'Discovery Island area',         time:'11am–4pm', tip:'Huge and hilarious — great photo op!',        icon:'🐦', tags:['Pixar'] },
+  { name:'Spider-Man',       park:'Universal',          location:'Marvel Super Hero Island',      time:'10am–6pm', tip:'Most interactive character meet at Universal.',icon:'🕷️', tags:['Marvel','Universal'] },
+  { name:'Captain America',  park:'Universal',          location:'Marvel Super Hero Island',      time:'10am–6pm', tip:'Fan favorite — longer lines near open.',      icon:'🛡️', tags:['Marvel','Universal'] },
+  { name:'The Grinch',       park:'Universal',          location:'Hogsmeade (seasonal)',          time:'Nov–Jan',  tip:'Holiday season only — arrive early.',         icon:'💚', tags:['Universal','Holiday'] },
+  { name:'Shamu (Costumed)', park:'SeaWorld',           location:'Shamu\'s Happy Harbor',         time:'11am–4pm', tip:'Fun for very young kids.',                   icon:'🐋', tags:['SeaWorld'] },
+];
+
+window._cMeetPark = 'All';
+window._cMeetTag = 'All';
+
+function openCharacterMeets() {
+  const existing = document.getElementById('cmeet-overlay');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'cmeet-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;display:flex;flex-direction:column;max-width:430px;left:50%;transform:translateX(-50%);';
+  const parks = ['All','Magic Kingdom','EPCOT','Hollywood Studios','Animal Kingdom','Universal','SeaWorld'];
+  const tags = ['All','Princess','Pixar','Marvel','Star Wars','Disney Classic','Universal','Holiday'];
+  el.innerHTML = `
+    <div style="background:linear-gradient(135deg,#C62828,#E91E63,#9C27B0);padding:18px 16px 16px;flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <button onclick="document.getElementById('cmeet-overlay').remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;">←</button>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;">✨ Character Meets</div>
+      </div>
+      <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.7);margin-bottom:6px;">FILTER BY PARK</div>
+      <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;" id="cm-park-tabs">
+        ${parks.map(p => `<button onclick="setCMPark('${p}',this)" data-p="${p}" style="flex-shrink:0;border-radius:20px;padding:5px 11px;border:1.5px solid ${p==='All'?'#fff':'rgba(255,255,255,.4)'};background:${p==='All'?'rgba(255,255,255,.25)':'transparent'};color:#fff;font-size:10px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">${p==='All'?'All Parks':p.split(' ')[0]}</button>`).join('')}
+      </div>
+      <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.7);margin:8px 0 6px;">FILTER BY TYPE</div>
+      <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;" id="cm-tag-tabs">
+        ${tags.map(t => `<button onclick="setCMTag('${t}',this)" data-t="${t}" style="flex-shrink:0;border-radius:20px;padding:5px 11px;border:1.5px solid ${t==='All'?'#fff':'rgba(255,255,255,.4)'};background:${t==='All'?'rgba(255,255,255,.25)':'transparent'};color:#fff;font-size:10px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">${t}</button>`).join('')}
+      </div>
+    </div>
+    <div style="overflow-y:auto;padding:14px 16px 80px;" id="cm-list"></div>`;
+  document.body.appendChild(el);
+  renderCharacterMeets();
+}
+window.openCharacterMeets = openCharacterMeets;
+
+function setCMPark(p, btn) {
+  window._cMeetPark = p;
+  document.querySelectorAll('#cm-park-tabs button').forEach(b => {
+    b.style.background = 'transparent'; b.style.borderColor = 'rgba(255,255,255,.4)';
+  });
+  btn.style.background = 'rgba(255,255,255,.25)'; btn.style.borderColor = '#fff';
+  renderCharacterMeets();
+}
+window.setCMPark = setCMPark;
+
+function setCMTag(t, btn) {
+  window._cMeetTag = t;
+  document.querySelectorAll('#cm-tag-tabs button').forEach(b => {
+    b.style.background = 'transparent'; b.style.borderColor = 'rgba(255,255,255,.4)';
+  });
+  btn.style.background = 'rgba(255,255,255,.25)'; btn.style.borderColor = '#fff';
+  renderCharacterMeets();
+}
+window.setCMTag = setCMTag;
+
+function renderCharacterMeets() {
+  const el = document.getElementById('cm-list');
+  if (!el) return;
+  const park = window._cMeetPark || 'All';
+  const tag = window._cMeetTag || 'All';
+  let filtered = CHARACTER_MEETS;
+  if (park !== 'All') filtered = filtered.filter(c => c.park === park);
+  if (tag !== 'All') filtered = filtered.filter(c => c.tags.includes(tag));
+  if (!filtered.length) { el.innerHTML = '<div style="text-align:center;padding:40px;color:#BDBDBD;font-size:13px;">No characters match this filter.</div>'; return; }
+  const parkColors = { 'Magic Kingdom':'#E53935','EPCOT':'#0277BD','Hollywood Studios':'#6A1B9A','Animal Kingdom':'#2E7D32','Universal':'#1565C0','SeaWorld':'#006064' };
+  el.innerHTML = `<div style="font-size:12px;font-weight:700;color:#9E9E9E;margin-bottom:10px;">${filtered.length} CHARACTER${filtered.length!==1?'S':''}</div>` +
+  filtered.map(c => `
+    <div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:8px;border-left:4px solid ${parkColors[c.park]||'#FF6B35'};">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:24px;">${c.icon}</span>
+          <div>
+            <div style="font-size:14px;font-weight:800;color:var(--text-primary);">${c.name}</div>
+            <div style="font-size:11px;color:${parkColors[c.park]||'#FF6B35'};font-weight:700;">${c.park}</div>
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:11px;font-weight:700;color:#9E9E9E;">⏰ ${c.time}</div>
+        </div>
+      </div>
+      <div style="font-size:12px;color:#757575;margin-bottom:4px;">📍 ${c.location}</div>
+      <div style="font-size:11px;color:#9E9E9E;line-height:1.4;">💡 ${c.tip}</div>
+    </div>`).join('');
+}
+window.renderCharacterMeets = renderCharacterMeets;
+</script>
+<script>
+/* ===== BLOCK GG2: Orlando Trivia Game ===== */
+const TRIVIA_QUESTIONS = [
+  { q:'What year did Walt Disney World open?', opts:['1955','1965','1971','1980'], a:2, cat:'History' },
+  { q:'Which was the first theme park to open at Walt Disney World?', opts:['EPCOT','Hollywood Studios','Animal Kingdom','Magic Kingdom'], a:3, cat:'History' },
+  { q:'What is the height of Cinderella Castle at Magic Kingdom?', opts:['100 ft','145 ft','189 ft','210 ft'], a:2, cat:'Magic Kingdom' },
+  { q:'EPCOT originally stood for what?', opts:['Experimental Prototype Community of Tomorrow','Every Person Can Organize Tomorrow','Environmental Protection Community of Technology','Extremely Popular Center of Theme-parks'], a:0, cat:'EPCOT' },
+  { q:'Which Orlando park was the first in the world to feature a Harry Potter area?', opts:['Islands of Adventure','Universal Studios Florida','Wizarding World UK','Hollywood Studios'], a:0, cat:'Universal' },
+  { q:'What is the name of the roller coaster inside Space Mountain?', opts:['Alpha','Beta','Delta','Omega'], a:0, cat:'Magic Kingdom' },
+  { q:'How many countries are represented in EPCOT\'s World Showcase?', opts:['9','11','13','15'], a:1, cat:'EPCOT' },
+  { q:'Animal Kingdom\'s Tree of Life stands how tall?', opts:['100 ft','145 ft','100 ft','145 ft'], opts:['89 ft','120 ft','145 ft','160 ft'], a:2, cat:'Animal Kingdom' },
+  { q:'What Orlando theme park is home to the Forbidden Journey ride?', opts:['Universal Studios','SeaWorld','Islands of Adventure','Hollywood Studios'], a:2, cat:'Universal' },
+  { q:'The Seven Dwarfs Mine Train is located in which "land" of Magic Kingdom?', opts:['Fantasyland','Adventureland','Tomorrowland','Liberty Square'], a:0, cat:'Magic Kingdom' },
+  { q:'Which park hosts the annual Epcot International Food & Wine Festival?', opts:['Hollywood Studios','Magic Kingdom','EPCOT','Animal Kingdom'], a:2, cat:'EPCOT' },
+  { q:'Kilimanjaro Safaris is the signature attraction of which park?', opts:['EPCOT','Animal Kingdom','Hollywood Studios','SeaWorld'], a:1, cat:'Animal Kingdom' },
+  { q:'Orlando\'s airport code is:', opts:['ORL','MIA','MCO','TPA'], a:2, cat:'Orlando' },
+  { q:'The famous "Before I Die" wall in Orlando is in which neighborhood?', opts:['Downtown','Lake Nona','Ivanhoe','Winter Park'], a:2, cat:'Orlando' },
+  { q:'Universal\'s Volcano Bay is themed as a:', opts:['Hawaiian island','Polynesian isle','Prehistoric world','Space station'], a:1, cat:'Universal' },
+  { q:'What is the name of the land added to Disney\'s Hollywood Studios featuring Star Wars?', opts:['Galaxy\'s Edge','Star Port','Starfall','Hyperspace'], a:0, cat:'Hollywood Studios' },
+  { q:'Which Disney park opened most recently?', opts:['EPCOT','Hollywood Studios','Animal Kingdom','Magic Kingdom'], a:2, cat:'History' },
+  { q:'The Haunted Mansion at Magic Kingdom has how many "Happy Haunts"?', opts:['499','666','999','1313'], a:2, cat:'Magic Kingdom' },
+  { q:'Where can you ride Guardians of the Galaxy: Cosmic Rewind?', opts:['Hollywood Studios','Magic Kingdom','EPCOT','Animal Kingdom'], a:2, cat:'EPCOT' },
+  { q:'Universal CityWalk connects which two parks?', opts:['Universal Studios & Islands of Adventure','Hollywood Studios & EPCOT','Magic Kingdom & EPCOT','SeaWorld & Aquatica'], a:0, cat:'Universal' },
+];
+
+window._triviaState = { qIdx:0, score:0, answered:false, questions:[] };
+
+function openTriviaGame() {
+  const existing = document.getElementById('trivia-overlay');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'trivia-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;display:flex;flex-direction:column;max-width:430px;left:50%;transform:translateX(-50%);overflow-y:auto;';
+  // Shuffle and pick 10 questions
+  const shuffled = [...TRIVIA_QUESTIONS].sort(() => Math.random() - 0.5).slice(0, 10);
+  window._triviaState = { qIdx:0, score:0, answered:false, questions:shuffled };
+  el.innerHTML = `
+    <div style="background:linear-gradient(135deg,#FF6B35,#FFC107);padding:18px 16px 16px;flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+        <button onclick="document.getElementById('trivia-overlay').remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;">←</button>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;">🎯 Orlando Trivia</div>
+        <div style="margin-left:auto;background:rgba(255,255,255,.2);border-radius:20px;padding:4px 12px;">
+          <span id="trivia-score-hdr" style="font-size:13px;font-weight:800;color:#fff;">Score: 0</span>
+        </div>
+      </div>
+    </div>
+    <div style="flex:1;padding:16px;overflow-y:auto;" id="trivia-content"></div>`;
+  document.body.appendChild(el);
+  renderTriviaQuestion();
+}
+window.openTriviaGame = openTriviaGame;
+
+function renderTriviaQuestion() {
+  const el = document.getElementById('trivia-content');
+  if (!el) return;
+  const { qIdx, score, questions } = window._triviaState;
+  if (qIdx >= questions.length) {
+    // Game over screen
+    const pct = Math.round((score / questions.length) * 100);
+    const grade = pct >= 90 ? '🏆 Expert!' : pct >= 70 ? '🌟 Great job!' : pct >= 50 ? '👍 Not bad!' : '📚 Keep learning!';
+    el.innerHTML = `
+      <div style="text-align:center;padding:30px 16px;">
+        <div style="font-size:60px;margin-bottom:12px;">🎯</div>
+        <div style="font-size:24px;font-weight:800;color:var(--text-primary);margin-bottom:4px;">${grade}</div>
+        <div style="font-size:15px;color:#9E9E9E;margin-bottom:24px;">You scored ${score} out of ${questions.length} (${pct}%)</div>
+        <div style="background:var(--card-bg,#fff);border-radius:16px;padding:20px;margin-bottom:20px;">
+          <div style="background:#E8F5E9;border-radius:12px;height:12px;overflow:hidden;margin-bottom:8px;">
+            <div style="width:${pct}%;height:100%;background:linear-gradient(90deg,#4CAF50,#8BC34A);border-radius:12px;"></div>
+          </div>
+          <div style="font-size:12px;color:#9E9E9E;">${pct}% correct</div>
+        </div>
+        <button onclick="openTriviaGame()" style="width:100%;background:linear-gradient(135deg,#FF6B35,#FFC107);border:none;border-radius:14px;padding:14px;color:#fff;font-size:15px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;margin-bottom:10px;">🔄 Play Again</button>
+        <button onclick="document.getElementById('trivia-overlay').remove()" style="width:100%;background:var(--card-bg,#fff);border:1px solid var(--border,#eee);border-radius:14px;padding:14px;color:var(--text-primary);font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">Close</button>
+      </div>`;
+    if (typeof awardPoints !== 'undefined' && score > 0) awardPoints(score * 10, 'Trivia game');
+    return;
+  }
+  const q = questions[qIdx];
+  el.innerHTML = `
+    <div style="margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div style="font-size:11px;font-weight:700;color:#9E9E9E;">QUESTION ${qIdx+1} OF ${questions.length}</div>
+        <div style="background:#FFF3E0;border-radius:20px;padding:3px 10px;font-size:10px;font-weight:700;color:#FF6B35;">${q.cat}</div>
+      </div>
+      <!-- Progress bar -->
+      <div style="background:var(--border,#eee);border-radius:6px;height:4px;margin-bottom:18px;">
+        <div style="width:${((qIdx)/questions.length)*100}%;height:100%;background:linear-gradient(90deg,#FF6B35,#FFC107);border-radius:6px;transition:width .3s;"></div>
+      </div>
+      <div style="font-size:17px;font-weight:800;color:var(--text-primary);line-height:1.4;margin-bottom:20px;">${q.q}</div>
+      <div id="trivia-opts" style="display:flex;flex-direction:column;gap:10px;">
+        ${q.opts.map((opt,i) => `
+          <button onclick="answerTrivia(${i})" data-oi="${i}" style="width:100%;text-align:left;background:var(--card-bg,#fff);border:2px solid var(--border,#eee);border-radius:14px;padding:14px 16px;font-size:14px;font-weight:600;color:var(--text-primary);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;display:flex;align-items:center;gap:10px;">
+            <span style="width:24px;height:24px;border-radius:50%;background:var(--bg,#F9F9F9);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#9E9E9E;flex-shrink:0;">${['A','B','C','D'][i]}</span>
+            ${opt}
+          </button>`).join('')}
+      </div>
+    </div>`;
+}
+window.renderTriviaQuestion = renderTriviaQuestion;
+
+function answerTrivia(selectedIdx) {
+  if (window._triviaState.answered) return;
+  window._triviaState.answered = true;
+  const { questions, qIdx } = window._triviaState;
+  const q = questions[qIdx];
+  const correct = q.a;
+  const isCorrect = selectedIdx === correct;
+  if (isCorrect) window._triviaState.score++;
+  const scoreEl = document.getElementById('trivia-score-hdr');
+  if (scoreEl) scoreEl.textContent = 'Score: ' + window._triviaState.score;
+  // Color the buttons
+  document.querySelectorAll('#trivia-opts button').forEach((btn, i) => {
+    btn.style.cursor = 'default';
+    if (i === correct) { btn.style.background = '#E8F5E9'; btn.style.borderColor = '#4CAF50'; btn.style.color = '#2E7D32'; }
+    else if (i === selectedIdx && !isCorrect) { btn.style.background = '#FFEBEE'; btn.style.borderColor = '#E53935'; btn.style.color = '#C62828'; }
+  });
+  // Add feedback + next button
+  const opts = document.getElementById('trivia-opts');
+  if (opts) {
+    const fb = document.createElement('div');
+    fb.style.cssText = 'margin-top:16px;text-align:center;';
+    fb.innerHTML = `<div style="font-size:20px;margin-bottom:6px;">${isCorrect ? '✅' : '❌'}</div>
+      <div style="font-size:14px;font-weight:700;color:${isCorrect?'#2E7D32':'#C62828'};margin-bottom:12px;">${isCorrect ? 'Correct!' : 'Not quite — the answer is ' + q.opts[correct]}</div>
+      <button onclick="nextTriviaQ()" style="background:linear-gradient(135deg,#FF6B35,#FFC107);border:none;border-radius:12px;padding:12px 28px;color:#fff;font-size:14px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;">${qIdx+1 >= questions.length ? 'See Results' : 'Next Question →'}</button>`;
+    opts.after(fb);
+  }
+}
+window.answerTrivia = answerTrivia;
+
+function nextTriviaQ() {
+  window._triviaState.qIdx++;
+  window._triviaState.answered = false;
+  renderTriviaQuestion();
+}
+window.nextTriviaQ = nextTriviaQ;
+</script>
+<style>
+/* ===== BLOCK GG CSS ===== */
+#cm-park-tabs::-webkit-scrollbar,#cm-tag-tabs::-webkit-scrollbar{display:none;}
+#cm-park-tabs,#cm-tag-tabs{-ms-overflow-style:none;scrollbar-width:none;}
+</style>
+<script>
+/* ===== BLOCK GG: Wiring ===== */
+(function wireGGFeatures() {
+  const GG_QUICK = [
+    { icon:'✨', label:'Characters', fn: openCharacterMeets },
+    { icon:'🎯', label:'Trivia',     fn: openTriviaGame },
+  ];
+
+  const _prevRH = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH) _prevRH.apply(this, arguments);
+    setTimeout(() => {
+      const row = document.getElementById('y-quick-row');
+      if (!row || row.querySelector('[data-gg-quick]')) return;
+      GG_QUICK.forEach(b => {
+        const btn = document.createElement('button');
+        btn.setAttribute('data-gg-quick','1');
+        btn.style.cssText = "flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:5px;background:var(--card-bg,#fff);border:1px solid var(--border,#eee);border-radius:14px;padding:12px 14px;cursor:pointer;font-family:'DM Sans',sans-serif;";
+        btn.innerHTML = `<span style="font-size:22px;">${b.icon}</span><span style="font-size:11px;font-weight:700;color:var(--text-primary,#212121);white-space:nowrap;">${b.label}</span>`;
+        btn.onclick = b.fn;
+        row.appendChild(btn);
+      });
+    }, 380);
+  };
+
+  const _prevRA = window.renderAccount;
+  window.renderAccount = function() {
+    if (_prevRA) _prevRA.apply(this, arguments);
+    setTimeout(() => {
+      const loggedIn = document.querySelector('.account-loggedin');
+      if (!loggedIn || loggedIn.querySelector('[data-gg-items]')) return;
+      const adminBtn = loggedIn.querySelector('.adm-account-btn');
+      const labels = { 'Characters':'Character Meet Finder', 'Trivia':'Orlando Trivia Game' };
+      GG_QUICK.forEach(item => {
+        const el = document.createElement('div');
+        el.setAttribute('data-gg-items','1');
+        el.className = 'account-menu-item';
+        el.innerHTML = `<span class="icon">${item.icon}</span><span>${labels[item.label]||item.label}</span><span class="arrow">›</span>`;
+        el.onclick = item.fn;
+        loggedIn.insertBefore(el, adminBtn || null);
+      });
+    }, 120);
+  };
+})();
+</script>
