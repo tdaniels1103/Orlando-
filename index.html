@@ -26774,3 +26774,359 @@ window.resetSplitter = resetSplitter;
   };
 })();
 </script>
+<script>
+/* ===== BLOCK II1: Trip Countdown + Day Planner ===== */
+function openTripCountdown() {
+  const existing = document.getElementById('countdown-overlay');
+  if (existing) existing.remove();
+  const data = JSON.parse(localStorage.getItem('tripCountdown') || '{"tripDate":null,"tripName":"My Orlando Trip","plans":{}}');
+  const el = document.createElement('div');
+  el.id = 'countdown-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;overflow-y:auto;max-width:430px;left:50%;transform:translateX(-50%);';
+
+  let countdownHTML = '';
+  if (data.tripDate) {
+    const now = new Date();
+    const trip = new Date(data.tripDate);
+    const diff = trip - now;
+    if (diff > 0) {
+      const days = Math.floor(diff / 86400000);
+      const hrs  = Math.floor((diff % 86400000) / 3600000);
+      const mins = Math.floor((diff % 3600000) / 60000);
+      countdownHTML = `
+        <div style="text-align:center;padding:8px 0 16px;">
+          <div style="font-size:13px;color:rgba(255,255,255,.8);margin-bottom:10px;">✈️ ${data.tripName}</div>
+          <div style="display:flex;justify-content:center;gap:12px;">
+            ${[{v:days,l:'DAYS'},{v:hrs,l:'HRS'},{v:mins,l:'MIN'}].map(u => `
+              <div style="background:rgba(255,255,255,.2);border-radius:12px;padding:12px 16px;min-width:56px;text-align:center;">
+                <div style="font-size:32px;font-weight:800;color:#fff;line-height:1;">${u.v}</div>
+                <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.7);">${u.l}</div>
+              </div>`).join('')}
+          </div>
+          <div style="font-size:12px;color:rgba(255,255,255,.7);margin-top:10px;">${trip.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'})}</div>
+        </div>`;
+    } else {
+      const pastDays = Math.abs(Math.floor(diff / 86400000));
+      countdownHTML = `<div style="text-align:center;padding:8px 0 16px;"><div style="font-size:36px;margin-bottom:6px;">🎉</div><div style="font-size:16px;font-weight:800;color:#fff;">You're in Orlando!</div><div style="font-size:12px;color:rgba(255,255,255,.8);margin-top:4px;">${pastDays > 0 ? 'Day '+pastDays+' of your trip' : 'Trip starts today!'}</div></div>`;
+    }
+  } else {
+    countdownHTML = `<div style="text-align:center;padding:8px 0 16px;color:rgba(255,255,255,.7);font-size:13px;">Set your trip date below to start the countdown!</div>`;
+  }
+
+  // Build day-plan section for next 7 days of trip
+  const PARKS = ['Magic Kingdom','EPCOT','Hollywood Studios','Animal Kingdom','Universal','SeaWorld','Rest Day','Disney Springs'];
+  let dayPlanHTML = '';
+  if (data.tripDate) {
+    const trip = new Date(data.tripDate);
+    for (let d = 0; d < 7; d++) {
+      const day = new Date(trip);
+      day.setDate(trip.getDate() + d);
+      const key = day.toISOString().slice(0,10);
+      const plan = data.plans[key] || '';
+      dayPlanHTML += `
+        <div style="background:var(--card-bg,#fff);border-radius:14px;padding:12px 14px;margin-bottom:8px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <div>
+              <div style="font-size:13px;font-weight:800;color:var(--text-primary);">Day ${d+1} — ${day.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})}</div>
+            </div>
+            ${plan ? `<span style="font-size:11px;font-weight:700;color:#FF6B35;background:#FFF3EE;border-radius:8px;padding:3px 8px;">${plan}</span>` : ''}
+          </div>
+          <select onchange="setDayPlan('${key}',this.value)" style="width:100%;border:1px solid var(--border,#eee);border-radius:8px;padding:8px;font-size:12px;font-family:'DM Sans',sans-serif;background:var(--bg,#F9F9F9);color:var(--text-primary);">
+            <option value="">— Choose park / activity —</option>
+            ${PARKS.map(p => `<option value="${p}" ${plan===p?'selected':''}>${p}</option>`).join('')}
+          </select>
+        </div>`;
+    }
+  }
+
+  el.innerHTML = `
+    <div style="background:linear-gradient(135deg,#4A148C,#7B1FA2,#E040FB);padding:18px 16px 16px;position:sticky;top:0;z-index:1;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <button onclick="document.getElementById('countdown-overlay').remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;">←</button>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;">⏳ Trip Countdown</div>
+      </div>
+      ${countdownHTML}
+    </div>
+    <div style="padding:14px 16px 80px;">
+      <!-- Set Trip -->
+      <div style="font-size:12px;font-weight:700;color:#9E9E9E;margin-bottom:8px;">TRIP SETTINGS</div>
+      <div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:16px;">
+        <div style="margin-bottom:10px;">
+          <div style="font-size:11px;font-weight:700;color:#9E9E9E;margin-bottom:5px;">TRIP NAME</div>
+          <input id="cd-name" type="text" value="${data.tripName||'My Orlando Trip'}" style="width:100%;border:1px solid var(--border,#eee);border-radius:8px;padding:8px;font-size:13px;font-family:'DM Sans',sans-serif;background:var(--bg,#F9F9F9);color:var(--text-primary);box-sizing:border-box;">
+        </div>
+        <div style="margin-bottom:12px;">
+          <div style="font-size:11px;font-weight:700;color:#9E9E9E;margin-bottom:5px;">ARRIVAL DATE</div>
+          <input id="cd-date" type="date" value="${data.tripDate||''}" style="width:100%;border:1px solid var(--border,#eee);border-radius:8px;padding:8px;font-size:13px;font-family:'DM Sans',sans-serif;background:var(--bg,#F9F9F9);color:var(--text-primary);box-sizing:border-box;">
+        </div>
+        <button onclick="saveTripCountdown()" style="width:100%;background:linear-gradient(135deg,#4A148C,#7B1FA2);border:none;border-radius:10px;padding:11px;color:#fff;font-size:13px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;">💾 Save Trip Date</button>
+      </div>
+      <!-- Day Planner -->
+      ${data.tripDate ? `<div style="font-size:12px;font-weight:700;color:#9E9E9E;margin-bottom:8px;">7-DAY PARK PLANNER</div>${dayPlanHTML}` : ''}
+    </div>`;
+  document.body.appendChild(el);
+}
+window.openTripCountdown = openTripCountdown;
+
+function saveTripCountdown() {
+  const name = document.getElementById('cd-name')?.value?.trim() || 'My Orlando Trip';
+  const date = document.getElementById('cd-date')?.value;
+  if (!date) { if (typeof showToast!=='undefined') showToast('Please pick an arrival date'); return; }
+  const data = JSON.parse(localStorage.getItem('tripCountdown') || '{"tripDate":null,"tripName":"My Orlando Trip","plans":{}}');
+  data.tripName = name;
+  data.tripDate = date;
+  localStorage.setItem('tripCountdown', JSON.stringify(data));
+  if (typeof awardPoints !== 'undefined') awardPoints(10, 'Trip countdown set');
+  if (typeof showToast !== 'undefined') showToast('✈️ Countdown saved!');
+  document.getElementById('countdown-overlay').remove();
+  openTripCountdown();
+}
+window.saveTripCountdown = saveTripCountdown;
+
+function setDayPlan(key, val) {
+  const data = JSON.parse(localStorage.getItem('tripCountdown') || '{"tripDate":null,"tripName":"My Orlando Trip","plans":{}}');
+  if (val) data.plans[key] = val; else delete data.plans[key];
+  localStorage.setItem('tripCountdown', JSON.stringify(data));
+  if (typeof showToast !== 'undefined') showToast('📅 Day plan updated');
+}
+window.setDayPlan = setDayPlan;
+</script>
+<script>
+/* ===== BLOCK II2: Accessibility Guide ===== */
+const ACCESS_INFO = {
+  'Magic Kingdom': {
+    icon:'🏰', color:'#E53935',
+    das: 'DAS (Disability Access Service) available at Guest Relations near the park entrance. Provides return times instead of waiting in standard queue.',
+    wheelchair: 'Wheelchair and ECV (electric conveyance vehicle) rentals available at the Stroller Shop near the Main Entrance.',
+    parking: 'Accessible parking in main lot — follow signs to designated spaces. Tram has accessible boarding.',
+    companion: 'Companion restrooms throughout the park. Ask any Cast Member for locations.',
+    sensory: 'Sensory guides available at Guest Relations. Noise-cancelling headphones available to borrow.',
+    highlights:[
+      { ride:'Haunted Mansion', note:'Omnimover system — standby queue mostly accessible. DAS eligible.' },
+      { ride:'Pirates of the Caribbean', note:'Boat ride — step-free boarding available with assistance.' },
+      { ride:'Seven Dwarfs Mine Train', note:'Traditional roller coaster — must be ambulatory. DAS eligible.' },
+      { ride:'It\'s a Small World', note:'Fully accessible boat ride — wheelchair boarding available.' },
+    ]
+  },
+  'EPCOT': {
+    icon:'🌍', color:'#0277BD',
+    das: 'DAS available at Guest Relations near the main entrance. EPCOT has two park entrances — both have Guest Relations.',
+    wheelchair: 'Wheelchair/ECV rentals at International Gateway and main entrance. Limited quantities — arrive early.',
+    parking: 'Accessible parking in main and overflow lots. No tram — closer walk to entrance.',
+    companion: 'Companion restrooms at all major pavilions in World Showcase.',
+    sensory: 'World Showcase can be overwhelming with sounds and crowds. Quieter areas near the lagoon shore.',
+    highlights:[
+      { ride:'Guardians of the Galaxy: Cosmic Rewind', note:'Reverse launch coaster — DAS eligible. Single rider available.' },
+      { ride:'Remy\'s Ratatouille Adventure', note:'Trackless ride — wheelchair accessible. DAS eligible.' },
+      { ride:'Soarin\'', note:'Hanging glider simulator — accessible boarding row available.' },
+      { ride:'Test Track', note:'Guests with motion sensitivity should consider skipping.' },
+    ]
+  },
+  'Hollywood Studios': {
+    icon:'🎬', color:'#6A1B9A',
+    das: 'DAS at Guest Services near the park entrance. Hollywood Studios has some of the longest waits — DAS is especially helpful here.',
+    wheelchair: 'Rentals at Oscar\'s Super Service near the park entrance.',
+    parking: 'Accessible spaces in main lot. Boarding area for bus/boat arrivals is step-free.',
+    companion: 'Companion restrooms throughout — notably near Echo Lake and near Galaxy\'s Edge.',
+    sensory: 'Galaxy\'s Edge can feel intense with its immersive theming. Sensory maps available at Guest Services.',
+    highlights:[
+      { ride:'Rise of the Resistance', note:'Multi-segment attraction. Some standing required. DAS eligible.' },
+      { ride:'Slinky Dog Dash', note:'Family coaster — DAS eligible. Transfer required from wheelchair.' },
+      { ride:'Millennium Falcon: Smugglers Run', note:'Motion simulator. Accessible seating available. DAS eligible.' },
+      { ride:'Tower of Terror', note:'Drop tower — guests must transfer to ride seat. DAS eligible.' },
+    ]
+  },
+  'Animal Kingdom': {
+    icon:'🦁', color:'#2E7D32',
+    das: 'DAS at Guest Relations near the main entrance. Large park — plan for longer distances between lands.',
+    wheelchair: 'Rentals at Garden Gate Gifts near the entrance. ECVs available — limited quantity.',
+    parking: 'Accessible spaces in main lot and overflow. Tram has accessible boarding.',
+    companion: 'Companion restrooms near Discovery Island, Africa, and Asia.',
+    sensory: 'Large outdoor park with animal smells and sounds. Can be stimulating. Quieter walking paths available near the perimeter.',
+    highlights:[
+      { ride:'Avatar: Flight of Passage', note:'Bike-style simulator — accessible version available. DAS eligible.' },
+      { ride:'Kilimanjaro Safaris', note:'Truck ride — step-free boarding with lowered platform. DAS eligible.' },
+      { ride:'Expedition Everest', note:'Roller coaster — must transfer from wheelchair. DAS eligible.' },
+      { ride:'DINOSAUR', note:'Rough/jerky ride — not recommended for guests with back/neck issues.' },
+    ]
+  },
+  'Universal': {
+    icon:'🎭', color:'#1565C0',
+    das: 'Universal offers an Attraction Assistance Pass (AAP) — available at Guest Services in CityWalk or at each park entrance.',
+    wheelchair: 'Rentals at the Front Gate. ECVs limited — arrive early. Third-party ECV rental delivery recommended.',
+    parking: 'Accessible parking in all garages — designated spaces near elevators.',
+    companion: 'Companion restrooms at regular intervals throughout both parks.',
+    sensory: 'Universal has a sensory guide available on their website and at Guest Services.',
+    highlights:[
+      { ride:'Harry Potter and the Forbidden Journey', note:'Hanging coaster — accessible vehicle available. AAP eligible.' },
+      { ride:'Hagrid\'s Motorbike Adventure', note:'Must be ambulatory. Motorbike and sidecar seating options.' },
+      { ride:'Velocicoaster', note:'Inverted coaster — must transfer from wheelchair. AAP eligible.' },
+      { ride:'Men in Black: Alien Attack', note:'Interactive spinner — fully accessible. AAP eligible.' },
+    ]
+  },
+  'SeaWorld': {
+    icon:'🐋', color:'#006064',
+    das: 'Ride Accessibility Program (RAP) available at Guest Services near the main entrance.',
+    wheelchair: 'Rentals at the main entrance. Limited ECVs available.',
+    parking: 'Accessible spaces in the main lot — close to the entrance.',
+    companion: 'Companion restrooms available throughout the park.',
+    sensory: 'Animal shows and exhibits can involve unexpected loud noises. Check show times and plan accordingly.',
+    highlights:[
+      { ride:'Ice Breaker', note:'Launch coaster — must transfer from wheelchair.' },
+      { ride:'Antarctica: Empire of the Penguin', note:'Gentle trackless ride — fully accessible.' },
+      { ride:'Mako', note:'Hypercoaster — must transfer from wheelchair.' },
+      { ride:'Dolphin Nursery', note:'Great sensory-friendly experience — calm and peaceful.' },
+    ]
+  },
+};
+
+window._accessPark = 'Magic Kingdom';
+
+function openAccessibilityGuide() {
+  const existing = document.getElementById('access-overlay');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'access-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;display:flex;flex-direction:column;max-width:430px;left:50%;transform:translateX(-50%);';
+  const parks = Object.keys(ACCESS_INFO);
+  el.innerHTML = `
+    <div style="background:linear-gradient(135deg,#0D47A1,#1565C0,#42A5F5);padding:18px 16px 14px;flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <button onclick="document.getElementById('access-overlay').remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;">←</button>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;">♿ Accessibility Guide</div>
+      </div>
+      <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;" id="access-park-tabs">
+        ${parks.map(p => `<button onclick="setAccessPark('${p}',this)" style="flex-shrink:0;border-radius:20px;padding:5px 11px;border:1.5px solid ${p===window._accessPark?'#fff':'rgba(255,255,255,.4)'};background:${p===window._accessPark?'rgba(255,255,255,.25)':'transparent'};color:#fff;font-size:10px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">${ACCESS_INFO[p].icon} ${p.split(' ')[0]}</button>`).join('')}
+      </div>
+    </div>
+    <div style="overflow-y:auto;padding:14px 16px 80px;" id="access-content"></div>`;
+  document.body.appendChild(el);
+  renderAccessContent();
+}
+window.openAccessibilityGuide = openAccessibilityGuide;
+
+function setAccessPark(p, btn) {
+  window._accessPark = p;
+  document.querySelectorAll('#access-park-tabs button').forEach(b => { b.style.background='transparent'; b.style.borderColor='rgba(255,255,255,.4)'; });
+  btn.style.background='rgba(255,255,255,.25)'; btn.style.borderColor='#fff';
+  renderAccessContent();
+}
+window.setAccessPark = setAccessPark;
+
+function renderAccessContent() {
+  const el = document.getElementById('access-content');
+  if (!el) return;
+  const p = window._accessPark || 'Magic Kingdom';
+  const info = ACCESS_INFO[p];
+  if (!info) return;
+  const sections = [
+    { icon:'🎫', title:'Disability Access Service', content:info.das },
+    { icon:'♿', title:'Wheelchair & ECV Rental', content:info.wheelchair },
+    { icon:'🅿️', title:'Accessible Parking', content:info.parking },
+    { icon:'🚻', title:'Companion Restrooms', content:info.companion },
+    { icon:'🧠', title:'Sensory Considerations', content:info.sensory },
+  ];
+  el.innerHTML = `
+    <div style="background:${info.color}11;border:1px solid ${info.color}33;border-radius:14px;padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;">
+      <span style="font-size:28px;">${info.icon}</span>
+      <div>
+        <div style="font-size:14px;font-weight:800;color:${info.color};">${p}</div>
+        <div style="font-size:11px;color:#9E9E9E;">Tap a section to read details</div>
+      </div>
+    </div>
+    ${sections.map(s => `
+    <details style="background:var(--card-bg,#fff);border-radius:14px;margin-bottom:8px;overflow:hidden;">
+      <summary style="padding:14px;cursor:pointer;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700;color:var(--text-primary);list-style:none;">
+        <span style="font-size:18px;">${s.icon}</span>${s.title}
+        <span style="margin-left:auto;color:#9E9E9E;font-size:16px;">›</span>
+      </summary>
+      <div style="padding:0 14px 14px;font-size:12px;color:#757575;line-height:1.6;">${s.content}</div>
+    </details>`).join('')}
+    <div style="font-size:12px;font-weight:700;color:#9E9E9E;margin:14px 0 8px;">RIDE-BY-RIDE NOTES</div>
+    ${info.highlights.map(h => `
+    <div style="background:var(--card-bg,#fff);border-radius:12px;padding:12px 14px;margin-bottom:8px;">
+      <div style="font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:4px;">🎢 ${h.ride}</div>
+      <div style="font-size:11px;color:#9E9E9E;line-height:1.5;">${h.note}</div>
+    </div>`).join('')}`;
+}
+window.renderAccessContent = renderAccessContent;
+</script>
+<style>
+/* ===== BLOCK II CSS ===== */
+#access-park-tabs::-webkit-scrollbar{display:none;}
+#access-park-tabs{-ms-overflow-style:none;scrollbar-width:none;}
+details summary::-webkit-details-marker{display:none;}
+details[open] summary span:last-child{transform:rotate(90deg);}
+#cd-name:focus,#cd-date:focus{outline:none;}
+</style>
+<script>
+/* ===== BLOCK II: Wiring ===== */
+(function wireIIFeatures() {
+  const II_QUICK = [
+    { icon:'⏳', label:'Countdown',     fn: openTripCountdown },
+    { icon:'♿', label:'Accessibility', fn: openAccessibilityGuide },
+  ];
+
+  const _prevRH = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH) _prevRH.apply(this, arguments);
+    setTimeout(() => {
+      const row = document.getElementById('y-quick-row');
+      if (!row || row.querySelector('[data-ii-quick]')) return;
+      II_QUICK.forEach(b => {
+        const btn = document.createElement('button');
+        btn.setAttribute('data-ii-quick','1');
+        btn.style.cssText = "flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:5px;background:var(--card-bg,#fff);border:1px solid var(--border,#eee);border-radius:14px;padding:12px 14px;cursor:pointer;font-family:'DM Sans',sans-serif;";
+        btn.innerHTML = `<span style="font-size:22px;">${b.icon}</span><span style="font-size:11px;font-weight:700;color:var(--text-primary,#212121);white-space:nowrap;">${b.label}</span>`;
+        btn.onclick = b.fn;
+        row.appendChild(btn);
+      });
+    }, 420);
+  };
+
+  const _prevRA = window.renderAccount;
+  window.renderAccount = function() {
+    if (_prevRA) _prevRA.apply(this, arguments);
+    setTimeout(() => {
+      const loggedIn = document.querySelector('.account-loggedin');
+      if (!loggedIn || loggedIn.querySelector('[data-ii-items]')) return;
+      const adminBtn = loggedIn.querySelector('.adm-account-btn');
+      const labels = { 'Countdown':'Trip Countdown & Planner', 'Accessibility':'Accessibility Guide' };
+      II_QUICK.forEach(item => {
+        const el = document.createElement('div');
+        el.setAttribute('data-ii-items','1');
+        el.className = 'account-menu-item';
+        el.innerHTML = `<span class="icon">${item.icon}</span><span>${labels[item.label]||item.label}</span><span class="arrow">›</span>`;
+        el.onclick = item.fn;
+        loggedIn.insertBefore(el, adminBtn || null);
+      });
+    }, 140);
+  };
+
+  // Show countdown chip on home screen
+  const _prevSS2 = window.showScreen;
+  window.showScreen = function(name, navEl) {
+    if (_prevSS2) _prevSS2(name, navEl);
+    if (name === 'home') {
+      setTimeout(() => {
+        const data = JSON.parse(localStorage.getItem('tripCountdown') || '{}');
+        if (!data.tripDate) return;
+        const diff = new Date(data.tripDate) - new Date();
+        const days = Math.ceil(diff / 86400000);
+        const existing = document.getElementById('ii-countdown-chip');
+        if (existing) existing.remove();
+        if (days >= 0 && days <= 365) {
+          const hero = document.querySelector('#screen-home .home-hero, #screen-home [class*="hero"]');
+          if (!hero) return;
+          const chip = document.createElement('div');
+          chip.id = 'ii-countdown-chip';
+          chip.onclick = openTripCountdown;
+          chip.style.cssText = 'text-align:center;margin:10px 16px 0;background:linear-gradient(135deg,#4A148C,#7B1FA2);border-radius:14px;padding:10px 16px;cursor:pointer;';
+          chip.innerHTML = `<span style="font-size:12px;font-weight:800;color:#fff;">${days === 0 ? '🎉 Your trip is TODAY!' : days === 1 ? '✈️ 1 day until Orlando!' : '⏳ '+days+' days until '+data.tripName+'!'}</span>`;
+          hero.after(chip);
+        }
+      }, 200);
+    }
+  };
+})();
+</script>
