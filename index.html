@@ -31355,3 +31355,792 @@ window._orlandoAddWeatherToDetail = function(containerEl) {
      ORLANDO TRAVEL GUIDE — COMPLETE WITH LIVE TIME + WEATHER
      All Blocks A through WX
      ============================================================ -->
+<script>
+/* ===== BLOCK XX: Live Park Hours & Operating Calendar ===== */
+(function initParkHours() {
+
+  /* Static schedule data — update seasonally */
+  const PARKS = [
+    {
+      id: 'mk', name: 'Magic Kingdom', emoji: '🏰', color: '#1565C0',
+      base: { open: '9:00 AM', close: '10:00 PM' },
+      epEntry: '8:30 AM', // Early Park Entry for resort guests
+      extra: 'Extended Evening Hours: select Deluxe resorts Tue/Thu until midnight',
+      tip: 'Best rope-drop rides: Tron, Guardians (if visiting DHS first), Seven Dwarfs, Space Mountain.',
+    },
+    {
+      id: 'epcot', name: 'EPCOT', emoji: '🌐', color: '#00695C',
+      base: { open: '9:00 AM', close: '9:00 PM' },
+      epEntry: '8:30 AM',
+      extra: 'World Showcase opens at 11:00 AM · Festival pavilions vary',
+      tip: 'Guardians of the Galaxy: Cosmic Rewind has a virtual queue — join at 7am via My Disney Experience.',
+    },
+    {
+      id: 'hs', name: 'Hollywood Studios', emoji: '🎬', color: '#B71C1C',
+      base: { open: '8:00 AM', close: '9:00 PM' },
+      epEntry: '7:30 AM',
+      extra: 'Galaxy\'s Edge crowds peak 10am–2pm · Tower of Terror runs late nights on event days',
+      tip: 'Slinky Dog, MMRR, and Rise of the Resistance have the longest waits. Hit all three at rope-drop.',
+    },
+    {
+      id: 'ak', name: 'Animal Kingdom', emoji: '🦁', color: '#2E7D32',
+      base: { open: '8:00 AM', close: '8:00 PM' },
+      epEntry: '7:30 AM',
+      extra: 'Rivers of Light: We Are One evenings at select dates · Park closes earlier than others',
+      tip: 'Flight of Passage is best at rope-drop or 30 min before closing. Na\'vi River Queue is fast after 6pm.',
+    },
+    {
+      id: 'universal', name: 'Universal Studios Florida', emoji: '🎥', color: '#7B1FA2',
+      base: { open: '9:00 AM', close: '9:00 PM' },
+      epEntry: 'N/A',
+      extra: 'Early admission for on-site hotel guests: 1 hour before open',
+      tip: 'Hollywood Rip Ride Rockit and Minion Land are best at park open. HHN season: September–November.',
+    },
+    {
+      id: 'ioa', name: 'Islands of Adventure', emoji: '⚓', color: '#0277BD',
+      base: { open: '9:00 AM', close: '9:00 PM' },
+      epEntry: 'N/A',
+      extra: 'Wizarding World: Hogsmeade opens with park · Hagrid\'s waits regularly exceed 2 hours',
+      tip: 'Hagrid\'s Magical Creatures is the #1 ride in Orlando. Arrive at park open or use Express Pass.',
+    },
+    {
+      id: 'seaworld', name: 'SeaWorld Orlando', emoji: '🐋', color: '#01579B',
+      base: { open: '10:00 AM', close: '8:00 PM' },
+      epEntry: 'N/A',
+      extra: 'Howl-O-Scream (Sept–Oct) and Christmas Celebration (Nov–Jan)',
+      tip: 'Ice Breaker and Pipeline are the newest thrills. Shows run at set times — check the app on arrival.',
+    },
+    {
+      id: 'busch', name: 'Busch Gardens Tampa', emoji: '🎡', color: '#33691E',
+      base: { open: '10:00 AM', close: '6:00 PM' },
+      epEntry: 'N/A',
+      extra: '75 miles from Orlando · Tigris & Iron Gwazi are world-class coasters',
+      tip: 'Best combo: SeaWorld + Busch Gardens multiday pass. Iron Gwazi has shortest waits at open.',
+    },
+  ];
+
+  /* DOM state */
+  let expanded = null;
+
+  function buildCard(p) {
+    const card = document.createElement('div');
+    card.className = 'px-card';
+    card.setAttribute('data-park-id', p.id);
+    card.style.cssText = `background:var(--card-bg,#fff);border-radius:14px;margin-bottom:10px;
+      border:1px solid var(--border,#eee);overflow:hidden;transition:all .3s ease;cursor:pointer;`;
+    card.innerHTML = `
+      <div class="px-card-header" style="display:flex;align-items:center;gap:12px;padding:14px;">
+        <span style="font-size:26px;">${p.emoji}</span>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;
+            color:var(--text-primary,#212121);">${p.name}</div>
+          <div style="font-size:11px;color:var(--text-secondary,#757575);margin-top:2px;">
+            ${p.base.open} – ${p.base.close}
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div class="px-status" style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;
+            background:${p.color}22;color:${p.color};">OPEN</div>
+          <div style="font-size:18px;margin-top:4px;color:var(--text-secondary,#aaa);transition:.3s;"
+            class="px-chevron">›</div>
+        </div>
+      </div>
+      <div class="px-card-detail" style="display:none;padding:0 14px 14px;border-top:1px solid var(--border,#eee);
+        margin-top:0;padding-top:12px;">
+        <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+          <div style="flex:1;min-width:120px;background:${p.color}11;border-radius:10px;padding:8px 10px;">
+            <div style="font-size:9px;font-weight:700;color:${p.color};margin-bottom:2px;">OPEN</div>
+            <div style="font-size:13px;font-weight:800;color:var(--text-primary,#212121);">${p.base.open}</div>
+          </div>
+          <div style="flex:1;min-width:120px;background:${p.color}11;border-radius:10px;padding:8px 10px;">
+            <div style="font-size:9px;font-weight:700;color:${p.color};margin-bottom:2px;">CLOSE</div>
+            <div style="font-size:13px;font-weight:800;color:var(--text-primary,#212121);">${p.base.close}</div>
+          </div>
+          ${p.epEntry !== 'N/A' ? `<div style="flex:1;min-width:120px;background:#FF6B3511;border-radius:10px;padding:8px 10px;">
+            <div style="font-size:9px;font-weight:700;color:#FF6B35;margin-bottom:2px;">EARLY ENTRY</div>
+            <div style="font-size:13px;font-weight:800;color:var(--text-primary,#212121);">${p.epEntry}</div>
+          </div>` : ''}
+        </div>
+        ${p.extra ? `<div style="font-size:11px;color:var(--primary,#FF6B35);font-weight:600;margin-bottom:8px;
+          padding:6px 10px;background:var(--primary,#FF6B35)11;border-radius:8px;line-height:1.4;">${p.extra}</div>` : ''}
+        <div style="display:flex;gap:8px;align-items:flex-start;padding:8px 10px;background:var(--card-bg,#f8f8f8);
+          border-radius:8px;border-left:3px solid ${p.color};">
+          <span style="font-size:14px;flex-shrink:0;">💡</span>
+          <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${p.tip}</div>
+        </div>
+      </div>`;
+
+    card.querySelector('.px-card-header').addEventListener('click', () => {
+      const detail = card.querySelector('.px-card-detail');
+      const chev   = card.querySelector('.px-chevron');
+      const isOpen = detail.style.display !== 'none';
+      if (isOpen) {
+        detail.style.display = 'none';
+        chev.style.transform = '';
+      } else {
+        detail.style.display = 'block';
+        chev.style.transform = 'rotate(90deg)';
+      }
+    });
+
+    return card;
+  }
+
+  function isCurrentlyOpen(p) {
+    const tz = 'America/New_York';
+    const now = new Date();
+    const fmt = o => new Intl.DateTimeFormat('en-US', { timeZone: tz, ...o });
+    const h = parseInt(fmt({ hour: 'numeric', hour12: false }).format(now));
+    // Parse open hour
+    const openH = parseInt(p.base.open.match(/(\d+)/)[1]);
+    const closeH = parseInt(p.base.close.match(/(\d+)/)[1]);
+    const openPM = p.base.open.includes('PM');
+    const closePM = p.base.close.includes('PM');
+    const open24 = openPM && openH !== 12 ? openH + 12 : openH;
+    const close24 = closePM && closeH !== 12 ? closeH + 12 : closeH;
+    return h >= open24 && h < close24;
+  }
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-park-hours';
+    s.className = 'screen';
+    s.style.display = 'none';
+    s.innerHTML = `
+      <div class="screen-header" style="padding:16px;display:flex;align-items:center;gap:12px;
+        background:linear-gradient(135deg,#1a1a3e,#FF6B35);color:#fff;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;
+          border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div>
+          <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;">Park Hours</div>
+          <div style="font-size:11px;opacity:.8;" id="px-subtitle">All Orlando parks</div>
+        </div>
+      </div>
+      <div style="padding:14px;overflow-y:auto;height:calc(100vh - 68px);-webkit-overflow-scrolling:touch;">
+        <div style="background:var(--card-bg,#fff);border-radius:14px;padding:12px 14px;margin-bottom:14px;
+          border:1px solid var(--border,#eee);">
+          <div style="font-size:11px;color:var(--text-secondary,#757575);margin-bottom:4px;">TODAY'S DATE & STATUS</div>
+          <div id="px-today-date" style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;
+            color:var(--text-primary,#212121);"></div>
+          <div id="px-today-note" style="font-size:11px;color:var(--primary,#FF6B35);margin-top:4px;font-weight:600;"></div>
+        </div>
+        <div id="px-card-list"></div>
+        <div style="font-size:10px;color:var(--text-secondary,#aaa);text-align:center;padding:10px 0;line-height:1.5;">
+          Hours are typical operating hours. Always verify on the official park app or website.<br>
+          Holiday, special events, and refurbishments can change hours significantly.
+        </div>
+      </div>`;
+    document.body.appendChild(s);
+
+    /* Populate cards */
+    const list = s.querySelector('#px-card-list');
+    PARKS.forEach(p => {
+      const card = buildCard(p);
+      /* Update open/closed badge */
+      const badge = card.querySelector('.px-status');
+      if (!isCurrentlyOpen(p)) {
+        badge.textContent = 'CLOSED';
+        badge.style.background = '#f4433611';
+        badge.style.color = '#f44336';
+      }
+      list.appendChild(card);
+    });
+
+    /* Today header */
+    const tz = 'America/New_York';
+    const now = new Date();
+    const dateStr = new Intl.DateTimeFormat('en-US', { timeZone: tz, weekday:'long', month:'long', day:'numeric', year:'numeric' }).format(now);
+    s.querySelector('#px-today-date').textContent = dateStr;
+    const weekday = new Intl.DateTimeFormat('en-US', { timeZone: tz, weekday:'long' }).format(now);
+    const isWeekend = weekday === 'Saturday' || weekday === 'Sunday';
+    s.querySelector('#px-today-note').textContent = isWeekend
+      ? '📅 Weekend — expect higher crowds. Buy Lightning Lane in advance.'
+      : '📅 Weekday — better crowd levels. Tuesday & Wednesday are typically lightest.';
+  }
+
+  function injectNavLink() {
+    const nav = document.querySelector('.quick-links-grid, .home-quick-links, [data-quick-links], .quick-actions');
+    if (!nav || nav.querySelector('[data-park-hours-link]')) return false;
+    const btn = document.createElement('button');
+    btn.setAttribute('data-park-hours-link', '1');
+    btn.className = 'quick-link-btn';
+    btn.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 8px;background:var(--card-bg,#fff);border:1px solid var(--border,#eee);border-radius:14px;cursor:pointer;font-family:DM Sans,sans-serif;min-width:72px;';
+    btn.innerHTML = `<span style="font-size:24px;">🕐</span><span style="font-size:10px;font-weight:700;color:var(--text-primary,#212121);text-align:center;">Park Hours</span>`;
+    btn.onclick = () => window.showScreen('park-hours');
+    nav.appendChild(btn);
+    return true;
+  }
+
+  function injectHomeCard() {
+    const tc = document.getElementById('orlando-time-content');
+    if (!tc) return false;
+    if (document.getElementById('px-home-preview')) return true;
+    const preview = document.createElement('div');
+    preview.id = 'px-home-preview';
+    preview.style.cssText = 'margin:10px 14px 0;background:var(--card-bg,#fff);border-radius:16px;padding:14px;border:1px solid var(--border,#eee);cursor:pointer;';
+    preview.onclick = () => window.showScreen('park-hours');
+
+    // Build mini open/closed status
+    const statusRows = PARKS.slice(0,4).map(p => {
+      const open = isCurrentlyOpen(p);
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;">
+        <span style="font-size:12px;color:var(--text-primary,#212121);">${p.emoji} ${p.name}</span>
+        <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;
+          background:${open ? '#E8F5E9' : '#FFEBEE'};color:${open ? '#2E7D32' : '#c62828'};">
+          ${open ? 'OPEN' : 'CLOSED'}</span>
+      </div>`;
+    }).join('');
+
+    preview.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;
+          color:var(--text-primary,#212121);">🕐 Park Hours Today</div>
+        <span style="font-size:11px;color:var(--primary,#FF6B35);font-weight:700;">See all ›</span>
+      </div>
+      ${statusRows}`;
+    tc.insertAdjacentElement('afterend', preview);
+    return true;
+  }
+
+  /* Build screen */
+  if (!document.getElementById('screen-park-hours')) buildScreen();
+
+  /* Hook showScreen */
+  const origShowScreen = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (origShowScreen) origShowScreen(name, el);
+    if (name === 'park-hours') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-park-hours');
+      if (s) s.style.display = 'block';
+    }
+  };
+
+  /* Inject into home */
+  let _pxNav = false, _pxCard = false;
+  setInterval(() => {
+    if (!_pxNav) _pxNav = injectNavLink();
+    if (!_pxCard) _pxCard = injectHomeCard();
+  }, 2000);
+  setTimeout(() => {
+    _pxNav = injectNavLink();
+    _pxCard = injectHomeCard();
+  }, 1300);
+
+  const _prevRH_px = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_px) _prevRH_px.apply(this, arguments);
+    setTimeout(() => {
+      _pxNav = injectNavLink();
+      _pxCard = injectHomeCard();
+    }, 650);
+  };
+
+  window._orlandoParkHours = PARKS;
+})();
+</script>
+<script>
+/* ===== BLOCK YY: Daily Itinerary Builder ===== */
+(function initItineraryBuilder() {
+
+  const STORAGE_KEY = 'orlando_itineraries_v1';
+  const PARKS_LIST = [
+    'Magic Kingdom','EPCOT','Hollywood Studios','Animal Kingdom',
+    'Universal Studios Florida','Islands of Adventure','Epic Universe',
+    'SeaWorld Orlando','Busch Gardens Tampa','LEGOLAND Florida',
+    'Disney Springs','CityWalk','I-Drive','Other',
+  ];
+  const ACTIVITY_TYPES = [
+    { icon:'🎢', label:'Ride' },
+    { icon:'🍽️', label:'Dining' },
+    { icon:'🎭', label:'Show' },
+    { icon:'📸', label:'Photo Stop' },
+    { icon:'🛍️', label:'Shopping' },
+    { icon:'💤', label:'Rest/Pool' },
+    { icon:'🚌', label:'Transport' },
+    { icon:'🏨', label:'Hotel' },
+    { icon:'🎡', label:'Other' },
+  ];
+
+  function load() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch { return {}; }
+  }
+  function save(data) { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+
+  function todayKey() {
+    const now = new Date();
+    return new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', year:'numeric', month:'2-digit', day:'2-digit' })
+      .format(now).replace(/\//g, '-');
+  }
+
+  /* ── Activity Item ── */
+  function renderItem(item, itinerary, dayKey, overlay) {
+    const div = document.createElement('div');
+    div.style.cssText = 'display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--card-bg,#fff);border-radius:10px;margin-bottom:6px;border:1px solid var(--border,#eee);';
+    const atype = ACTIVITY_TYPES.find(a => a.label === item.type) || ACTIVITY_TYPES[8];
+    div.innerHTML = `
+      <span style="font-size:20px;">${atype.icon}</span>
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${item.name}</div>
+        <div style="font-size:10px;color:var(--text-secondary,#888);">${item.time || ''} ${item.park ? '· '+item.park : ''}</div>
+      </div>
+      <button data-del="${item.id}" style="background:#f4433611;border:none;border-radius:6px;padding:4px 8px;
+        font-size:11px;color:#f44336;cursor:pointer;font-weight:700;">✕</button>`;
+    div.querySelector('[data-del]').onclick = () => {
+      const data = load();
+      if (data[dayKey]) data[dayKey] = data[dayKey].filter(i => i.id !== item.id);
+      save(data);
+      renderItineraryView(dayKey, overlay);
+    };
+    return div;
+  }
+
+  /* ── Add Activity Modal ── */
+  function showAddActivity(dayKey, overlay) {
+    const modal = document.createElement('div');
+    modal.style.cssText = 'position:fixed;inset:0;z-index:8500;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.5);';
+    modal.innerHTML = `
+      <div style="background:var(--bg,#f5f5f5);border-radius:20px 20px 0 0;padding:20px;width:100%;max-width:480px;
+        max-height:80vh;overflow-y:auto;">
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;margin-bottom:16px;
+          color:var(--text-primary,#212121);">Add Activity</div>
+        <input id="ity-name" placeholder="Activity name (e.g. Tron Lightcycle Run)" style="width:100%;padding:10px 12px;
+          border-radius:10px;border:1px solid var(--border,#ddd);font-size:14px;margin-bottom:10px;
+          background:var(--card-bg,#fff);color:var(--text-primary,#212121);box-sizing:border-box;">
+        <input id="ity-time" type="time" style="width:100%;padding:10px 12px;border-radius:10px;
+          border:1px solid var(--border,#ddd);font-size:14px;margin-bottom:10px;background:var(--card-bg,#fff);
+          color:var(--text-primary,#212121);box-sizing:border-box;">
+        <select id="ity-park" style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border,#ddd);
+          font-size:14px;margin-bottom:10px;background:var(--card-bg,#fff);color:var(--text-primary,#212121);box-sizing:border-box;">
+          <option value="">Select park / location...</option>
+          ${PARKS_LIST.map(p => `<option>${p}</option>`).join('')}
+        </select>
+        <div style="margin-bottom:14px;">
+          <div style="font-size:12px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:8px;">TYPE</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;">
+            ${ACTIVITY_TYPES.map(a => `<button class="ity-type-btn" data-type="${a.label}"
+              style="display:flex;align-items:center;gap:4px;padding:6px 10px;border-radius:20px;
+              border:1px solid var(--border,#ddd);background:var(--card-bg,#fff);cursor:pointer;
+              font-size:12px;color:var(--text-primary,#212121);">${a.icon} ${a.label}</button>`).join('')}
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button id="ity-cancel" style="flex:1;padding:12px;border-radius:10px;border:1px solid var(--border,#ddd);
+            background:var(--card-bg,#fff);font-size:14px;cursor:pointer;color:var(--text-primary,#212121);">Cancel</button>
+          <button id="ity-save" style="flex:2;padding:12px;border-radius:10px;border:none;
+            background:var(--primary,#FF6B35);color:#fff;font-size:14px;font-weight:700;cursor:pointer;">Add to Plan</button>
+        </div>
+      </div>`;
+
+    let selectedType = 'Other';
+    modal.querySelectorAll('.ity-type-btn').forEach(btn => {
+      btn.onclick = () => {
+        modal.querySelectorAll('.ity-type-btn').forEach(b => { b.style.background='var(--card-bg,#fff)'; b.style.color='var(--text-primary,#212121)'; });
+        btn.style.background = 'var(--primary,#FF6B35)';
+        btn.style.color = '#fff';
+        selectedType = btn.dataset.type;
+      };
+    });
+    modal.querySelector('#ity-cancel').onclick = () => modal.remove();
+    modal.querySelector('#ity-save').onclick = () => {
+      const name = modal.querySelector('#ity-name').value.trim();
+      if (!name) return;
+      const data = load();
+      if (!data[dayKey]) data[dayKey] = [];
+      const rawTime = modal.querySelector('#ity-time').value;
+      let timeStr = '';
+      if (rawTime) {
+        const [hh, mm] = rawTime.split(':').map(Number);
+        const ampm = hh >= 12 ? 'PM' : 'AM';
+        const h12 = hh % 12 || 12;
+        timeStr = `${h12}:${String(mm).padStart(2,'0')} ${ampm}`;
+      }
+      data[dayKey].push({
+        id: Date.now() + '-' + Math.random().toString(36).slice(2),
+        name,
+        time: timeStr,
+        park: modal.querySelector('#ity-park').value,
+        type: selectedType,
+      });
+      // Sort by time
+      data[dayKey].sort((a, b) => (a.time || '99:99') > (b.time || '99:99') ? 1 : -1);
+      save(data);
+      modal.remove();
+      renderItineraryView(dayKey, overlay);
+    };
+    document.body.appendChild(modal);
+  }
+
+  /* ── Render day view inside overlay ── */
+  function renderItineraryView(dayKey, overlay) {
+    const data = load();
+    const items = data[dayKey] || [];
+    const content = overlay.querySelector('#ity-content');
+    if (!content) return;
+
+    const dateLabel = dayKey.split('-').reverse().join('/');
+    content.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div style="font-size:12px;font-weight:700;color:var(--text-secondary,#888);">PLAN FOR ${dateLabel}</div>
+        <button id="ity-add-btn" style="background:var(--primary,#FF6B35);color:#fff;border:none;border-radius:20px;
+          padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;">+ Add</button>
+      </div>
+      ${items.length === 0 ? `<div style="text-align:center;padding:40px 20px;color:var(--text-secondary,#aaa);">
+        <div style="font-size:40px;margin-bottom:10px;">📋</div>
+        <div style="font-size:13px;">No activities yet. Tap + Add to build your plan.</div>
+      </div>` : ''}
+      <div id="ity-list"></div>`;
+
+    const list = content.querySelector('#ity-list');
+    items.forEach(item => list.appendChild(renderItem(item, data, dayKey, overlay)));
+    content.querySelector('#ity-add-btn').onclick = () => showAddActivity(dayKey, overlay);
+  }
+
+  /* ── Main Overlay ── */
+  function openItinerary(startDayKey) {
+    const existing = document.getElementById('orlando-itinerary-overlay');
+    if (existing) { existing.remove(); }
+
+    const data = load();
+    // Build list of days that have entries, plus today
+    const today = todayKey();
+    const days = new Set([today]);
+    Object.keys(data).forEach(k => days.add(k));
+    const dayList = Array.from(days).sort();
+
+    const ov = document.createElement('div');
+    ov.id = 'orlando-itinerary-overlay';
+    ov.style.cssText = 'position:fixed;inset:0;z-index:7600;background:var(--bg,#f5f5f5);display:flex;flex-direction:column;';
+    ov.innerHTML = `
+      <div style="padding:16px;display:flex;align-items:center;gap:12px;
+        background:linear-gradient(135deg,#1a1a3e,#FF6B35);color:#fff;flex-shrink:0;">
+        <button onclick="document.getElementById('orlando-itinerary-overlay').remove()"
+          style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;
+          font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;">Daily Itinerary</div>
+          <div style="font-size:11px;opacity:.8;">Plan your perfect Orlando day</div>
+        </div>
+        <button id="ity-new-day" style="background:rgba(255,255,255,.2);border:none;border-radius:20px;
+          padding:6px 12px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;">+ Day</button>
+      </div>
+      <!-- Day tabs -->
+      <div id="ity-tabs" style="display:flex;gap:8px;padding:12px 14px;overflow-x:auto;
+        background:var(--card-bg,#fff);border-bottom:1px solid var(--border,#eee);flex-shrink:0;-webkit-overflow-scrolling:touch;"></div>
+      <!-- Content -->
+      <div id="ity-content" style="flex:1;overflow-y:auto;padding:14px;-webkit-overflow-scrolling:touch;"></div>`;
+
+    document.body.appendChild(ov);
+
+    let activeDay = startDayKey || today;
+
+    function renderTabs() {
+      const tabs = ov.querySelector('#ity-tabs');
+      const data2 = load();
+      const days2 = new Set([today]);
+      Object.keys(data2).forEach(k => days2.add(k));
+      const dayArr = Array.from(days2).sort();
+      tabs.innerHTML = '';
+      dayArr.forEach(dk => {
+        const btn = document.createElement('button');
+        const isActive = dk === activeDay;
+        btn.style.cssText = `flex-shrink:0;padding:6px 14px;border-radius:20px;border:none;
+          font-size:12px;font-weight:700;cursor:pointer;
+          background:${isActive ? 'var(--primary,#FF6B35)' : 'var(--card-bg,#f5f5f5)'};
+          color:${isActive ? '#fff' : 'var(--text-primary,#212121)'};`;
+        // Format date
+        const parts = dk.split('-');
+        const d = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+        btn.textContent = dk === today ? 'Today' : new Intl.DateTimeFormat('en-US', { month:'short', day:'numeric' }).format(d);
+        btn.onclick = () => { activeDay = dk; renderTabs(); renderItineraryView(dk, ov); };
+        tabs.appendChild(btn);
+      });
+    }
+
+    ov.querySelector('#ity-new-day').onclick = () => {
+      const input = prompt('Enter date (YYYY-MM-DD):');
+      if (!input || !/^\d{4}-\d{2}-\d{2}$/.test(input)) return;
+      const data2 = load();
+      if (!data2[input]) { data2[input] = []; save(data2); }
+      activeDay = input;
+      renderTabs();
+      renderItineraryView(input, ov);
+    };
+
+    renderTabs();
+    renderItineraryView(activeDay, ov);
+  }
+
+  window.openItinerary = openItinerary;
+
+  /* ── Home Card ── */
+  function injectItineraryCard() {
+    if (document.getElementById('ity-home-card')) return true;
+    const pxPreview = document.getElementById('px-home-preview');
+    if (!pxPreview) return false;
+    const card = document.createElement('div');
+    card.id = 'ity-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:var(--card-bg,#fff);border-radius:16px;padding:14px;border:1px solid var(--border,#eee);cursor:pointer;';
+    card.onclick = () => openItinerary();
+
+    const today = todayKey();
+    const items = (load()[today] || []);
+    const preview = items.slice(0,3).map(i => {
+      const atype = ACTIVITY_TYPES.find(a => a.label === i.type) || ACTIVITY_TYPES[8];
+      return `<div style="display:flex;align-items:center;gap:8px;padding:4px 0;">
+        <span style="font-size:14px;">${atype.icon}</span>
+        <span style="font-size:12px;color:var(--text-primary,#212121);">${i.name}</span>
+        ${i.time ? `<span style="font-size:10px;color:var(--text-secondary,#aaa);margin-left:auto;">${i.time}</span>` : ''}
+      </div>`;
+    }).join('');
+
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;
+          color:var(--text-primary,#212121);">📋 Today's Itinerary</div>
+        <span style="font-size:11px;color:var(--primary,#FF6B35);font-weight:700;">Edit ›</span>
+      </div>
+      ${items.length > 0 ? preview : '<div style="font-size:12px;color:var(--text-secondary,#aaa);">Tap to build your day plan</div>'}
+      ${items.length > 3 ? `<div style="font-size:11px;color:var(--primary,#FF6B35);margin-top:6px;">+${items.length-3} more activities</div>` : ''}`;
+    pxPreview.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _ityCard = false;
+  setInterval(() => { if (!_ityCard) _ityCard = injectItineraryCard(); }, 2500);
+  setTimeout(() => { _ityCard = injectItineraryCard(); }, 1500);
+
+  const _prevRH_ity = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_ity) _prevRH_ity.apply(this, arguments);
+    setTimeout(() => { _ityCard = false; _ityCard = injectItineraryCard(); }, 700);
+  };
+
+  /* Account menu shortcut */
+  const _prevRA_ity = window.renderAccount;
+  window.renderAccount = function() {
+    if (_prevRA_ity) _prevRA_ity.apply(this, arguments);
+    setTimeout(() => {
+      const lg = document.querySelector('.account-loggedin');
+      if (!lg || lg.querySelector('[data-ity-acct]')) return;
+      const el = document.createElement('div');
+      el.setAttribute('data-ity-acct','1');
+      el.className = 'account-menu-item';
+      el.innerHTML = `<span class="icon">📋</span><span>My Itinerary Builder</span><span class="arrow">›</span>`;
+      el.onclick = () => openItinerary();
+      const adm = lg.querySelector('.adm-account-btn');
+      lg.insertBefore(el, adm || null);
+    }, 660);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK ZZ: Lightning Lane & Genie+ Guide ===== */
+(function initLightningLaneGuide() {
+
+  const LL_DATA = {
+    'Magic Kingdom': {
+      color:'#1565C0', emoji:'🏰',
+      individual: [
+        { name:'Tron Lightcycle / Run', tip:'Buy at 7am on My Disney Experience app — sells out within minutes.', price:'$18–25' },
+        { name:'Seven Dwarfs Mine Train', tip:'Most popular ILL at MK. Buy early; prices surge with demand.', price:'$12–20' },
+      ],
+      multipass: [
+        'Space Mountain','Haunted Mansion','Big Thunder Mountain','Buzz Lightyear\'s Space Ranger Spin',
+        'Jungle Cruise','Pirates of the Caribbean','Peter Pan\'s Flight','The Many Adventures of Winnie the Pooh',
+      ],
+      ropeDropOrder: ['Tron Lightcycle / Run','Seven Dwarfs Mine Train','Space Mountain'],
+      bestDays: 'Tuesday & Wednesday',
+      crowdTip: 'Book Genie+ at 7am sharp. First LL selection available at park open. Stack selections for afternoon.',
+    },
+    'EPCOT': {
+      color:'#00695C', emoji:'🌐',
+      individual: [
+        { name:'Guardians of the Galaxy: Cosmic Rewind', tip:'Virtual queue only (7am) OR Individual Lightning Lane. Book at exactly 7:00am.', price:'$14–22' },
+      ],
+      multipass: [
+        'Test Track','Frozen Ever After','Remy\'s Ratatouille Adventure','Soarin\'',
+        'Mission: SPACE','Spaceship Earth',
+      ],
+      ropeDropOrder: ['Guardians virtual queue at 7am','Frozen Ever After','Test Track'],
+      bestDays: 'Monday & Tuesday',
+      crowdTip: 'Use virtual queue for Guardians — book at 7am or 1pm. Frozen Ever After is best at rope drop.',
+    },
+    'Hollywood Studios': {
+      color:'#B71C1C', emoji:'🎬',
+      individual: [
+        { name:'Star Wars: Rise of the Resistance', tip:'Must-do ILL. Book at 7am; sells out daily in minutes.', price:'$15–25' },
+      ],
+      multipass: [
+        'Slinky Dog Dash','Mickey & Minnie\'s Runaway Railway','Millenium Falcon: Smugglers Run',
+        'Rock \'n\' Roller Coaster','Tower of Terror','Toy Story Mania',
+      ],
+      ropeDropOrder: ['Slinky Dog Dash','MMRR','Smugglers Run — OR buy Rise ILL at 7am'],
+      bestDays: 'Sunday & Monday',
+      crowdTip: 'Early entry guests get 30 min head start. Rope drop Slinky + MMRR, then hit ILL for Rise.',
+    },
+    'Animal Kingdom': {
+      color:'#2E7D32', emoji:'🦁',
+      individual: [
+        { name:'Avatar: Flight of Passage', tip:'Worth the ILL price. Standby waits often exceed 90 min — this saves your morning.', price:'$12–18' },
+      ],
+      multipass: [
+        'Na\'vi River Journey','Expedition Everest','Kilimanjaro Safaris','DINOSAUR',
+        'Kali River Rapids','Tricera Top Spin',
+      ],
+      ropeDropOrder: ['Flight of Passage (if no ILL)','Kilimanjaro Safaris','Expedition Everest'],
+      bestDays: 'Tuesday & Thursday',
+      crowdTip: 'Park closes earlier than others — plan to be done by 7pm. Na\'vi River has short waits after 6pm.',
+    },
+    'Universal Studios': {
+      color:'#7B1FA2', emoji:'🎥',
+      individual: [],
+      multipass: [],
+      expressPass: true,
+      expressDesc: 'Universal Express Pass: unlimited front-of-line access. ~$100–300/person depending on date.',
+      ropeDropOrder: ['Villain-Con Minion Blast','Revenge of the Mummy','Hollywood Rip Ride Rockit'],
+      bestDays: 'Wednesday & Thursday',
+      crowdTip: 'On-site hotel guests get Early Park Admission (1 hr before open) — best perk at Universal.',
+    },
+    'Islands of Adventure': {
+      color:'#0277BD', emoji:'⚓',
+      individual: [],
+      multipass: [],
+      expressPass: true,
+      expressDesc: 'Universal Express Pass works at both parks. Hagrid\'s Magical Creatures is not on Express Pass.',
+      ropeDropOrder: ['Hagrid\'s Magical Creatures','Jurassic World VelociCoaster','Forbidden Journey'],
+      bestDays: 'Wednesday & Thursday',
+      crowdTip: 'Hagrid\'s has no Express Pass access. Only way to beat the wait: rope drop or late evening.',
+    },
+  };
+
+  const TIPS_GENERAL = [
+    { icon:'⏰', tip:'Set an alarm for 6:55am on park day. At exactly 7:00am, the LL and virtual queue booking windows open.' },
+    { icon:'📱', tip:'Use My Disney Experience for Disney parks. Universal app for Universal parks. Both are free.' },
+    { icon:'💰', tip:'Genie+ costs $24–36/person/day. Individual Lightning Lane is additional per ride. Budget $50–100 per person.' },
+    { icon:'🎯', tip:'Best value: stack Genie+ selections to run 4–5 in the afternoon when standby waits are longest.' },
+    { icon:'🤝', tip:'Annual Passholders get discounts on ILL at Disney. Check your pass tier for included benefits.' },
+    { icon:'📅', tip:'Skip Genie+ on low-crowd days (Tue/Wed in January). Save $30+ per person and walk-on most rides.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-lightning-lane';
+    s.className = 'screen';
+    s.style.display = 'none';
+    s.innerHTML = `
+      <div class="screen-header" style="padding:16px;display:flex;align-items:center;gap:12px;
+        background:linear-gradient(135deg,#7B1FA2,#1565C0);color:#fff;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;
+          border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div>
+          <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;">Lightning Lane & Express Pass</div>
+          <div style="font-size:11px;opacity:.8;">Skip the line — strategically</div>
+        </div>
+      </div>
+      <div style="padding:14px;overflow-y:auto;height:calc(100vh - 68px);-webkit-overflow-scrolling:touch;">
+        <!-- General tips card -->
+        <div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:14px;border:1px solid var(--border,#eee);">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:12px;">⚡ Pro Tips</div>
+          ${TIPS_GENERAL.map(t => `<div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:10px;">
+            <span style="font-size:18px;flex-shrink:0;">${t.icon}</span>
+            <span style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;">${t.tip}</span>
+          </div>`).join('')}
+        </div>
+        <!-- Per-park cards -->
+        ${Object.entries(LL_DATA).map(([parkName, p]) => `
+          <div style="background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;
+            border:1px solid var(--border,#eee);overflow:hidden;">
+            <div style="padding:12px 14px;background:${p.color}11;display:flex;align-items:center;gap:10px;
+              border-bottom:1px solid var(--border,#eee);">
+              <span style="font-size:22px;">${p.emoji}</span>
+              <span style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;
+                color:var(--text-primary,#212121);">${parkName}</span>
+              <span style="margin-left:auto;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;
+                background:${p.color};color:#fff;">Best: ${p.bestDays || 'Weekdays'}</span>
+            </div>
+            <div style="padding:12px 14px;">
+              ${p.expressPass ? `
+                <div style="background:#FFF8E1;border-radius:10px;padding:10px;margin-bottom:10px;border-left:3px solid #F57F17;">
+                  <div style="font-size:10px;font-weight:700;color:#F57F17;margin-bottom:4px;">EXPRESS PASS</div>
+                  <div style="font-size:12px;color:var(--text-primary,#212121);">${p.expressDesc}</div>
+                </div>` : ''}
+              ${p.individual && p.individual.length > 0 ? `
+                <div style="margin-bottom:10px;">
+                  <div style="font-size:10px;font-weight:700;color:#f44336;margin-bottom:6px;">INDIVIDUAL LIGHTNING LANE</div>
+                  ${p.individual.map(r => `<div style="background:#FFEBEE;border-radius:8px;padding:8px 10px;margin-bottom:6px;">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+                      <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);">${r.name}</div>
+                      <span style="font-size:10px;font-weight:700;color:#f44336;white-space:nowrap;">${r.price}</span>
+                    </div>
+                    <div style="font-size:11px;color:var(--text-secondary,#555);margin-top:4px;">${r.tip}</div>
+                  </div>`).join('')}
+                </div>` : ''}
+              ${p.multipass && p.multipass.length > 0 ? `
+                <div style="margin-bottom:10px;">
+                  <div style="font-size:10px;font-weight:700;color:#1565C0;margin-bottom:6px;">GENIE+ / MULTI PASS RIDES</div>
+                  <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                    ${p.multipass.map(r => `<span style="padding:4px 10px;background:#E3F2FD;border-radius:20px;
+                      font-size:11px;color:#1565C0;font-weight:600;">${r}</span>`).join('')}
+                  </div>
+                </div>` : ''}
+              <div style="background:${p.color}11;border-radius:8px;padding:8px 10px;margin-bottom:10px;">
+                <div style="font-size:10px;font-weight:700;color:${p.color};margin-bottom:4px;">ROPE DROP ORDER</div>
+                ${p.ropeDropOrder.map((r,i) => `<div style="font-size:12px;color:var(--text-primary,#212121);
+                  padding:2px 0;">${i+1}. ${r}</div>`).join('')}
+              </div>
+              <div style="display:flex;gap:8px;align-items:flex-start;">
+                <span style="font-size:14px;">💡</span>
+                <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${p.crowdTip}</div>
+              </div>
+            </div>
+          </div>`).join('')}
+      </div>`;
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-lightning-lane')) buildScreen();
+
+  const _prevSS_ll = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_ll) _prevSS_ll(name, el);
+    if (name === 'lightning-lane') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-lightning-lane');
+      if (s) s.style.display = 'block';
+    }
+  };
+
+  /* Home card */
+  function injectLLCard() {
+    if (document.getElementById('ll-home-card')) return true;
+    const ityCard = document.getElementById('ity-home-card');
+    const ref = ityCard || document.getElementById('px-home-preview');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'll-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#7B1FA2,#1565C0);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('lightning-lane');
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">⚡ Lightning Lane Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);margin-top:4px;">ILL · Genie+ · Express Pass · rope drop order</div>
+        </div>
+        <span style="font-size:24px;">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _llCard = false;
+  setInterval(() => { if (!_llCard) _llCard = injectLLCard(); }, 3000);
+  setTimeout(() => { _llCard = injectLLCard(); }, 1700);
+
+  const _prevRH_ll = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_ll) _prevRH_ll.apply(this, arguments);
+    setTimeout(() => { _llCard = false; _llCard = injectLLCard(); }, 750);
+  };
+})();
+</script>
