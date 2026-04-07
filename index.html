@@ -28098,3 +28098,276 @@ window.renderNeighborhood = renderNeighborhood;
   };
 })();
 </script>
+<script>
+/* ===== BLOCK MM1: Transportation Guide ===== */
+const TRANSPORT_SECTIONS = [
+  {
+    id: 'disney',
+    icon: '🚌',
+    title: 'Disney Transportation (Free)',
+    color: '#1565C0',
+    items: [
+      { name:'Bus Network', detail:'Connects all Disney resorts to all 4 parks + Disney Springs. Runs 30–45 min before park open until 1 hr after close. Frequency: every 20 min.', tip:'Buses load by destination. Check My Disney Experience app for real-time arrivals.'},
+      { name:'Disney Skyliner', detail:'Gondola system connecting EPCOT & Hollywood Studios to Caribbean Beach, Pop Century, Art of Animation, and Riviera Resort.', tip:'Breathtaking views of EPCOT and the resort. No strollers on board — fold and carry.'},
+      { name:'Monorail', detail:'Runs: TTC ↔ Magic Kingdom (Express), TTC ↔ EPCOT (Resort loop) stopping at Contemporary, Polynesian, and Grand Floridian.', tip:'Take the Resort Monorail for a scenic ride and dinner-less view of the resort hotels.'},
+      { name:'Boat / Ferry', detail:'Magic Kingdom ferry from the TTC (Ticket & Transportation Center). Also runs between Hollywood Studios and EPCOT via Crescent Lake resorts.', tip:'The Magic Kingdom ferry ride is magical at sunset. Short wait, beautiful view.'},
+      { name:'Disney Minnie Vans', detail:'Lyft-powered service — accessible vehicles available. $25–35 flat rate anywhere on Disney property.', tip:'Worth it for airport runs or when travelling with strollers and lots of luggage.'},
+    ]
+  },
+  {
+    id: 'rideshare',
+    icon: '🚗',
+    title: 'Rideshare: Uber & Lyft',
+    color: '#6A1B9A',
+    items: [
+      { name:'Pickup Zones', detail:'Disney parks have designated rideshare pickup/dropoff zones — do NOT try to be picked up at the main entrance. Follow app directions to the correct lot.', tip:'Magic Kingdom: TTC. EPCOT: front of park. Hollywood Studios: outside the gates. AK: main lot.'},
+      { name:'Surge Pricing', detail:'Expect surges at park close (especially after fireworks). Walking 10–15 min from the park before requesting saves $5–15.', tip:'Use both Uber and Lyft apps — check price in both before committing.'},
+      { name:'I-Drive Area', detail:'Uber/Lyft are abundant on International Drive. Average ride: $8–15 for I-Drive to Disney.', tip:'Skip the rental car on I-Drive days — parking is expensive and traffic is brutal.'},
+      { name:'Airport (MCO)', detail:'MCO has dedicated rideshare pickup on Level 1, Side B, Ground Transportation. Follow yellow signs.', tip:'Book airport rides in advance during peak season. Prices spike during conventions.'},
+    ]
+  },
+  {
+    id: 'local',
+    icon: '🚊',
+    title: 'I-Drive Trolley & SunRail',
+    color: '#E65100',
+    items: [
+      { name:'I-Ride Trolley', detail:'Runs the length of International Drive from Universal Blvd to Sand Lake Rd. $2/ride, day pass $5. Runs daily 8am–10:30pm.', tip:'Great for hopping between I-Drive restaurants, ICON Park, and outlets. Avoid driving I-Drive at night.'},
+      { name:'SunRail Commuter Train', detail:'Runs from DeBary in the north to Poinciana in the south through downtown Orlando. Stops: Church St, LYNX, Sand Lake Rd.', tip:'Sand Lake Rd stop is 1 mile from I-Drive. Great option for downtown dinner trips.'},
+      { name:'LYNX Bus', detail:'Orlando\'s public bus system. Coverage across the metro area. Base fare $2. Rarely used by tourists but useful for budget travelers.', tip:'Route 50 (International Drive) is most useful for visitors.'},
+    ]
+  },
+  {
+    id: 'tips',
+    icon: '💡',
+    title: 'Pro Transportation Tips',
+    color: '#2E7D32',
+    items: [
+      { name:'Rent a Car vs. No Car', detail:'If staying on Disney property, skip the car entirely — Disney transportation is free and comprehensive. For Universal or SeaWorld, rideshare makes more sense than renting.', tip:'Parking at Disney parks costs $30/day. Factor this into your rental car decision.'},
+      { name:'Magical Express is Gone', detail:'Disney\'s free airport shuttle ended in 2022. Mears Connect is the replacement (~$39/person round trip) or Sunshine Flyer (~$35). Book ahead.', tip:'Mears Connect: mearsconnect.com. Runs shared shuttle or private van options.'},
+      { name:'Arriving by Car', detail:'Use the official Disney/Universal/SeaWorld parking lots. I-4 is unpredictable — add 30 min buffer during rush hour (7–9am, 4–7pm).', tip:'Google Maps underestimates I-4 travel times. Waze is more accurate for local traffic.'},
+      { name:'Theme Park Express', detail:'Mears Transportation runs a Theme Park Express bus between many I-Drive hotels and Disney parks. Check with your hotel concierge.', tip:'Some I-Drive hotels include free shuttle service to Disney — always ask before booking.'},
+    ]
+  },
+];
+
+window._transpSection = 'disney';
+
+function openTransportGuide() {
+  const existing = document.getElementById('transport-overlay');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'transport-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;display:flex;flex-direction:column;max-width:430px;left:50%;transform:translateX(-50%);';
+  el.innerHTML = `
+    <div style="background:linear-gradient(135deg,#0D47A1,#1565C0,#1E88E5);padding:18px 16px 14px;flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <button onclick="document.getElementById('transport-overlay').remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;">←</button>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;">🚌 Getting Around Orlando</div>
+      </div>
+      <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;" id="transport-tabs">
+        ${TRANSPORT_SECTIONS.map(s => `<button onclick="setTransportTab('${s.id}',this)" style="flex-shrink:0;border-radius:20px;padding:5px 11px;border:1.5px solid ${s.id==='disney'?'#fff':'rgba(255,255,255,.4)'};background:${s.id==='disney'?'rgba(255,255,255,.25)':'transparent'};color:#fff;font-size:10px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">${s.icon} ${s.title.split(':')[0].split('(')[0].trim()}</button>`).join('')}
+      </div>
+    </div>
+    <div style="overflow-y:auto;flex:1;padding:14px 16px 80px;" id="transport-content"></div>`;
+  document.body.appendChild(el);
+  renderTransportTab('disney');
+}
+window.openTransportGuide = openTransportGuide;
+
+function setTransportTab(id, btn) {
+  window._transpSection = id;
+  document.querySelectorAll('#transport-tabs button').forEach(b => { b.style.background='transparent'; b.style.borderColor='rgba(255,255,255,.4)'; });
+  btn.style.background='rgba(255,255,255,.25)'; btn.style.borderColor='#fff';
+  renderTransportTab(id);
+}
+window.setTransportTab = setTransportTab;
+
+function renderTransportTab(id) {
+  const el = document.getElementById('transport-content');
+  if (!el) return;
+  const sec = TRANSPORT_SECTIONS.find(s => s.id === id);
+  if (!sec) return;
+  el.innerHTML = `<div style="font-size:12px;font-weight:700;color:#9E9E9E;margin-bottom:10px;">${sec.title.toUpperCase()}</div>` +
+  sec.items.map(item => `
+    <div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:10px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <div style="width:8px;height:8px;border-radius:50%;background:${sec.color};flex-shrink:0;"></div>
+        <div style="font-size:13px;font-weight:800;color:var(--text-primary);">${item.name}</div>
+      </div>
+      <div style="font-size:12px;color:#757575;line-height:1.5;margin-bottom:8px;">${item.detail}</div>
+      <div style="background:${sec.color}11;border-left:3px solid ${sec.color};border-radius:0 8px 8px 0;padding:8px 10px;">
+        <div style="font-size:11px;color:${sec.color};line-height:1.4;">💡 ${item.tip}</div>
+      </div>
+    </div>`).join('');
+}
+window.renderTransportTab = renderTransportTab;
+</script>
+<script>
+/* ===== BLOCK MM2: Park Etiquette & Insider Rules ===== */
+const ETIQUETTE_RULES = [
+  {
+    cat: 'Queue Etiquette',
+    icon: '🧍',
+    color: '#1565C0',
+    rules: [
+      { title:'No Line Jumping', detail:'Saving spots for latecomers is against park policy and upsets other guests. If part of your group is separated, rejoin at the back.' },
+      { title:'Keep Moving', detail:'Don\'t stop in the middle of walkways for photos or maps. Step to the side — congestion builds quickly, especially near park entrances.' },
+      { title:'Personal Space in Queues', detail:'Maintain reasonable personal space. Constantly bumping the person ahead doesn\'t make the line move faster.' },
+      { title:'Phone Brightness', detail:'Dim your phone in dark ride queues and theaters. The light bothers other guests significantly more than you realize.' },
+    ]
+  },
+  {
+    cat: 'Photography',
+    icon: '📸',
+    color: '#6A1B9A',
+    rules: [
+      { title:'Don\'t Block the View', detail:'Holding up phones/iPads at shows blocks guests behind you. Capture a few photos then put it away and enjoy the experience.' },
+      { title:'Flash Photography', detail:'Flash is prohibited on most rides — it disorients other riders and can startle cast members. Disable flash before boarding.' },
+      { title:'Character Meet Wait', detail:'Be efficient during character meets. Get your photos, say hello, and move on — long queues of excited kids are waiting.' },
+      { title:'Drone Policy', detail:'Drones are strictly prohibited at all Disney, Universal, and SeaWorld properties. Violations result in ejection without refund.' },
+    ]
+  },
+  {
+    cat: 'With Kids',
+    icon: '👨‍👩‍👧',
+    color: '#2E7D32',
+    rules: [
+      { title:'Know Your Child\'s Limits', detail:'Overtired, overstimulated children melt down. Plan for rest breaks, snacks, and downtime. A quiet 30 min in the hotel beats a 2-hour tantrum.' },
+      { title:'Identify Kids Early', detail:'Write your cell number on your child\'s wrist with a Sharpie on the first morning. If separated, they can show any Cast Member.' },
+      { title:'Meeting Point Plan', detail:'Designate a meeting spot (e.g. "the big purple fountain") before entering a crowded area in case you get separated.' },
+      { title:'Use Stroller Signs', detail:'Mark your stroller with a flag, balloon, or bright ribbon — Cast Members may move strollers and identical rentals cause confusion.' },
+    ]
+  },
+  {
+    cat: 'Lightning Lane / Genie+',
+    icon: '⚡',
+    color: '#E65100',
+    rules: [
+      { title:'Book at 7am Sharp', detail:'Lightning Lane Individual selections open at 7am for on-site guests. Have the app open, park selected, and fingers ready. Top rides sell out in minutes.' },
+      { title:'Return Window is Firm', detail:'Your Lightning Lane return time is a 1-hour window. Arriving late (more than 15 min past your window end) means losing that reservation.' },
+      { title:'Multi-Pass Strategy', detail:'Book your first Genie+ ride at 7am, then book your next immediately after tapping in to each ride — don\'t wait.' },
+      { title:'Check Cancellations', detail:'Lightning Lane slots get dropped throughout the day. Check the app repeatedly — you can snag hard-to-get rides via cancellations.' },
+    ]
+  },
+  {
+    cat: 'General Courtesy',
+    icon: '🤝',
+    color: '#AD1457',
+    rules: [
+      { title:'Thank Cast Members', detail:'They work incredibly hard in Florida heat. A genuine "thank you" or compliment goes a long way — and you can recognize them by name in the My Disney Experience app.' },
+      { title:'Trash & Recycling', detail:'Disney parks have trash cans every 30 steps (Walt\'s empirical research). Use them. Dropping litter in a theme park is especially egregious.' },
+      { title:'Smoking Areas Only', detail:'All Disney, Universal, and SeaWorld parks are smoke-free except in designated areas outside the park entrance. Vaping is treated the same as smoking.' },
+      { title:'Noise Levels at Shows', detail:'Talking during shows, parades, or fireworks ruins the experience for others. Save the commentary for after.' },
+    ]
+  },
+];
+
+window._etiqCat = 0;
+
+function openEtiquetteGuide() {
+  const existing = document.getElementById('etiq-overlay');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'etiq-overlay';
+  el.style.cssText = 'position:fixed;inset:0;background:var(--bg,#F9F9F9);z-index:7500;display:flex;flex-direction:column;max-width:430px;left:50%;transform:translateX(-50%);';
+  el.innerHTML = `
+    <div style="background:linear-gradient(135deg,#880E4F,#C2185B,#E91E63);padding:18px 16px 14px;flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <button onclick="document.getElementById('etiq-overlay').remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;">←</button>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;">🤝 Park Etiquette Guide</div>
+      </div>
+      <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;" id="etiq-tabs">
+        ${ETIQUETTE_RULES.map((r,i) => `<button onclick="setEtiqCat(${i},this)" style="flex-shrink:0;border-radius:20px;padding:5px 11px;border:1.5px solid ${i===0?'#fff':'rgba(255,255,255,.4)'};background:${i===0?'rgba(255,255,255,.25)':'transparent'};color:#fff;font-size:10px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">${r.icon} ${r.cat.split(' ')[0]}</button>`).join('')}
+      </div>
+    </div>
+    <div style="overflow-y:auto;flex:1;padding:14px 16px 80px;" id="etiq-content"></div>`;
+  document.body.appendChild(el);
+  window._etiqCat = 0;
+  renderEtiquette();
+}
+window.openEtiquetteGuide = openEtiquetteGuide;
+
+function setEtiqCat(i, btn) {
+  window._etiqCat = i;
+  document.querySelectorAll('#etiq-tabs button').forEach(b => { b.style.background='transparent'; b.style.borderColor='rgba(255,255,255,.4)'; });
+  btn.style.background='rgba(255,255,255,.25)'; btn.style.borderColor='#fff';
+  renderEtiquette();
+}
+window.setEtiqCat = setEtiqCat;
+
+function renderEtiquette() {
+  const el = document.getElementById('etiq-content');
+  if (!el) return;
+  const cat = ETIQUETTE_RULES[window._etiqCat || 0];
+  el.innerHTML = `
+    <div style="background:${cat.color};border-radius:14px;padding:14px;margin-bottom:14px;display:flex;align-items:center;gap:12px;">
+      <span style="font-size:32px;">${cat.icon}</span>
+      <div>
+        <div style="font-size:16px;font-weight:800;color:#fff;">${cat.cat}</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.8);">${cat.rules.length} guidelines</div>
+      </div>
+    </div>` +
+  cat.rules.map((r,i) => `
+    <div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:10px;">
+      <div style="display:flex;align-items:flex-start;gap:10px;">
+        <span style="background:${cat.color};color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;">${i+1}</span>
+        <div>
+          <div style="font-size:13px;font-weight:800;color:var(--text-primary);margin-bottom:5px;">${r.title}</div>
+          <div style="font-size:12px;color:#757575;line-height:1.5;">${r.detail}</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+window.renderEtiquette = renderEtiquette;
+</script>
+<style>
+/* ===== BLOCK MM CSS ===== */
+#transport-tabs::-webkit-scrollbar,#etiq-tabs::-webkit-scrollbar{display:none;}
+#transport-tabs,#etiq-tabs{-ms-overflow-style:none;scrollbar-width:none;}
+</style>
+<script>
+/* ===== BLOCK MM: Wiring ===== */
+(function wireMMFeatures() {
+  const MM_QUICK = [
+    { icon:'🚌', label:'Transport',  fn: openTransportGuide },
+    { icon:'🤝', label:'Etiquette',  fn: openEtiquetteGuide },
+  ];
+
+  const _prevRH = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH) _prevRH.apply(this, arguments);
+    setTimeout(() => {
+      const row = document.getElementById('y-quick-row');
+      if (!row || row.querySelector('[data-mm-quick]')) return;
+      MM_QUICK.forEach(b => {
+        const btn = document.createElement('button');
+        btn.setAttribute('data-mm-quick','1');
+        btn.style.cssText = "flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:5px;background:var(--card-bg,#fff);border:1px solid var(--border,#eee);border-radius:14px;padding:12px 14px;cursor:pointer;font-family:'DM Sans',sans-serif;";
+        btn.innerHTML = `<span style="font-size:22px;">${b.icon}</span><span style="font-size:11px;font-weight:700;color:var(--text-primary,#212121);white-space:nowrap;">${b.label}</span>`;
+        btn.onclick = b.fn;
+        row.appendChild(btn);
+      });
+    }, 500);
+  };
+
+  const _prevRA = window.renderAccount;
+  window.renderAccount = function() {
+    if (_prevRA) _prevRA.apply(this, arguments);
+    setTimeout(() => {
+      const loggedIn = document.querySelector('.account-loggedin');
+      if (!loggedIn || loggedIn.querySelector('[data-mm-items]')) return;
+      const adminBtn = loggedIn.querySelector('.adm-account-btn');
+      const labels = { 'Transport':'Getting Around Orlando', 'Etiquette':'Park Etiquette Guide' };
+      MM_QUICK.forEach(item => {
+        const el = document.createElement('div');
+        el.setAttribute('data-mm-items','1');
+        el.className = 'account-menu-item';
+        el.innerHTML = `<span class="icon">${item.icon}</span><span>${labels[item.label]||item.label}</span><span class="arrow">›</span>`;
+        el.onclick = item.fn;
+        loggedIn.insertBefore(el, adminBtn || null);
+      });
+    }, 180);
+  };
+})();
+</script>
