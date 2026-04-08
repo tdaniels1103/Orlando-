@@ -61923,3 +61923,353 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK NNNNNNN: Universal Express Pass Strategy Guide ===== */
+(function initUniversalExpress() {
+
+  const EXPRESS_PASSES = [
+    {
+      type:'Universal Express Pass (Single Day)', emoji:'⚡', color:'#C62828',
+      price:'$90–200/person depending on date',
+      coverage:'One-time use at most major rides at Universal Studios Florida and Islands of Adventure. Does NOT include Hagrid\'s Motorbike, Velocicoaster virtual queue, or certain new attractions.',
+      best_for:'Guests visiting Universal for 1 day who want to maximize rides without Standby lines. On peak days (spring break, summer, holidays), the Express Pass can save 3–5 hours of cumulative waiting.',
+      note:'Prices fluctuate daily by demand — peak-season weekends approach $200/person. Buy at least 2 days in advance to lock in lower prices. Walk-up purchases on the busiest days can be $189+.',
+    },
+    {
+      type:'Universal Express Pass Unlimited', emoji:'♾️', color:'#7B1FA2',
+      price:'$130–250/person depending on date',
+      coverage:'Same as Express Pass but unlimited uses — ride the same attraction multiple times. On busy days with Unlimited, guests with full itineraries can ride VelociCoaster 3–4 times.',
+      best_for:'Power visitors who want to ride top attractions multiple times. Also valuable if you plan to spend a full day at a single park (e.g., all day at Islands of Adventure without park-hopping).',
+      note:'The price premium over single-use is typically $40–60/person. Worth it if you have 2+ rides you want to re-ride. Not worth it if you\'re a once-on-everything visitor.',
+    },
+    {
+      type:'Annual Pass Express (Premier Only)', emoji:'🏆', color:'#E65100',
+      price:'Included with Premier Annual Pass ($749/person)',
+      coverage:'Unlimited Express Pass access on all pass visit days. The single most valuable annual pass perk in Orlando.',
+      best_for:'Anyone visiting Universal 3+ days per year. The Premier AP ($749) includes unlimited Express Pass + free preferred parking + discounts. Compare: 3 single-day Express Passes alone = $360–600. The pass pays for itself.',
+      note:'Premier AP Express is not valid on all dates — blockout dates apply. Check the Universal website for specific blackout calendar before purchasing.',
+    },
+    {
+      type:'On-Site Hotel Express (Premier/Hard Rock/Portofino)', emoji:'🏨', color:'#0277BD',
+      price:'Included with Premier hotel stay',
+      coverage:'Staying at Universal\'s three Premier on-site hotels (Hard Rock Hotel, Loews Portofino Bay, Royal Pacific Resort) includes free Unlimited Express Pass for all guests during their stay.',
+      best_for:'Families or groups where the hotel cost + Express Pass value works out favorably. Hard Rock Hotel starts around $350/night — add Express Passes for 2 people (value ~$280/day) and the effective hotel cost approaches standard hotel pricing.',
+      note:'The hotel Express Pass is per-night: check in Sunday, get Express for Sunday and Monday. Check out Tuesday, no Express on Tuesday. Plan your park days to align with hotel nights for maximum value.',
+    },
+  ];
+
+  const EXPRESS_STRATEGY = [
+    {
+      title:'Which rides accept Express Pass?', color:'#003087',
+      content:'Most major rides accept Express Pass. Notable exceptions that do NOT include Express: Hagrid\'s Motorbike Adventure (standby or virtual queue only), and occasionally new or recently opened attractions. The Express line typically merges with standby at the 15–20 minute mark into the ride.',
+    },
+    {
+      title:'Is Express Pass worth it on slow days?', color:'#2E7D32',
+      content:'On slow days (January weekdays, mid-September), many Universal rides run 10–20 minute standby waits. Express Pass saves 15 minutes per ride maximum. With 10 rides in a day, you save 150 minutes — valuable, but not as transformative as on busy days (where you might save 30–60 minutes per ride).',
+    },
+    {
+      title:'Two-Park Express Pass strategy', color:'#C62828',
+      content:'Universal Studios Florida and Islands of Adventure are connected via the Hogwarts Express (one-way without park-to-park ticket) or a 10-minute walk between entrances. An Express Pass purchased for a single day is valid at both parks simultaneously. Plan your day: start at USF for morning, cross to IOA midday, return to USF for evening — the Express Pass works at every attraction across both parks all day.',
+    },
+    {
+      title:'Virtual Queue vs Express Pass', color:'#7B1FA2',
+      content:'Hagrid\'s Motorbike Adventure uses a virtual queue system — you join the queue remotely via the Universal app at a designated drop time (typically 7 AM and 1 PM). Express Pass cannot skip this queue. The virtual queue is free and fair — it distributes Hagrid\'s boarding groups equally. Secure your Hagrid\'s boarding group first, then use Express for everything else.',
+    },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-universal-express';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#C62828,#7B1FA2,#E65100);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Universal Express Pass Strategy</div>
+          <div style="font-size:11px;opacity:.8;">Single-use · Unlimited · Annual Pass · Hotel perk · Virtual queue</div>
+        </div>
+        <span style="font-size:28px;">⚡</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        Universal's Express Pass system is more straightforward than Disney's Genie+ — one pass skips most lines for the whole day. Whether to buy it depends on the date, your budget, and whether an Annual Pass makes the math work better.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    EXPRESS_PASSES.forEach(pass => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:9px 14px;background:${pass.color}18;border-left:4px solid ${pass.color};">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:20px;">${pass.emoji}</span>
+              <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${pass.type}</div>
+            </div>
+            <div style="font-size:11px;font-weight:700;color:${pass.color};flex-shrink:0;">${pass.price}</div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          <div style="font-size:11px;color:var(--text-secondary,#555);margin-bottom:5px;line-height:1.5;">${pass.coverage}</div>
+          <div style="font-size:11px;color:var(--text-primary,#333);font-weight:600;margin-bottom:4px;">Best for: <span style="font-weight:400;">${pass.best_for}</span></div>
+          <div style="font-size:10px;color:var(--text-secondary,#888);font-style:italic;border-top:1px solid var(--border,#eee);padding-top:5px;margin-top:5px;">${pass.note}</div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const stratCard = document.createElement('div');
+    stratCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+    stratCard.innerHTML = `<div style="padding:9px 14px;background:#C628280d;border-left:4px solid #C62828;">
+      <div style="font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--text-primary,#212121);">🗺️ Advanced Strategy</div>
+    </div>
+    <div style="padding:8px 14px;">
+      ${EXPRESS_STRATEGY.map(s=>`<div style="margin-bottom:9px;padding-bottom:9px;border-bottom:1px solid var(--border,#f5f5f5);">
+        <div style="font-size:12px;font-weight:700;color:${s.color};margin-bottom:3px;">${s.title}</div>
+        <div style="font-size:11px;color:var(--text-secondary,#444);line-height:1.6;">${s.content}</div>
+      </div>`).join('')}
+    </div>`;
+    body.appendChild(stratCard);
+
+    const compCard = document.createElement('div');
+    compCard.style.cssText = 'background:linear-gradient(135deg,#C62828,#003087);border-radius:14px;margin-bottom:20px;padding:14px;color:#fff;';
+    compCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;margin-bottom:8px;">⚡ vs. 🪄 Express Pass vs. Genie+</div>
+    ${[
+      {icon:'⚡',text:'Universal Express Pass: buy once, skip every line all day. Simple, flat, predictable.'},
+      {icon:'🪄',text:'Disney Genie+: buy daily ($35–45), book one LL at a time, re-book every 2 hours. More complex management required throughout the day.'},
+      {icon:'💡',text:'Verdict: Universal Express Pass is more intuitive and less stressful than Genie+. The Disney system requires active management; Universal requires no management after purchase.'},
+      {icon:'💰',text:'Both add $35–200+/person/day. For a family of 4 on a busy day, Express Pass or Genie+ adds $140–800 to the day\'s cost. Budget accordingly.'},
+    ].map(t=>`<div style="display:flex;gap:10px;margin-bottom:7px;align-items:flex-start;">
+      <span style="font-size:18px;flex-shrink:0;">${t.icon}</span>
+      <div style="font-size:11px;opacity:.95;line-height:1.5;">${t.text}</div>
+    </div>`).join('')}`;
+    body.appendChild(compCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-universal-express')) buildScreen();
+
+  const _prevSS_nnnnnnn = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_nnnnnnn) _prevSS_nnnnnnn(name, el);
+    if (name === 'universal-express') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-universal-express');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectUECard() {
+    if (document.getElementById('universal-express-home-card')) return true;
+    const ref = document.getElementById('magicband-mde-home-card') || document.getElementById('parking-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'universal-express-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#C62828,#7B1FA2,#E65100 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('universal-express');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">⚡</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Universal Express Pass Strategy</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Single · Unlimited · Annual Pass · Hotel perk · vs. Genie+</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _ueCard = false;
+  setInterval(() => { if (!_ueCard) _ueCard = injectUECard(); }, 100000);
+  setTimeout(() => { _ueCard = injectUECard(); }, 96500);
+  const _prevRH_nnnnnnn = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_nnnnnnn) _prevRH_nnnnnnn.apply(this, arguments);
+    setTimeout(() => { _ueCard = false; _ueCard = injectUECard(); }, 35000);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK OOOOOOO: Orlando Craft Beer & Cocktail Bar Guide ===== */
+(function initOrlandoBars() {
+
+  const BAR_NEIGHBORHOODS = [
+    {
+      area:'Mills 50 / Milk District', emoji:'🍺', color:'#8B4513',
+      desc:'The indie craft beer heartland of Orlando. A half-mile stretch of independent bars, bottle shops, and dive bars with no chain restaurants in sight.',
+      spots:[
+        {name:'Will\'s Pub', type:'Dive bar + live music', note:'The most beloved bar in Orlando by a wide margin. Live music 7 nights a week. No VIP, no bottle service, no attitude — just great beer and touring bands. The outdoor beer garden is legendary.'},
+        {name:'The Hammered Lamb', type:'Craft beer bar', note:'100+ taps of Florida craft beer plus national selections. The most comprehensive tap list in Orlando. Food truck parked outside most evenings. No pretension — just serious beer knowledge.'},
+        {name:'The Bart', type:'Neighborhood bar', note:'Friendly, no-frills bar with arcade machines, cheap beer, and the best jukebox in the Milk District. The anti-theme-park experience Orlando also offers.'},
+        {name:'Redlight Redlight', type:'Craft beer bar + brewery', note:'Craft beer bar with in-house brewing and the best rotating tap list in Central Florida. Belgian imports alongside Florida seasonals. The outdoor patio is packed on cool evenings.'},
+      ],
+    },
+    {
+      area:'Thornton Park', emoji:'🍷', color:'#7B1FA2',
+      desc:'The upscale urban neighborhood east of downtown with wine bars, gastropubs, and outdoor dining along cobblestone streets.',
+      spots:[
+        {name:'Quantum Leap Winery', type:'Urban winery + bar', note:'Craft winery making Florida wines on-site in a modern tasting room. The only urban winery in Orlando proper. Wine flights change monthly — the dry mead and Florida blueberry wine are outstanding.'},
+        {name:'Hanson\'s Shoe Repair', type:'Speakeasy cocktail bar', note:'Hidden behind a shoe repair storefront — knock on the door for the password (changes weekly, found on social media). Inside: exceptional craft cocktails in a Prohibition-era setting. One of the best cocktail bars in Florida.'},
+        {name:'The Nook on Robinson', type:'Gastropub', note:'Outdoor seating, excellent craft beer list, and the best casual dinner in Thornton Park. The Friday evening patio crowd is a window into local Orlando social life.'},
+      ],
+    },
+    {
+      area:'Downtown Orlando', emoji:'🌃', color:'#003087',
+      desc:'The traditional downtown bar scene — nightclubs and sports bars around Orange Avenue plus several craft cocktail destinations.',
+      spots:[
+        {name:'The Courtesy Bar', type:'Craft cocktail bar', note:'Named one of the best cocktail bars in Florida by multiple publications. The menu changes seasonally — every cocktail is made with house-made syrups, infusions, and fresh juice. Reservations recommended on weekends.'},
+        {name:'The Stubborn Mule', type:'Craft cocktail bar', note:'Acclaimed cocktail program in a warm, intimate space. The Moscow Mule variations and barrel-aged cocktails are the best in downtown. Outstanding service — bartenders explain every cocktail\'s origin.'},
+        {name:'Independent Bar (iBar)', type:'Alternative music bar', note:'The underground music venue and bar that\'s been serving alternative Orlando since 1985. The eclectic crowd, cheap drinks, and irreverence make it the anti-tourist bar in the tourist capital.'},
+      ],
+    },
+    {
+      area:'I-Drive / Tourist Corridor', emoji:'🎡', color:'#C62828',
+      desc:'The tourist strip has chain bars primarily, but a few notable exceptions worth seeking out among the resort and restaurant complexes.',
+      spots:[
+        {name:'Minus5 Ice Bar (ICON Park)', type:'Ice bar', note:'A bar where everything — the walls, the furniture, the glasses — is made of ice. Parkas and gloves provided. Entirely gimmicky in the best way. Genuinely novel experience; worth the $25 entry.'},
+        {name:'The Rusty Spoon', type:'Farm-to-table restaurant/bar', note:'Dr. Phillips restaurant with the best cocktail program on the I-Drive corridor. Ingredients sourced from local farms. The bar program matches the kitchen\'s quality.'},
+        {name:'Atlantic Beer & Oyster', type:'Seafood bar', note:'Excellent raw bar with Florida oysters, craft beer, and an outdoor patio. One of the few non-chain dining establishments worth seeking out along the tourist corridor.'},
+      ],
+    },
+  ];
+
+  const FLORIDA_CRAFT_BEER = [
+    {brewery:'Ivanhoe Park Brewing', neighborhood:'Ivanhoe Village', note:'IPA and lager specialists in a converted building in the charming Ivanhoe Row neighborhood. Outdoor biergarten. Dog-friendly.'},
+    {brewery:'Crooked Can Brewing (Winter Garden)', neighborhood:'Winter Garden Plant Street Market', note:'Best brewery in the greater Orlando area. The indoor/outdoor Plant Street Market setting is exceptional. Their flagship Gnarly Mane IPA is the best Florida IPA I\'ve had.'},
+    {brewery:'Hourglass Brewing', neighborhood:'Longwood', note:'Award-winning sour and wild ale program 20 minutes north of Orlando. Their barrel-aged program is world-class. Worth the drive for serious beer enthusiasts.'},
+    {brewery:'Orange Blossom Pilsner (OBP)', neighborhood:'Various Orlando bars', note:'Not a taproom destination, but the most beloved local Florida lager. Look for it on tap at any serious bar. Brewed with Florida orange blossom honey — crisp, citrus-forward.'},
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-bars-beer';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#8B4513,#7B1FA2,#003087);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Orlando Craft Beer & Cocktail Bars</div>
+          <div style="font-size:11px;opacity:.8;">Mills 50 · Thornton Park · Downtown · Florida craft breweries</div>
+        </div>
+        <span style="font-size:28px;">🍺</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        Orlando has a genuine craft bar scene outside the tourist corridor — independent bars, craft cocktail destinations, and Florida breweries that locals prefer over resort offerings. None of these are in the parks.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    BAR_NEIGHBORHOODS.forEach(hood => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:9px 14px;background:${hood.color}18;border-left:4px solid ${hood.color};">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:20px;">${hood.emoji}</span>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${hood.area}</div>
+              <div style="font-size:10px;color:var(--text-secondary,#777);">${hood.desc}</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:8px 14px;">
+          ${hood.spots.map(sp=>`<div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--border,#f5f5f5);padding-left:8px;border-left:3px solid ${hood.color};">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:1px;">
+              <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);">${sp.name}</div>
+              <span style="font-size:9px;padding:1px 5px;background:${hood.color}18;color:${hood.color};border-radius:10px;flex-shrink:0;">${sp.type}</span>
+            </div>
+            <div style="font-size:10px;color:var(--text-secondary,#555);line-height:1.5;">${sp.note}</div>
+          </div>`).join('')}
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const brewCard = document.createElement('div');
+    brewCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+    brewCard.innerHTML = `<div style="padding:9px 14px;background:#8B451318;border-left:4px solid #8B4513;">
+      <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">🍻 Florida Craft Breweries Worth Seeking</div>
+    </div>
+    <div style="padding:8px 14px;">
+      ${FLORIDA_CRAFT_BEER.map(b=>`<div style="margin-bottom:7px;padding-bottom:7px;border-bottom:1px solid var(--border,#f5f5f5);">
+        <div style="font-size:12px;font-weight:700;color:#8B4513;">${b.brewery}</div>
+        <div style="font-size:10px;color:var(--text-secondary,#888);font-weight:600;margin-bottom:1px;">${b.neighborhood}</div>
+        <div style="font-size:10px;color:var(--text-secondary,#555);">${b.note}</div>
+      </div>`).join('')}
+    </div>`;
+    body.appendChild(brewCard);
+
+    const tipCard = document.createElement('div');
+    tipCard.style.cssText = 'background:linear-gradient(135deg,#8B4513,#003087);border-radius:14px;margin-bottom:20px;padding:14px;color:#fff;';
+    tipCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;margin-bottom:8px;">🍺 Bar Scene Tips</div>
+    ${[
+      {icon:'🚗', tip:'Most of these bars require a car or rideshare — they\'re in residential neighborhoods 10–20 minutes from Disney. Uber/Lyft from Disney to Mills 50 runs $15–25 each way.'},
+      {icon:'📅', tip:'Friday and Saturday evenings are the best nights to experience Orlando\'s local bar scene. The neighborhoods come alive between 8 PM and midnight.'},
+      {icon:'🌡️', tip:'Orlando\'s outdoor bar culture is year-round thanks to the climate. November–March evenings are perfect patio weather. Summer evenings work well after 8 PM when temperatures drop.'},
+      {icon:'🍽️', tip:'Most local bars in Mills 50 and Thornton Park don\'t have kitchens — eat at a nearby restaurant first. Food trucks at many craft beer bars fill the gap.'},
+    ].map(t=>`<div style="display:flex;gap:10px;margin-bottom:7px;align-items:flex-start;">
+      <span style="font-size:18px;flex-shrink:0;">${t.icon}</span>
+      <div style="font-size:11px;opacity:.95;line-height:1.5;">${t.tip}</div>
+    </div>`).join('')}`;
+    body.appendChild(tipCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-bars-beer')) buildScreen();
+
+  const _prevSS_ooooooo = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_ooooooo) _prevSS_ooooooo(name, el);
+    if (name === 'bars-beer') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-bars-beer');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectBarsCard() {
+    if (document.getElementById('bars-beer-home-card')) return true;
+    const ref = document.getElementById('universal-express-home-card') || document.getElementById('magicband-mde-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'bars-beer-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#8B4513,#7B1FA2,#003087 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('bars-beer');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🍺</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Craft Beer & Cocktail Bars</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Will\'s Pub · Hanson\'s Speakeasy · The Courtesy Bar · Crooked Can</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _barsCard = false;
+  setInterval(() => { if (!_barsCard) _barsCard = injectBarsCard(); }, 101000);
+  setTimeout(() => { _barsCard = injectBarsCard(); }, 97500);
+  const _prevRH_ooooooo = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_ooooooo) _prevRH_ooooooo.apply(this, arguments);
+    setTimeout(() => { _barsCard = false; _barsCard = injectBarsCard(); }, 35400);
+  };
+})();
+</script>
