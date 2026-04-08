@@ -33673,3 +33673,1989 @@ window._orlandoAddWeatherToDetail = function(containerEl) {
   };
 })();
 </script>
+<style>
+/* ===== DATE NIGHT MODE: CSS Variables & Global Styles ===== */
+:root {
+  --dn-burgundy: #6B0F1A;
+  --dn-rose-gold: #C9A96E;
+  --dn-champagne: #F5E6CA;
+  --dn-soft-rose: #FF6B9D;
+  --dn-midnight: #2D1B69;
+  --dn-deep-rose: #C2185B;
+}
+
+/* Body class toggled by Date Night Mode */
+body.date-night-mode {
+  --primary: #FF6B9D;
+}
+body.date-night-mode .btn-primary,
+body.date-night-mode [class*="save-btn"],
+body.date-night-mode .save-btn {
+  background: var(--dn-soft-rose) !important;
+}
+/* Subtle vignette around all screens */
+body.date-night-mode::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 99999;
+  background: radial-gradient(ellipse at center,
+    transparent 60%,
+    rgba(107,15,26,.18) 100%);
+}
+/* Glowing nav border */
+body.date-night-mode .bottom-nav,
+body.date-night-mode [class*="bottom-nav"],
+body.date-night-mode nav {
+  box-shadow: 0 -2px 16px 0 rgba(255,107,157,.35) !important;
+}
+/* Floating heart keyframes */
+@keyframes dnHeartRise {
+  0%   { opacity: 0; transform: translateY(0) scale(.6); }
+  20%  { opacity: .9; }
+  80%  { opacity: .4; }
+  100% { opacity: 0; transform: translateY(-120px) scale(1.2); }
+}
+/* Mode indicator pulse */
+@keyframes dnIndicatorPulse {
+  0%,100% { opacity: 1; }
+  50%      { opacity: .6; }
+}
+/* Confirmation checkmark bounce */
+@keyframes dnCheckBounce {
+  0%   { transform: scale(0); }
+  60%  { transform: scale(1.25); }
+  80%  { transform: scale(.9); }
+  100% { transform: scale(1); }
+}
+/* Romantic fade-in for overlays */
+@keyframes dnFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+/* Planner slide transitions */
+@keyframes dnSlideInRight  { from { transform:translateX(100%); opacity:0; } to { transform:translateX(0); opacity:1; } }
+@keyframes dnSlideInLeft   { from { transform:translateX(-100%); opacity:0; } to { transform:translateX(0); opacity:1; } }
+@keyframes dnSlideOutLeft  { from { transform:translateX(0); opacity:1; } to { transform:translateX(-100%); opacity:0; } }
+/* Gold glow for proposal cards */
+@keyframes dnGoldGlow {
+  0%,100% { box-shadow: 0 0 8px 2px rgba(201,169,110,.4); }
+  50%      { box-shadow: 0 0 18px 6px rgba(201,169,110,.75); }
+}
+/* Loading hearts */
+@keyframes dnHeartFloat {
+  0%   { opacity:0; transform: translateY(0) scale(.7); }
+  30%  { opacity:1; }
+  100% { opacity:0; transform: translateY(-90px) scale(1.1); }
+}
+</style>
+
+<script>
+/* ===== BLOCK DN1: Date Night Mode Toggle & Home Integration ===== */
+(function initDateNightMode() {
+
+  /* ── State ── */
+  if (!window.appState) window.appState = {};
+  if (!window.appState.dateNight) {
+    window.appState.dateNight = {
+      active: false,
+      reservations: [],
+      savedPlans: [],
+    };
+  }
+
+  const DN = window.appState.dateNight;
+
+  /* ── Activate / Deactivate ── */
+  window.toggleDateNightMode = function(force) {
+    DN.active = (force !== undefined) ? force : !DN.active;
+    document.body.classList.toggle('date-night-mode', DN.active);
+    if (DN.active) {
+      applyDNHero();
+      injectDNIndicator();
+    } else {
+      removeDNHero();
+      const ind = document.getElementById('dn-indicator');
+      if (ind) ind.remove();
+    }
+    // Refresh home card badge
+    const badge = document.getElementById('dn-hero-badge');
+    if (badge) badge.style.display = DN.active ? 'flex' : 'none';
+    // Update AI planner prompts
+    if (typeof window._orlandoUpdateAIPrompts === 'function') window._orlandoUpdateAIPrompts();
+  };
+  window.openDateNightScreen = function() {
+    if (!DN.active) window.toggleDateNightMode(true);
+    const s = document.getElementById('screen-date-night');
+    if (s) {
+      document.querySelectorAll('.screen').forEach(x => x.style.display = 'none');
+      s.style.display = 'block';
+      s.style.animation = 'dnFadeIn .6s ease';
+    }
+  };
+
+  /* ── Hero gradient override ── */
+  const ORIG_HERO_BG = {};
+  function applyDNHero() {
+    const hero = document.querySelector('#screen-home .screen-hero,[class*="home-hero"],[data-orlando-hero]');
+    if (!hero) return;
+    ORIG_HERO_BG.bg = hero.style.background;
+    hero.style.transition = 'background 1.5s ease';
+    hero.style.background = 'linear-gradient(160deg,#3B0010,#8B1A4A,#C9A96E)';
+    /* Heart badge */
+    if (!document.getElementById('dn-hero-badge')) {
+      const badge = document.createElement('div');
+      badge.id = 'dn-hero-badge';
+      badge.style.cssText = 'position:absolute;top:12px;left:14px;background:var(--dn-soft-rose,#FF6B9D);border-radius:20px;padding:4px 10px;font-size:12px;font-weight:800;color:#fff;z-index:10;display:flex;align-items:center;gap:4px;';
+      badge.innerHTML = '🌹 Date Night';
+      hero.style.position = hero.style.position || 'relative';
+      hero.appendChild(badge);
+    } else {
+      document.getElementById('dn-hero-badge').style.display = 'flex';
+    }
+  }
+  function removeDNHero() {
+    const hero = document.querySelector('#screen-home .screen-hero,[class*="home-hero"],[data-orlando-hero]');
+    if (hero && ORIG_HERO_BG.bg !== undefined) {
+      hero.style.background = ORIG_HERO_BG.bg;
+    }
+    const badge = document.getElementById('dn-hero-badge');
+    if (badge) badge.style.display = 'none';
+  }
+
+  /* ── Mode Indicator bar ── */
+  function injectDNIndicator() {
+    if (document.getElementById('dn-indicator')) return;
+    const el = document.createElement('div');
+    el.id = 'dn-indicator';
+    el.style.cssText = `display:flex;align-items:center;gap:10px;padding:8px 14px;
+      background:linear-gradient(135deg,var(--dn-burgundy,#6B0F1A),var(--dn-deep-rose,#C2185B));
+      color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;
+      animation:dnIndicatorPulse 3s ease infinite;`;
+    el.innerHTML = `
+      <span style="font-size:18px;">🌹</span>
+      <span style="flex:1;">Date Night Mode Active</span>
+      <button onclick="window.toggleDateNightMode(false)"
+        style="background:rgba(255,255,255,.2);border:none;border-radius:20px;padding:4px 12px;
+        color:#fff;font-size:11px;font-weight:700;cursor:pointer;">Turn Off</button>`;
+    const homeScreen = document.getElementById('screen-home');
+    if (homeScreen) homeScreen.prepend(el);
+  }
+
+  /* ── Date Night Button on Home ── */
+  function buildDNButton() {
+    const btn = document.createElement('button');
+    btn.id = 'dn-home-btn';
+    btn.style.cssText = `display:flex;align-items:center;justify-content:center;gap:10px;
+      width:calc(100% - 28px);margin:10px 14px 0;padding:14px;border:none;border-radius:30px;
+      background:linear-gradient(135deg,#6B0F1A,#C2185B,#C9A96E);color:#fff;
+      font-family:'DM Sans',sans-serif;font-size:15px;font-weight:800;cursor:pointer;
+      box-shadow:0 4px 20px rgba(107,15,26,.4);letter-spacing:.02em;`;
+    btn.innerHTML = `<span style="font-size:22px;">🌹</span>Plan Your Perfect Date Night<span style="font-size:18px;">›</span>`;
+    btn.onclick = () => window.openDateNightScreen();
+    return btn;
+  }
+
+  /* ── Inject after category pills ── */
+  function injectDNButton() {
+    if (document.getElementById('dn-home-btn')) return true;
+    // Try category pills row
+    const pills = document.querySelector('.category-pills, .home-categories, [class*="category-row"], [data-category-pills]');
+    const homeContent = document.querySelector('#screen-home .screen-content, #screen-home .home-content, #screen-home > div:last-child');
+    const ref = pills || homeContent;
+    if (!ref) return false;
+    if (pills) pills.insertAdjacentElement('afterend', buildDNButton());
+    else ref.prepend(buildDNButton());
+    // If mode already active, show indicator
+    if (DN.active) { applyDNHero(); injectDNIndicator(); }
+    return true;
+  }
+
+  let _dnBtnReady = false;
+  setInterval(() => { if (!_dnBtnReady) _dnBtnReady = injectDNButton(); }, 1800);
+  setTimeout(() => { _dnBtnReady = injectDNButton(); }, 600);
+
+  const _prevRH_dn1 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_dn1) _prevRH_dn1.apply(this, arguments);
+    setTimeout(() => {
+      _dnBtnReady = false;
+      _dnBtnReady = injectDNButton();
+      if (DN.active) { applyDNHero(); injectDNIndicator(); }
+    }, 400);
+  };
+
+  const _prevSS_dn1 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_dn1) _prevSS_dn1(name, el);
+    if (name === 'home' && DN.active) setTimeout(() => { applyDNHero(); injectDNIndicator(); }, 250);
+    if (name === 'date-night') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-date-night');
+      if (s) { s.style.display = 'block'; s.style.animation = 'dnFadeIn .6s ease'; }
+    }
+  };
+
+  window._dnState = DN;
+  window._dnApplyHero = applyDNHero;
+  window._dnRemoveHero = removeDNHero;
+  window._dnInjectIndicator = injectDNIndicator;
+})();
+</script>
+<script>
+/* ===== BLOCK DN2: Date Night Discovery Screen ===== */
+(function buildDateNightScreen() {
+
+  /* ── Filter state ── */
+  const filters = { budget:'Any Budget', vibe:'All Vibes', duration:'Full Evening', occasion:'Date Night' };
+
+  /* ── Tab state ── */
+  let activeTab = 'restaurants';
+
+  /* ── Filter chip groups ── */
+  const FILTER_GROUPS = [
+    { key:'budget',   label:'Budget',   chips:['Any Budget','Under $50','$50–$150','$150+','Splurge'] },
+    { key:'vibe',     label:'Vibe',     chips:['All Vibes','Cozy & Intimate','Adventurous','Luxurious','Casual Fun','Cultural'] },
+    { key:'duration', label:'Duration', chips:['Quick (2 hrs)','Half Day','Full Evening','Overnight'] },
+    { key:'occasion', label:'Occasion', chips:['Date Night','Anniversary','Proposal','First Date','Birthday','Valentine\'s Day','Honeymoon'] },
+  ];
+
+  function buildFilterRow(group) {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:8px;overflow-x:auto;padding:4px 14px;-webkit-overflow-scrolling:touch;scrollbar-width:none;';
+    const label = document.createElement('div');
+    label.style.cssText = 'font-size:10px;font-weight:700;color:rgba(255,255,255,.6);padding:0 14px 4px;flex-shrink:0;';
+    label.textContent = group.label.toUpperCase();
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'padding-bottom:4px;';
+    wrap.appendChild(label);
+    wrap.appendChild(row);
+    group.chips.forEach(chip => {
+      const btn = document.createElement('button');
+      btn.className = 'dn-filter-chip';
+      btn.dataset.group = group.key;
+      btn.dataset.value = chip;
+      const isActive = filters[group.key] === chip;
+      btn.style.cssText = `flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid;
+        font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .2s;
+        background:${isActive ? '#FF6B9D' : 'rgba(255,255,255,.08)'};
+        color:${isActive ? '#fff' : 'rgba(255,255,255,.8)'};
+        border-color:${isActive ? '#FF6B9D' : 'rgba(255,255,255,.2)'};`;
+      btn.textContent = chip;
+      btn.onclick = () => {
+        filters[group.key] = chip;
+        document.querySelectorAll(`.dn-filter-chip[data-group="${group.key}"]`).forEach(b => {
+          const a = b.dataset.value === chip;
+          b.style.background = a ? '#FF6B9D' : 'rgba(255,255,255,.08)';
+          b.style.color = a ? '#fff' : 'rgba(255,255,255,.8)';
+          b.style.borderColor = a ? '#FF6B9D' : 'rgba(255,255,255,.2)';
+        });
+        if (typeof window._dnRenderActiveTab === 'function') window._dnRenderActiveTab();
+      };
+      row.appendChild(btn);
+    });
+    return wrap;
+  }
+
+  /* ── Floating hearts ── */
+  function buildFloatingHearts() {
+    const container = document.createElement('div');
+    container.style.cssText = 'position:absolute;inset:0;pointer-events:none;overflow:hidden;';
+    const HEARTS = ['❤️','💕','🌹','💖','✨'];
+    for (let i = 0; i < 10; i++) {
+      const h = document.createElement('span');
+      const delay = (i * 1.1).toFixed(1);
+      const left  = 5 + (i * 9) % 90;
+      h.style.cssText = `position:absolute;bottom:0;left:${left}%;font-size:${12 + (i%5)*4}px;
+        animation:dnHeartRise ${3.5 + (i % 3)}s ease-in infinite;
+        animation-delay:${delay}s;opacity:0;`;
+      h.textContent = HEARTS[i % HEARTS.length];
+      container.appendChild(h);
+    }
+    return container;
+  }
+
+  /* ── Surprise Me ── */
+  function surpriseMe() {
+    const plans = [
+      { activity:'🚣 Lake Eola Paddle Boat at Sunset', restaurant:'🍽️ The Ravenous Pig', end:'🌟 Stargazing at Lake Nona' },
+      { activity:'🎡 ICON Park Wheel Private Gondola', restaurant:'🥩 Capa Steakhouse', end:'🍸 Midnight Rose Rooftop Bar' },
+      { activity:'🎭 Escape Room at Escapology', restaurant:'🍣 Sushi Pop', end:'🍹 Rooftop Bar Hopping on I-Drive' },
+      { activity:'🧖 Couples Spa at Four Seasons', restaurant:'🍝 Ravello at Four Seasons', end:'🌙 Private balcony at Grand Bohemian' },
+      { activity:'🎨 Art Gallery Walk on Park Avenue', restaurant:'🍕 Prato on Park Avenue', end:'🥂 Wine bar at The Boheme' },
+    ];
+    const pick = plans[Math.floor(Math.random() * plans.length)];
+    const modal = document.createElement('div');
+    modal.style.cssText = 'position:fixed;inset:0;z-index:9200;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.7);animation:dnFadeIn .4s ease;';
+    modal.innerHTML = `
+      <div style="background:linear-gradient(160deg,#1a0a15,#2D1B69);border-radius:24px;padding:24px;
+        max-width:340px;width:90%;text-align:center;border:1px solid rgba(201,169,110,.3);">
+        <div style="font-size:36px;margin-bottom:8px;">✨</div>
+        <div style="font-family:'Playfair Display',serif;font-size:20px;color:#C9A96E;font-weight:700;margin-bottom:4px;">
+          Your Surprise Date Night
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.6);margin-bottom:20px;">A romantic evening curated just for you</div>
+        <div style="text-align:left;display:flex;flex-direction:column;gap:12px;margin-bottom:20px;">
+          ${[{time:'7:00 PM',item:pick.activity,color:'#FF6B9D'},{time:'8:30 PM',item:pick.restaurant,color:'#C9A96E'},{time:'10:30 PM',item:pick.end,color:'#8B5CF6'}]
+            .map(s=>`<div style="display:flex;gap:12px;align-items:flex-start;">
+              <div style="width:8px;height:8px;border-radius:50%;background:${s.color};flex-shrink:0;margin-top:5px;"></div>
+              <div>
+                <div style="font-size:10px;color:${s.color};font-weight:700;">${s.time}</div>
+                <div style="font-size:13px;color:#fff;font-weight:600;">${s.item}</div>
+              </div>
+            </div>`).join('')}
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button onclick="this.closest('[style*=\"fixed\"]').remove()" style="flex:1;padding:11px;border-radius:12px;
+            border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.7);font-size:13px;cursor:pointer;">
+            Close</button>
+          <button onclick="window.openDateNightPlanner && window.openDateNightPlanner();this.closest('[style*=\"fixed\"]').remove()"
+            style="flex:2;padding:11px;border-radius:12px;border:none;
+            background:linear-gradient(135deg,#6B0F1A,#FF6B9D);color:#fff;font-size:13px;font-weight:700;cursor:pointer;">
+            Build My Plan ›</button>
+        </div>
+      </div>`;
+    document.body.appendChild(modal);
+  }
+
+  /* ── Tab bar ── */
+  const TABS = [
+    { id:'restaurants', label:'🍽️ Restaurants' },
+    { id:'activities',  label:'🎯 Activities' },
+    { id:'hotels',      label:'🏨 Hotels' },
+    { id:'plans',       label:'📋 Full Plans' },
+  ];
+
+  function buildTabBar(s) {
+    const bar = document.createElement('div');
+    bar.id = 'dn-tab-bar';
+    bar.style.cssText = 'display:flex;background:rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.1);flex-shrink:0;';
+    TABS.forEach(tab => {
+      const btn = document.createElement('button');
+      btn.className = 'dn-tab-btn';
+      btn.dataset.tab = tab.id;
+      btn.style.cssText = `flex:1;padding:10px 4px;border:none;background:transparent;
+        font-size:11px;font-weight:700;cursor:pointer;color:rgba(255,255,255,.5);
+        border-bottom:2px solid transparent;transition:all .2s;`;
+      btn.textContent = tab.label;
+      if (tab.id === activeTab) {
+        btn.style.color = '#FF6B9D';
+        btn.style.borderBottomColor = '#FF6B9D';
+      }
+      btn.onclick = () => {
+        activeTab = tab.id;
+        document.querySelectorAll('.dn-tab-btn').forEach(b => {
+          b.style.color = 'rgba(255,255,255,.5)';
+          b.style.borderBottomColor = 'transparent';
+        });
+        btn.style.color = '#FF6B9D';
+        btn.style.borderBottomColor = '#FF6B9D';
+        if (typeof window._dnRenderActiveTab === 'function') window._dnRenderActiveTab();
+      };
+      bar.appendChild(btn);
+    });
+    return bar;
+  }
+
+  /* ── Build the full screen ── */
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-date-night';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7700;background:#1a0a15;flex-direction:column;overflow:hidden;';
+
+    /* Header */
+    const header = document.createElement('div');
+    header.style.cssText = 'position:relative;overflow:hidden;flex-shrink:0;';
+    header.innerHTML = `
+      <div style="background:linear-gradient(160deg,#3B0010,#8B1A4A,#C9A96E 120%);padding:18px 14px 20px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+          <button onclick="window.showScreen('home')"
+            style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:36px;height:36px;
+            font-size:18px;color:#fff;cursor:pointer;">‹</button>
+          <div style="flex:1;">
+            <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#F5E6CA;
+              text-shadow:0 2px 8px rgba(0,0,0,.3);">Plan Your Perfect Date Night</div>
+            <div style="font-size:11px;color:rgba(245,230,202,.7);margin-top:2px;">Orlando's most romantic experiences</div>
+          </div>
+        </div>
+        <!-- Build Plan button -->
+        <button onclick="window.openDateNightPlanner && window.openDateNightPlanner()"
+          style="width:100%;padding:13px;border-radius:14px;border:1.5px solid rgba(201,169,110,.5);
+          background:rgba(201,169,110,.15);color:#F5E6CA;font-family:'DM Sans',sans-serif;
+          font-size:14px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
+          margin-bottom:2px;">
+          <span style="font-size:18px;">💌</span>Build Your Date Night Plan
+        </button>
+      </div>`;
+    header.appendChild(buildFloatingHearts());
+
+    /* Filter area (dark) */
+    const filterArea = document.createElement('div');
+    filterArea.style.cssText = 'background:rgba(0,0,0,.3);padding:8px 0 4px;flex-shrink:0;';
+    FILTER_GROUPS.forEach(g => filterArea.appendChild(buildFilterRow(g)));
+
+    /* Surprise Me */
+    const surpriseBtn = document.createElement('button');
+    surpriseBtn.style.cssText = `margin:8px 14px 0;width:calc(100% - 28px);padding:11px;border-radius:14px;border:1.5px dashed rgba(201,169,110,.5);
+      background:rgba(201,169,110,.1);color:#C9A96E;font-size:13px;font-weight:700;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;gap:8px;`;
+    surpriseBtn.innerHTML = '<span style="font-size:18px;">✨</span>Surprise Me — Generate a Random Date Night';
+    surpriseBtn.onclick = () => surpriseMe();
+
+    /* Tab bar */
+    const tabBar = buildTabBar(s);
+
+    /* Content area */
+    const content = document.createElement('div');
+    content.id = 'dn-tab-content';
+    content.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    s.appendChild(header);
+    s.appendChild(filterArea);
+    s.appendChild(surpriseBtn);
+    s.appendChild(tabBar);
+    s.appendChild(content);
+    document.body.appendChild(s);
+
+    /* Expose tab renderer — filled in by later blocks */
+    window._dnActiveTab = () => activeTab;
+    window._dnFilters   = filters;
+    window._dnRenderActiveTab = function() {
+      const tab = activeTab;
+      if (tab === 'restaurants' && typeof window._dnRenderRestaurants === 'function') window._dnRenderRestaurants(content, filters);
+      else if (tab === 'activities' && typeof window._dnRenderActivities === 'function') window._dnRenderActivities(content, filters);
+      else if (tab === 'hotels' && typeof window._dnRenderHotels === 'function') window._dnRenderHotels(content, filters);
+      else if (tab === 'plans' && typeof window._dnRenderPlans === 'function') window._dnRenderPlans(content, filters);
+      else { content.innerHTML = '<div style="text-align:center;padding:40px;color:rgba(255,255,255,.4);">Loading…</div>'; }
+    };
+    // Initial render once restaurants are loaded
+    setTimeout(() => { if (typeof window._dnRenderActiveTab === 'function') window._dnRenderActiveTab(); }, 300);
+  }
+
+  if (!document.getElementById('screen-date-night')) buildScreen();
+})();
+</script>
+<script>
+/* ===== BLOCK DN3: Romantic Restaurants + Reservation Modal ===== */
+(function initDNRestaurants() {
+
+  const RESTAURANTS = [
+    {
+      id:'capa', name:'Capa Steakhouse', emoji:'🥩',
+      hearts:5, price:'$$$$', priceNum:200, neighborhood:'Four Seasons Resort',
+      desc:'Rooftop perfection with Magic Kingdom fireworks views. Watch Disney magic while enjoying world-class steakhouse fare.',
+      ambiance:['Candlelit','Rooftop'], dress:'Formal', dressColor:'#C9A96E',
+      specialMenu:true, privateDining:true,
+      vibes:['Luxurious'], budgets:['$150+','Splurge'],
+    },
+    {
+      id:'boheme', name:'The Boheme', emoji:'🎷',
+      hearts:5, price:'$$$', priceNum:150, neighborhood:'Grand Bohemian Hotel, Downtown',
+      desc:'Live jazz floats through an extraordinary art gallery. Every evening here is a masterpiece of ambiance and flavor.',
+      ambiance:['Live Music','Art Deco'], dress:'Smart Casual', dressColor:'#1565C0',
+      specialMenu:false, privateDining:false,
+      vibes:['Cozy & Intimate','Cultural'], budgets:['$50–$150','$150+'],
+    },
+    {
+      id:'victalberts', name:"Victoria & Albert's", emoji:'👑',
+      hearts:5, price:'$$$$$', priceNum:400, neighborhood:"Disney's Grand Floridian",
+      desc:"Orlando's most exclusive dining experience. A seven-course orchestral journey paired with the world's finest wines.",
+      ambiance:['Private Dining','Candlelit'], dress:'Formal', dressColor:'#C9A96E',
+      specialMenu:true, privateDining:true,
+      vibes:['Luxurious'], budgets:['Splurge'],
+    },
+    {
+      id:'ravpig', name:'The Ravenous Pig', emoji:'🍖',
+      hearts:4, price:'$$$', priceNum:120, neighborhood:'Winter Park',
+      desc:'Farm-to-table magic by James Beard-nominated chefs. Intimate, warm, and utterly delicious.',
+      ambiance:['Candlelit'], dress:'Smart Casual', dressColor:'#1565C0',
+      specialMenu:false, privateDining:false,
+      vibes:['Cozy & Intimate'], budgets:['$50–$150'],
+    },
+    {
+      id:'prato', name:'Prato', emoji:'🍝',
+      hearts:4, price:'$$$', priceNum:130, neighborhood:"Park Avenue, Winter Park",
+      desc:"Authentic Italian romance on Orlando's most beautiful street. Sip Barolo, share pasta, fall in love all over again.",
+      ambiance:['Garden'], dress:'Smart Casual', dressColor:'#1565C0',
+      specialMenu:false, privateDining:false,
+      vibes:['Cozy & Intimate','Cultural'], budgets:['$50–$150'],
+    },
+    {
+      id:'ravello', name:'Ravello at Four Seasons', emoji:'🌊',
+      hearts:5, price:'$$$$', priceNum:180, neighborhood:'Four Seasons Resort',
+      desc:'Italian fine dining with breathtaking lake views. The waterfront terrace at sunset is among the most romantic settings in Florida.',
+      ambiance:['Lake Views','Waterfront'], dress:'Formal', dressColor:'#C9A96E',
+      specialMenu:true, privateDining:false,
+      vibes:['Luxurious'], budgets:['$150+','Splurge'],
+    },
+    {
+      id:'hillstone', name:'Hillstone', emoji:'🥂',
+      hearts:4, price:'$$$', priceNum:110, neighborhood:'Sand Lake Road',
+      desc:'Sophisticated American cuisine with a warm, intimate atmosphere. Reliable excellence for a classic romantic evening.',
+      ambiance:['Candlelit'], dress:'Smart Casual', dressColor:'#1565C0',
+      specialMenu:false, privateDining:false,
+      vibes:['Cozy & Intimate'], budgets:['$50–$150'],
+    },
+    {
+      id:'sushipop', name:'Sushi Pop', emoji:'🍣',
+      hearts:3, price:'$$', priceNum:80, neighborhood:'Oviedo',
+      desc:'Creative Japanese sharing plates that spark conversation. Fun, adventurous, and utterly memorable for couples.',
+      ambiance:['Live Music'], dress:'Casual', dressColor:'#2E7D32',
+      specialMenu:false, privateDining:false,
+      vibes:['Adventurous','Casual Fun'], budgets:['Under $50','$50–$150'],
+    },
+    {
+      id:'midnightrose', name:'Midnight Rose Rooftop Bar', emoji:'🌃',
+      hearts:4, price:'$$', priceNum:60, neighborhood:'Downtown Orlando',
+      desc:'Cocktails with the best city views in Orlando. Watch the skyline sparkle as you sip something spectacular.',
+      ambiance:['Rooftop','City Views'], dress:'Smart Casual', dressColor:'#1565C0',
+      specialMenu:false, privateDining:false,
+      vibes:['Adventurous','Casual Fun'], budgets:['Under $50','$50–$150'],
+    },
+    {
+      id:'citricos', name:'Citricos at Grand Floridian', emoji:'🏰',
+      hearts:4, price:'$$$$', priceNum:160, neighborhood:"Disney's Grand Floridian",
+      desc:"Elegant California-French cuisine steps from the Magic Kingdom. Disney magic surrounds every exquisite plate.",
+      ambiance:['Candlelit'], dress:'Formal', dressColor:'#C9A96E',
+      specialMenu:true, privateDining:false,
+      vibes:['Luxurious'], budgets:['$150+'],
+    },
+  ];
+  window._dnRestaurants = RESTAURANTS;
+
+  /* ── Reservation Simulation Modal ── */
+  // replace with OpenTable API or Resy API integration in production
+  window.openReservationModal = function(restaurant) {
+    const existing = document.getElementById('dn-reservation-modal');
+    if (existing) existing.remove();
+
+    const modal = document.createElement('div');
+    modal.id = 'dn-reservation-modal';
+    modal.style.cssText = 'position:fixed;inset:0;z-index:9100;display:flex;align-items:flex-end;background:rgba(0,0,0,.6);animation:dnFadeIn .3s ease;';
+
+    const now = new Date();
+    const DAYS = [];
+    const DAY_LABELS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const MONTH_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(now); d.setDate(d.getDate() + i);
+      DAYS.push({ label: (i===0?'Today':i===1?'Tomorrow':DAY_LABELS[d.getDay()]), sub: MONTH_SHORT[d.getMonth()]+' '+d.getDate(), date: d.toISOString().split('T')[0] });
+    }
+    const SLOTS = ['5:30 PM','6:00 PM','6:30 PM','7:00 PM','7:30 PM','8:00 PM','8:30 PM','9:00 PM'];
+    const BOOKED_SLOTS_SEED = restaurant.id.charCodeAt(0);
+    const bookedIdxs = new Set([(BOOKED_SLOTS_SEED % 3), (BOOKED_SLOTS_SEED % 5 + 2) % 8]);
+
+    let selDay = DAYS[0].date;
+    let selTime = '';
+    let selParty = 2;
+    let selOccasion = 'Date Night';
+
+    modal.innerHTML = `
+      <div id="dn-res-inner" style="background:var(--bg,#fff);border-radius:24px 24px 0 0;width:100%;max-height:90vh;overflow-y:auto;-webkit-overflow-scrolling:touch;">
+        <div style="background:linear-gradient(135deg,#6B0F1A,#C2185B);padding:16px 16px 20px;border-radius:24px 24px 0 0;text-align:center;">
+          <div style="font-size:32px;">${restaurant.emoji}</div>
+          <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:#F5E6CA;margin-top:4px;">${restaurant.name}</div>
+          <div style="font-size:11px;color:rgba(245,230,202,.7);">Reservation Request</div>
+        </div>
+        <div style="padding:16px;">
+          <!-- Day picker -->
+          <div style="font-size:11px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:8px;">SELECT DATE</div>
+          <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px;-webkit-overflow-scrolling:touch;">
+            ${DAYS.map(d=>`<button class="dn-day-chip" data-date="${d.date}"
+              style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding:8px 12px;border-radius:12px;
+              border:1.5px solid var(--border,#ddd);background:var(--card-bg,#fff);cursor:pointer;min-width:56px;
+              ${d.date===selDay?'background:#FF6B9D;border-color:#FF6B9D;color:#fff;':''}">
+              <span style="font-size:10px;font-weight:700;">${d.label}</span>
+              <span style="font-size:12px;font-weight:800;">${d.sub}</span>
+            </button>`).join('')}
+          </div>
+          <!-- Time slots -->
+          <div style="font-size:11px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:8px;">AVAILABLE TIMES</div>
+          <div id="dn-res-slots" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;">
+            ${SLOTS.map((sl,i)=>{
+              const booked = bookedIdxs.has(i);
+              return `<button class="dn-time-slot" data-time="${sl}" ${booked?'disabled':''}
+                style="padding:8px 4px;border-radius:10px;border:1.5px solid var(--border,#ddd);
+                font-size:12px;font-weight:700;cursor:${booked?'not-allowed':'pointer'};
+                background:${booked?'var(--border,#eee)':'var(--card-bg,#fff)'};
+                color:${booked?'var(--text-secondary,#aaa)':'var(--text-primary,#212121)'};text-align:center;">
+                ${booked?'<span style="text-decoration:line-through">'+sl+'</span>':sl}
+              </button>`;}).join('')}
+          </div>
+          <!-- Party size -->
+          <div style="font-size:11px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:8px;">PARTY SIZE</div>
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
+            <button id="dn-party-dec" style="width:36px;height:36px;border-radius:50%;border:1px solid var(--border,#ddd);background:var(--card-bg,#fff);font-size:20px;cursor:pointer;color:#FF6B9D;">−</button>
+            <span id="dn-party-count" style="font-size:20px;font-weight:800;min-width:28px;text-align:center;">2</span>
+            <button id="dn-party-inc" style="width:36px;height:36px;border-radius:50%;border:1px solid var(--border,#ddd);background:var(--card-bg,#fff);font-size:20px;cursor:pointer;color:#FF6B9D;">+</button>
+          </div>
+          <!-- Occasion -->
+          <div style="font-size:11px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:8px;">OCCASION</div>
+          <select id="dn-res-occasion" style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border,#ddd);font-size:13px;background:var(--card-bg,#fff);color:var(--text-primary,#212121);margin-bottom:14px;">
+            ${['Date Night','Anniversary','Proposal','First Date','Birthday',"Valentine's Day",'Honeymoon','Just Because'].map(o=>`<option>${o}</option>`).join('')}
+          </select>
+          <!-- Special requests -->
+          <textarea id="dn-res-requests" placeholder="Special requests, dietary needs, celebration notes…" rows="2"
+            style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border,#ddd);font-size:13px;resize:none;background:var(--card-bg,#fff);color:var(--text-primary,#212121);margin-bottom:14px;box-sizing:border-box;"></textarea>
+          <button id="dn-res-confirm" style="width:100%;padding:13px;border-radius:14px;border:none;
+            background:linear-gradient(135deg,#6B0F1A,#FF6B9D);color:#fff;font-size:15px;font-weight:800;cursor:pointer;">
+            Confirm Reservation</button>
+          <button onclick="document.getElementById('dn-reservation-modal').remove()"
+            style="width:100%;padding:10px;border-radius:14px;border:none;background:transparent;color:var(--text-secondary,#aaa);font-size:13px;cursor:pointer;margin-top:8px;">Cancel</button>
+        </div>
+      </div>`;
+
+    document.body.appendChild(modal);
+
+    // Day chip selection
+    modal.querySelectorAll('.dn-day-chip').forEach(btn => {
+      btn.onclick = () => {
+        selDay = btn.dataset.date;
+        modal.querySelectorAll('.dn-day-chip').forEach(b => {
+          b.style.background = b.dataset.date === selDay ? '#FF6B9D' : 'var(--card-bg,#fff)';
+          b.style.borderColor = b.dataset.date === selDay ? '#FF6B9D' : 'var(--border,#ddd)';
+          b.style.color = b.dataset.date === selDay ? '#fff' : '';
+        });
+      };
+    });
+    // Time slot selection
+    modal.querySelectorAll('.dn-time-slot:not([disabled])').forEach(btn => {
+      btn.onclick = () => {
+        selTime = btn.dataset.time;
+        modal.querySelectorAll('.dn-time-slot:not([disabled])').forEach(b => {
+          b.style.background = b.dataset.time === selTime ? '#FF6B9D' : 'var(--card-bg,#fff)';
+          b.style.borderColor = b.dataset.time === selTime ? '#FF6B9D' : 'var(--border,#ddd)';
+          b.style.color = b.dataset.time === selTime ? '#fff' : 'var(--text-primary,#212121)';
+        });
+      };
+    });
+    // Party size
+    modal.querySelector('#dn-party-dec').onclick = () => { if (selParty > 2) { selParty--; modal.querySelector('#dn-party-count').textContent = selParty; } };
+    modal.querySelector('#dn-party-inc').onclick = () => { if (selParty < 8) { selParty++; modal.querySelector('#dn-party-count').textContent = selParty; } };
+
+    // Confirm
+    modal.querySelector('#dn-res-confirm').onclick = () => {
+      if (!selTime) { alert('Please select a time slot.'); return; }
+      const confirmNum = 'DN-' + Date.now().toString(36).toUpperCase().slice(-6);
+      const res = {
+        id: confirmNum,
+        restaurant: restaurant.name,
+        emoji: restaurant.emoji,
+        date: selDay,
+        time: selTime,
+        party: selParty,
+        occasion: modal.querySelector('#dn-res-occasion').value,
+        requests: modal.querySelector('#dn-res-requests').value,
+        confirmedAt: Date.now(),
+      };
+      if (window.appState && window.appState.dateNight) {
+        window.appState.dateNight.reservations.push(res);
+      }
+      // Show confirmation
+      modal.querySelector('#dn-res-inner').innerHTML = `
+        <div style="padding:40px 24px;text-align:center;">
+          <div style="font-size:64px;animation:dnCheckBounce .6s ease;">✅</div>
+          <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#2E7D32;margin:12px 0 4px;">
+            Reservation Confirmed!</div>
+          <div style="font-size:12px;color:var(--text-secondary,#888);margin-bottom:20px;">
+            Confirmation #${confirmNum}</div>
+          <div style="background:var(--card-bg,#f8f8f8);border-radius:14px;padding:14px;text-align:left;margin-bottom:20px;">
+            <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:8px;">${restaurant.emoji} ${restaurant.name}</div>
+            <div style="font-size:12px;color:var(--text-secondary,#666);line-height:2;">
+              📅 ${selDay} at ${selTime}<br>
+              👥 Party of ${selParty}<br>
+              🎉 ${res.occasion}
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button onclick="document.getElementById('dn-reservation-modal').remove()"
+              style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border,#ddd);
+              background:var(--card-bg,#fff);font-size:13px;cursor:pointer;">Close</button>
+            <button onclick="alert('Added to your trip!');document.getElementById('dn-reservation-modal').remove()"
+              style="flex:2;padding:12px;border-radius:12px;border:none;
+              background:linear-gradient(135deg,#FF6B35,#FF6B9D);color:#fff;font-size:13px;font-weight:700;cursor:pointer;">
+              Add to My Trip</button>
+          </div>
+        </div>`;
+    };
+  };
+
+  /* ── Restaurant Card Builder ── */
+  function buildRestaurantCard(r) {
+    const heartsHTML = Array.from({length:5},(_,i)=>i<r.hearts?'❤️':'🤍').join('');
+    const gradients = {
+      '#6B0F1A':'linear-gradient(135deg,#6B0F1A,#C2185B)',
+      default:'linear-gradient(135deg,#8B1A4A,#C9A96E)',
+    };
+    const card = document.createElement('div');
+    card.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+    card.innerHTML = `
+      <!-- Hero image area -->
+      <div style="height:90px;background:linear-gradient(135deg,#3B0010,#8B1A4A,#C9A96E 150%);
+        display:flex;align-items:center;justify-content:center;position:relative;">
+        <span style="font-size:44px;filter:drop-shadow(0 2px 8px rgba(0,0,0,.3));">${r.emoji}</span>
+        ${r.specialMenu?'<span style="position:absolute;top:8px;left:8px;background:#C9A96E;color:#fff;font-size:9px;font-weight:800;padding:3px 8px;border-radius:20px;">✨ DATE NIGHT MENU</span>':''}
+        ${r.privateDining?'<span style="position:absolute;top:8px;right:8px;background:#7B1FA2;color:#fff;font-size:9px;font-weight:800;padding:3px 8px;border-radius:20px;">🔒 PRIVATE DINING</span>':''}
+      </div>
+      <!-- Content -->
+      <div style="padding:12px 14px;">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--text-primary,#212121);flex:1;">${r.name}</div>
+          <span style="font-size:11px;font-weight:800;padding:3px 8px;border-radius:20px;
+            background:${r.dressColor}22;color:${r.dressColor};flex-shrink:0;margin-left:8px;">${r.dress}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+          <span style="font-size:13px;">${heartsHTML}</span>
+          <span style="font-size:13px;color:var(--text-secondary,#888);">${r.price}</span>
+          <span style="font-size:11px;color:var(--text-secondary,#aaa);">· ${r.neighborhood}</span>
+        </div>
+        <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;margin-bottom:8px;">${r.desc}</div>
+        <!-- Ambiance tags -->
+        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;">
+          ${r.ambiance.map(a=>`<span style="padding:3px 9px;background:#FF6B9D18;border-radius:20px;font-size:10px;color:#FF6B9D;font-weight:700;">${a}</span>`).join('')}
+        </div>
+        <!-- Avg spend -->
+        <div style="background:rgba(201,169,110,.1);border-radius:8px;padding:7px 10px;margin-bottom:10px;
+          display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-size:11px;color:var(--text-secondary,#888);">Avg Spend Per Couple</span>
+          <span style="font-size:14px;font-weight:800;color:#C9A96E;">~$${r.priceNum}</span>
+        </div>
+        <button onclick="window.openReservationModal(window._dnRestaurants.find(x=>x.id==='${r.id}'))"
+          style="width:100%;padding:10px;border-radius:12px;border:none;
+          background:linear-gradient(135deg,#6B0F1A,#FF6B9D);color:#fff;font-size:13px;font-weight:700;cursor:pointer;">
+          Reserve Now 🌹</button>
+      </div>`;
+    return card;
+  }
+
+  /* ── Render function exposed globally ── */
+  window._dnRenderRestaurants = function(container, filters) {
+    container.innerHTML = '';
+    const filtered = RESTAURANTS.filter(r => {
+      if (filters.budget !== 'Any Budget' && !r.budgets.includes(filters.budget)) return false;
+      if (filters.vibe !== 'All Vibes' && !r.vibes.includes(filters.vibe)) return false;
+      return true;
+    });
+    if (filtered.length === 0) {
+      container.innerHTML = '<div style="text-align:center;padding:40px;color:rgba(255,255,255,.4);">No restaurants match your filters.</div>';
+      return;
+    }
+    filtered.forEach(r => container.appendChild(buildRestaurantCard(r)));
+  };
+
+  // Auto-render if already on date-night screen
+  setTimeout(() => {
+    const c = document.getElementById('dn-tab-content');
+    if (c && window._dnActiveTab && window._dnActiveTab() === 'restaurants') {
+      window._dnRenderRestaurants(c, window._dnFilters || {});
+    }
+  }, 200);
+})();
+</script>
+<script>
+/* ===== BLOCK DN4: Romantic Activities + Hotels ===== */
+(function initDNActivitiesHotels() {
+
+  /* ── Activities ── */
+  const ACTIVITIES = [
+    { id:'sunsetcruise', name:'Sunset Cruise on Lake Tohopekaliga', emoji:'⛵', hearts:5, vibe:'Cozy & Intimate',
+      duration:'2 hours', price:90, thrill:'Relaxing', desc:'Glide across sparkling waters as the Florida sky erupts in amber and rose. Pure romance.',
+      budgets:['$50–$150'], vibes:['Cozy & Intimate'] },
+    { id:'balloon', name:'Hot Air Balloon Ride at Dawn', emoji:'🎈', hearts:5, vibe:'Adventurous',
+      duration:'3 hours', price:280, thrill:'Thrilling', desc:'Float above the sleeping world at sunrise. Champagne in hand, the earth below, just the two of you.',
+      budgets:['$150+','Splurge'], vibes:['Adventurous','Luxurious'] },
+    { id:'iconwheel', name:'ICON Park Wheel Private Gondola + Champagne', emoji:'🎡', hearts:5, vibe:'Luxurious',
+      duration:'45 min', price:120, thrill:'Relaxing', desc:'Your own private gondola at the top of Orlando. Champagne, city lights, and absolute privacy.',
+      budgets:['$50–$150','$150+'], vibes:['Luxurious'] },
+    { id:'spa4seasons', name:'Couples Spa at Four Seasons', emoji:'🧖', hearts:5, vibe:'Luxurious',
+      duration:'2 hours', price:400, thrill:'Relaxing', desc:"Side-by-side indulgence in Orlando's finest spa. Emerge glowing, relaxed, and deeply connected.",
+      budgets:['Splurge'], vibes:['Luxurious'] },
+    { id:'cooking', name:'Private Cooking Class in Winter Park', emoji:'👨‍🍳', hearts:4, vibe:'Casual Fun',
+      duration:'2 hours', price:160, thrill:'Relaxing', desc:'Create a feast together with an expert chef. The laughter, the aromas, the tasting — unforgettable.',
+      budgets:['$150+'], vibes:['Casual Fun','Cultural'] },
+    { id:'paddleboat', name:'Lake Eola Paddle Boat at Sunset', emoji:'🚣', hearts:4, vibe:'Cozy & Intimate',
+      duration:'1 hour', price:20, thrill:'Relaxing', desc:'The most romantic $20 you will ever spend. Swan-shaped boats on a gorgeous urban lake at golden hour.',
+      budgets:['Under $50'], vibes:['Cozy & Intimate'] },
+    { id:'kayak', name:'Kayaking at Wekiwa Springs at Sunrise', emoji:'🌿', hearts:4, vibe:'Adventurous',
+      duration:'2 hours', price:50, thrill:'Moderate', desc:'Paddle through crystal-clear springs in the soft morning light. Nature at its most magical.',
+      budgets:['Under $50','$50–$150'], vibes:['Adventurous'] },
+    { id:'artgallery', name:'Art Gallery Walk on Park Avenue', emoji:'🎨', hearts:3, vibe:'Cultural',
+      duration:'2 hours', price:0, thrill:'Relaxing', desc:"Stroll Winter Park's beautiful boulevard, discover galleries, and find your favorite piece together.",
+      budgets:['Under $50'], vibes:['Cultural'] },
+    { id:'escape', name:'Escape Room Challenge at Escapology', emoji:'🔐', hearts:3, vibe:'Adventurous',
+      duration:'1 hour', price:60, thrill:'Moderate', desc:"Nothing bonds a couple like solving puzzles under pressure. Will you escape in time?",
+      budgets:['$50–$150'], vibes:['Adventurous','Casual Fun'] },
+    { id:'stargazing', name:'Stargazing at Lake Nona Waterfront', emoji:'🌟', hearts:5, vibe:'Cozy & Intimate',
+      duration:'2 hours', price:0, thrill:'Relaxing', desc:'Lay on a blanket under Florida skies. Billions of stars, just the two of you, and endless conversation.',
+      budgets:['Under $50'], vibes:['Cozy & Intimate'] },
+    { id:'bowling', name:'Bowling & Cocktails at Punch Bowl Social', emoji:'🎳', hearts:3, vibe:'Casual Fun',
+      duration:'2 hours', price:50, thrill:'Relaxing', desc:'Friendly competition and great drinks. Perfect for couples who like to laugh and play.',
+      budgets:['Under $50','$50–$150'], vibes:['Casual Fun'] },
+    { id:'rooftopbar', name:'Rooftop Bar Hopping Route on I-Drive', emoji:'🍹', hearts:4, vibe:'Adventurous',
+      duration:'3 hours', price:80, thrill:'Moderate', desc:"Discover Orlando's best rooftop views bar by bar. Each stop a new vantage point on a beautiful city.",
+      budgets:['$50–$150'], vibes:['Adventurous','Casual Fun'] },
+  ];
+  window._dnActivities = ACTIVITIES;
+
+  /* ── Hotels ── */
+  const HOTELS = [
+    { id:'grandbohemian', name:'Grand Bohemian Hotel', emoji:'🎨', hearts:5, pricePerNight:350,
+      neighborhood:'Downtown Orlando',
+      desc:'An extraordinary boutique hotel wrapped in original art. Every corner whispers romance.',
+      amenities:['Jacuzzi Suite','Spa on Site'],
+      budgets:['$150+'], vibes:['Cozy & Intimate','Cultural'] },
+    { id:'fourseasons', name:'Four Seasons Orlando', emoji:'👑', hearts:5, pricePerNight:750,
+      neighborhood:'Disney World Resort',
+      desc:"Florida's ultimate honeymoon experience. Perfection from the moment you arrive.",
+      amenities:['Jacuzzi Suite','Champagne Service','Rose Petal Turndown','Rooftop Pool','Private Balcony','Honeymoon Suite','Couples Package','Spa on Site'],
+      budgets:['Splurge'], vibes:['Luxurious'] },
+    { id:'portofino', name:'Loews Portofino Bay', emoji:'⛵', hearts:4, pricePerNight:400,
+      neighborhood:'Universal Orlando Resort',
+      desc:'An Italian coastal village transported to Florida. Gondola rides, waterfront dining, pure romance.',
+      amenities:['Rooftop Pool','Couples Package'],
+      budgets:['$150+','Splurge'], vibes:['Luxurious','Adventurous'] },
+    { id:'waldorf', name:'Waldorf Astoria Orlando', emoji:'✨', hearts:5, pricePerNight:550,
+      neighborhood:'Disney World Area',
+      desc:'Timeless elegance near the magic. A classic honeymoon hotel with impeccable service.',
+      amenities:['Rose Petal Turndown','Honeymoon Suite','Spa on Site'],
+      budgets:['Splurge'], vibes:['Luxurious'] },
+    { id:'alfond', name:'Alfond Inn', emoji:'🖼️', hearts:4, pricePerNight:320,
+      neighborhood:'Park Avenue, Winter Park',
+      desc:"Sophisticated boutique romance on Park Avenue. Art, refinement, and genuine warmth.",
+      amenities:['Champagne Service'],
+      budgets:['$150+'], vibes:['Cultural','Cozy & Intimate'] },
+    { id:'bresort', name:'B Resort & Spa at Disney Springs', emoji:'🌊', hearts:4, pricePerNight:280,
+      neighborhood:'Disney Springs',
+      desc:'Modern romantic boutique with a stunning rooftop pool and full-service spa steps from Disney.',
+      amenities:['Rooftop Pool','Spa on Site'],
+      budgets:['$150+'], vibes:['Casual Fun','Adventurous'] },
+    { id:'shinglecreek', name:'Rosen Shingle Creek', emoji:'🏌️', hearts:3, pricePerNight:260,
+      neighborhood:'International Drive',
+      desc:'Secluded resort romance with championship golf, a world-class spa, and peaceful creek views.',
+      amenities:['Spa on Site','Private Balcony'],
+      budgets:['$150+'], vibes:['Luxurious','Cozy & Intimate'] },
+  ];
+  window._dnHotels = HOTELS;
+
+  const THRILL_COLORS = { Relaxing:'#2E7D32', Moderate:'#F57F17', Thrilling:'#c62828' };
+  const AMENITY_COLORS = {
+    'Jacuzzi Suite':'#7B1FA2','Champagne Service':'#C9A96E','Rose Petal Turndown':'#FF6B9D',
+    'Rooftop Pool':'#1565C0','Private Balcony':'#2E7D32','Honeymoon Suite':'#c62828',
+    'Couples Package':'#FF6B9D','Spa on Site':'#00695C',
+  };
+
+  /* ── Activity card ── */
+  function buildActivityCard(a) {
+    const hearts = Array.from({length:5},(_,i)=>i<a.hearts?'❤️':'🤍').join('');
+    const tc = THRILL_COLORS[a.thrill] || '#888';
+    const card = document.createElement('div');
+    card.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+    card.innerHTML = `
+      <div style="height:72px;background:linear-gradient(135deg,#2D1B69,#6B0F1A 80%,#C9A96E);
+        display:flex;align-items:center;justify-content:center;">
+        <span style="font-size:40px;">${a.emoji}</span>
+      </div>
+      <div style="padding:12px 14px;">
+        <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:6px;">${a.name}</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+          <span style="font-size:12px;">${hearts}</span>
+          <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:${tc}18;color:${tc};">${a.thrill}</span>
+        </div>
+        <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;margin-bottom:8px;">${a.desc}</div>
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
+          <span style="font-size:11px;color:var(--text-secondary,#888);">⏱ ${a.duration}</span>
+          <span style="font-size:14px;font-weight:800;color:#C9A96E;margin-left:auto;">${a.price > 0 ? '~$'+a.price+'/couple' : 'Free'}</span>
+        </div>
+        <div style="display:flex;gap:6px;">
+          <span style="padding:3px 9px;background:#FF6B9D18;border-radius:20px;font-size:10px;color:#FF6B9D;font-weight:700;">${a.vibe}</span>
+        </div>
+      </div>`;
+    return card;
+  }
+
+  /* ── Hotel card ── */
+  function buildHotelCard(h) {
+    const hearts = Array.from({length:5},(_,i)=>i<h.hearts?'❤️':'🤍').join('');
+    const card = document.createElement('div');
+    card.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+    card.innerHTML = `
+      <div style="height:72px;background:linear-gradient(135deg,#6B0F1A,#2D1B69 80%,#C9A96E);
+        display:flex;align-items:center;justify-content:center;">
+        <span style="font-size:40px;">${h.emoji}</span>
+      </div>
+      <div style="padding:12px 14px;">
+        <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:2px;">${h.name}</div>
+        <div style="font-size:11px;color:var(--text-secondary,#aaa);margin-bottom:6px;">${h.neighborhood}</div>
+        <div style="font-size:12px;margin-bottom:6px;">${hearts}</div>
+        <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;margin-bottom:8px;">${h.desc}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;">
+          ${h.amenities.map(a=>`<span style="padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;
+            background:${(AMENITY_COLORS[a]||'#888')}18;color:${AMENITY_COLORS[a]||'#888'};">${a}</span>`).join('')}
+        </div>
+        <div style="background:rgba(201,169,110,.1);border-radius:8px;padding:7px 10px;display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-size:11px;color:var(--text-secondary,#888);">Per night for two</span>
+          <span style="font-size:15px;font-weight:800;color:#C9A96E;">$${h.pricePerNight}</span>
+        </div>
+      </div>`;
+    return card;
+  }
+
+  /* ── Render functions ── */
+  window._dnRenderActivities = function(container, filters) {
+    container.innerHTML = '';
+    const filtered = ACTIVITIES.filter(a => {
+      if (filters.budget !== 'Any Budget' && !a.budgets.includes(filters.budget)) return false;
+      if (filters.vibe !== 'All Vibes' && !a.vibes.includes(filters.vibe)) return false;
+      return true;
+    });
+    if (!filtered.length) {
+      container.innerHTML = '<div style="text-align:center;padding:40px;color:rgba(255,255,255,.4);">No activities match your filters.</div>';
+      return;
+    }
+    filtered.forEach(a => container.appendChild(buildActivityCard(a)));
+  };
+
+  window._dnRenderHotels = function(container, filters) {
+    container.innerHTML = '';
+    const filtered = HOTELS.filter(h => {
+      if (filters.budget !== 'Any Budget' && !h.budgets.includes(filters.budget)) return false;
+      if (filters.vibe !== 'All Vibes' && !h.vibes.includes(filters.vibe)) return false;
+      return true;
+    });
+    if (!filtered.length) {
+      container.innerHTML = '<div style="text-align:center;padding:40px;color:rgba(255,255,255,.4);">No hotels match your filters.</div>';
+      return;
+    }
+    filtered.forEach(h => container.appendChild(buildHotelCard(h)));
+  };
+
+  window._dnRenderPlans = function(container, filters) {
+    container.innerHTML = `
+      <div style="text-align:center;padding:40px 20px;">
+        <div style="font-size:44px;margin-bottom:12px;">💌</div>
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:rgba(255,255,255,.9);margin-bottom:8px;">
+          Build Your Perfect Plan</div>
+        <div style="font-size:13px;color:rgba(255,255,255,.5);margin-bottom:20px;line-height:1.6;">
+          Use the Date Night Planner to generate a personalised full-evening itinerary based on your budget, vibe, and occasion.
+        </div>
+        <button onclick="window.openDateNightPlanner && window.openDateNightPlanner()"
+          style="padding:14px 30px;border-radius:14px;border:none;
+          background:linear-gradient(135deg,#6B0F1A,#FF6B9D);color:#fff;font-size:15px;font-weight:800;cursor:pointer;">
+          💌 Open the Planner</button>
+      </div>`;
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK DN5: Date Night Planner (5-Step Wizard + Itinerary Generator) ===== */
+(function initDateNightPlanner() {
+
+  let plannerState = {
+    step: 1,
+    occasion: '', budget: '', vibe: '', startTime: '7pm', duration: '4 Hours Standard',
+    partnerName: '', specialNote: '', surpriseMode: false,
+  };
+
+  const OCCASIONS = [
+    {emoji:'🌹', label:'Date Night'}, {emoji:'💍', label:'Anniversary'},
+    {emoji:'💎', label:'Proposal'}, {emoji:'🦋', label:'First Date'},
+    {emoji:'🎂', label:'Birthday'}, {emoji:'❤️', label:"Valentine's Day"},
+    {emoji:'🥂', label:'Honeymoon'}, {emoji:'✨', label:'Just Because'},
+  ];
+  const BUDGETS = [
+    {emoji:'💚', label:'Under $50', range:'Under $50'},
+    {emoji:'💛', label:'$50 – $150', range:'$50–$150'},
+    {emoji:'🧡', label:'$150 – $300', range:'$150+'},
+    {emoji:'💜', label:'Splurge!', range:'Splurge'},
+  ];
+  const VIBES = [
+    {emoji:'🕯️', label:'Cozy & Intimate'}, {emoji:'🧭', label:'Adventurous'},
+    {emoji:'👑', label:'Luxurious'}, {emoji:'🎉', label:'Casual Fun'},
+    {emoji:'🖼️', label:'Cultural'}, {emoji:'❓', label:'Surprise Us'},
+  ];
+  const TIMES = ['4pm Afternoon','6pm Early Evening','7pm Prime Time','8pm Late Start','9pm Night Owl'];
+  const DURATIONS = ['2 Hours Quick','4 Hours Standard','6 Hours Full Evening','Overnight Stay'];
+
+  // replace with real Claude API call using date night system prompt for genuinely personalized AI recommendations in production
+  function generateItinerary(state) {
+    const budget = state.budget;
+    const vibe = state.vibe === 'Surprise Us' ? ['Cozy & Intimate','Adventurous','Luxurious'][Math.floor(Math.random()*3)] : state.vibe;
+    const name = state.partnerName ? state.partnerName : 'your partner';
+
+    const TEMPLATES = {
+      'Luxurious+Splurge': [
+        {time:'6:00 PM', emoji:'🧖', venue:"Couples Spa at Four Seasons", desc:"Begin with side-by-side massage and hydrotherapy — arrive glowing.", cost:400},
+        {time:'8:30 PM', emoji:'🥩', venue:'Capa Steakhouse', desc:'Rooftop dining with Disney fireworks over prime wagyu and exceptional wine.', cost:200},
+        {time:'10:30 PM', emoji:'🎨', venue:'Grand Bohemian Hotel Suite', desc:'Retire to your art-filled suite with champagne and rose petals waiting.', cost:350},
+      ],
+      'Luxurious+$150+': [
+        {time:'7:00 PM', emoji:'⛵', venue:'Sunset Cruise on Lake Toho', desc:'Champagne on the water as the sky turns gold.', cost:90},
+        {time:'9:00 PM', emoji:'🌊', venue:'Ravello at Four Seasons', desc:'Italian fine dining with lakefront terrace views under the stars.', cost:180},
+        {time:'11:00 PM', emoji:'🌹', venue:'Rooftop Bar Nightcap', desc:'Signature cocktails with Orlando glittering below you.', cost:40},
+      ],
+      'Cozy & Intimate+Under $50': [
+        {time:'6:30 PM', emoji:'🚣', venue:'Lake Eola Paddle Boat', desc:'Swan boats at golden hour — the most romantic $20 in Orlando.', cost:20},
+        {time:'8:00 PM', emoji:'🍖', venue:'The Ravenous Pig', desc:'Candlelit farm-to-table warmth. Order the charcuterie board to share.', cost:120},
+        {time:'10:30 PM', emoji:'🌟', venue:'Lake Nona Stargazing', desc:'Lay out a blanket under the stars. Just you two and the universe.', cost:0},
+      ],
+      'Adventurous+$50–$150': [
+        {time:'5:30 PM', emoji:'🔐', venue:'Escape Room at Escapology', desc:'Can you solve the mystery together? Teamwork is the ultimate bond.', cost:60},
+        {time:'7:30 PM', emoji:'🍣', venue:'Sushi Pop', desc:'Creative sharing plates — adventurous flavors to match your spirit.', cost:80},
+        {time:'9:30 PM', emoji:'🍹', venue:'Rooftop Bar Hopping on I-Drive', desc:'Three rooftop bars, three views, one unforgettable night.', cost:80},
+      ],
+      'Casual Fun+$50–$150': [
+        {time:'6:00 PM', emoji:'🎳', venue:'Bowling at Punch Bowl Social', desc:'Friendly competition with craft cocktails — laughter guaranteed.', cost:50},
+        {time:'8:00 PM', emoji:'🌃', venue:'Midnight Rose Rooftop Bar', desc:'City views, signature drinks, and the perfect urban twilight.', cost:60},
+        {time:'9:30 PM', emoji:'🎡', venue:'ICON Park Wheel Private Gondola', desc:'A magical close to the evening — city lights from the top.', cost:120},
+      ],
+      'Cultural+Any': [
+        {time:'5:30 PM', emoji:'🎨', venue:'Art Gallery Walk on Park Avenue', desc:'Discover extraordinary art together and find your favorite piece.', cost:0},
+        {time:'7:30 PM', emoji:'🎷', venue:'The Boheme', desc:'Live jazz in an art gallery hotel. Romance and culture in perfect harmony.', cost:150},
+        {time:'10:00 PM', emoji:'🍕', venue:'Prato on Park Avenue', desc:'Late-night Italian — share pasta under the warm glow of Park Ave.', cost:130},
+      ],
+    };
+
+    const key = Object.keys(TEMPLATES).find(k => {
+      const parts = k.split('+');
+      return (vibe.includes(parts[0]) || parts[0] === vibe) && (budget === parts[1] || parts[1] === 'Any');
+    });
+    const stops = key ? TEMPLATES[key] : TEMPLATES['Cozy & Intimate+Under $50'];
+    const total = stops.reduce((n,s)=>n+s.cost, 0);
+    return { stops, total, name, occasion: state.occasion, surpriseMode: state.surpriseMode };
+  }
+
+  /* ── Step Renderers ── */
+  function renderStep(overlay, stepNum, dir) {
+    const content = overlay.querySelector('#dn-planner-content');
+    const oldEl = content.firstElementChild;
+    const newEl = buildStepEl(stepNum, overlay);
+    content.appendChild(newEl);
+    if (dir === 'forward') {
+      newEl.style.animation = 'dnSlideInRight .35s ease forwards';
+      if (oldEl) { oldEl.style.animation = 'dnSlideOutLeft .35s ease forwards'; setTimeout(()=>oldEl.remove(), 350); }
+    } else {
+      newEl.style.animation = 'dnSlideInLeft .35s ease forwards';
+      if (oldEl) oldEl.remove();
+    }
+    // Update progress
+    const dots = overlay.querySelectorAll('.dn-step-dot');
+    dots.forEach((d,i)=>{
+      d.style.background = i < stepNum ? '#FF6B9D' : 'rgba(255,255,255,.3)';
+      d.style.transform = i === stepNum-1 ? 'scale(1.3)' : 'scale(1)';
+    });
+  }
+
+  function buildOptionGrid(items, stateKey, overlay, stepNum) {
+    const grid = document.createElement('div');
+    grid.style.cssText = 'display:grid;grid-template-columns:repeat(2,1fr);gap:10px;';
+    items.forEach(item => {
+      const btn = document.createElement('button');
+      const isActive = plannerState[stateKey] === item.label;
+      btn.style.cssText = `padding:16px 10px;border-radius:14px;border:2px solid;cursor:pointer;text-align:center;transition:all .2s;
+        background:${isActive?'rgba(255,107,157,.2)':'rgba(255,255,255,.05)'};
+        border-color:${isActive?'#FF6B9D':'rgba(255,255,255,.15)'};`;
+      btn.innerHTML = `<div style="font-size:28px;margin-bottom:6px;">${item.emoji}</div>
+        <div style="font-size:13px;font-weight:700;color:#fff;">${item.label}</div>`;
+      btn.onclick = () => {
+        plannerState[stateKey] = item.label;
+        grid.querySelectorAll('button').forEach(b => {
+          b.style.background = 'rgba(255,255,255,.05)';
+          b.style.borderColor = 'rgba(255,255,255,.15)';
+        });
+        btn.style.background = 'rgba(255,107,157,.2)';
+        btn.style.borderColor = '#FF6B9D';
+        // Auto-advance on selection
+        setTimeout(()=> {
+          if (stepNum < 5) { plannerState.step = stepNum+1; renderStep(overlay, plannerState.step, 'forward'); }
+        }, 300);
+      };
+      grid.appendChild(btn);
+    });
+    return grid;
+  }
+
+  function buildStepEl(stepNum, overlay) {
+    const el = document.createElement('div');
+    el.style.cssText = 'padding:20px;position:relative;';
+    const TITLES = ['','What is the Occasion?','What is Your Budget?','What is Your Vibe?','When Does Your Evening Start?','Personal Touches'];
+    const title = document.createElement('div');
+    title.style.cssText = "font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#F5E6CA;margin-bottom:20px;text-align:center;";
+    title.textContent = TITLES[stepNum];
+    el.appendChild(title);
+
+    if (stepNum === 1) el.appendChild(buildOptionGrid(OCCASIONS, 'occasion', overlay, 1));
+    else if (stepNum === 2) el.appendChild(buildOptionGrid(BUDGETS.map(b=>({emoji:b.emoji,label:b.range})), 'budget', overlay, 2));
+    else if (stepNum === 3) el.appendChild(buildOptionGrid(VIBES, 'vibe', overlay, 3));
+    else if (stepNum === 4) {
+      const timeTitle = document.createElement('div');
+      timeTitle.style.cssText = 'font-size:11px;font-weight:700;color:rgba(255,255,255,.5);margin-bottom:8px;';
+      timeTitle.textContent = 'START TIME';
+      el.appendChild(timeTitle);
+      const timeGrid = document.createElement('div');
+      timeGrid.style.cssText = 'display:flex;flex-direction:column;gap:8px;margin-bottom:16px;';
+      TIMES.forEach(t => {
+        const btn = document.createElement('button');
+        const isA = plannerState.startTime === t;
+        btn.style.cssText = `padding:10px 14px;border-radius:12px;border:1.5px solid;cursor:pointer;text-align:left;font-size:13px;font-weight:600;color:#fff;transition:all .2s;background:${isA?'rgba(255,107,157,.2)':'rgba(255,255,255,.05)'};border-color:${isA?'#FF6B9D':'rgba(255,255,255,.15)'};`;
+        btn.textContent = t;
+        btn.onclick = () => { plannerState.startTime = t; timeGrid.querySelectorAll('button').forEach(b=>{b.style.background='rgba(255,255,255,.05)';b.style.borderColor='rgba(255,255,255,.15)';}); btn.style.background='rgba(255,107,157,.2)';btn.style.borderColor='#FF6B9D'; };
+        timeGrid.appendChild(btn);
+      });
+      el.appendChild(timeGrid);
+      const durTitle = document.createElement('div');
+      durTitle.style.cssText = 'font-size:11px;font-weight:700;color:rgba(255,255,255,.5);margin-bottom:8px;';
+      durTitle.textContent = 'DURATION';
+      el.appendChild(durTitle);
+      const durGrid = document.createElement('div');
+      durGrid.style.cssText = 'display:flex;flex-direction:column;gap:8px;';
+      DURATIONS.forEach(d => {
+        const btn = document.createElement('button');
+        const isA = plannerState.duration === d;
+        btn.style.cssText = `padding:10px 14px;border-radius:12px;border:1.5px solid;cursor:pointer;text-align:left;font-size:13px;font-weight:600;color:#fff;transition:all .2s;background:${isA?'rgba(255,107,157,.2)':'rgba(255,255,255,.05)'};border-color:${isA?'#FF6B9D':'rgba(255,255,255,.15)'};`;
+        btn.textContent = d;
+        btn.onclick = () => { plannerState.duration = d; durGrid.querySelectorAll('button').forEach(b=>{b.style.background='rgba(255,255,255,.05)';b.style.borderColor='rgba(255,255,255,.15)';}); btn.style.background='rgba(255,107,157,.2)';btn.style.borderColor='#FF6B9D'; };
+        durGrid.appendChild(btn);
+      });
+      el.appendChild(durGrid);
+    } else if (stepNum === 5) {
+      const fields = [
+        {id:'dn-partner-name', label:"Partner's Name (optional)", type:'input', placeholder:'e.g. Sarah'},
+        {id:'dn-special-note', label:'Special Notes / Allergies', type:'textarea', placeholder:'Any dietary needs, special requests, or surprises planned…'},
+      ];
+      fields.forEach(f => {
+        const lbl = document.createElement('div');
+        lbl.style.cssText = 'font-size:11px;font-weight:700;color:rgba(255,255,255,.5);margin-bottom:6px;';
+        lbl.textContent = f.label.toUpperCase();
+        el.appendChild(lbl);
+        const inp = document.createElement(f.type === 'textarea' ? 'textarea' : 'input');
+        inp.id = f.id; inp.placeholder = f.placeholder;
+        inp.style.cssText = `width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.15);font-size:13px;background:rgba(255,255,255,.08);color:#fff;margin-bottom:14px;box-sizing:border-box;${f.type==='textarea'?'resize:none;height:70px;':''}`;
+        el.appendChild(inp);
+      });
+      // Surprise Mode toggle
+      const toggleRow = document.createElement('div');
+      toggleRow.style.cssText = 'display:flex;align-items:center;gap:12px;padding:12px;background:rgba(255,255,255,.06);border-radius:12px;margin-bottom:20px;';
+      toggleRow.innerHTML = `
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:700;color:#fff;">Surprise Mode</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.5);">Hide venue names so the location is a surprise</div>
+        </div>
+        <div id="dn-surprise-toggle" style="width:44px;height:24px;border-radius:12px;background:${plannerState.surpriseMode?'#FF6B9D':'rgba(255,255,255,.2)'};cursor:pointer;position:relative;transition:.3s;">
+          <div style="position:absolute;top:2px;left:${plannerState.surpriseMode?'22':'2'}px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.3s;"></div>
+        </div>`;
+      toggleRow.querySelector('#dn-surprise-toggle').onclick = function() {
+        plannerState.surpriseMode = !plannerState.surpriseMode;
+        this.style.background = plannerState.surpriseMode ? '#FF6B9D' : 'rgba(255,255,255,.2)';
+        this.querySelector('div').style.left = plannerState.surpriseMode ? '22px' : '2px';
+      };
+      el.appendChild(toggleRow);
+    }
+
+    // Nav buttons (except step 1 which auto-advances)
+    if (stepNum > 1) {
+      const navRow = document.createElement('div');
+      navRow.style.cssText = 'display:flex;gap:10px;margin-top:20px;';
+      const backBtn = document.createElement('button');
+      backBtn.style.cssText = 'flex:1;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.7);font-size:14px;cursor:pointer;';
+      backBtn.textContent = '‹ Back';
+      backBtn.onclick = () => { plannerState.step--; renderStep(overlay, plannerState.step, 'back'); };
+      navRow.appendChild(backBtn);
+      if (stepNum < 5) {
+        const nextBtn = document.createElement('button');
+        nextBtn.style.cssText = 'flex:2;padding:12px;border-radius:12px;border:none;background:linear-gradient(135deg,#6B0F1A,#FF6B9D);color:#fff;font-size:14px;font-weight:700;cursor:pointer;';
+        nextBtn.textContent = 'Next ›';
+        nextBtn.onclick = () => { plannerState.step++; renderStep(overlay, plannerState.step, 'forward'); };
+        navRow.appendChild(nextBtn);
+      } else {
+        const genBtn = document.createElement('button');
+        genBtn.style.cssText = 'flex:2;padding:12px;border-radius:12px;border:none;background:linear-gradient(135deg,#6B0F1A,#FF6B9D);color:#fff;font-size:14px;font-weight:800;cursor:pointer;';
+        genBtn.innerHTML = '🌹 Generate My Date Night';
+        genBtn.onclick = () => {
+          // Capture step 5 fields
+          const pn = document.getElementById('dn-partner-name');
+          const sn = document.getElementById('dn-special-note');
+          if (pn) plannerState.partnerName = pn.value;
+          if (sn) plannerState.specialNote = sn.value;
+          showLoadingThenItinerary(overlay);
+        };
+        navRow.appendChild(genBtn);
+      }
+      el.appendChild(navRow);
+    }
+    return el;
+  }
+
+  /* ── Loading animation ── */
+  function showLoadingThenItinerary(overlay) {
+    const content = overlay.querySelector('#dn-planner-content');
+    content.innerHTML = `
+      <div style="text-align:center;padding:60px 20px;position:relative;min-height:300px;">
+        <div style="position:relative;width:100%;height:120px;margin-bottom:20px;">
+          ${[...Array(8)].map((_,i)=>`<span style="position:absolute;left:${10+i*10}%;bottom:0;font-size:${14+i*2}px;
+            animation:dnHeartFloat ${2+i*.3}s ease-in infinite;animation-delay:${i*.25}s;opacity:0;">
+            ${['❤️','💕','🌹','💖','✨'][i%5]}</span>`).join('')}
+        </div>
+        <div style="font-family:'Playfair Display',serif;font-style:italic;font-size:18px;color:#C9A96E;">
+          Creating your perfect evening…</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.4);margin-top:8px;">Curating magic just for you</div>
+      </div>`;
+    setTimeout(() => { showItinerary(overlay, generateItinerary(plannerState)); }, 2000);
+  }
+
+  /* ── Itinerary display ── */
+  function showItinerary(overlay, plan) {
+    const content = overlay.querySelector('#dn-planner-content');
+    const STOP_COLORS = ['#FF6B9D','#C9A96E','#8B5CF6','#22C55E','#F59E0B'];
+    const stopsHTML = plan.stops.map((s,i)=>`
+      <div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:20px;">
+        <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;">
+          <div style="width:16px;height:16px;border-radius:50%;background:${STOP_COLORS[i%5]};flex-shrink:0;"></div>
+          ${i<plan.stops.length-1?`<div style="width:2px;flex:1;background:linear-gradient(${STOP_COLORS[i%5]},${STOP_COLORS[(i+1)%5]});margin:4px 0;min-height:24px;"></div>`:''}
+        </div>
+        <div style="flex:1;padding-bottom:4px;">
+          <div style="font-size:10px;font-weight:700;color:${STOP_COLORS[i%5]};margin-bottom:2px;">${s.time}</div>
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+            <span style="font-size:18px;">${s.emoji}</span>
+            <span style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:#F5E6CA;">
+              ${plan.surpriseMode ? '🔒 Surprise Location…' : s.venue}</span>
+          </div>
+          <div style="font-size:12px;color:rgba(255,255,255,.65);line-height:1.5;margin-bottom:4px;">${s.desc}</div>
+          <div style="font-size:11px;color:#C9A96E;font-weight:700;">${s.cost > 0 ? '~$'+s.cost : 'Free'}</div>
+        </div>
+      </div>`).join('');
+
+    content.innerHTML = `
+      <div style="padding:20px;">
+        <div style="text-align:center;margin-bottom:24px;">
+          <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:.1em;margin-bottom:6px;">YOUR PERFECT EVENING</div>
+          <div style="font-family:'Playfair Display',serif;font-size:22px;color:#F5E6CA;font-weight:700;margin-bottom:4px;">
+            ${plan.occasion} Night${plan.name !== 'your partner' ? ' for '+plan.name : ''}</div>
+          <div style="width:60px;height:2px;background:linear-gradient(90deg,#FF6B9D,#C9A96E);margin:12px auto;border-radius:1px;"></div>
+        </div>
+        <!-- Timeline -->
+        ${stopsHTML}
+        <!-- Total -->
+        <div style="background:rgba(201,169,110,.12);border-radius:14px;padding:14px;margin-bottom:20px;
+          border:1px solid rgba(201,169,110,.3);display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-size:13px;color:rgba(255,255,255,.7);font-weight:600;">Total Estimated Cost</span>
+          <span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#C9A96E;">~$${plan.total}</span>
+        </div>
+        <!-- Action buttons -->
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button onclick="alert('Saved to your trip!')"
+            style="flex:1;min-width:120px;padding:11px;border-radius:12px;border:none;background:linear-gradient(135deg,#FF6B35,#FF6B9D);color:#fff;font-size:12px;font-weight:700;cursor:pointer;">
+            💾 Save to My Trip</button>
+          <button onclick="alert('Share: '+encodeURIComponent('Our Date Night Plan – Orlando Explorer'))"
+            style="flex:1;min-width:120px;padding:11px;border-radius:12px;border:none;background:linear-gradient(135deg,#1565C0,#42A5F5);color:#fff;font-size:12px;font-weight:700;cursor:pointer;">
+            📤 Share This Plan</button>
+          <button onclick="window.print()"
+            style="flex:1;min-width:80px;padding:11px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.7);font-size:12px;font-weight:700;cursor:pointer;">
+            🖨️ Print</button>
+          <button onclick="window._dnRegenerate && window._dnRegenerate()"
+            style="flex:1;min-width:80px;padding:11px;border-radius:12px;border:1px solid #FF6B9D;background:transparent;color:#FF6B9D;font-size:12px;font-weight:700;cursor:pointer;">
+            🔄 Regenerate</button>
+        </div>
+        ${plan.occasion === 'Proposal' ? '<div id="dn-proposal-section"></div>' : ''}
+      </div>`;
+
+    window._dnRegenerate = () => showLoadingThenItinerary(overlay);
+
+    // If proposal, inject proposal spots below
+    if (plan.occasion === 'Proposal') {
+      setTimeout(() => {
+        const propSec = document.getElementById('dn-proposal-section');
+        if (propSec && typeof window._dnRenderProposalSection === 'function') window._dnRenderProposalSection(propSec);
+      }, 100);
+    }
+
+    // Save plan
+    if (window.appState && window.appState.dateNight) {
+      window.appState.dateNight.savedPlans.push({ ...plan, savedAt: Date.now() });
+    }
+  }
+
+  /* ── Main overlay builder ── */
+  window.openDateNightPlanner = function() {
+    const existing = document.getElementById('dn-planner-overlay');
+    if (existing) existing.remove();
+    plannerState = { step:1, occasion:'', budget:'', vibe:'', startTime:'7pm Prime Time', duration:'4 Hours Standard', partnerName:'', specialNote:'', surpriseMode:false };
+
+    const ov = document.createElement('div');
+    ov.id = 'dn-planner-overlay';
+    ov.style.cssText = 'position:fixed;inset:0;z-index:9000;background:#1a0a15;display:flex;flex-direction:column;animation:dnFadeIn .5s ease;overflow:hidden;';
+    ov.innerHTML = `
+      <div style="background:linear-gradient(135deg,#3B0010,#6B0F1A);padding:16px;flex-shrink:0;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+          <button onclick="document.getElementById('dn-planner-overlay').remove()"
+            style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">✕</button>
+          <div style="flex:1;font-family:'Playfair Display',serif;font-size:18px;color:#F5E6CA;font-weight:700;">Date Night Planner</div>
+          <div style="font-size:12px;color:rgba(255,255,255,.5);" id="dn-step-label">Step 1 of 5</div>
+        </div>
+        <!-- Progress dots -->
+        <div style="display:flex;gap:6px;align-items:center;justify-content:center;">
+          ${[1,2,3,4,5].map(i=>`<div class="dn-step-dot" style="height:8px;border-radius:4px;transition:all .3s;
+            width:${i===1?'24':'8'}px;background:${i===1?'#FF6B9D':'rgba(255,255,255,.3)'}"></div>`).join('')}
+        </div>
+      </div>
+      <div id="dn-planner-content" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;position:relative;"></div>`;
+
+    document.body.appendChild(ov);
+    renderStep(ov, 1, 'forward');
+
+    // Update step label on render
+    const origRender = renderStep;
+    const stepLabel = ov.querySelector('#dn-step-label');
+    const obs = new MutationObserver(() => { if(stepLabel) stepLabel.textContent = `Step ${plannerState.step} of 5`; });
+    obs.observe(ov.querySelector('#dn-planner-content'), {childList:true});
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK DN6: Proposal Planner, Spots, Checklist ===== */
+(function initProposalPlanner() {
+
+  const PROPOSAL_SPOTS = [
+    {
+      id:'mk-fireworks', name:'Magic Kingdom Fireworks Bridge', emoji:'🏰',
+      bestTime:'9:00 PM during fireworks', crowd:'Moderate', privacy:3,
+      tip:'Have a friend hide 30ft away with a professional camera. The fireworks backdrop is unmatchable.',
+      dinnerAfter:'Capa Steakhouse (rooftop) or The Grand Floridian\'s Citricos',
+      desc:'Propose as the Magic Kingdom fireworks erupt overhead. The most magical backdrop in the world.',
+      photographerNote:'Hotel photography service available. Request "proposal package" when booking.',
+    },
+    {
+      id:'balloon', name:'Hot Air Balloon at Sunrise', emoji:'🎈',
+      bestTime:'6:00 AM dawn flight', crowd:'Completely Private', privacy:5,
+      tip:'Professional photographer is typically included in premium packages. Champagne on landing.',
+      dinnerAfter:'Brunch at The Alfond Inn or late morning at Prato on Park Ave.',
+      desc:'Float above sleeping Florida at dawn. Just the two of you, the sunrise, and the question.',
+      photographerNote:'Professional photographer included in most packages. Confirm when booking.',
+    },
+    {
+      id:'icon-wheel', name:'ICON Park Wheel Private Gondola', emoji:'🎡',
+      bestTime:'Sunset, 7:00–8:00 PM', crowd:'Completely Private', privacy:5,
+      tip:'Gondola photographer available for $50 extra — worth every penny for this once-in-a-lifetime moment.',
+      dinnerAfter:'Sushi Pop or rooftop bar on I-Drive — you\'ll want to celebrate nearby.',
+      desc:'Your own private gondola 400ft above Orlando. City lights, champagne, and the question.',
+      photographerNote:'Gondola photographer available as add-on. Book in advance.',
+    },
+    {
+      id:'grand-bohemian', name:'Grand Bohemian Hotel Rooftop', emoji:'🎨',
+      bestTime:'8:00 PM', crowd:'Intimate (hotel guests)', privacy:4,
+      tip:'Hotel photography service available. Ask for the rooftop to be prepared with rose petals.',
+      dinnerAfter:'The Boheme on-site — jazz and champagne are the perfect celebration.',
+      desc:'A boutique rooftop surrounded by extraordinary art. Intimate, beautiful, and unforgettable.',
+      photographerNote:'Hotel photography service bookable through concierge.',
+    },
+    {
+      id:'lake-eola', name:'Lake Eola Park Fountain at Sunset', emoji:'⛲',
+      bestTime:'7:00 PM sunset', crowd:'Moderate (public park)', privacy:3,
+      tip:'The beautiful fountain backdrop is social-media perfect. Hire a candid street photographer in advance.',
+      dinnerAfter:'Hillstone on Sand Lake or The Boheme downtown — both minutes away.',
+      desc:'Orlando\'s most iconic park at its most golden hour. The fountain reflects a city in love.',
+      photographerNote:'Hire a candid Orlando photographer on Snappr or The Knot. $150–300 for 1 hour.',
+    },
+    {
+      id:'capa-fireworks', name:'Capa Rooftop at Four Seasons during Disney Fireworks', emoji:'🥂',
+      bestTime:'9:00 PM fireworks show', crowd:'Very Intimate (fine dining)', privacy:4,
+      tip:'Reserve the specific fireworks-view table weeks in advance. Alert the restaurant to the proposal.',
+      dinnerAfter:"You're already at the best restaurant in Orlando — stay and celebrate!",
+      desc:'Propose over world-class food as Disney fireworks light the sky. The ultimate grand gesture.',
+      photographerNote:'Hotel photography service available through Four Seasons concierge.',
+    },
+    {
+      id:'park-avenue', name:'Park Avenue, Winter Park under String Lights', emoji:'🌟',
+      bestTime:'Dusk, 7:30 PM', crowd:'Romantic but public', privacy:3,
+      tip:'Street photographer-friendly. Hire in advance and give them a signal word to start shooting.',
+      dinnerAfter:'Prato or The Ravenous Pig — both are perfect for a celebration dinner.',
+      desc:'The most romantic street in Florida at its most magical hour. European elegance in Orlando.',
+      photographerNote:'Hire a candid photographer. The string lights create naturally beautiful photos.',
+    },
+    {
+      id:'wekiwa', name:'Wekiwa Springs Natural Setting at Sunrise', emoji:'🌿',
+      bestTime:'Sunrise, 6:30 AM', crowd:'Completely Private', privacy:5,
+      tip:'Completely secluded and utterly natural. The crystal water and morning mist are breathtaking.',
+      dinnerAfter:'Drive to Winter Park for brunch — a beautiful transition from nature to celebration.',
+      desc:'The most secluded proposal in Orlando. Nature at its purest, love at its most real.',
+      photographerNote:'Bring your own photographer — natural light here is extraordinary. Golden hour is perfect.',
+    },
+  ];
+  window._dnProposalSpots = PROPOSAL_SPOTS;
+
+  const PRIVACY_LABELS = {1:'Busy',2:'Lively',3:'Moderate',4:'Intimate',5:'Completely Private'};
+  const PRIVACY_COLORS = {1:'#c62828',2:'#E65100',3:'#F57F17',4:'#2E7D32',5:'#1565C0'};
+
+  function buildSpotCard(spot) {
+    const privColor = PRIVACY_COLORS[spot.privacy] || '#888';
+    const privLabel = PRIVACY_LABELS[spot.privacy] || '';
+    const stars = '💎'.repeat(spot.privacy);
+    const card = document.createElement('div');
+    card.style.cssText = `background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;
+      border:1px solid rgba(201,169,110,.4);animation:dnGoldGlow 3s ease-in-out infinite;`;
+    card.innerHTML = `
+      <div style="background:linear-gradient(135deg,#3B0010,#6B0F1A,#C9A96E 150%);padding:14px;
+        display:flex;align-items:center;gap:12px;">
+        <span style="font-size:32px;">${spot.emoji}</span>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:#F5E6CA;">${spot.name}</div>
+          <div style="font-size:11px;color:rgba(245,230,202,.7);">Best time: ${spot.bestTime}</div>
+        </div>
+        <span style="font-size:10px;font-weight:800;padding:4px 10px;border-radius:20px;
+          background:${privColor}22;color:${privColor};border:1px solid ${privColor}44;">${privLabel}</span>
+      </div>
+      <div style="padding:12px 14px;">
+        <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;margin-bottom:10px;font-style:italic;">"${spot.desc}"</div>
+        <div style="background:rgba(201,169,110,.08);border-radius:10px;padding:10px 12px;margin-bottom:8px;">
+          <div style="font-size:10px;font-weight:700;color:#C9A96E;margin-bottom:4px;">💡 PHOTOGRAPHER TIP</div>
+          <div style="font-size:12px;color:var(--text-secondary,#555);">${spot.tip}</div>
+          <div style="font-size:11px;color:var(--text-secondary,#888);margin-top:4px;font-style:italic;">${spot.photographerNote}</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:flex-start;">
+          <span style="font-size:14px;flex-shrink:0;">🍽️</span>
+          <div style="font-size:12px;color:var(--text-secondary,#555);"><strong>After:</strong> ${spot.dinnerAfter}</div>
+        </div>
+      </div>`;
+    return card;
+  }
+
+  const CHECKLIST_ITEMS = [
+    'Choose and purchase the ring',
+    'Scout the location in advance',
+    'Book a photographer',
+    'Reserve the post-proposal dinner',
+    'Plan what you will say',
+    'Notify close friends or family',
+    'Arrange any flowers or extras',
+    'Charge your phone fully',
+  ];
+  const CHECKLIST_KEY = 'orlando_proposal_checklist_v1';
+
+  function loadChecklist() {
+    try { return JSON.parse(localStorage.getItem(CHECKLIST_KEY) || '{}'); } catch { return {}; }
+  }
+  function saveChecklist(data) { localStorage.setItem(CHECKLIST_KEY, JSON.stringify(data)); }
+
+  function buildChecklist(container) {
+    const checked = loadChecklist();
+    container.innerHTML = '';
+    const title = document.createElement('div');
+    title.style.cssText = "font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:12px;display:flex;align-items:center;gap:8px;";
+    title.innerHTML = '<span>💎</span>Proposal Planning Checklist';
+    container.appendChild(title);
+    CHECKLIST_ITEMS.forEach((item, i) => {
+      const row = document.createElement('label');
+      row.style.cssText = `display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;
+        margin-bottom:8px;cursor:pointer;background:var(--card-bg,#fff);border:1px solid var(--border,#eee);
+        ${checked[i]?'opacity:.7;':''}`;
+      row.innerHTML = `
+        <input type="checkbox" ${checked[i]?'checked':''} data-idx="${i}"
+          style="width:20px;height:20px;accent-color:#C9A96E;flex-shrink:0;">
+        <span style="font-size:13px;color:var(--text-primary,#212121);${checked[i]?'text-decoration:line-through;':''}">
+          ${item}</span>
+        ${checked[i]?'<span style="margin-left:auto;color:#2E7D32;font-size:16px;animation:dnCheckBounce .4s ease;">✓</span>':''}`;
+      row.querySelector('input').onchange = e => {
+        const ch = loadChecklist();
+        if (e.target.checked) ch[i] = true; else delete ch[i];
+        saveChecklist(ch);
+        buildChecklist(container);
+      };
+      container.appendChild(row);
+    });
+    const total = CHECKLIST_ITEMS.length;
+    const done = Object.keys(loadChecklist()).length;
+    const pctEl = document.createElement('div');
+    pctEl.style.cssText = 'margin-top:4px;';
+    pctEl.innerHTML = `
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-secondary,#888);margin-bottom:5px;">
+        <span>PLANNING PROGRESS</span><span>${done}/${total}</span>
+      </div>
+      <div style="height:4px;background:var(--border,#eee);border-radius:2px;">
+        <div style="height:4px;background:#C9A96E;border-radius:2px;width:${Math.round(done/total*100)}%;"></div>
+      </div>`;
+    container.appendChild(pctEl);
+  }
+
+  /* ── Global render for proposal section ── */
+  window._dnRenderProposalSection = function(container) {
+    container.innerHTML = '';
+    container.style.cssText = 'margin-top:24px;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = "font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#F5E6CA;margin-bottom:6px;text-align:center;";
+    hdr.textContent = '💍 Proposal Planning Mode';
+    const sub = document.createElement('div');
+    sub.style.cssText = 'font-size:12px;color:rgba(255,255,255,.5);text-align:center;margin-bottom:20px;';
+    sub.textContent = 'The most important moment. Get it perfect.';
+    container.appendChild(hdr);
+    container.appendChild(sub);
+
+    // Spots
+    const spotsTitle = document.createElement('div');
+    spotsTitle.style.cssText = 'font-size:11px;font-weight:700;color:rgba(255,255,255,.4);margin-bottom:12px;letter-spacing:.08em;';
+    spotsTitle.textContent = 'TOP PROPOSAL SPOTS IN ORLANDO';
+    container.appendChild(spotsTitle);
+    PROPOSAL_SPOTS.forEach(s => container.appendChild(buildSpotCard(s)));
+
+    // Checklist (in a card for dark background)
+    const clCard = document.createElement('div');
+    clCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-top:4px;';
+    buildChecklist(clCard);
+    container.appendChild(clCard);
+  };
+
+  /* ── Standalone screen for Proposal spots ── */
+  function buildProposalScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-proposal';
+    s.className = 'screen';
+    s.style.display = 'none';
+    s.innerHTML = `
+      <div style="padding:16px;display:flex;align-items:center;gap:12px;
+        background:linear-gradient(135deg,#3B0010,#6B0F1A);color:#fff;">
+        <button onclick="window.showScreen('date-night')" style="background:rgba(255,255,255,.2);border:none;
+          border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div>
+          <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:#F5E6CA;">💍 Proposal Planner</div>
+          <div style="font-size:11px;color:rgba(245,230,202,.7);">Top Orlando proposal spots & checklist</div>
+        </div>
+      </div>
+      <div style="padding:14px;overflow-y:auto;height:calc(100vh - 68px);-webkit-overflow-scrolling:touch;" id="proposal-screen-content"></div>`;
+    document.body.appendChild(s);
+    const content = s.querySelector('#proposal-screen-content');
+    PROPOSAL_SPOTS.forEach(sp => content.appendChild(buildSpotCard(sp)));
+    const clCard = document.createElement('div');
+    clCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-top:4px;';
+    buildChecklist(clCard);
+    content.appendChild(clCard);
+  }
+
+  if (!document.getElementById('screen-proposal')) buildProposalScreen();
+
+  const _prevSS_prop = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_prop) _prevSS_prop(name, el);
+    if (name === 'proposal') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display='none');
+      const s = document.getElementById('screen-proposal');
+      if (s) { s.style.display='block'; s.style.animation='dnFadeIn .5s ease'; }
+    }
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK DN7: Conversation Starters + Date Night Reviews + AI Updates ===== */
+(function initDNExtras() {
+
+  /* ═══ CONVERSATION STARTERS ═══ */
+  const STARTERS = {
+    restaurant: [
+      "What's the most memorable meal you've ever had and where was it?",
+      "If you could eat dinner anywhere in the world tonight, where would it be?",
+      "What food from your childhood brings back the strongest memories?",
+      "If you could only eat one cuisine for the rest of your life, what would you choose?",
+      "What's a restaurant or dish you've always wanted to try but never have?",
+      "If you were a chef, what would your signature dish be?",
+      "What's the most adventurous thing you've ever eaten?",
+      "If we opened a restaurant together, what would it be like?",
+      "Describe your perfect meal from starter to dessert.",
+      "What's a food tradition from your family that you'd love to carry forward?",
+    ],
+    activity: [
+      "What's still on your bucket list that you want us to do together?",
+      "When did you feel most adventurous in your life?",
+      "What's something you've always wanted to try but been too nervous to?",
+      "If you could master any skill overnight, what would it be?",
+      "What's the most spontaneous thing you've ever done?",
+      "If you could live anywhere in the world for one month, where would you go?",
+      "What adventure would you go on if money were no object?",
+      "Is there a fear you've overcome that you're proud of?",
+      "What's the most beautiful place you've ever been?",
+      "If we could teleport anywhere right now, where would you choose?",
+    ],
+    hotel: [
+      "If we could live anywhere in the world for one year, where would you choose?",
+      "What does your perfect vacation look like from start to finish?",
+      "Where in the world do you most want to travel together?",
+      "If you could design our dream home, what would it look like?",
+      "What's a city you'd love to live in for a month?",
+      "What's the most magical place you've ever stayed?",
+      "If we had a second home anywhere, where would it be?",
+      "What kind of traveler are you — luxury resort or backpack adventure?",
+      "What's a country or culture you'd love to immerse yourself in?",
+      "If we planned the ultimate dream trip together, what would we do first?",
+    ],
+  };
+
+  window._dnGetStarters = function(type, count) {
+    const pool = STARTERS[type] || STARTERS.restaurant;
+    const shuffled = [...pool].sort(() => Math.random() - .5);
+    return shuffled.slice(0, count || 5);
+  };
+
+  /* Inject conversation starters into any screen when Date Night Mode is active */
+  window._dnInjectConversationStarters = function(containerEl, type) {
+    if (!window.appState || !window.appState.dateNight || !window.appState.dateNight.active) return;
+    if (containerEl.querySelector('[data-dn-starters]')) return;
+
+    const section = document.createElement('div');
+    section.setAttribute('data-dn-starters', '1');
+    section.style.cssText = 'background:linear-gradient(135deg,#1a0a15,#2D1B69);border-radius:16px;padding:16px;margin-top:12px;';
+
+    let questions = window._dnGetStarters(type);
+
+    function render() {
+      const qs = section.querySelector('.dn-starter-list');
+      if (!qs) return;
+      qs.innerHTML = questions.map(q=>`
+        <div style="display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.08);">
+          <span style="color:#FF6B9D;font-size:14px;flex-shrink:0;margin-top:1px;">♥</span>
+          <span style="font-size:13px;color:#F5E6CA;line-height:1.5;font-style:italic;">${q}</span>
+        </div>`).join('');
+    }
+
+    section.innerHTML = `
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+        <span style="font-size:20px;">💬</span>
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#F5E6CA;">Conversation Starters</div>
+        <button class="dn-starter-shuffle" style="margin-left:auto;background:rgba(255,255,255,.1);border:none;
+          border-radius:20px;padding:5px 12px;color:rgba(255,255,255,.7);font-size:11px;font-weight:700;cursor:pointer;">
+          🔀 Shuffle</button>
+      </div>
+      <div class="dn-starter-list"></div>`;
+
+    section.querySelector('.dn-starter-shuffle').onclick = () => {
+      questions = window._dnGetStarters(type);
+      render();
+    };
+    render();
+    containerEl.appendChild(section);
+  };
+
+  /* ═══ DATE NIGHT REVIEWS ═══ */
+  const DN_REVIEWS_KEY = 'orlando_dn_reviews_v1';
+
+  function loadDNReviews() {
+    try { return JSON.parse(localStorage.getItem(DN_REVIEWS_KEY) || '{}'); } catch { return {}; }
+  }
+  function saveDNReviews(data) { localStorage.setItem(DN_REVIEWS_KEY, JSON.stringify(data)); }
+
+  window._dnOpenReviewForm = function(venueId, venueName) {
+    const existing = document.getElementById('dn-review-modal');
+    if (existing) existing.remove();
+
+    const modal = document.createElement('div');
+    modal.id = 'dn-review-modal';
+    modal.style.cssText = 'position:fixed;inset:0;z-index:9300;display:flex;align-items:flex-end;background:rgba(0,0,0,.6);animation:dnFadeIn .3s ease;';
+
+    let heartRatings = { overall:0, ambiance:0, romance:0, service:0 };
+    let forFirstDate = false, forAnniversary = false;
+    let selectedOccasion = '';
+
+    function heartRow(label, key) {
+      return `<div style="margin-bottom:12px;">
+        <div style="font-size:11px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:6px;">${label}</div>
+        <div style="display:flex;gap:8px;" id="dn-hr-${key}">
+          ${[1,2,3,4,5].map(n=>`<span data-k="${key}" data-v="${n}"
+            style="font-size:28px;cursor:pointer;filter:${heartRatings[key]>=n?'':'grayscale(1)'};transition:.15s;">❤️</span>`).join('')}
+        </div>
+      </div>`;
+    }
+
+    modal.innerHTML = `
+      <div style="background:var(--bg,#f5f5f5);border-radius:24px 24px 0 0;width:100%;max-height:90vh;overflow-y:auto;-webkit-overflow-scrolling:touch;">
+        <div style="background:linear-gradient(135deg,#6B0F1A,#C2185B);padding:16px;border-radius:24px 24px 0 0;text-align:center;">
+          <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#F5E6CA;">Date Night Review</div>
+          <div style="font-size:11px;color:rgba(245,230,202,.7);">${venueName}</div>
+        </div>
+        <div style="padding:16px;">
+          ${heartRow('Overall Rating','overall')}
+          ${heartRow('Ambiance','ambiance')}
+          ${heartRow('Romance','romance')}
+          ${heartRow('Service for Couples','service')}
+          <div style="font-size:11px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:8px;">OCCASION</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;" id="dn-occ-chips">
+            ${['Date Night','Anniversary','Proposal','First Date','Birthday',"Valentine's Day",'Honeymoon','Just Because']
+              .map(o=>`<button class="dn-occ-chip" data-occ="${o}"
+                style="padding:5px 12px;border-radius:20px;border:1px solid var(--border,#ddd);
+                font-size:11px;font-weight:700;cursor:pointer;background:var(--card-bg,#fff);
+                color:var(--text-primary,#212121);">${o}</button>`).join('')}
+          </div>
+          <div style="display:flex;gap:14px;margin-bottom:14px;">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;flex:1;">
+              <input type="checkbox" id="dn-rev-firstdate" style="width:18px;height:18px;accent-color:#FF6B9D;">
+              <span style="font-size:12px;color:var(--text-primary,#212121);">Recommend for First Date</span>
+            </label>
+          </div>
+          <div style="display:flex;gap:14px;margin-bottom:14px;">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;flex:1;">
+              <input type="checkbox" id="dn-rev-anniv" style="width:18px;height:18px;accent-color:#FF6B9D;">
+              <span style="font-size:12px;color:var(--text-primary,#212121);">Recommend for Anniversary</span>
+            </label>
+          </div>
+          <div style="font-size:11px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:6px;">TIPS FOR OTHER COUPLES</div>
+          <textarea id="dn-rev-tips" placeholder="Share your insider tips to help other couples…" rows="3"
+            style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border,#ddd);font-size:13px;resize:none;background:var(--card-bg,#fff);color:var(--text-primary,#212121);margin-bottom:14px;box-sizing:border-box;"></textarea>
+          <button id="dn-rev-submit" style="width:100%;padding:13px;border-radius:14px;border:none;background:linear-gradient(135deg,#6B0F1A,#FF6B9D);color:#fff;font-size:15px;font-weight:800;cursor:pointer;">Submit Date Night Review</button>
+          <button onclick="document.getElementById('dn-review-modal').remove()" style="width:100%;padding:10px;border-radius:14px;border:none;background:transparent;color:var(--text-secondary,#aaa);font-size:13px;cursor:pointer;margin-top:6px;">Cancel</button>
+        </div>
+      </div>`;
+
+    document.body.appendChild(modal);
+
+    // Heart rating handlers
+    modal.querySelectorAll('[data-k]').forEach(heart => {
+      heart.onclick = () => {
+        const k = heart.dataset.k; const v = parseInt(heart.dataset.v);
+        heartRatings[k] = v;
+        modal.querySelectorAll(`[data-k="${k}"]`).forEach((h,i) => {
+          h.style.filter = i < v ? '' : 'grayscale(1)';
+        });
+      };
+    });
+
+    // Occasion chips
+    modal.querySelectorAll('.dn-occ-chip').forEach(btn => {
+      btn.onclick = () => {
+        selectedOccasion = btn.dataset.occ;
+        modal.querySelectorAll('.dn-occ-chip').forEach(b=>{b.style.background='var(--card-bg,#fff)';b.style.color='var(--text-primary,#212121)';});
+        btn.style.background='#FF6B9D';btn.style.color='#fff';
+      };
+    });
+
+    modal.querySelector('#dn-rev-submit').onclick = () => {
+      const reviews = loadDNReviews();
+      if (!reviews[venueId]) reviews[venueId] = [];
+      const tips = modal.querySelector('#dn-rev-tips').value.trim();
+      const allFilled = Object.values(heartRatings).every(v=>v>0) && selectedOccasion && tips;
+      reviews[venueId].push({
+        ...heartRatings,
+        occasion: selectedOccasion,
+        forFirstDate: modal.querySelector('#dn-rev-firstdate').checked,
+        forAnniversary: modal.querySelector('#dn-rev-anniv').checked,
+        tips,
+        verified: allFilled,
+        date: new Date().toISOString().split('T')[0],
+        id: Date.now() + Math.random().toString(36).slice(2),
+      });
+      saveDNReviews(reviews);
+      modal.remove();
+      alert('Thank you for your Date Night review! 🌹');
+    };
+  };
+
+  /* ═══ DATE NIGHT AI PLANNER UPDATES ═══ */
+  const DN_AI_PROMPTS = [
+    'Plan a romantic dinner for two in Orlando',
+    'Best proposal spots in Orlando',
+    'Surprise anniversary ideas near Disney',
+    'Romantic date night under $100',
+    'Surprise my partner — mystery itinerary',
+  ];
+
+  const DN_AI_RESPONSES = {
+    'romantic dinner': "🌹 For a romantic dinner, I suggest three options based on your mood:\n\n• **Capa Steakhouse** (Splurge) — rooftop dining with Disney fireworks views. Reserve weeks in advance.\n• **The Boheme** (Mid-range) — live jazz in an art gallery hotel. Intimate and unforgettable.\n• **Prato on Park Avenue** (Mid-range) — Italian romance on Orlando's most beautiful street.\n\nAll three offer candlelit settings and exceptional wine lists. Call ahead and mention it's a special occasion — Orlando restaurants take good care of couples!",
+    'proposal spot': "💍 Top 3 Orlando Proposal Spots:\n\n1. **Hot Air Balloon at Dawn** — Completely private, sunrise backdrop, champagne on landing. Most romantic option.\n2. **ICON Park Wheel Private Gondola** ($120) — 400ft above Orlando at sunset. Gondola photographer available for $50 extra.\n3. **Capa Rooftop at Four Seasons** — Propose during Disney fireworks over a fine dining table. Alert the restaurant in advance.\n\n**Photography tip:** Book a professional for spots 1 and 3. For natural settings like Wekiwa Springs, golden-hour light does the work.",
+    'anniversary': "💍 Perfect Anniversary Plan:\n\n**Morning:** Couples Spa at Four Seasons ($400) — side-by-side treatments and hydrotherapy.\n**Evening:** Capa Steakhouse ($200+/couple) with Disney fireworks views.\n**Night:** Grand Bohemian Hotel suite ($350/night) with rose petal turndown service.\n\n**Budget version:** Lake Eola Paddle Boat ($20) → The Ravenous Pig dinner ($120) → stargazing at Lake Nona (free). Total: ~$140 for an unforgettable evening.",
+    'budget date': "💚 Romantic Date Night Under $100:\n\n1. **Lake Eola Paddle Boat** (6:30 PM) — $20/couple. Swan boats at golden hour.\n2. **Happy Hour at Midnight Rose Rooftop** (8:00 PM) — cocktails with city views, ~$40 during happy hour.\n3. **Stargazing at Lake Nona Waterfront** (10:00 PM) — completely free, bring a blanket.\n\n**Total: ~$60.** Pack a small charcuterie board from Trader Joe's and bring it to the stargazing spot for a perfect picnic finale.",
+    'surprise': "✨ Mystery Date Night Itinerary:\n\nTell your partner only: *'Dress smart casual, we leave at 6:30 PM.'*\n\n🕡 6:30 PM — *'We're going somewhere beautiful...'* (Lake Eola Paddle Boat)\n🕗 8:00 PM — *'I've chosen your favorite kind of cuisine...'* (Dinner at The Ravenous Pig)\n🕙 10:00 PM — *'One more stop — look up.'* (Rooftop bar with city views)\n\nReveal each location only upon arrival. The mystery builds romance throughout the evening.",
+  };
+
+  window._orlandoUpdateAIPrompts = function() {
+    const isDN = window.appState && window.appState.dateNight && window.appState.dateNight.active;
+    // Find AI planner prompt area
+    const promptArea = document.querySelector('.ai-suggestion-chips, .ai-quick-prompts, [data-ai-prompts]');
+    if (!promptArea) return;
+    if (isDN) {
+      promptArea.setAttribute('data-dn-prompts-active', '1');
+      promptArea.innerHTML = DN_AI_PROMPTS.map(p => `
+        <button class="ai-chip" onclick="window._dnAIQuery && window._dnAIQuery('${p}')"
+          style="padding:7px 14px;border-radius:20px;border:1.5px solid #FF6B9D;background:#FF6B9D18;
+          font-size:12px;font-weight:600;cursor:pointer;color:#FF6B9D;white-space:nowrap;">
+          🌹 ${p}</button>`).join('');
+    } else {
+      promptArea.removeAttribute('data-dn-prompts-active');
+    }
+  };
+
+  window._dnAIQuery = function(prompt) {
+    const p = prompt.toLowerCase();
+    let response = '';
+    if (p.includes('dinner') || p.includes('restaurant')) response = DN_AI_RESPONSES['romantic dinner'];
+    else if (p.includes('proposal') || p.includes('propose')) response = DN_AI_RESPONSES['proposal spot'];
+    else if (p.includes('anniversary')) response = DN_AI_RESPONSES['anniversary'];
+    else if (p.includes('budget') || p.includes('100') || p.includes('cheap')) response = DN_AI_RESPONSES['budget date'];
+    else if (p.includes('surprise') || p.includes('mystery')) response = DN_AI_RESPONSES['surprise'];
+    else response = DN_AI_RESPONSES['romantic dinner'];
+
+    // Show in AI planner if it exists
+    const aiResponse = document.querySelector('.ai-response-area, [data-ai-response], #ai-planner-response');
+    if (aiResponse) {
+      aiResponse.innerHTML = `<div style="white-space:pre-wrap;font-size:13px;line-height:1.6;">${response.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div>`;
+      aiResponse.scrollIntoView({ behavior:'smooth' });
+    } else {
+      // Fallback: show in modal
+      const modal = document.createElement('div');
+      modal.style.cssText = 'position:fixed;inset:0;z-index:9500;display:flex;align-items:flex-end;background:rgba(0,0,0,.6);';
+      modal.innerHTML = `<div style="background:var(--bg,#fff);border-radius:24px 24px 0 0;padding:20px;width:100%;max-height:80vh;overflow-y:auto;">
+        <div style="font-family:'Playfair Display',serif;font-size:17px;color:var(--text-primary,#212121);margin-bottom:12px;">🌹 Date Night AI</div>
+        <div style="font-size:13px;color:var(--text-secondary,#555);line-height:1.7;white-space:pre-wrap;">${response.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div>
+        <button onclick="this.closest('[style*=fixed]').remove()" style="width:100%;margin-top:16px;padding:12px;border-radius:12px;border:none;background:linear-gradient(135deg,#6B0F1A,#FF6B9D);color:#fff;font-size:14px;font-weight:700;cursor:pointer;">Close</button>
+      </div>`;
+      document.body.appendChild(modal);
+    }
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK DN_WIRE: Wire Date Night System into App ===== */
+(function wireDateNightSystem() {
+
+  /* ── renderHome patch: inject DN button and featured content ── */
+  const _prevRH_dnw = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_dnw) _prevRH_dnw.apply(this, arguments);
+    setTimeout(() => {
+      /* DN button */
+      if (!document.getElementById('dn-home-btn')) {
+        const pills = document.querySelector('.category-pills,.home-categories,[class*="category-row"],[data-category-pills]');
+        const homeContent = document.querySelector('#screen-home .screen-content,#screen-home .home-content,#screen-home>div:last-child');
+        const ref = pills || homeContent;
+        if (ref) {
+          const btn = document.createElement('button');
+          btn.id = 'dn-home-btn';
+          btn.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:10px;width:calc(100% - 28px);margin:10px 14px 0;padding:14px;border:none;border-radius:30px;background:linear-gradient(135deg,#6B0F1A,#C2185B,#C9A96E);color:#fff;font-family:\'DM Sans\',sans-serif;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 20px rgba(107,15,26,.4);';
+          btn.innerHTML = '<span style="font-size:22px;">🌹</span>Plan Your Perfect Date Night<span style="font-size:18px;">›</span>';
+          btn.onclick = () => window.openDateNightScreen();
+          if (pills) pills.insertAdjacentElement('afterend', btn);
+          else ref.prepend(btn);
+        }
+      }
+      /* If DN mode active, restore hero and indicator */
+      const DN = window.appState && window.appState.dateNight;
+      if (DN && DN.active) {
+        if (typeof window._dnApplyHero === 'function') window._dnApplyHero();
+        if (typeof window._dnInjectIndicator === 'function') window._dnInjectIndicator();
+      }
+      /* DN Featured Today section when mode is active */
+      if (DN && DN.active) {
+        const featured = document.querySelector('.featured-today,.home-featured,[data-featured-today]');
+        if (featured && !featured.querySelector('[data-dn-featured]')) {
+          const dnFeat = document.createElement('div');
+          dnFeat.setAttribute('data-dn-featured','1');
+          dnFeat.style.cssText = 'background:linear-gradient(135deg,#3B0010,#6B0F1A);border-radius:14px;padding:14px;margin-bottom:10px;cursor:pointer;';
+          dnFeat.onclick = () => window.openDateNightScreen();
+          dnFeat.innerHTML = `
+            <div style="font-size:10px;font-weight:700;color:rgba(245,230,202,.6);margin-bottom:6px;">DATE NIGHT PICKS TODAY</div>
+            <div style="display:flex;gap:10px;overflow-x:auto;-webkit-overflow-scrolling:touch;">
+              ${[{e:'🥩',n:'Capa Steakhouse'},{e:'🎡',n:'ICON Park Gondola'},{e:'🎨',n:'Grand Bohemian Hotel'},{e:'⛵',n:'Sunset Cruise'}]
+                .map(i=>`<div style="flex-shrink:0;text-align:center;width:70px;">
+                  <div style="font-size:28px;margin-bottom:4px;">${i.e}</div>
+                  <div style="font-size:10px;color:rgba(245,230,202,.8);font-weight:600;line-height:1.3;">${i.n}</div>
+                </div>`).join('')}
+            </div>`;
+          featured.prepend(dnFeat);
+        }
+      }
+    }, 500);
+  };
+
+  /* ── renderAccount patch: My Reservations section ── */
+  const _prevRA_dnw = window.renderAccount;
+  window.renderAccount = function() {
+    if (_prevRA_dnw) _prevRA_dnw.apply(this, arguments);
+    setTimeout(() => {
+      const lg = document.querySelector('.account-loggedin');
+      if (!lg || lg.querySelector('[data-dn-acct-section]')) return;
+
+      /* Date Night Mode toggle in account */
+      const modeEl = document.createElement('div');
+      modeEl.setAttribute('data-dn-acct-section','1');
+      modeEl.innerHTML = `
+        <div style="margin:10px 14px;background:linear-gradient(135deg,#3B0010,#6B0F1A);border-radius:14px;padding:14px;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#F5E6CA;margin-bottom:10px;">
+            🌹 Date Night</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button onclick="window.toggleDateNightMode();window.renderAccount && window.renderAccount()"
+              style="flex:1;padding:10px;border-radius:10px;border:none;
+              background:${window.appState&&window.appState.dateNight&&window.appState.dateNight.active?'rgba(255,107,157,.2)':'rgba(255,255,255,.1)'};
+              color:#fff;font-size:12px;font-weight:700;cursor:pointer;">
+              ${window.appState&&window.appState.dateNight&&window.appState.dateNight.active?'🌹 Mode: Active — Turn Off':'🌹 Enable Date Night Mode'}</button>
+            <button onclick="window.openDateNightScreen()"
+              style="flex:1;padding:10px;border-radius:10px;border:none;background:rgba(201,169,110,.2);color:#C9A96E;font-size:12px;font-weight:700;cursor:pointer;">
+              Explore Venues ›</button>
+            <button onclick="window.showScreen('proposal')"
+              style="flex:1;padding:10px;border-radius:10px;border:none;background:rgba(255,255,255,.1);color:rgba(255,255,255,.7);font-size:12px;font-weight:700;cursor:pointer;">
+              💍 Proposal Planner</button>
+          </div>
+        </div>`;
+
+      /* My Reservations */
+      const DN = window.appState && window.appState.dateNight;
+      const reservations = (DN && DN.reservations) || [];
+      if (reservations.length > 0) {
+        const resSection = document.createElement('div');
+        resSection.style.cssText = 'margin:0 14px 10px;';
+        resSection.innerHTML = `
+          <div style="font-size:11px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:8px;">MY RESERVATIONS (${reservations.length})</div>
+          ${reservations.slice(-3).reverse().map(r=>`
+            <div style="background:var(--card-bg,#fff);border-radius:12px;padding:12px;margin-bottom:8px;border:1px solid var(--border,#eee);
+              border-left:3px solid #FF6B9D;">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                <span style="font-size:20px;">${r.emoji}</span>
+                <div style="flex:1;">
+                  <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${r.restaurant}</div>
+                  <div style="font-size:11px;color:var(--text-secondary,#aaa);">${r.date} at ${r.time} · Party of ${r.party}</div>
+                </div>
+                <span style="font-size:10px;font-weight:700;background:#FF6B9D18;color:#FF6B9D;padding:3px 8px;border-radius:20px;">${r.occasion}</span>
+              </div>
+              <div style="font-size:10px;color:var(--text-secondary,#aaa);">Confirmation: ${r.id}</div>
+            </div>`).join('')}`;
+        modeEl.appendChild(resSection);
+      }
+
+      /* My Saved Plans */
+      const savedPlans = (DN && DN.savedPlans) || [];
+      if (savedPlans.length > 0) {
+        const plansDiv = document.createElement('div');
+        plansDiv.style.cssText = 'margin:0 14px 10px;';
+        plansDiv.innerHTML = `
+          <div style="font-size:11px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:8px;">SAVED DATE NIGHT PLANS (${savedPlans.length})</div>
+          ${savedPlans.slice(-2).reverse().map(p=>`
+            <div style="background:var(--card-bg,#fff);border-radius:12px;padding:12px;margin-bottom:8px;border:1px solid var(--border,#eee);">
+              <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${p.occasion} Night</div>
+              <div style="font-size:11px;color:var(--text-secondary,#aaa);">~$${p.total} · ${p.stops.length} stops</div>
+            </div>`).join('')}`;
+        modeEl.appendChild(plansDiv);
+      }
+
+      const adm = lg.querySelector('.adm-account-btn');
+      lg.insertBefore(modeEl, adm || null);
+    }, 720);
+  };
+
+  /* ── showScreen hook: trigger tab renders ── */
+  const _prevSS_dnw = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_dnw) _prevSS_dnw(name, el);
+    if (name === 'date-night') {
+      setTimeout(() => {
+        if (typeof window._dnRenderActiveTab === 'function') window._dnRenderActiveTab();
+      }, 200);
+    }
+  };
+
+  /* ── Account menu shortcut ── */
+  const _prevRA2_dnw = window.renderAccount;
+  // (Already patched above — no duplicate needed)
+
+  /* ── Init: if date-night screen exists, trigger first render ── */
+  setTimeout(() => {
+    const c = document.getElementById('dn-tab-content');
+    if (c && typeof window._dnRenderActiveTab === 'function') window._dnRenderActiveTab();
+  }, 500);
+
+  console.log('[Orlando Date Night] System fully wired. Toggle with window.toggleDateNightMode()');
+})();
+</script>
