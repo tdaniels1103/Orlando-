@@ -42919,3 +42919,190 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK TTT2: Itinerary Generator V2 — Smart Trip Planner ===== */
+(function initItineraryV2() {
+
+  /* Enhanced trip plan generator based on party type, days, budget, season */
+  const PLANS = {
+    family_moderate_5: {
+      title:"5-Day Family Adventure (Moderate Budget)",
+      tag:'👨‍👩‍👧 Family · 5 Days · Moderate',
+      days:[
+        { day:'Day 1 — Magic Kingdom', theme:'🏰 The Classics', morning:"Rope Drop → TRON Virtual Queue on app → TRON Lightcycle Run → Space Mountain → Buzz Lightyear", afternoon:"Lunch at Pecos Bill's (Mobile Order). Pirates of the Caribbean → Haunted Mansion → Jungle Cruise", evening:"Dinner at Crystal Palace (reserve 60 days out). Stay for Happily Ever After fireworks at 9 PM.", tips:'Claim fireworks spot 30 min early in the hub. Strollers must be parked at designated areas.' },
+        { day:'Day 2 — EPCOT', theme:'🌍 World Showcase', morning:"Rope Drop → Guardians of Galaxy LL Premier at 7 AM → Test Track → Remy's Ratatouille Adventure", afternoon:"World Showcase lunch crawl: Mexico → Japan → Morocco → France. Charge the kids on the Harmonious lagoon story.", evening:"Via Napoli for dinner (reserve 60 days). Luminous fireworks at 9 PM from France pavilion.", tips:'The Flower & Garden or Food & Wine festival adds incredible value when running.' },
+        { day:'Day 3 — Hollywood Studios', theme:'🎬 Hollywood & Beyond', morning:"Rope Drop → Rise of the Resistance LL Premier at 7 AM → Slinky Dog Dash → Smuggler's Run", afternoon:"Lunch at Docking Bay 7 (Mobile Order). Millenium Falcon again if time. Tower of Terror → Rock \'n\' Roller Coaster", evening:"A Star is Born show. Dinner at 50\'s Prime Time Café. Star Wars Galactic Spectacular fireworks.", tips:'Hollywood Studios is the most compact Disney park — less walking between attractions.' },
+        { day:'Day 4 — Universal Both Parks', theme:'🎭 Wizarding World', morning:"IoA Rope Drop → Hagrid's Virtual Queue (join in app) → Velocicoaster single rider → Hogsmeade exploration", afternoon:"Diagon Alley lunch at Leaky Cauldron. Escape from Gringotts → Hogwarts Express → back to IoA", evening:"Dinner at Mythos Restaurant (IoA). CityWalk entertainment to finish the evening.", tips:'Hogwarts Express requires a 2-park ticket. The experience is worth every cent.' },
+        { day:'Day 5 — Animal Kingdom + Rest', theme:'🦁 Nature & Discovery', morning:"Rope Drop → Flight of Passage LL at 7 AM → Kilimanjaro Safaris at 9 AM (animals most active)", afternoon:"Lunch at Satu'li Canteen (best QS in Disney). Kali River Rapids. Na'vi River Journey.", evening:"Tree of Life Awakenings at dusk. Early evening resort pool. Pack for departure.", tips:'Flight of Passage is the most popular Disney ride — LL or early rope drop are essential.' },
+      ],
+    },
+    couple_luxury_4: {
+      title:"4-Day Romantic Couple's Getaway (Luxury)",
+      tag:'💑 Couple · 4 Days · Luxury',
+      days:[
+        { day:'Day 1 — EPCOT & Fine Dining', theme:'🌐 EPCOT World Showcase', morning:"Arrive mid-morning. Check in to Yacht & Beach Club. EPCOT via International Gateway. Guardians LL.", afternoon:"World Showcase Wine Walk: France → Morocco → Japan. Moana Journey of Water interactive.", evening:"Dinner at Chefs de France (France Pavilion). Luminous fireworks from France waterfront. Walk back via International Gateway to resort.", tips:'The Yacht Club puts you within 5 min walk of EPCOT\'s International Gateway — no bus needed.' },
+        { day:'Day 2 — Hollywood Studios & California Grill', theme:'🎬 Movies & Magic', morning:"Late morning start. Hollywood Studios. Rise of the Resistance (LL Premier). Lunch at Brown Derby (TS).", afternoon:"Tower of Terror, Rock 'n' Roller Coaster. Afternoon spa at resort if time.", evening:"California Grill dinner at 9 PM table (reserve at 60 days for fireworks window). Watch Happily Ever After from the restaurant rooftop deck.", tips:'California Grill is one of the greatest date-night experiences in Florida. Do not miss it.' },
+        { day:'Day 3 — Magic Kingdom + Dinner at V&A', theme:"🏰 Disney's Crown Jewel", morning:"Magic Kingdom rope drop. TRON → Seven Dwarfs (LL) → Haunted Mansion → Pirates. Light lunch at QS.", afternoon:"Afternoon rest at resort. Spa treatment at Senses if desired. Get ready for the evening.", evening:"Victoria & Albert's dinner — 7:30 PM table (reserve exactly at 60-day mark, early morning). The 10-course tasting menu is a once-in-a-lifetime evening.", tips:"Victoria & Albert's is a true bucket-list experience. Dress code: business formal for men, cocktail attire for women." },
+        { day:'Day 4 — Universal & Departure', theme:"🦁 Wizarding Finale", morning:"Universal IoA. Velocicoaster. Hogsmeade exploration + Butterbeer.", afternoon:"Diagon Alley. Escape from Gringotts. CityWalk lunch. Check out by 2 PM.", evening:"Airport departure or hotel extension night.", tips:'For 2 people at Universal for 1 day: Express Pass is strongly recommended.' },
+      ],
+    },
+    solo_budget_3: {
+      title:"3-Day Epic Solo Trip (Budget)",
+      tag:'🧳 Solo · 3 Days · Budget',
+      days:[
+        { day:'Day 1 — Universal (Both Parks)', theme:'🎬 Wizarding World Solo', morning:"Arrive at Universal IoA 30 min early. Rope Drop: Velocicoaster (single rider — walk on). Hagrid\'s Virtual Queue on app. Hogsmeade.", afternoon:"Hogwarts Express to USF. Diagon Alley. Escape from Gringotts single rider. Lunch at Leaky Cauldron (solo seat at bar).", evening:"CityWalk: Rising Star karaoke with live band (best solo night entertainment in Orlando). Budget: $89 ticket + $30 food + $20 evening = $139", tips:'Single rider lines at Universal are your superpower. Velocicoaster single rider: 15 min vs. 90 min standby.' },
+        { day:'Day 2 — Magic Kingdom', theme:'🏰 Disney Solo Magic', morning:"Mobile Order breakfast from hotel. Arrive at MK 40 min before open. Rope Drop: TRON Virtual Queue → TRON → Buzz Lightyear → Space Mountain → Haunted Mansion", afternoon:"Pecos Bill's QS lunch. Single rider for Seven Dwarfs sometimes available (ask CM). Afternoon shows.", evening:"Bar seat at The Friar's Nook counter. Happily Ever After fireworks solo from Main Street center. Budget: $145 ticket + $30 food = $175", tips:'Solo visitors move faster than any family group. Use this advantage aggressively at rope drop.' },
+        { day:'Day 3 — EPCOT World Showcase', theme:'🌍 Solo World Tour', morning:"EPCOT via International Gateway (free walk from BoardWalk area). Guardians of Galaxy LL if in budget.", afternoon:"World Showcase solo food crawl: Beer in Germany, crepes in France, sake in Japan, tea in England, tacos in Mexico. 3 hours.", evening:"Luminous fireworks solo from France pavilion. Exit via International Gateway. Total day budget: $109 ticket + $60 food = $169", tips:'The EPCOT World Showcase food crawl alone is worth the park admission as a solo experience.' },
+      ],
+    },
+  };
+
+  function renderPlan(container, planKey) {
+    const plan = PLANS[planKey];
+    if (!plan) return;
+
+    container.innerHTML = `
+      <div style="background:linear-gradient(135deg,#1A237E,#283593);border-radius:12px;padding:14px;margin-bottom:12px;color:#fff;">
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;margin-bottom:4px;">${plan.title}</div>
+        <div style="font-size:12px;opacity:.8;">${plan.tag}</div>
+      </div>
+      ${plan.days.map((day, i) => `
+        <div style="background:var(--card-bg,#fff);border-radius:12px;margin-bottom:10px;
+          border:1px solid var(--border,#eee);overflow:hidden;">
+          <div style="background:linear-gradient(135deg,#1A237E,#283593);padding:8px 12px;">
+            <div style="font-size:13px;font-weight:800;color:#fff;">${day.day}</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.75);">${day.theme}</div>
+          </div>
+          <div style="padding:10px 12px;">
+            <div style="font-size:10px;font-weight:700;color:#1565C0;margin-bottom:3px;">🌅 MORNING</div>
+            <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;margin-bottom:8px;">${day.morning}</div>
+            <div style="font-size:10px;font-weight:700;color:#E65100;margin-bottom:3px;">☀️ AFTERNOON</div>
+            <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;margin-bottom:8px;">${day.afternoon}</div>
+            <div style="font-size:10px;font-weight:700;color:#7B1FA2;margin-bottom:3px;">🌙 EVENING</div>
+            <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;margin-bottom:8px;">${day.evening}</div>
+            <div style="background:#1A237E10;border-left:3px solid #283593;padding:7px 10px;border-radius:0 6px 6px 0;">
+              <div style="font-size:11px;color:var(--text-secondary,#555);">💡 ${day.tips}</div>
+            </div>
+          </div>
+        </div>`).join('')}`;
+  }
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-itinerary-v2';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;';
+
+    const header = document.createElement('div');
+    header.style.cssText = 'background:linear-gradient(135deg,#1A237E,#283593,#5C6BC0);padding:18px 14px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0;';
+    header.innerHTML = `
+      <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;
+        border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+      <div style="flex:1;">
+        <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#fff;">Smart Trip Planner</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.8);">3 expert itineraries · Choose your style</div>
+      </div>
+      <span style="font-size:28px;">🗓️</span>`;
+
+    const content = document.createElement('div');
+    content.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    // Plan selector
+    const planBar = document.createElement('div');
+    planBar.style.cssText = 'display:flex;gap:6px;overflow-x:auto;padding-bottom:10px;margin-bottom:10px;scrollbar-width:none;';
+    const planResult = document.createElement('div');
+
+    const plans = [
+      { key:'family_moderate_5', label:'👨‍👩‍👧 Family 5-Day' },
+      { key:'couple_luxury_4', label:'💑 Couple 4-Day' },
+      { key:'solo_budget_3', label:'🧳 Solo 3-Day' },
+    ];
+
+    plans.forEach((plan, i) => {
+      const btn = document.createElement('button');
+      btn.style.cssText = `flex-shrink:0;padding:8px 14px;border-radius:20px;border:1.5px solid;
+        font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;
+        background:${i===0?'#1A237E':'rgba(26,35,126,.1)'};
+        color:${i===0?'#fff':'#1A237E'};
+        border-color:${i===0?'#1A237E':'rgba(26,35,126,.3)'};`;
+      btn.textContent = plan.label;
+      btn.onclick = () => {
+        planBar.querySelectorAll('button').forEach(b => {
+          b.style.background = 'rgba(26,35,126,.1)';
+          b.style.color = '#1A237E';
+          b.style.borderColor = 'rgba(26,35,126,.3)';
+        });
+        btn.style.background = '#1A237E';
+        btn.style.color = '#fff';
+        btn.style.borderColor = '#1A237E';
+        renderPlan(planResult, plan.key);
+      };
+      planBar.appendChild(btn);
+    });
+
+    content.appendChild(planBar);
+    content.appendChild(planResult);
+    renderPlan(planResult, 'family_moderate_5');
+
+    const footer = document.createElement('div');
+    footer.style.cssText = 'background:linear-gradient(135deg,#1A237E,#283593);border-radius:14px;padding:14px;margin-top:8px;margin-bottom:20px;color:#fff;';
+    footer.innerHTML = `
+      <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:8px;">💌 Want a Personalized Plan?</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.85);line-height:1.6;margin-bottom:10px;">
+        Use the AI Trip Planner (available from the home screen) to generate a fully customized itinerary based on your specific dates, party, budget, and which parks you want to prioritize.
+      </div>
+      <button onclick="window.showScreen('home')" style="padding:10px 20px;border-radius:12px;border:1px solid rgba(255,255,255,.4);
+        background:rgba(255,255,255,.15);color:#fff;font-size:13px;font-weight:700;cursor:pointer;width:100%;">
+        ← Back to Home & AI Planner
+      </button>`;
+    content.appendChild(footer);
+
+    s.appendChild(header);
+    s.appendChild(content);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-itinerary-v2')) buildScreen();
+
+  const _prevSS_ttt2 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_ttt2) _prevSS_ttt2(name, el);
+    if (name === 'itinerary-v2') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-itinerary-v2');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectItinCard() {
+    if (document.getElementById('itin-home-card')) return true;
+    const ref = document.getElementById('shop-home-card') || document.getElementById('wp-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'itin-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#1A237E,#283593,#5C6BC0);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('itinerary-v2');
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:28px;">🗓️</span>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Smart Trip Planner</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.85);">3 expert itineraries · Family · Couple · Solo</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _itinCard = false;
+  setInterval(() => { if (!_itinCard) _itinCard = injectItinCard(); }, 21000);
+  setTimeout(() => { _itinCard = injectItinCard(); }, 17500);
+
+  const _prevRH_ttt2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_ttt2) _prevRH_ttt2.apply(this, arguments);
+    setTimeout(() => { _itinCard = false; _itinCard = injectItinCard(); }, 4000);
+  };
+})();
+</script>
