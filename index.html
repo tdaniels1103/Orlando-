@@ -39143,3 +39143,695 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK AAA2: Solo Traveler's Complete Guide ===== */
+(function initSoloTraveler() {
+
+  const SOLO_SECTIONS = [
+    {
+      title:'Why Orlando Solo is Extraordinary',
+      emoji:'🧳',
+      color:'#4A148C',
+      content:[
+        { point:'No Compromise', detail:'Choose every park, every restaurant, every ride exactly as you want. The parks at your own pace is a completely different (and often better) experience.' },
+        { point:'Single Rider Lines = Your Superpower', detail:'Velocicoaster, Guardians of the Galaxy, Revenge of the Mummy, Hagrid\'s — all have single rider lines where you ride in 15–20 minutes what takes families 90+ minutes.' },
+        { point:'Solo Rope Drop Dominance', detail:'You move faster than any family group. Rope Drop → first ride in the park → moved to second before families have left the parking tram.' },
+        { point:'Budget Freedom', detail:'Solo trips can be paradoxically cheaper: one quick-service meal, no resort split, Airbnb access to better neighborhoods near parks.' },
+      ],
+    },
+    {
+      title:'Best Solo-Friendly Experiences',
+      emoji:'⭐',
+      color:'#1565C0',
+      content:[
+        { point:'Hollywood Studios', detail:'Best solo park at Disney. Short distances, great food scenes, Rise of the Resistance, excellent single rider line strategy available.' },
+        { point:'EPCOT World Showcase Solo Walk', detail:"Circumnavigate 11 countries solo at your own pace. Try the global food booths. Have wine in France. No one to rush you. It's perfect." },
+        { point:'Universal Studios Florida (Diagon Alley solo)', detail:"The butterbeer, the shops, Escape from Gringotts — everything is better when you can linger as long as you want without watching the clock." },
+        { point:'Downtown Orlando & Thornton Park', detail:"Solo evening at Dexter's wine bar, then Lake Eola sunset walk — genuinely one of the best solo evenings in America." },
+      ],
+    },
+    {
+      title:'Solo Safety & Practical Tips',
+      emoji:'🛡️',
+      color:'#2E7D32',
+      content:[
+        { point:'Share Location', detail:'Share your Google Maps live location with someone at home. Takes 30 seconds, adds major peace of mind.' },
+        { point:'Hotel Security', detail:"Disney resort hotels have excellent security. Off-site, choose hotels with interior corridor rooms and deadbolt doors. Read reviews specifically for 'safe' and 'solo'." },
+        { point:'Rideshare Only', detail:'Use Uber/Lyft exclusively — never unlicensed cabs. Share the ride details to your contact before getting in.' },
+        { point:"Don't Announce Aloneness", detail:"Tell service staff you're 'with a group' not 'solo' when necessary — especially at late-night venues if you feel uncertain." },
+      ],
+    },
+    {
+      title:'Solo Dining Mastery',
+      emoji:'🍽️',
+      color:'#E65100',
+      content:[
+        { point:'Bar Seating Strategy', detail:'Request bar seating at all Orlando table-service restaurants. Victoria & Albert\'s, Capa, Flying Fish — all serve the full menu at the bar. Often no reservation needed.' },
+        { point:'Counter Service Freedom', detail:'Solo diners at Disney Quick Service can eat anywhere. Grab a table at Be Our Guest for the experience without the sit-down reservation.' },
+        { point:'EPCOT Food Festival Solo Pro Tip', detail:"Buy one thing per country, eat as you walk. Circuit of the globe costs $60–80 and takes 3 hours of glorious solo exploring." },
+        { point:'Drinking Alone (It\'s Fine)', detail:"The bar at Flying Fish on the BoardWalk, The Enchanted Rose at Grand Floridian, or Nomad Lounge at Animal Kingdom — solo cocktail hours at these spots are genuinely wonderful." },
+      ],
+    },
+    {
+      title:'Solo Park Strategies by Day',
+      emoji:'📋',
+      color:'#B71C1C',
+      content:[
+        { point:'Day 1: Magic Kingdom', detail:"Solo Rope Drop → TRON virtual queue → Haunted Mansion → Big Thunder → Seven Dwarfs → Splash. Lunch at Pecos Bill's. Afternoon: Fantasyland walkthrough. Evening fireworks from Main Street solo. Pure magic." },
+        { point:'Day 2: Hollywood Studios + EPCOT hop', detail:"Rope Drop Rise of the Resistance → Slinky Dog → Smuggler\'s Run → lunch. Afternoon monorail to EPCOT → World Showcase walk → dinner in France or Italy." },
+        { point:'Day 3: Universal Both Parks', detail:"IoA Rope Drop: Hagrid's virtual queue → Velocicoaster single rider → Hogsmeade. Mid-morning: Diagon Alley at USF → Escape from Gringotts. Afternoon: Velocicoaster a second time." },
+        { point:'Day 4: EPCOT Full Day', detail:"Morning: Future World / World Discovery rides. Midday: World Showcase leisurely lunch crawl (Japan → Morocco → France). Evening: Harmonious or Luminous show at lagoon." },
+      ],
+    },
+  ];
+
+  const COMMUNITY_TIPS = [
+    { icon:'👥', tip:'Join the r/WaltDisneyWorld and r/UniversalOrlando Reddit communities before your trip — solo trip reports are incredibly helpful and welcoming.' },
+    { icon:'📸', tip:'Disney cast members will take your photo for free. Just ask with a smile. Same at Universal. Never be shy about solo photos.' },
+    { icon:'🤝', tip:"Talk to other solo travelers at the parks — you'll find them at bar seats and single rider lines. Friendships form surprisingly often." },
+    { icon:'🧘', tip:'Build in one afternoon of complete rest. Solo parks at your own pace is still physically demanding. A hotel pool afternoon recharges everything.' },
+    { icon:'📓', tip:"Keep a trip journal or voice memo notes. Solo travel creates vivid memories that fade quickly. Capture them." },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-solo-guide';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;';
+    s.innerHTML = `
+      <div style="background:linear-gradient(135deg,#4A148C,#6A1B9A,#CE93D8);padding:18px 14px 20px;
+        display:flex;align-items:center;gap:12px;flex-shrink:0;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;
+          border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#fff;">Solo Traveler's Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">Go alone · Experience everything · Zero compromise</div>
+        </div>
+        <span style="font-size:28px;">🧳</span>
+      </div>
+      <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;">
+
+        <div style="background:linear-gradient(135deg,#4A148C,#6A1B9A);border-radius:16px;padding:14px;margin-bottom:14px;color:#fff;">
+          <div style="font-size:32px;text-align:center;margin-bottom:8px;">🧳</div>
+          <div style="font-size:13px;line-height:1.6;opacity:.9;text-align:center;">
+            "Solo travel to Orlando is not a compromise. It's the only way to experience these parks without compromise."
+          </div>
+        </div>
+
+        ${SOLO_SECTIONS.map(section => `
+          <div style="background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;
+            border:1px solid var(--border,#eee);overflow:hidden;">
+            <div style="background:${section.color};padding:10px 14px;display:flex;align-items:center;gap:8px;">
+              <span style="font-size:22px;">${section.emoji}</span>
+              <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:#fff;">${section.title}</div>
+            </div>
+            <div style="padding:10px 14px;">
+              ${section.content.map(item => `
+                <div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border,#f0f0f0);">
+                  <div style="font-size:13px;font-weight:700;color:${section.color};margin-bottom:3px;">${item.point}</div>
+                  <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;">${item.detail}</div>
+                </div>`).join('')}
+            </div>
+          </div>`).join('')}
+
+        <!-- Community tips -->
+        <div style="background:linear-gradient(135deg,#4A148C,#6A1B9A);border-radius:14px;padding:14px;margin-bottom:20px;color:#fff;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">👥 Solo Community Tips</div>
+          ${COMMUNITY_TIPS.map(ct => `
+            <div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
+              <span style="font-size:18px;flex-shrink:0;">${ct.icon}</span>
+              <div style="font-size:12px;color:rgba(255,255,255,.85);line-height:1.5;">${ct.tip}</div>
+            </div>`).join('')}
+        </div>
+      </div>`;
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-solo-guide')) buildScreen();
+
+  const _prevSS_aaa2 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_aaa2) _prevSS_aaa2(name, el);
+    if (name === 'solo-guide') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-solo-guide');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectSoloCard() {
+    if (document.getElementById('solo-home-card')) return true;
+    const ref = document.getElementById('access-home-card') || document.getElementById('seasonal-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'solo-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#4A148C,#6A1B9A,#CE93D8);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('solo-guide');
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:28px;">🧳</span>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Solo Traveler's Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.85);">Single rider tips · Safety · 4-day solo plans</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _soloCard = false;
+  setInterval(() => { if (!_soloCard) _soloCard = injectSoloCard(); }, 11500);
+  setTimeout(() => { _soloCard = injectSoloCard(); }, 8000);
+
+  const _prevRH_aaa2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_aaa2) _prevRH_aaa2.apply(this, arguments);
+    setTimeout(() => { _soloCard = false; _soloCard = injectSoloCard(); }, 2100);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK BBB2: Pet-Friendly Orlando Guide ===== */
+(function initPetGuide() {
+
+  const PET_SECTIONS = [
+    {
+      title:"Disney's Best Friend Kennels",
+      emoji:'🐕',
+      color:'#1565C0',
+      items:[
+        { name:'Best Friends Pet Care — Disney Resort', loc:'Near Magic Kingdom', cost:'$49–$89/night', detail:"Disney's on-site kennel is full-service, climate-controlled, and staffed by animal lovers. Dogs can have 'day care' while you park-hop and come back for the night." },
+        { name:'Day Care Services', loc:'Best Friends Pet Care', cost:'$16–$20/day', detail:"Leave your dog for the day while you visit the parks. They get walks, play time, and air conditioning. Pick up when you return." },
+        { name:"Pet-Friendly Disney Resort Rooms", loc:'All Disney resorts', cost:'$75–$150 pet fee', detail:"Disney allows dogs (not all pets) in select rooms at all Disney resort hotels. Fort Wilderness Campground allows pets most freely." },
+        { name:'Fort Wilderness — Most Pet Friendly', loc:'Disney\'s Fort Wilderness Campground', cost:'$30–$125/night + pet fee', detail:"RV and cabin sites welcome pets. Walking trails, outdoor spaces, dogs off-leash in designated areas. The most pet-friendly Disney accommodations." },
+      ],
+    },
+    {
+      title:'Pet-Friendly Hotels Near Parks',
+      emoji:'🏨',
+      color:'#1B5E20',
+      items:[
+        { name:'Kimpton Angler\'s Hotel', loc:'Downtown Orlando', cost:'$0 pet fee (Kimpton policy)', detail:"Kimpton Hotels have no pet fee and no weight limit — famously pet-forward brand. Bowls, beds, and welcome treats provided." },
+        { name:'Drury Inn & Suites', loc:'Near International Drive', cost:'$35/night pet fee', detail:"Allows up to 2 pets under 80 lbs each. Free hot breakfast included. Walking distance to I-Drive." },
+        { name:'Loews Hotels (select)', loc:'Universal Orlando area', cost:'$35–$75/night', detail:"Loews properties are generally pet-friendly with advance notice. Some have dog walking services." },
+        { name:'Home Away from Home (VRBO/Airbnb)', loc:'Kissimmee, Celebration, Winter Park', detail:"Short-term rentals are the best option for pets — backyard access, full kitchen, fewer restrictions. Filter for 'pets allowed' on both platforms.", cost:'Varies' },
+      ],
+    },
+    {
+      title:'Pet-Friendly Activities & Restaurants',
+      emoji:'🌿',
+      color:'#E65100',
+      items:[
+        { name:'Lake Eola Park Dog Walk', loc:'Downtown Orlando', cost:'Free', detail:"Wide paths, dog fountains, dog-friendly atmosphere. One of the best urban dog walks in Florida. Farmer's Market on Sunday is dog-friendly too." },
+        { name:'Bar-K Dog Bar (when open)', loc:'Various locations check online', cost:'Membership or day pass', detail:"A full bar with an off-leash dog park attached. Humans drink craft beer while dogs play. Unique Orlando experience." },
+        { name:'Park Avenue, Winter Park', loc:'Winter Park', cost:'Free', detail:"Most shops and restaurants on Park Avenue allow leashed dogs on patios. The tree-lined street is beautiful for dog walks." },
+        { name:'Wekiwa Springs State Park', loc:'Apopka (30 min north)', cost:'$6/car', detail:"Dogs allowed on all trails (on leash). Beautiful spring and forest — a perfect dog adventure day." },
+        { name:'Harry\'s Poolside Bar & Grill', loc:'Grand Bohemian Hotel', cost:'Menu prices', detail:"Outdoor patio dining that welcomes leashed dogs. One of the better upscale dog-friendly dining options downtown." },
+      ],
+    },
+    {
+      title:'Veterinary Resources',
+      emoji:'🏥',
+      color:'#B71C1C',
+      items:[
+        { name:'VCA Animal Hospitals', loc:'Multiple Orlando locations', cost:'Emergency pricing', detail:"24-hour emergency vet care. Multiple locations near the parks. Search 'VCA Orlando' for nearest location." },
+        { name:'BluePearl Pet Hospital', loc:'Near Universal Orlando area', cost:'Emergency pricing', detail:"Top-tier emergency and specialty veterinary care. Call ahead: (407) 644-4449." },
+        { name:'Orlando Veterinary Specialists', loc:'Maitland (near Winter Park)', cost:'Specialist pricing', detail:"Cardiology, oncology, internal medicine. For serious ongoing health concerns while traveling." },
+        { name:'Walmart Pet Section — Emergency Supplies', loc:'Multiple locations open 24/7', cost:'Retail', detail:"Food, medications, flea/tick treatment, first aid kits for pets. Multiple 24-hour locations near the parks." },
+      ],
+    },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-pet-guide';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;';
+    s.innerHTML = `
+      <div style="background:linear-gradient(135deg,#795548,#A1887F,#D7CCC8);padding:18px 14px 20px;
+        display:flex;align-items:center;gap:12px;flex-shrink:0;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;
+          border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#fff;">Pet-Friendly Orlando</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">Hotels · Activities · Dining · Vet resources</div>
+        </div>
+        <span style="font-size:28px;">🐾</span>
+      </div>
+      <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;">
+
+        <div style="background:linear-gradient(135deg,#795548,#6D4C41);border-radius:16px;padding:14px;margin-bottom:14px;color:#fff;">
+          <div style="font-size:13px;line-height:1.6;opacity:.9;">
+            Traveling to Orlando with pets requires planning but absolutely works. Disney even has a full-service kennel on property. Here's everything you need to bring your furry family member and still have an incredible trip.
+          </div>
+        </div>
+
+        ${PET_SECTIONS.map(section => `
+          <div style="margin-bottom:14px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+              <span style="font-size:22px;">${section.emoji}</span>
+              <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:${section.color};">${section.title}</div>
+            </div>
+            ${section.items.map(item => `
+              <div style="background:var(--card-bg,#fff);border-radius:12px;margin-bottom:8px;
+                border:1px solid var(--border,#eee);padding:10px 12px;">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3px;">
+                  <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);flex:1;margin-right:8px;">${item.name}</div>
+                  <span style="font-size:11px;font-weight:700;color:${section.color};white-space:nowrap;">${item.cost}</span>
+                </div>
+                <div style="font-size:10px;color:var(--text-secondary,#888);margin-bottom:4px;">📍 ${item.loc}</div>
+                <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;">${item.detail}</div>
+              </div>`).join('')}
+          </div>`).join('')}
+
+        <!-- Florida pet safety tips -->
+        <div style="background:linear-gradient(135deg,#795548,#6D4C41);border-radius:14px;padding:14px;margin-bottom:20px;color:#fff;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">⚠️ Florida Pet Safety</div>
+          ${[
+            '🐊 Alligators: Keep pets away from ALL freshwater edges — lakes, retention ponds, canals. Never let pets drink from or enter these water sources.',
+            '🌡️ Heat: Florida asphalt can exceed 150°F in summer. Test pavement with your hand for 5 seconds. If it burns you, it burns paws.',
+            '🦟 Heartworm prevention is essential in Florida year-round — mosquitos are prolific even in winter.',
+            "🐍 Burmese pythons exist in south Florida wildlife areas but don't reach Orlando parks in significant numbers. Be aware in natural areas.",
+            '🍄 Florida has toxic mushrooms — watch for foraging pets in wooded areas and parks.',
+            '☀️ Shade is limited in theme park areas and parking lots. Never leave pets in cars, even briefly — interior heat reaches dangerous levels in minutes.',
+          ].map(tip => `<div style="font-size:12px;color:rgba(255,255,255,.9);padding:4px 0;border-bottom:1px solid rgba(255,255,255,.15);line-height:1.5;">${tip}</div>`).join('')}
+        </div>
+      </div>`;
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-pet-guide')) buildScreen();
+
+  const _prevSS_bbb2 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_bbb2) _prevSS_bbb2(name, el);
+    if (name === 'pet-guide') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-pet-guide');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectPetCard() {
+    if (document.getElementById('pet-home-card')) return true;
+    const ref = document.getElementById('solo-home-card') || document.getElementById('access-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'pet-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#795548,#A1887F,#D7CCC8);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('pet-guide');
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:28px;">🐾</span>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Pet-Friendly Orlando</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.85);">Disney kennels · Pet hotels · Vet resources</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _petCard = false;
+  setInterval(() => { if (!_petCard) _petCard = injectPetCard(); }, 12000);
+  setTimeout(() => { _petCard = injectPetCard(); }, 8500);
+
+  const _prevRH_bbb2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_bbb2) _prevRH_bbb2.apply(this, arguments);
+    setTimeout(() => { _petCard = false; _petCard = injectPetCard(); }, 2200);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK CCC2: Orlando Road Trip & Day Trips Guide ===== */
+(function initDayTrips() {
+
+  const DAY_TRIPS = [
+    {
+      destination:'Kennedy Space Center',
+      emoji:'🚀',
+      distance:'55 miles (60–75 min from Disney)',
+      price:'$75 adult / $65 child (all day)',
+      rating:5,
+      bestFor:'Space enthusiasts · Families · Adults · Everyone',
+      highlights:["Shuttle Atlantis exhibit — the actual retired space shuttle on display. Jaw-dropping.", 'Rocket Garden with Mercury, Gemini, Apollo era rockets', 'Apollo 8 launch experience (4D simulation)', 'IMAX films on space exploration', 'Meet a real astronaut (daily, included in admission)', "Launch viewing — check Kennedy's public launch calendar for scheduled SpaceX/NASA launches"],
+      tips:["Plan 5–7 hours minimum. The exhibits are genuinely world-class, not tourist traps.", "Check for launch days — watching a live rocket launch from the viewing area is a once-in-a-lifetime experience.", "Parking and all exhibits included in one ticket price. No upcharging."],
+      bestMonth:'Any month — indoor exhibits, no Florida heat issues',
+    },
+    {
+      destination:'St. Augustine',
+      emoji:'⚓',
+      distance:'105 miles (90 min from Orlando)',
+      price:'Walking/exploring mostly free · Attractions $10–25',
+      rating:5,
+      bestFor:'History lovers · Couples · Foodies · Architecture fans',
+      highlights:['Oldest city in the United States (founded 1565)', "Castillo de San Marcos — real 17th century Spanish fortress. $15 admission.", 'St. George Street — historic pedestrian shopping and dining district', 'Flagler College campus (free to walk around) — stunning architecture', "Aviles Street — America's oldest street with art galleries", "Lightner Museum — Gilded Age collection in a former Ponce de León hotel"],
+      tips:["Stay overnight if possible — St. Augustine at night is magical.", "Avoid parking downtown — use the visitors center parking and take the free trolley or walk.", "The Hyppo has the best popsicles in Florida. Non-negotiable stop."],
+      bestMonth:'November–April (summer is very hot and crowded)',
+    },
+    {
+      destination:'Clearwater Beach',
+      emoji:'🏖️',
+      distance:'110 miles (90 min from Disney)',
+      price:'Beach free · Parking $5/hr · Activities extra',
+      rating:5,
+      bestFor:'Beach day · Families · Couples · Sun seekers',
+      highlights:['Consistently rated #1 beach in the US (TripAdvisor)', "Pier 60 nightly sunset celebration with street performers and craft vendors (free)", 'Clear Gulf water, white sand, calm waves — the full Florida beach experience', 'Clearwater Marine Aquarium — home of Winter the dolphin (from Dolphin Tale movie)', "Captain Memo's pirate cruise or dolphin watching tours from the pier", "Fishing: charter boats, pier fishing, and kayak rentals all available"],
+      tips:["Leave Orlando by 9 AM to beat traffic and get parking.", "Pier 60 at sunset is one of the best free experiences in Florida. Time your day to finish there.", "Eat at Frenchy's Rockaway Grill — iconic beach bar with legendary grouper sandwiches."],
+      bestMonth:'October–May (hurricane season July–September and extreme heat)',
+    },
+    {
+      destination:'Tampa & Ybor City',
+      emoji:'🦁',
+      distance:'85 miles (75 min from Orlando)',
+      price:'Busch Gardens $95+; City free to explore',
+      rating:4,
+      bestFor:'Thrill seekers · Foodies · History buffs · Families',
+      highlights:["Busch Gardens Tampa — serious roller coaster destination with incredible animal exhibits. Iron Gwazi is world-class.", "Ybor City — Tampa's historic Cuban neighborhood with great restaurants, cigars, and nightlife", "Tampa Riverwalk — beautiful waterfront public park connecting downtown", "Florida Aquarium — excellent family aquarium near the waterfront", "Bern's Steak House — legendary Tampa institution with the most extensive wine list in the world", "Columbia Restaurant, Ybor City — America's oldest restaurant (since 1905), incredible Spanish/Cuban food"],
+      tips:["Busch Gardens Express Pass is highly recommended on weekends — park gets crowded fast.", "Ybor City is best experienced in the evening — the architecture and culture are unique in Florida.", "Tampa and Orlando together form Florida's I-4 corridor. Easy drive with no tolls."],
+      bestMonth:'October–April (heat and crowds are lower)',
+    },
+    {
+      destination:'Daytona Beach & Speedway',
+      emoji:'🏎️',
+      distance:'60 miles (55 min from Disney)',
+      price:'Beach free · Speedway tours $25+',
+      rating:4,
+      bestFor:'NASCAR fans · Beach day (budget-friendly) · Speed lovers',
+      highlights:['Daytona International Speedway — year-round tours even on non-race days', "Daytona Beach — wide hard-packed sand, historic boardwalk, classic Florida beach vibes", "World Center of Racing museum at the Speedway", "Bike Week and Speed Weeks events (February) — massive gatherings if you enjoy motorcycles or racing culture", "Ocean Center entertainment complex on the boardwalk"],
+      tips:["Daytona Beach is more affordable and less crowded than Clearwater Beach.", "The Speedway tours are genuinely impressive even if you're not a NASCAR fan — the scale is incredible.", "February is DAYTONA 500 month — book months ahead if visiting during race week."],
+      bestMonth:'October–April (calmer weather, less tourist season)',
+    },
+    {
+      destination:'Everglades (Airboat Experience)',
+      emoji:'🐊',
+      distance:'230 miles (3 hours from Disney)',
+      price:'Airboat tour $30–60 · Park entry $35/car',
+      rating:4,
+      bestFor:'Nature lovers · Wildlife enthusiasts · Adventure seekers',
+      highlights:['Airboat tours through the River of Grass with alligator sightings', "Anhinga Trail — most reliable place in America to see large wildlife (herons, alligators, turtles)", "Flamingo Area — remote southern tip with incredible bird watching", "Shark Valley — flat bike/walking trail with observation tower over the Glades", "Florida Bay — stunning sunset on the bay at Flamingo"],
+      tips:["Make this a 2-day trip ideally — it's too far to truly appreciate in one day.", "November–April: best wildlife viewing and dry season. Summer is hot and buggy beyond description.", "Bring serious insect repellent — DEET required. This is not negotiable."],
+      bestMonth:'December–March (dry season, peak wildlife)',
+    },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-day-trips';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;';
+    s.innerHTML = `
+      <div style="background:linear-gradient(135deg,#E65100,#F57C00,#FFCC02);padding:18px 14px 20px;
+        display:flex;align-items:center;gap:12px;flex-shrink:0;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;
+          border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#fff;">Day Trips from Orlando</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.9);">Space Coast · Beaches · History · Wildlife</div>
+        </div>
+        <span style="font-size:28px;">🗺️</span>
+      </div>
+      <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;">
+
+        <div style="background:linear-gradient(135deg,#E65100,#F57C00);border-radius:16px;padding:14px;margin-bottom:14px;color:#fff;">
+          <div style="font-size:13px;line-height:1.6;opacity:.9;">
+            Orlando's central Florida location is a strategic advantage. The Space Coast, Tampa, St. Augustine, Clearwater Beach, and the Everglades are all within reach for a day trip or overnight escape.
+          </div>
+        </div>
+
+        ${DAY_TRIPS.map((trip, i) => `
+          <div style="background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;
+            border:1px solid var(--border,#eee);overflow:hidden;">
+            <div style="background:linear-gradient(135deg,#E65100,#F57C00);padding:12px 14px;">
+              <div style="display:flex;align-items:flex-start;gap:8px;">
+                <span style="font-size:26px;">${trip.emoji}</span>
+                <div style="flex:1;">
+                  <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:#fff;">${trip.destination}</div>
+                  <div style="font-size:10px;color:rgba(255,255,255,.8);">🚗 ${trip.distance}</div>
+                </div>
+                <div style="text-align:right;flex-shrink:0;">
+                  <div style="font-size:13px;">${'⭐'.repeat(trip.rating)}</div>
+                </div>
+              </div>
+            </div>
+            <div style="padding:12px 14px;">
+              <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:11px;">
+                <span style="color:var(--text-secondary,#888);">💰 ${trip.price}</span>
+                <span style="color:#E65100;font-weight:700;">Best: ${trip.bestMonth}</span>
+              </div>
+              <div style="font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:5px;">HIGHLIGHTS</div>
+              ${trip.highlights.map(h => `<div style="font-size:12px;color:var(--text-secondary,#555);padding:2px 0;">→ ${h}</div>`).join('')}
+              <div style="margin-top:8px;border-top:1px solid var(--border,#eee);padding-top:8px;">
+                <div style="font-size:10px;font-weight:700;color:#E65100;margin-bottom:4px;">PRO TIPS</div>
+                ${trip.tips.map(t => `<div style="font-size:11px;color:var(--text-secondary,#666);padding:2px 0;">💡 ${t}</div>`).join('')}
+              </div>
+              <div style="margin-top:6px;font-size:10px;color:var(--text-secondary,#888);">Best for: ${trip.bestFor}</div>
+            </div>
+          </div>`).join('')}
+
+        <!-- Road trip tips -->
+        <div style="background:linear-gradient(135deg,#E65100,#F57C00);border-radius:14px;padding:14px;margin-bottom:20px;color:#fff;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">🚗 Florida Road Trip Tips</div>
+          ${[
+            'Florida has SunPass toll roads everywhere — rent a car with a SunPass included or pay tolls by mail later.',
+            'I-4 through Orlando is ranked among the most dangerous highways in the US — drive defensively, avoid rush hours (7–9 AM, 4–7 PM).',
+            'Gas stations are infrequent on some stretches — fill up before leaving the metro area.',
+            'Florida speed limits: 70 mph on interstates, 65 mph some state roads. Speed cameras are rare but police are active.',
+            'Afternoon thunderstorms in summer are intense and fast-moving — pull off safely, do not drive through flooded areas.',
+          ].map(tip => `<div style="font-size:12px;color:rgba(255,255,255,.9);padding:4px 0;border-bottom:1px solid rgba(255,255,255,.15);line-height:1.5;">✓ ${tip}</div>`).join('')}
+        </div>
+      </div>`;
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-day-trips')) buildScreen();
+
+  const _prevSS_ccc2 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_ccc2) _prevSS_ccc2(name, el);
+    if (name === 'day-trips') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-day-trips');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectDayTripCard() {
+    if (document.getElementById('daytrip-home-card')) return true;
+    const ref = document.getElementById('pet-home-card') || document.getElementById('solo-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'daytrip-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#E65100,#F57C00,#FFCC02);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('day-trips');
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:28px;">🗺️</span>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Day Trips from Orlando</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.9);">Kennedy Space Center · Beaches · Tampa · Everglades</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _dtCard = false;
+  setInterval(() => { if (!_dtCard) _dtCard = injectDayTripCard(); }, 12500);
+  setTimeout(() => { _dtCard = injectDayTripCard(); }, 9000);
+
+  const _prevRH_ccc2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_ccc2) _prevRH_ccc2.apply(this, arguments);
+    setTimeout(() => { _dtCard = false; _dtCard = injectDayTripCard(); }, 2300);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK DDD2: Photography & Content Creator Guide ===== */
+(function initPhotographyGuide() {
+
+  const PHOTO_SPOTS = [
+    {
+      park:'Magic Kingdom',
+      emoji:'🏰',
+      color:'#1565C0',
+      shots:[
+        { spot:'Cinderella Castle from Main Street USA Hub', time:'Blue Hour (7:15–7:45 AM or 20 min after park close)', tip:'Use the hub's circular path for a centered composition. Arrive at rope drop for fog and morning light.' },
+        { spot:'The Haunted Mansion Entry', time:'Any time, but overcast is best', tip:'The wrought iron gates and winding path offer incredible gothic composition. Shoot from low.' },
+        { spot:'Tomorrowland Speedway track from the bridge', time:'Golden Hour (last 90 min of park day)', tip:'The monorail crossing in the background is the ideal timing. Patience required.' },
+        { spot:'Partners Statue (Walt & Mickey), Main Street', time:'Rope Drop or 30 min before close', tip:'Morning: warm east light on Walt\'s face. Evening: beautiful backlight. This is the quintessential Disney photo.' },
+      ],
+    },
+    {
+      park:'EPCOT',
+      emoji:'🌐',
+      color:'#00695C',
+      shots:[
+        { spot:'Spaceship Earth Reflection in the fountain', time:'Golden Hour evening', tip:'The fountain in front of Spaceship Earth creates a perfect mirror shot. Use a wide angle and shoot low.' },
+        { spot:'World Showcase Lagoon at Luminous fireworks', time:'Nightly show (check times)', tip:'Shoot from Italy pavilion facing the lagoon. 24mm or wider for the full panorama.' },
+        { spot:'Japan Pavilion pagoda with koi pond', time:'Any time (overcast ideal)', tip:'The koi pond reflects the pagoda beautifully. Shoot with the garden in the foreground.' },
+        { spot:'France Pavilion streetscape', time:'Morning (before 11 AM)', tip:"Narrow Paris-style streets. Shoot toward the Eiffel Tower replica. This feels genuinely Parisian." },
+      ],
+    },
+    {
+      park:'Hollywood Studios',
+      emoji:'🎬',
+      color:'#B71C1C',
+      shots:[
+        { spot:'Star Wars: Galaxy\'s Edge — The Millennium Falcon', time:'Rope Drop or evening (blue light mode)', tip:'Shoot from the far corner of the Falcon plaza. Evening blue lighting is cinematic and dramatic.' },
+        { spot:'Slinky Dog Dash track from the Toy Story land path', time:'Late afternoon', tip:"The colorful carnival theming and 'giant' scale of Slinky is visually unique. Use a telephoto to compress perspective." },
+        { spot:'Tower of Terror from Sunset Boulevard', time:'Blue Hour', tip:"Hollywood Tower Hotel is dramatic against a deep blue sky. Include a palm tree silhouette on the left side." },
+        { spot:'Hollywood Boulevard marquee at night', time:'Park close (lights come on)', tip:'The retro neon signage is stunning. Use a slow shutter to capture light trails from passing guests.' },
+      ],
+    },
+    {
+      park:'Universal — Wizarding World',
+      emoji:'⚡',
+      color:'#4A148C',
+      shots:[
+        { spot:'Hogsmeade Village from the Hogwarts Express arch', time:'Rope Drop or 30 min before park close', tip:'The stone arch frames the village perfectly. This is the most-shared Universal photo. Patience = crowd-free.' },
+        { spot:'Hogwarts Castle from Hogsmeade main path', time:'After 8 PM (night lighting)', tip:'The castle is dramatically lit at night and fewer people are in the shot. Include the Three Broomsticks in the foreground.' },
+        { spot:'Diagon Alley — Gringotts Bank exterior', time:'Any time (overcast for detail)', tip:"The dragon on top breathes fire every 15 minutes. Film the fire moment for social content." },
+      ],
+    },
+    {
+      park:'Outside the Parks',
+      emoji:'📸',
+      color:'#2E7D32',
+      shots:[
+        { spot:'Kraft Azalea Garden at sunrise, Winter Park', time:'30 min before sunrise', tip:'Ancient cypress trees in pastel morning light. Completely free and almost always empty. Bring a tripod.' },
+        { spot:'Lake Eola Fountain at golden hour', time:'1 hour before sunset', tip:'The fountain and downtown skyline create an iconic Orlando shot. Walk the full path for varied compositions.' },
+        { spot:'Disney BoardWalk at dusk', time:'30 min before park close', tip:'The carousel horses and lit boardwalk are charming and distinctive. Hotels reflect in the lagoon.' },
+        { spot:'ICON Observation Wheel from the street', time:'After dark', tip:"The giant wheel illuminated against the night sky from the side streets of I-Drive is an unexpected striking composition." },
+      ],
+    },
+  ];
+
+  const GEAR_TIPS = [
+    { icon:'📱', title:'Phone Photography', tip:"iPhone 15 Pro or Pixel 8 Pro can rival mirrorless cameras at theme parks. In bright light, a clip-on wide angle lens ($40) transforms your shots." },
+    { icon:'📷', title:'Best Camera for Parks', tip:"Sony A7C II or Fujifilm X-T5 are the go-to mirrorless choices. Compact, weather-sealed, excellent low-light for indoor rides." },
+    { icon:'🔭', title:'Best Lenses', tip:"35mm f/1.8 for street/environmental. 85mm f/1.8 for portraits with castle backgrounds. 70–200mm for fireworks and telephoto compression." },
+    { icon:'🔦', title:'Low Light Essentials', tip:"Indoor rides are shot at ISO 3200–12800. Wide aperture (f/1.8–2.8) and good stabilization are mandatory. Sony's Eye AF excels here." },
+    { icon:'🎬', title:'Video & Content Creator', tip:"DJI Osmo Action 5 for ride POVs. Insta360 X5 for immersive 360° content. Both are allowed on most rides (check each park's policy)." },
+    { icon:'💡', title:'Editing Workflow', tip:"Adobe Lightroom Mobile (free) for quick edits on-property. VSCO's A4 or Fuji Eterna presets complement the warm Florida tones perfectly." },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-photography';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;';
+    s.innerHTML = `
+      <div style="background:linear-gradient(135deg,#212121,#424242,#757575);padding:18px 14px 20px;
+        display:flex;align-items:center;gap:12px;flex-shrink:0;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;
+          border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#fff;">Photography & Content Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.7);">Best shots · Timing · Gear · Pro techniques</div>
+        </div>
+        <span style="font-size:28px;">📸</span>
+      </div>
+      <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;">
+
+        <div style="background:linear-gradient(135deg,#212121,#424242);border-radius:16px;padding:14px;margin-bottom:14px;color:#fff;">
+          <div style="font-size:13px;line-height:1.6;opacity:.9;">
+            Orlando is one of the world's great photography destinations. The parks invest billions in visual design — every corner is a composition waiting to be made. Here are the exact shots, times, and techniques.
+          </div>
+        </div>
+
+        ${PHOTO_SPOTS.map(park => `
+          <div style="background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;
+            border:1px solid var(--border,#eee);overflow:hidden;">
+            <div style="background:${park.color};padding:10px 14px;display:flex;align-items:center;gap:8px;">
+              <span style="font-size:22px;">${park.emoji}</span>
+              <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:#fff;">${park.park}</div>
+            </div>
+            <div style="padding:10px 14px;">
+              ${park.shots.map(shot => `
+                <div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border,#f0f0f0);">
+                  <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:2px;">📸 ${shot.spot}</div>
+                  <div style="font-size:10px;font-weight:700;color:${park.color};margin-bottom:4px;">⏰ ${shot.time}</div>
+                  <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;">💡 ${shot.tip}</div>
+                </div>`).join('')}
+            </div>
+          </div>`).join('')}
+
+        <!-- Gear guide -->
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;
+          color:var(--text-primary,#212121);margin:16px 0 10px;">📷 Gear Guide</div>
+        ${GEAR_TIPS.map(g => `
+          <div style="background:var(--card-bg,#fff);border-radius:12px;margin-bottom:8px;
+            border:1px solid var(--border,#eee);padding:10px 12px;display:flex;gap:10px;align-items:flex-start;">
+            <span style="font-size:22px;flex-shrink:0;">${g.icon}</span>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:3px;">${g.title}</div>
+              <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;">${g.tip}</div>
+            </div>
+          </div>`).join('')}
+
+        <!-- Content creator rules -->
+        <div style="background:linear-gradient(135deg,#212121,#424242);border-radius:14px;padding:14px;margin-top:14px;margin-bottom:20px;color:#fff;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">📋 Content Creator Rules</div>
+          ${[
+            'No selfie sticks on any rides (Disney, Universal, SeaWorld). In parks, selfie sticks must be stored in bags.',
+            'No tripods in parks without special media permits. Gorillapods and flexible tripods are typically allowed.',
+            "Disney's media policy: non-commercial photography is unrestricted. Commercial shoots require permits.",
+            'Drones are strictly prohibited at all Orlando theme parks and most city areas without specific permits.',
+            'Photography inside dark rides is allowed but flash is prohibited — train yourself to shoot flash-off.',
+            "Social media disclosure: Any paid partnership content requires #ad or #sponsored disclosure even at theme parks.",
+          ].map(rule => `<div style="font-size:12px;color:rgba(255,255,255,.9);padding:4px 0;border-bottom:1px solid rgba(255,255,255,.15);line-height:1.5;">→ ${rule}</div>`).join('')}
+        </div>
+      </div>`;
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-photography')) buildScreen();
+
+  const _prevSS_ddd2 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_ddd2) _prevSS_ddd2(name, el);
+    if (name === 'photography') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-photography');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectPhotoCard() {
+    if (document.getElementById('photo-home-card')) return true;
+    const ref = document.getElementById('daytrip-home-card') || document.getElementById('pet-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'photo-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#212121,#424242,#757575);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('photography');
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:28px;">📸</span>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Photography & Content Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">20+ top shots · Timing · Gear recommendations</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _photoCard = false;
+  setInterval(() => { if (!_photoCard) _photoCard = injectPhotoCard(); }, 13000);
+  setTimeout(() => { _photoCard = injectPhotoCard(); }, 9500);
+
+  const _prevRH_ddd2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_ddd2) _prevRH_ddd2.apply(this, arguments);
+    setTimeout(() => { _photoCard = false; _photoCard = injectPhotoCard(); }, 2400);
+  };
+})();
+</script>
