@@ -60169,3 +60169,378 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK DDDDDDD: Florida Wildlife & Ecotourism Guide ===== */
+(function initFloridaWildlife() {
+
+  const WILDLIFE_SPOTS = [
+    {
+      name:'Merritt Island National Wildlife Refuge', emoji:'🦅', color:'#2E7D32',
+      distance:'65 miles east (1 hour)',
+      animals:['Manatees (winter)', 'Bald eagles', 'Great blue herons', 'Roseate spoonbills', 'American alligators', 'Sea turtles (nesting June–July)'],
+      activities:'Wildlife drive (7-mile loop), kayaking, birding, manatee tours',
+      bestTime:'November–March for manatees and migratory birds. June–August for sea turtle nesting.',
+      tip:'Merritt Island is adjacent to Kennedy Space Center — combine both in one day. The Black Point Wildlife Drive can be done by car for alligator and bird sightings without leaving your vehicle. The nesting sea turtle night walks (June–July) require reservations.',
+    },
+    {
+      name:'Blue Spring State Park', emoji:'🐟', color:'#0277BD',
+      distance:'45 miles north (50 minutes)',
+      animals:['West Indian manatees (hundreds in winter)', 'Various fish species', 'Wading birds', 'River otters'],
+      activities:'Manatee viewing from the boardwalk, snorkeling (summer), swimming in spring run, kayaking',
+      bestTime:'November–March for manatees. The spring (72°F year-round) is best for swimming in summer.',
+      tip:'Blue Spring has the most accessible manatee viewing in Florida — up to 400 manatees congregate in the warm spring water when temperatures drop. The boardwalk view is free with park admission. No swim with manatees here — observation only, which is better for conservation.',
+    },
+    {
+      name:'Everglades Airboat Tours', emoji:'🐊', color:'#37474F',
+      distance:'3 hours south (but worth a long day trip)',
+      animals:['American alligators (guaranteed)', 'American crocodiles (uncommon)', 'Anhinga birds', 'Roseate spoonbills', 'Large fish', 'Rare Florida panthers (very lucky)'],
+      activities:'Airboat tours, kayaking, hiking, Everglades National Park visitor center',
+      bestTime:'December–April (dry season, more wildlife concentrated at water sources)',
+      tip:'The airboat tours at the north edge of the Everglades (near Homestead or near Miami) provide guaranteed alligator sightings within the first 5 minutes. Every tour encounters them. The Everglades National Park proper offers quieter, more ecologically authentic experiences than the tourist airboat operators.',
+    },
+    {
+      name:'Paynes Prairie Preserve', emoji:'🦌', color:'#8B4513',
+      distance:'80 miles north (1.5 hours)',
+      animals:['American bison (herd)', 'Wild horses (Spanish mustang descendants)', 'Florida sandhill cranes', 'Alligators', 'Wild turkeys'],
+      activities:'Wildlife viewing from observation tower, horseback riding trails, birdwatching',
+      bestTime:'Year-round. Wildlife most active at dawn and dusk.',
+      tip:'Paynes Prairie is the only place in Florida with free-roaming wild bison and wild horses. These are not zoo animals — they roam 21,000 acres of basin prairie. The La Chua Trail (4.6 miles) goes closest to the most active wildlife areas. The observation platform offers panoramic views.',
+    },
+    {
+      name:'Crystal River — Manatee Swim', emoji:'🐟', color:'#00796B',
+      distance:'100 miles northwest (1.5 hours)',
+      animals:['West Indian manatees (Nov–March, hundreds)', 'Common snook', 'Redfish', 'Various bird species'],
+      activities:'Snorkel tours with manatees, kayaking, scalloping (summer), diving',
+      bestTime:'November–March for manatees. Year-round for other activities.',
+      tip:'Crystal River is the only place in the United States where you are legally permitted to be in the water with wild manatees. The passive interaction (no chasing, no touching unless they initiate) creates genuinely extraordinary moments. Book Plantation Adventure Center or River Ventures for guided tours.',
+    },
+    {
+      name:'Canaveral National Seashore', emoji:'🌊', color:'#0d47a1',
+      distance:'65 miles east (1.1 hours)',
+      animals:['Loggerhead sea turtles (nesting June–July)', 'Bottlenose dolphins', 'Various shorebirds', 'American oystercatcher'],
+      activities:'Undeveloped beach access, sea turtle monitoring tours, hiking, swimming',
+      bestTime:'June–July for sea turtle nesting. Year-round for beaches.',
+      tip:'The most pristine undeveloped beach within 2 hours of Orlando. 24 miles of Atlantic coastline with no development. The sea turtle nesting tours (June–July, advance reservation required) involve guided nighttime beach walks to observe actual nesting loggerhead sea turtles.',
+    },
+  ];
+
+  const FLORIDA_ECOLOGY = [
+    {
+      biome:'Scrub', desc:'The rarest Florida biome — ancient sand dunes now far from any ocean. Florida scrub-jays (found ONLY in Florida) nest here.', where:'Ocala National Forest, Lake Wales Ridge'},
+    {
+      biome:'Freshwater Springs', desc:'Over 700 natural springs in Florida — the highest concentration in the world. Constant 68–72°F temperature. Manatee habitat.', where:'Crystal River, Blue Spring, Ginnie Springs'},
+    {
+      biome:'Wet Prairie / Everglades', desc:'The "River of Grass" — a 50-mile wide, extremely shallow flow of freshwater from Lake Okeechobee to Florida Bay. Alligators, wading birds.', where:'South Florida'},
+    {
+      biome:'Coastal Maritime Hammock', desc:'Dense subtropical forest along Florida\'s Atlantic and Gulf coasts. Sea oats stabilize dunes. Rare gopher tortoises burrow here.', where:'Canaveral National Seashore, Merritt Island'},
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-wildlife';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#1B5E20,#2E7D32,#0277BD);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Florida Wildlife & Ecotourism</div>
+          <div style="font-size:11px;opacity:.8;">Manatees · Bald eagles · Wild bison · Alligators · Sea turtle nesting</div>
+        </div>
+        <span style="font-size:28px;">🦅</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        Florida has some of the most extraordinary wildlife accessible to visitors of any US state. Within 90 minutes of Orlando: hundreds of manatees, free-roaming wild bison, nesting sea turtles, and the bioluminescent Indian River Lagoon.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    WILDLIFE_SPOTS.forEach(spot => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:10px 14px;background:${spot.color}18;border-left:4px solid ${spot.color};">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div style="display:flex;gap:8px;align-items:center;">
+              <span style="font-size:22px;">${spot.emoji}</span>
+              <div>
+                <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--text-primary,#212121);">${spot.name}</div>
+                <div style="font-size:10px;font-weight:600;color:${spot.color};">${spot.distance}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:7px;">
+            ${spot.animals.map(a=>`<span style="font-size:10px;padding:2px 7px;background:${spot.color}18;color:${spot.color};border-radius:20px;">${a}</span>`).join('')}
+          </div>
+          <div style="font-size:11px;color:var(--text-secondary,#666);margin-bottom:4px;"><strong>Activities:</strong> ${spot.activities}</div>
+          <div style="font-size:11px;color:#2E7D32;font-weight:600;margin-bottom:5px;">📅 Best time: ${spot.bestTime}</div>
+          <div style="display:flex;gap:5px;background:${spot.color}0d;border-radius:8px;padding:7px;">
+            <span style="font-size:11px;flex-shrink:0;">💡</span>
+            <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${spot.tip}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const ecoCard = document.createElement('div');
+    ecoCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+    ecoCard.innerHTML = `<div style="padding:10px 14px;background:linear-gradient(135deg,#1B5E20,#0277BD);color:#fff;">
+      <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;">🌿 Florida Biomes & Ecosystems</div>
+    </div>
+    <div style="padding:10px 14px;">
+      ${FLORIDA_ECOLOGY.map(e=>`<div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--border,#f0f0f0);">
+        <div style="font-size:12px;font-weight:700;color:#2E7D32;">${e.biome}</div>
+        <div style="font-size:11px;color:var(--text-secondary,#555);margin:2px 0;">${e.desc}</div>
+        <div style="font-size:10px;color:var(--text-secondary,#888);font-style:italic;">Examples: ${e.where}</div>
+      </div>`).join('')}
+    </div>`;
+    body.appendChild(ecoCard);
+
+    const footCard = document.createElement('div');
+    footCard.style.cssText = 'background:linear-gradient(135deg,#1B5E20,#2E7D32);border-radius:14px;margin-bottom:20px;padding:14px;color:#fff;';
+    footCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;margin-bottom:8px;">🌿 Wildlife Ethics & Leave No Trace</div>
+    ${[
+      'Observe from distance. Florida wildlife (manatees, gators, birds) are wild animals. Feeding changes behavior and creates danger.',
+      'Manatee approach rules: passive observation only. If one approaches you, enjoy it. Never chase, never block their escape route.',
+      'Alligators: 15 feet is the minimum safe observation distance. On land, they move faster than they appear. Never feed them — fed gators lose fear of humans.',
+      'Sea turtle nesting: no flashlights on the beach during nesting season (June–July). White light disorients hatchlings. Red-light flashlights only.',
+    ].map(t=>`<div style="display:flex;gap:8px;margin-bottom:6px;align-items:flex-start;">
+      <span style="font-size:11px;flex-shrink:0;">🌿</span>
+      <div style="font-size:11px;opacity:.9;line-height:1.4;">${t}</div>
+    </div>`).join('')}`;
+    body.appendChild(footCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-wildlife')) buildScreen();
+
+  const _prevSS_ddddddd = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_ddddddd) _prevSS_ddddddd(name, el);
+    if (name === 'wildlife') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-wildlife');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectWildlifeCard() {
+    if (document.getElementById('wildlife-home-card')) return true;
+    const ref = document.getElementById('practical-home-card') || document.getElementById('water-parks-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'wildlife-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#1B5E20,#2E7D32,#0277BD 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('wildlife');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🦅</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Florida Wildlife & Ecotourism</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Manatees · Wild bison · Sea turtles · Alligators · Eagles</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _wildlifeCard = false;
+  setInterval(() => { if (!_wildlifeCard) _wildlifeCard = injectWildlifeCard(); }, 90000);
+  setTimeout(() => { _wildlifeCard = injectWildlifeCard(); }, 86500);
+  const _prevRH_ddddddd = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_ddddddd) _prevRH_ddddddd.apply(this, arguments);
+    setTimeout(() => { _wildlifeCard = false; _wildlifeCard = injectWildlifeCard(); }, 31000);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK EEEEEEE: Orlando Trip Planning Master Checklist ===== */
+(function initTripChecklist() {
+
+  const CHECKLIST_PHASES = [
+    {
+      phase:'6+ Months Before', emoji:'📅', color:'#003087',
+      items:[
+        {task:'Book Disney or Universal resort hotel (peak seasons book out 11+ months)', priority:'HIGH', note:'Walt Disney World resort guests get 60-day ADR window and early park access. Book now to get it.'},
+        {task:'Purchase park tickets (lock in current pricing)', priority:'HIGH', note:'Disney and Universal raise prices annually, often January 1. Buy before the new year for savings.'},
+        {task:'Research and plan parks by day (match park to crowd level)', priority:'MEDIUM', note:'Lower-crowd days are Tuesday–Thursday. Match your highest-priority parks to your lowest-crowd days.'},
+        {task:'Check seasonal events calendar', priority:'MEDIUM', note:'Food & Wine, Christmas Party, HHN — confirm dates and decide if you want to attend.'},
+        {task:'Book Victoria & Albert\'s (opens at 60 days from arrival)', priority:'HIGH IF GOING', note:'V&A opens at 60 days from your first dining day. Calendar alert is mandatory — books in hours.'},
+      ],
+    },
+    {
+      phase:'60 Days Before (Disney Hotel Guests)', emoji:'🎯', color:'#C62828',
+      items:[
+        {task:'Book ALL Disney dining reservations at exactly midnight', priority:'CRITICAL', note:'60-day ADR window for resort guests. Be Gulest, Cinderella\'s Royal Table, Ohana, Topolino\'s all book instantly.'},
+        {task:'Book top signature restaurants immediately', priority:'HIGH', note:'Monsieur Paul, Artist Point, California Grill. These book on the first day of the window.'},
+        {task:'Book character dining', priority:'HIGH', note:'Tusker House, Akershus, Chef Mickey\'s — these are for the experience as much as the food. Book Day 1.'},
+        {task:'Research Lightning Lane strategy for your park days', priority:'MEDIUM', note:'Identify which rides need LLP (Rise, Tron) vs. LL (Slinky Dog, Frozen). Budget accordingly.'},
+      ],
+    },
+    {
+      phase:'30 Days Before', emoji:'⚡', color:'#7B1FA2',
+      items:[
+        {task:'Purchase Lightning Lane Multi Pass if using', priority:'MEDIUM', note:'Can now be purchased 7 days in advance for Disney hotel guests.'},
+        {task:'Download My Disney Experience AND Universal app', priority:'HIGH', note:'Mobile ordering, wait times, virtual queues, and Lightning Lane are all app-based. Essential tools.'},
+        {task:'Plan packing list (sunscreen, ponchos, comfortable shoes)', priority:'MEDIUM', note:'Walking 8–12 miles/day in Florida heat. Shoes are the most important equipment decision.'},
+        {task:'Arrange Airport transportation', priority:'HIGH', note:'Rental car, Mears Connect, or rideshare. Don\'t arrive at MCO without a plan.'},
+        {task:'Set Disney Park Pass reservations (if not done already)', priority:'HIGH', note:'Park Pass system requires advance park reservation even for Annual Passholders.'},
+      ],
+    },
+    {
+      phase:'1 Week Before', emoji:'🎒', color:'#2E7D32',
+      items:[
+        {task:'Check ride closures and refurbishments', priority:'HIGH', note:'Disney\'s official site lists scheduled closures. Universal\'s App shows current status. Major rides occasionally close for maintenance.'},
+        {task:'Download offline maps (Google Maps offline area)', priority:'MEDIUM', note:'Theme park areas and day trip routes. Cellular service in parks is unreliable at peak times.'},
+        {task:'Charge all devices and prepare portable battery', priority:'MEDIUM', note:'Parks drain phones via GPS, app refreshing, and photography. A 20,000mAh power bank handles 2 full park days.'},
+        {task:'Set alarm for LL purchase opening (7 AM the day of your park visit)', priority:'HIGH', note:'Lightning Lane Multi Pass purchases open at 7 AM on the day of your visit. Set phone alarm.'},
+        {task:'Check weather forecast and adjust packing', priority:'MEDIUM', note:'Florida weather can shift. Add layers for winter, extra sunscreen/ponchos for summer.'},
+      ],
+    },
+    {
+      phase:'Day of Park Visit', emoji:'🌅', color:'#E65100',
+      items:[
+        {task:'Wake up 90 minutes before park opening', priority:'HIGH', note:'Arrive at least 30 minutes before the stated opening time. The first hour is when you can accomplish 3 hours of afternoon riding.'},
+        {task:'Open app and check Lightning Lane availability immediately', priority:'HIGH', note:'LLP for Rise/Tron/Guardians (individual purchases, sold out fast). LL Multi Pass for other rides starting at 7 AM.'},
+        {task:'Mobile order breakfast before parking', priority:'MEDIUM', note:'Schedule a pickup at 11:30 AM while still in the car or early in the park. When lunch crowd hits, your food is ready.'},
+        {task:'Check evening show times and secure fireworks spot by 8 PM', priority:'MEDIUM', note:'Disney Enchantment (MK), EPCOT Forever (EPCOT), Fantasmic! (HS) — plan for 45 minutes early positioning.'},
+        {task:'Take a 2-hour midday break', priority:'MEDIUM', note:'Hotel pool, air conditioning, rest. Parks are least pleasant 12–2 PM. You\'ll ride more in the cooler evening anyway.'},
+      ],
+    },
+  ];
+
+  const PACKING_ESSENTIALS = [
+    {item:'Comfortable walking shoes (broken in)', note:'Test before the trip. New shoes mean blisters. 8–12 miles/day on pavement.'},
+    {item:'SPF 50+ water-resistant sunscreen', note:'Apply before leaving hotel, reapply every 90 minutes. Don\'t trust the morning application to last all day.'},
+    {item:'Poncho or lightweight rain jacket', note:'Florida afternoon storms. Inexpensive ponchos ($8–12) or a packable rain jacket.'},
+    {item:'Portable phone charger (20,000mAh)', note:'Disney/Universal apps drain battery rapidly. A full-power bank handles 2 days.'},
+    {item:'Reusable water bottle', note:'Free refills at Disney water fountains. Saves $4–8 per day vs. purchasing bottles.'},
+    {item:'Park-appropriate bag (anti-pickpocket is overkill)', note:'Small daypack with secure zipper. Enough for sunscreen, snacks, poncho, and phone charger.'},
+    {item:'Snacks for in-park use', note:'Disney allows outside food. Granola bars, nuts, and dried fruit save $30–50/day for a family.'},
+    {item:'Medical kit', note:'Blister pads are the #1 overlooked necessity. Also: ibuprofen, antihistamine, antidiarrheal.'},
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-checklist';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#003087,#C62828,#E65100);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Trip Planning Master Checklist</div>
+          <div style="font-size:11px;opacity:.8;">6 months out to day-of — everything you need to do and when</div>
+        </div>
+        <span style="font-size:28px;">✅</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        An Orlando trip with this much to book and plan requires a timeline. Missing the 60-day dining window costs you the most coveted reservations. Missing LL purchase time costs you hours in line. This checklist prevents both.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    CHECKLIST_PHASES.forEach(phase => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:10px 14px;background:${phase.color}18;border-left:4px solid ${phase.color};">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:20px;">${phase.emoji}</span>
+            <div style="font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${phase.phase}</div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          ${phase.items.map(item=>`<div style="display:flex;gap:8px;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--border,#f5f5f5);">
+            <div style="width:12px;height:12px;border:2px solid ${phase.color};border-radius:3px;flex-shrink:0;margin-top:2px;"></div>
+            <div style="flex:1;">
+              <div style="display:flex;align-items:center;gap:5px;margin-bottom:2px;">
+                <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);">${item.task}</div>
+                <span style="font-size:9px;padding:1px 5px;background:${item.priority==='CRITICAL'?'#C62828':item.priority==='HIGH'?phase.color:'#888'}20;color:${item.priority==='CRITICAL'?'#C62828':item.priority==='HIGH'?phase.color:'#888'};border-radius:10px;font-weight:700;">${item.priority}</span>
+              </div>
+              <div style="font-size:10px;color:var(--text-secondary,#666);">${item.note}</div>
+            </div>
+          </div>`).join('')}
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const packCard = document.createElement('div');
+    packCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+    packCard.innerHTML = `<div style="padding:10px 14px;background:linear-gradient(135deg,#2E7D32,#0277BD);color:#fff;">
+      <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;">🎒 Essential Packing List</div>
+    </div>
+    <div style="padding:10px 14px;">
+      ${PACKING_ESSENTIALS.map(p=>`<div style="display:flex;gap:8px;margin-bottom:7px;padding-bottom:7px;border-bottom:1px solid var(--border,#f5f5f5);">
+        <div style="width:12px;height:12px;border:2px solid #2E7D32;border-radius:3px;flex-shrink:0;margin-top:2px;"></div>
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);">${p.item}</div>
+          <div style="font-size:10px;color:var(--text-secondary,#666);">${p.note}</div>
+        </div>
+      </div>`).join('')}
+    </div>`;
+    body.appendChild(packCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-checklist')) buildScreen();
+
+  const _prevSS_eeeeeee = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_eeeeeee) _prevSS_eeeeeee(name, el);
+    if (name === 'checklist') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-checklist');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectChecklistCard() {
+    if (document.getElementById('checklist-home-card')) return true;
+    const ref = document.getElementById('wildlife-home-card') || document.getElementById('practical-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'checklist-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#003087,#C62828,#E65100 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('checklist');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">✅</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Trip Planning Master Checklist</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">6 months → day-of · Dining · LL · Packing · What to do when</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _checklistCard = false;
+  setInterval(() => { if (!_checklistCard) _checklistCard = injectChecklistCard(); }, 91000);
+  setTimeout(() => { _checklistCard = injectChecklistCard(); }, 87500);
+  const _prevRH_eeeeeee = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_eeeeeee) _prevRH_eeeeeee.apply(this, arguments);
+    setTimeout(() => { _checklistCard = false; _checklistCard = injectChecklistCard(); }, 31400);
+  };
+})();
+</script>
