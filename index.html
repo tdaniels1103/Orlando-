@@ -47274,3 +47274,194 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK RRRR2: Orlando Springs & Natural Wonders Guide ===== */
+(function initNatureGuide() {
+
+  const SPRINGS = [
+    {
+      name:'Wekiwa Springs State Park', distance:'30 min from I-Drive', emoji:'💧', color:'#00695C',
+      temp:'68°F year-round', flow:'43 million gallons/day',
+      activities:['Swimming in crystal-clear spring','Kayaking / canoeing down the run','Hiking (16 miles of trails)','Camping','Wildlife watching (otters, deer, wading birds)'],
+      tips:['Arrive before 9am on weekends — parking fills up fast and they stop entry when capacity reached','Kayak rentals available inside the park (~$25/2 hrs)','The spring is 68°F year-round — bracingly cold but refreshing in summer heat','Wekiwa Springs Run kayak trail (6 miles to Rock Springs) is one of the best Florida paddling experiences'],
+      cost:'$6/vehicle',
+    },
+    {
+      name:'Rock Springs / King\'s Landing', distance:'40 min from I-Drive', emoji:'🌿', color:'#2E7D32',
+      temp:'68°F', flow:'Spring-fed run only',
+      activities:['Tubing down the natural spring run','Kayaking (7-mile trail)','Swimming in the springs','Picnicking at King\'s Landing'],
+      tips:['King\'s Landing is the launch point for the tubing run ($15/tube, includes bus back to start)','7-mile kayak trail is the most beautiful in Central Florida — completely natural, no development visible','Manatees occasionally appear in the run, especially in winter','Weekends require early arrival (park by 9am) — capacity very limited'],
+      cost:'$15/tube or kayak rental rates',
+    },
+    {
+      name:'Silver Springs State Park', distance:'90 min from Orlando', emoji:'🐠', color:'#0077B6',
+      temp:'72°F year-round', flow:'550 million gallons/day (world\'s largest)',
+      activities:['Glass-bottom boat tours (world\'s first)','Kayaking through the headspring','Snorkeling with manatees and fish','Wild Rhesus monkey sightings (on the banks — yes, really!)','Hiking Silver River State Forest'],
+      tips:['Glass-bottom boats have operated since 1878 — historical experience as well as beautiful','The wild Rhesus macaque monkeys are descendants of a 1930s Tarzan movie escapees — see them on the riverbanks','Snorkeling gear available to rent at the park','Visibility in the headspring is 150+ feet — some of the clearest water on Earth'],
+      cost:'$2/vehicle (Silver Springs), $4/vehicle (Silver River)',
+    },
+    {
+      name:'Blue Spring State Park', distance:'45 min from Orlando', emoji:'🐋', color:'#1565C0',
+      temp:'68°F', flow:'100+ million gallons/day',
+      activities:['Manatee watching (October–March)','Swimming and snorkeling (April–September, when manatees leave)','Kayaking the St. Johns River','Scuba diving for certified divers','Tubing'],
+      tips:['January–February peak manatee season — up to 700+ manatees congregate in the warm spring. Awe-inspiring.','When manatees are present, swimming is prohibited in the spring run (they need the warm water)','Bring a camera with a zoom lens — manatees surface frequently for air','Book kayak rentals in advance on manatee season weekends'],
+      cost:'$6/vehicle',
+    },
+    {
+      name:'Merritt Island National Wildlife Refuge', distance:'45 min east', emoji:'🦅', color:'#33691E',
+      temp:'Varies (outdoor)', flow:'N/A',
+      activities:['Birdwatching (330+ species)','Wildlife photography (manatees, dolphins, alligators)','Kayaking through Indian River Lagoon','Hiking Black Point Wildlife Drive','NASA shuttle launch viewing (when launches occur)'],
+      tips:['Black Point Wildlife Drive (7-mile auto tour) is free and you can do it in 45 min with frequent wildlife sightings','Adjacent to Kennedy Space Center — combine for a full day','Best birding October–April during migration season','Bald eagles nest here November–May'],
+      cost:'Free (National Wildlife Refuge)',
+    },
+  ];
+
+  const OUTDOOR_ALSO = [
+    { name:'Canaveral National Seashore', desc:'24 miles of undeveloped Atlantic beach. Zero development visible — pristine Florida coast. Near Kennedy Space Center.', dist:'60 min' },
+    { name:'Paynes Prairie (near Gainesville)', desc:'Vast wetland prairie with wild horses, bison, alligators, and cranes. Florida in its most primal form.', dist:'90 min' },
+    { name:'St. Sebastian River State Buffer Preserve', desc:'Isolated wilderness near Vero Beach. Kayaking, fishing, bird watching in total solitude.', dist:'80 min' },
+    { name:'Green Swamp Wilderness Headwaters', desc:'6,400 acres of swamp forest. Canoe trails, primitive camping. True Florida wilderness 60 min from Orlando.', dist:'60 min' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-nature-guide';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const header = document.createElement('div');
+    header.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#1B5E20,#2E7D32,#00695C);padding:16px 14px 14px;';
+    header.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:#fff;">Springs & Natural Wonders</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">5 springs · Wildlife · Manatees · Free Florida</div>
+        </div>
+        <span style="font-size:24px;">🌿</span>
+      </div>
+      <div style="background:rgba(255,255,255,.12);border-radius:8px;padding:7px 12px;font-size:11px;color:rgba(255,255,255,.9);">
+        Florida's natural springs are some of the most beautiful places on Earth — crystal-clear 68°F water, visible to 150+ feet deep, teeming with wildlife. No theme park ticket required.
+      </div>`;
+
+    const content = document.createElement('div');
+    content.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    SPRINGS.forEach(spring => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+
+      const sh = document.createElement('div');
+      sh.style.cssText = `background:${spring.color};padding:10px 14px;`;
+      sh.innerHTML = `
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
+          <span style="font-size:22px;">${spring.emoji}</span>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:#fff;">${spring.name}</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.8);">📍 ${spring.distance} · 🌡️ ${spring.temp}</div>
+          </div>
+          <div style="margin-left:auto;text-align:right;">
+            <div style="font-size:11px;font-weight:800;color:rgba(255,255,255,.9);">${spring.cost}</div>
+          </div>
+        </div>`;
+      card.appendChild(sh);
+
+      const sb = document.createElement('div');
+      sb.style.cssText = 'padding:12px 14px;';
+
+      const actLabel = document.createElement('div');
+      actLabel.style.cssText = 'font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:5px;';
+      actLabel.textContent = 'ACTIVITIES';
+      sb.appendChild(actLabel);
+
+      const actGrid = document.createElement('div');
+      actGrid.style.cssText = 'display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;';
+      spring.activities.slice(0,4).forEach(a => {
+        const chip = document.createElement('span');
+        chip.style.cssText = `padding:2px 8px;border-radius:20px;font-size:10px;background:${spring.color}12;color:${spring.color};font-weight:600;`;
+        chip.textContent = a;
+        actGrid.appendChild(chip);
+      });
+      sb.appendChild(actGrid);
+
+      spring.tips.slice(0,2).forEach(t => {
+        const tip = document.createElement('div');
+        tip.style.cssText = 'font-size:11px;color:var(--text-secondary,#555);padding:2px 0;line-height:1.5;';
+        tip.textContent = '💡 ' + t;
+        sb.appendChild(tip);
+      });
+
+      card.appendChild(sb);
+      content.appendChild(card);
+    });
+
+    // Also visit
+    const alsoHeader = document.createElement('div');
+    alsoHeader.style.cssText = 'font-size:13px;font-weight:800;color:#2E7D32;margin:14px 0 8px;';
+    alsoHeader.textContent = '🗺️ ALSO WORTH THE DRIVE';
+    content.appendChild(alsoHeader);
+
+    OUTDOOR_ALSO.forEach(place => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:12px;margin-bottom:8px;padding:11px 13px;border:1px solid var(--border,#eee);border-left:3px solid #2E7D32;';
+      card.innerHTML = `
+        <div style="display:flex;justify-content:space-between;margin-bottom:3px;">
+          <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);">${place.name}</div>
+          <span style="font-size:10px;color:#2E7D32;font-weight:700;">${place.dist}</span>
+        </div>
+        <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.4;">${place.desc}</div>`;
+      content.appendChild(card);
+    });
+
+    const spacer = document.createElement('div');
+    spacer.style.height = '20px';
+    content.appendChild(spacer);
+
+    s.appendChild(header);
+    s.appendChild(content);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-nature-guide')) buildScreen();
+
+  const _prevSS_rrrr2 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_rrrr2) _prevSS_rrrr2(name, el);
+    if (name === 'nature-guide') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-nature-guide');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectNatureCard() {
+    if (document.getElementById('nature-home-card')) return true;
+    const ref = document.getElementById('ent-home-card') || document.getElementById('family-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'nature-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#1B5E20,#2E7D32,#00695C);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('nature-guide');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:3px;">🌿 Springs & Natural Wonders</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.85);">Wekiwa · Blue Spring · Manatees · 68°F crystal water</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.5);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _natureCard = false;
+  setInterval(() => { if (!_natureCard) _natureCard = injectNatureCard(); }, 33000);
+  setTimeout(() => { _natureCard = injectNatureCard(); }, 29500);
+
+  const _prevRH_rrrr2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_rrrr2) _prevRH_rrrr2.apply(this, arguments);
+    setTimeout(() => { _natureCard = false; _natureCard = injectNatureCard(); }, 8100);
+  };
+})();
+</script>
