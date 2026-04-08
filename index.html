@@ -36589,3 +36589,657 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK MMM: Photo Spots & Instagram Guide ===== */
+(function initPhotoGuide() {
+  const SPOTS = [
+    { park:'Magic Kingdom', emoji:'🏰', color:'#1565C0', shots:[
+      { name:'Cinderella Castle Main Street', time:'Rope drop (9am)', crowd:'Low early, High by 10am', tip:'Stand at the hub fountain. Blue sky behind the castle. Arrive 30min before open.', gear:'Phone wide mode or standard lens', tags:['#MagicKingdom','#CinderellaCastle','#Disney'] },
+      { name:'Liberty Square Bridge', time:'Golden hour (5–6pm)', crowd:'Moderate', tip:'The iron bridge with the castle in the background. Magical evening light.', gear:'Telephoto for castle compression', tags:['#LibertySquare','#Disney'] },
+      { name:'Tomorrowland at Night', time:'After dark (9pm+)', crowd:'Lower', tip:'Neon lights and futuristic glow. Long exposure on a tripod phone mode is stunning.', gear:'Night mode required', tags:['#Tomorrowland','#DisneyNight'] },
+      { name:'Haunted Mansion Queue', time:'Any time', crowd:'Inside queue', tip:'The stretching room portraits are incredible. Ask to hold back for a crowd-free photo.', gear:'Portrait mode for details', tags:['#HauntedMansion','#DisneyDetails'] },
+    ]},
+    { park:'EPCOT', emoji:'🌐', color:'#00695C', shots:[
+      { name:'Spaceship Earth at Sunset', time:'6–7pm', crowd:'Moderate', tip:'Stand at the Future World fountain. Orange sky reflects in the globe perfectly.', gear:'Wide angle', tags:['#EPCOT','#SpaceshipEarth'] },
+      { name:'World Showcase Lagoon', time:'During IllumiNations (9pm)', crowd:'Busy', tip:'France pavilion bridge gives the widest view of the entire lagoon show.', gear:'Night mode or camera', tags:['#IllumiNations','#EPCOT'] },
+      { name:'Japan Pagoda', time:'Morning (10–11am)', crowd:'Low', tip:'The red pagoda reflected in the koi pond. One of the most photogenic spots in all Disney.', gear:'Any mode works', tags:['#ECPOTJapan','#WorldShowcase'] },
+      { name:'Flower & Garden Festival Topiaries', time:'Spring (March–July)', crowd:'Low near topiaries', tip:'Character topiaries throughout Future World. Each is a unique photo opportunity.', gear:'Portrait mode', tags:['#FlowerGarden','#ECPOTFestival'] },
+    ]},
+    { park:'Hollywood Studios', emoji:'🎬', color:'#B71C1C', shots:[
+      { name:'Hollywood Boulevard at Sunset', time:'Golden hour (6–7pm)', crowd:'Moderate', tip:'The Chinese Theatre with orange sky — classic Hollywood glamour. Walk to center of the street.', gear:'Wide or standard', tags:['#HollywoodStudios','#ChineseTheatre'] },
+      { name:'Galaxy\'s Edge Batuu Streets', time:'Early morning or evening', crowd:'Lower at both ends', tip:'Millennium Falcon entrance is most iconic. Blue-purple sky at dusk is stunning.', gear:'Wide angle for scale', tags:['#GalaxysEdge','#Batuu','#StarWars'] },
+      { name:'Toy Story Land at Night', time:'After 8pm', crowd:'Lower', tip:'Green army men, colorful lights, and the oversized toy theme. Wide angle shows the scale.', gear:'Night mode', tags:['#ToyStoryLand','#Disney'] },
+      { name:'Tower of Terror Sign', time:'Twilight (7:30pm)', crowd:'Moderate', tip:'The Hollywood Tower Hotel sign lit against the purple sky is hauntingly beautiful.', gear:'Portrait mode for vertical', tags:['#TowerOfTerror','#Disney'] },
+    ]},
+    { park:'Animal Kingdom', emoji:'🦁', color:'#2E7D32', shots:[
+      { name:'Tree of Life', time:'Morning (8–9am)', crowd:'Low', tip:'Discovery Island looking toward the tree. Early morning mist adds magical atmosphere.', gear:'Wide — you need it to capture the full tree', tags:['#TreeOfLife','#AnimalKingdom'] },
+      { name:'Pandora World of Avatar at Night', time:'After dark', crowd:'Moderate', tip:'The bioluminescent plants and floating mountains glow. Most otherworldly scene in all parks.', gear:'Night mode essential', tags:['#Pandora','#Avatar','#Disney'] },
+      { name:'Kilimanjaro Safaris — Golden Light', time:'Morning safari (8–10am)', crowd:'Inside ride', tip:'Animals are most active in morning cool. Sunlight is golden and perfect for photography.', gear:'Telephoto or zoom', tags:['#Safaris','#AnimalKingdom'] },
+      { name:'Asia Winding Path', time:'Any time', crowd:'Low on side paths', tip:'The river path through Anandapur has gorgeous architecture and no crowds if you wander off the main route.', gear:'Portrait mode', tags:['#AnimalKingdomAsia'] },
+    ]},
+    { park:'Universal Islands of Adventure', emoji:'⚓', color:'#0277BD', shots:[
+      { name:'Hogsmeade Village', time:'Rope drop (9am)', crowd:'Very low for 15min', tip:'The snow-capped roofs with Hogwarts behind. Get there at park open for an empty shot.', gear:'Wide angle essential', tags:['#Hogsmeade','#HarryPotter','#Universal'] },
+      { name:'Hogwarts Castle', time:'Blue hour (dusk)', crowd:'Moderate', tip:'The castle turns purple-blue at dusk. The lanterns come on. One of the most magical shots in any park.', gear:'Portrait for vertical, wide for castle', tags:['#HogwartsCastle','#HarryPotter'] },
+      { name:'VelociCoaster Launch', time:'Any time', crowd:'From the midway', tip:'Watch the launch from the outside viewing area. Full speed visible with the lagoon behind.', gear:'Burst mode for action', tags:['#VelociCoaster','#JurassicWorld'] },
+      { name:'Marvel Avengers Island Sign', time:'Morning', crowd:'Low', tip:'The Avengers Campus entrance archway is a classic shot. Clean lines and bold graphics.', gear:'Standard or wide', tags:['#Avengers','#Marvel','#Universal'] },
+    ]},
+    { park:'Orlando City', emoji:'🌆', color:'#7B1FA2', shots:[
+      { name:'Lake Eola Fountain at Sunset', time:'6:30–7:30pm', crowd:'Public park — moderate', tip:'The swan boats and fountain with downtown skyline. Best from the east shore looking west.', gear:'Wide for skyline, portrait for fountain', tags:['#LakeEola','#Orlando','#VisitOrlando'] },
+      { name:'Park Avenue, Winter Park', time:'Golden hour (5:30–6:30pm)', crowd:'Moderate pedestrian', tip:'Looking north on Park Ave with string lights beginning to glow. European-feel street photography.', gear:'Street photography mode', tags:['#ParkAvenue','#WinterPark','#Orlando'] },
+      { name:'ICON Park Observation Wheel at Night', time:'After 8pm', crowd:'Queue inside', tip:'From below looking up at the lit wheel. City lights in background.', gear:'Wide angle + night mode', tags:['#ICONPark','#OrlandoSkyline'] },
+      { name:'I-Drive Neon Strip', time:'9–11pm', crowd:'Busy', tip:'Long exposure of the neon lights and passing traffic on International Drive. Classic night cityscape.', gear:'Night mode, steady hands or tripod', tags:['#InternationalDrive','#OrlandoNight'] },
+    ]},
+  ];
+
+  const TIME_TIPS = [
+    { icon:'🌅', title:'Golden Hour (6–7:30am & 5:30–7pm)', tip:'The single most important photo tip: soft warm light makes everything look better. Plan your key shots around these windows.' },
+    { icon:'🌀', title:'Blue Hour (Just after sunset)', tip:'15–20 minutes after sunset, the sky turns deep blue while park lights glow warm. Most magical time for Disney castle shots.' },
+    { icon:'⏰', title:'Rope Drop (Park Opening)', tip:'First 30 minutes after park opens: empty walkways, clean backgrounds, and incredible shots with no crowds. Worth the early wake-up.' },
+    { icon:'🌧️', title:'Rainy Days', tip:'Wet pavement reflects lights beautifully. After a shower, puddle reflections of the castle or Spaceship Earth are extraordinary.' },
+    { icon:'📱', title:'iPhone/Android Tips', tip:'Use Portrait Mode for characters and close-ups. Panorama for landscapes. Night Mode for after-dark shots. Always shoot HDR when available.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-photo-guide';
+    s.className = 'screen';
+    s.style.display = 'none';
+    s.innerHTML = `
+      <div style="padding:16px;display:flex;align-items:center;gap:12px;
+        background:linear-gradient(135deg,#4A148C,#E91E63);color:#fff;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div>
+          <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;">Photo Spots Guide</div>
+          <div style="font-size:11px;opacity:.8;">Best shots at every Orlando park & city</div>
+        </div>
+      </div>
+      <div style="padding:14px;overflow-y:auto;height:calc(100vh - 68px);-webkit-overflow-scrolling:touch;">
+        <!-- Timing tips -->
+        <div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:14px;border:1px solid var(--border,#eee);">
+          <div style="font-size:11px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:10px;">📸 PHOTOGRAPHY TIMING GUIDE</div>
+          ${TIME_TIPS.map(t=>`<div style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start;">
+            <span style="font-size:20px;flex-shrink:0;">${t.icon}</span>
+            <div><div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);">${t.title}</div>
+            <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;">${t.tip}</div></div>
+          </div>`).join('')}
+        </div>
+        <!-- Park sections -->
+        ${SPOTS.map(park=>`
+          <div style="margin-bottom:16px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+              <span style="font-size:24px;">${park.emoji}</span>
+              <span style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:${park.color};">${park.park}</span>
+            </div>
+            ${park.shots.map(shot=>`
+              <div style="background:var(--card-bg,#fff);border-radius:14px;margin-bottom:10px;padding:13px;border:1px solid var(--border,#eee);border-left:3px solid ${park.color};">
+                <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:4px;">📍 ${shot.name}</div>
+                <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+                  <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:${park.color}18;color:${park.color};">⏰ ${shot.time}</span>
+                  <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:#f0f0f0;color:var(--text-secondary,#666);">👥 ${shot.crowd}</span>
+                  <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:#f0f0f0;color:var(--text-secondary,#666);">📱 ${shot.gear}</span>
+                </div>
+                <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;margin-bottom:8px;">${shot.tip}</div>
+                <div style="display:flex;flex-wrap:wrap;gap:4px;">
+                  ${shot.tags.map(tag=>`<span style="font-size:10px;color:#E91E63;font-weight:600;">${tag}</span>`).join('')}
+                </div>
+              </div>`).join('')}
+          </div>`).join('')}
+      </div>`;
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-photo-guide')) buildScreen();
+
+  const _prevSS_pg = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_pg) _prevSS_pg(name, el);
+    if (name === 'photo-guide') {
+      document.querySelectorAll('.screen').forEach(s=>s.style.display='none');
+      const s = document.getElementById('screen-photo-guide');
+      if (s) s.style.display='block';
+    }
+  };
+
+  function injectPGCard() {
+    if (document.getElementById('pg-home-card')) return true;
+    const igCard = document.getElementById('ig-home-card');
+    if (!igCard) return false;
+    const card = document.createElement('div');
+    card.id = 'pg-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#4A148C,#E91E63);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('photo-guide');
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">📸 Photo Spots Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);margin-top:3px;">24 best shots · golden hour tips · hashtags</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.6);">›</span>
+      </div>`;
+    igCard.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _pgCard = false;
+  setInterval(()=>{ if(!_pgCard) _pgCard=injectPGCard(); }, 4000);
+  setTimeout(()=>{ _pgCard=injectPGCard(); }, 1200);
+  const _prevRH_pg = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_pg) _prevRH_pg.apply(this, arguments);
+    setTimeout(()=>{ _pgCard=false; _pgCard=injectPGCard(); }, 620);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK NNN: Merchandise & Souvenir Guide ===== */
+(function initMerchandiseGuide() {
+
+  const EXCLUSIVES = [
+    { park:'Magic Kingdom', emoji:'🏰', color:'#1565C0',
+      items:[
+        { name:'Main Street Bakery Mugs', price:'$22–28', note:'Exclusive Mickey and castle designs. Sold only on Main Street. Popular daily sellout.' },
+        { name:'Haunted Mansion Spirit Jersey', price:'$79', note:'Hitchhiking ghosts design. Year-round exclusive. One of the most popular park exclusives.' },
+        { name:'Magic Kingdom 50th Anniversary Pin Sets', price:'$15–45', note:'Limited edition pins for major milestones. Tradeable with Cast Members.' },
+        { name:'Cinderella Castle Snow Globe', price:'$35–65', note:'Music-box versions available. Classic collector piece. Seasonal designs for holidays.' },
+      ]},
+    { park:'EPCOT', emoji:'🌐', color:'#00695C',
+      items:[
+        { name:'Figment Merchandise', price:'$20–55', note:'The purple dragon is EPCOT\'s cult icon. Plush, mugs, pins — all sell out. Imagination pavilion.' },
+        { name:'World Showcase Country Merchandise', price:'Varies', note:'Each pavilion sells authentic goods from that country. Japan has Studio Ghibli items. UK has Cadbury.' },
+        { name:'Spaceship Earth Collection', price:'$18–40', note:'Geometric globe designs on apparel and accessories. Clean modern aesthetic.' },
+        { name:'Festival-Exclusive Items', price:'$15–50', note:'Each EPCOT festival (Food & Wine, Flower & Garden) has limited merchandise. Only available during the event.' },
+      ]},
+    { park:'Hollywood Studios', emoji:'🎬', color:'#B71C1C',
+      items:[
+        { name:'Galaxy\'s Edge Droid Depot Build-a-Droid', price:'$99–120', note:'Build your own R-series or BB-series droid. Incredibly popular — lines form before park open. Comes in dome.' },
+        { name:'Lightsaber Building at Savi\'s Workshop', price:'$260', note:'Create a custom lightsaber with kyber crystal of your choice. 45-min ceremony. Reserve in advance.' },
+        { name:'Galaxy\'s Edge Black Spire Outpost Shirts', price:'$35–45', note:'Batuu-exclusive designs. Not sold anywhere else. The most authentic Star Wars merchandise.' },
+        { name:'Toy Story Land Exclusive Plush', price:'$20–35', note:'Oversized versions of classic Toy Story characters. Only in this land.' },
+      ]},
+    { park:'Animal Kingdom', emoji:'🦁', color:'#2E7D32',
+      items:[
+        { name:'Pandora Ikran (Banshee) Collectors Figures', price:'$60–80', note:'The bioluminescent Banshee figures from World of Avatar. Stunning display pieces.' },
+        { name:'Animal Kingdom Nahtazu Collection', price:'$25–50', note:'Conservation-themed apparel. Part of proceeds go to Disney Conservation Fund.' },
+        { name:'Expedition Everest Yeti Plush', price:'$25–35', note:'Exclusive to the park. The Yeti design varies — some are very rare and collectible.' },
+        { name:'Na\'vi River Journey Spirit Jerseys', price:'$79', note:'Pandora-exclusive designs with bioluminescent print patterns.' },
+      ]},
+    { park:'Universal Orlando', emoji:'🎡', color:'#7B1FA2',
+      items:[
+        { name:'Interactive Wands (Ollivanders)', price:'$58–68', note:'Harry Potter wand that activates 25+ spots throughout Diagon Alley and Hogsmeade. Worth every penny.' },
+        { name:'Butterbeer Merchandise', price:'$5–35', note:'Butterbeer mugs, pint glasses, shirts. The branded mug is the classic souvenir.' },
+        { name:'Honeydukes Candy', price:'$5–30', note:'Authentic HP-themed sweets: Bertie Bott\'s, Chocolate Frogs, pumpkin pasties. Diagon Alley and Hogsmeade.' },
+        { name:'Hogwarts Acceptance Letter', price:'$20', note:'Official-looking replica parchment letter. Great gift for Harry Potter fans of all ages.' },
+      ]},
+    { park:'Disney Springs', emoji:'🛍️', color:'#FF6B35',
+      items:[
+        { name:'shopDisney Exclusives', price:'Varies', note:'World of Disney is the largest Disney store in the world. Items exclusive to Disney Springs often.' },
+        { name:'Marketplace Co-Op', price:'$20–100', note:'Designer collaborations and limited Disney merchandise. Unique finds not at park gift shops.' },
+        { name:'The Art of Disney Gallery', price:'$50–500+', note:'Original Disney artwork, limited edition prints, and animation cels. Serious collector destination.' },
+        { name:'LEGO Store Disney Sets', price:'$30–400', note:'Disney LEGO sets including the Giant Disney Castle (71040) and park-exclusive minifigures.' },
+      ]},
+  ];
+
+  const BUYING_TIPS = [
+    { icon:'💰', tip:'Buy at Disney Springs on your last day — no park admission needed, same prices, better selection and no need to carry items all day.' },
+    { icon:'🎒', tip:'Disney will ship purchases from any park location to your resort for free — or to your home ($7 flat fee). No bag carrying needed.' },
+    { icon:'📅', tip:'Limited merchandise drops happen at park opening. Follow @WDWToday and @DisneySprings on social media for announcements.' },
+    { icon:'📌', tip:'Pin trading: Disney Cast Members always carry pins and will trade with you. Start with a cheap starter set ($15–20) and trade up.' },
+    { icon:'🏪', tip:'Avoid merchandise inside rides — identical items are sold outside without the queue. Exception: Ollivanders wands are best bought there.' },
+    { icon:'✈️', tip:'Ship large purchases home directly from the parks. Much cheaper than airline baggage fees and safer than checking fragile items.' },
+    { icon:'💳', tip:'Disney Visa Card gives 10% off merchandise at select locations. Apply before your trip if you plan to shop heavily.' },
+    { icon:'🎁', tip:'Personalization studios can add names and dates to select items. Great for gifts — mugs, shirts, and ornaments.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-merchandise';
+    s.className = 'screen';
+    s.style.display = 'none';
+    s.innerHTML = `
+      <div style="padding:16px;display:flex;align-items:center;gap:12px;
+        background:linear-gradient(135deg,#FF6B35,#C9A96E);color:#fff;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div>
+          <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;">Merchandise Guide</div>
+          <div style="font-size:11px;opacity:.8;">Exclusives, must-buys & shopping strategy</div>
+        </div>
+      </div>
+      <div style="padding:14px;overflow-y:auto;height:calc(100vh - 68px);-webkit-overflow-scrolling:touch;">
+        <!-- Buying tips -->
+        <div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:14px;border:1px solid var(--border,#eee);">
+          <div style="font-size:11px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:10px;">🛍️ SMART SHOPPING TIPS</div>
+          ${BUYING_TIPS.map(t=>`<div style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start;">
+            <span style="font-size:18px;flex-shrink:0;">${t.icon}</span>
+            <span style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;">${t.tip}</span>
+          </div>`).join('')}
+        </div>
+        <!-- Park exclusives -->
+        ${EXCLUSIVES.map(park=>`
+          <div style="background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);">
+            <div style="padding:10px 14px;background:${park.color}15;border-bottom:1px solid ${park.color}22;display:flex;align-items:center;gap:8px;">
+              <span style="font-size:20px;">${park.emoji}</span>
+              <span style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:${park.color};">${park.park}</span>
+              <span style="margin-left:auto;font-size:9px;font-weight:800;padding:3px 8px;border-radius:20px;background:${park.color};color:#fff;">EXCLUSIVES</span>
+            </div>
+            <div style="padding:10px 14px;">
+              ${park.items.map(item=>`<div style="padding:8px 0;border-bottom:1px solid var(--border,#f0f0f0);">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:3px;">
+                  <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${item.name}</div>
+                  <div style="font-size:12px;font-weight:800;color:${park.color};flex-shrink:0;">${item.price}</div>
+                </div>
+                <div style="font-size:11px;color:var(--text-secondary,#666);line-height:1.4;">${item.note}</div>
+              </div>`).join('')}
+            </div>
+          </div>`).join('')}
+      </div>`;
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-merchandise')) buildScreen();
+  const _prevSS_mg = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_mg) _prevSS_mg(name, el);
+    if (name === 'merchandise') {
+      document.querySelectorAll('.screen').forEach(s=>s.style.display='none');
+      const s = document.getElementById('screen-merchandise');
+      if (s) s.style.display='block';
+    }
+  };
+
+  function injectMGCard() {
+    if (document.getElementById('mg-home-card')) return true;
+    const pgCard = document.getElementById('pg-home-card');
+    if (!pgCard) return false;
+    const card = document.createElement('div');
+    card.id = 'mg-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:var(--card-bg,#fff);border-radius:16px;padding:14px;border:1px solid var(--border,#eee);cursor:pointer;';
+    card.onclick = () => window.showScreen('merchandise');
+    card.innerHTML = `<div style="display:flex;align-items:center;justify-content:space-between;">
+      <div><div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--text-primary,#212121);">🛍️ Merchandise Guide</div>
+      <div style="font-size:11px;color:var(--text-secondary,#888);margin-top:3px;">Park exclusives · must-buys · smart shopping tips</div></div>
+      <span style="font-size:24px;color:var(--primary,#FF6B35);">›</span></div>`;
+    pgCard.insertAdjacentElement('afterend', card);
+    return true;
+  }
+  let _mgCard = false;
+  setInterval(()=>{ if(!_mgCard) _mgCard=injectMGCard(); }, 4200);
+  setTimeout(()=>{ _mgCard=injectMGCard(); }, 1300);
+  const _prevRH_mg = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_mg) _prevRH_mg.apply(this, arguments);
+    setTimeout(()=>{ _mgCard=false; _mgCard=injectMGCard(); }, 630);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK OOO: Character Dining Masterclass ===== */
+(function initCharDining() {
+  const CHAR_DINING = [
+    { id:'crt', name:"Cinderella's Royal Table", emoji:'👸', park:'Magic Kingdom', restaurant:'Inside Cinderella Castle',
+      characters:['Cinderella','Fairy Godmother','Sleeping Beauty','Snow White','Ariel'],
+      meal:'Breakfast · Lunch · Dinner', price:'$$$$', perPerson:65, bookAt:'180 days (resort guests) / 60 days (day guests)',
+      hearts:5, type:'Princess Dining', tip:'THE hardest ADR in Disney. Book at exactly 6am EST on your 180-day window. Lunch is the best value.',
+      dress:'Smart casual to formal encouraged', indoor:true },
+    { id:'beastcastle', name:"Be Our Guest Restaurant", emoji:'🥀', park:'Magic Kingdom', restaurant:'Beast\'s Castle, Fantasyland',
+      characters:['The Beast (dinner only)'],
+      meal:'Breakfast (Quick Service) · Lunch (Quick Service) · Dinner (Table Service)',
+      price:'$$$', perPerson:62, bookAt:'60 days',
+      hearts:4, type:'Character Meet', tip:'Only dinner is table service with a Beast meet. Breakfast and lunch are quick service (no Beast). The ballroom is stunning at any meal.',
+      dress:'Casual is fine', indoor:true },
+    { id:'chefmickey', name:"Chef Mickey's", emoji:'🎉', park:'Disney Contemporary Resort', restaurant:'Contemporary Resort — 4th Floor',
+      characters:['Mickey','Minnie','Donald','Goofy','Pluto'],
+      meal:'Breakfast · Dinner', price:'$$$', perPerson:55,
+      bookAt:'60 days', hearts:4, type:'Fab Five', tip:'Most reliable way to meet all five main characters. Breakfast is the better value. Monorail access from Magic Kingdom.',
+      dress:'Casual', indoor:true },
+    { id:'glorias', name:"Garden Grill", emoji:'🌿', park:'EPCOT — The Land',
+      restaurant:'Rotating restaurant above Living with the Land',
+      characters:['Chip \'n\' Dale','Mickey','Pluto'],
+      meal:'Lunch · Dinner', price:'$$$', perPerson:55,
+      bookAt:'60 days', hearts:4, type:'Nature Themed', tip:'A rotating restaurant! Slowly revolves over the Living with the Land greenhouse. Characters come to your table.',
+      dress:'Casual', indoor:true },
+    { id:'hoop', name:"Hoop-Dee-Doo Revue", emoji:'🎭', park:'Fort Wilderness Resort',
+      restaurant:'Pioneer Hall',
+      characters:['Frontier Revue Performers (show, not characters)'],
+      meal:'Dinner Show', price:'$$$', perPerson:80,
+      bookAt:'60 days', hearts:4, type:'Dinner Show', tip:'A hilarious all-you-can-eat dinner show. Family friendly and genuinely funny. Get there 30min early for the best seats.',
+      dress:'Casual Western encouraged', indoor:true },
+    { id:'ohana', name:"'Ohana — Character Breakfast", emoji:'🌺', park:"Disney's Polynesian Resort",
+      restaurant:"'Ohana Restaurant",
+      characters:['Mickey','Pluto','Lilo','Stitch'],
+      meal:'Breakfast only (characters)', price:'$$$', perPerson:42,
+      bookAt:'60 days', hearts:5, type:'Polynesian Luau Style', tip:'The BEST character breakfast value in Disney. All-you-can-eat with bread pudding dessert. Stitch is relatively rare to meet.',
+      dress:'Casual', indoor:true },
+    { id:'spiritofalohaclosed', name:"Topolino's Terrace — Character Breakfast", emoji:'🖌️', park:'EPCOT — Disney Riviera Resort',
+      restaurant:"Topolino's Terrace (rooftop)",
+      characters:['Mickey · Minnie · Daisy · Donald (all in artist outfits)'],
+      meal:'Breakfast only', price:'$$$', perPerson:55,
+      bookAt:'60 days', hearts:5, type:'Artist Themed', tip:'The characters wear adorable artist berets. Rooftop terrace with Skyliner views. One of the most photogenic character meals.',
+      dress:'Smart casual encouraged — the rooftop setting is beautiful', indoor:false },
+    { id:'cinelux', name:'Akershus Royal Banquet Hall', emoji:'🏰', park:'EPCOT — Norway Pavilion',
+      restaurant:"Norway Pavilion",
+      characters:['Belle','Snow White','Aurora','Ariel','Cinderella (rotation)'],
+      meal:'Breakfast · Lunch · Dinner', price:'$$$', perPerson:55,
+      bookAt:'60 days', hearts:4, type:'Princess Dining', tip:'The best alternative to Cinderella\'s Royal Table if you can\'t get that reservation. Beautiful castle setting in Norway.',
+      dress:'Smart casual', indoor:true },
+  ];
+
+  const BOOKING_STRATEGY = [
+    { step:'1', title:'Set Your 60/180-Day Alarm', body:'Disney resort guests can book 180 days out; off-site guests 60 days. Set a 6:00am alarm — reservations open at 6am EST. Chef Mickey\'s, Cinderella\'s Royal Table, and Be Our Guest dinner fill in under 10 minutes.' },
+    { step:'2', title:'Use Multiple Devices', body:'Have two phones and a laptop all logged in and ready at 5:59am. The booking system can crash — multiple devices increase your chance of getting through.' },
+    { step:'3', title:'Be Flexible on Times', body:'If 8:00am is taken, 7:30am or 8:30am may be available. Book any time slot for your preferred restaurant — you can usually modify later if better opens up.' },
+    { step:'4', title:'Credit Card Required', body:'All ADRs require a credit card. Disney charges $10/person no-show fee for most character dining. Cancel at least 2 hours before to avoid the fee.' },
+    { step:'5', title:'Check for Cancellations', body:'Log into My Disney Experience at 6am daily for the 7 days before your visit. Cancellations from other guests appear regularly — persistence pays off.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-char-dining';
+    s.className = 'screen';
+    s.style.display = 'none';
+    s.innerHTML = `
+      <div style="padding:16px;display:flex;align-items:center;gap:12px;
+        background:linear-gradient(135deg,#c62828,#E91E63);color:#fff;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div>
+          <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;">Character Dining Guide</div>
+          <div style="font-size:11px;opacity:.8;">8 experiences · booking strategy · tips</div>
+        </div>
+      </div>
+      <div style="padding:14px;overflow-y:auto;height:calc(100vh - 68px);-webkit-overflow-scrolling:touch;">
+        <!-- Booking strategy -->
+        <div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:14px;border:1px solid var(--border,#eee);">
+          <div style="font-size:11px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:10px;">📅 ADR BOOKING MASTERCLASS</div>
+          ${BOOKING_STRATEGY.map(s2=>`<div style="display:flex;gap:12px;margin-bottom:10px;align-items:flex-start;">
+            <div style="width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#c62828,#E91E63);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${s2.step}</div>
+            <div><div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${s2.title}</div>
+            <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;margin-top:2px;">${s2.body}</div></div>
+          </div>`).join('')}
+        </div>
+        <!-- Dining experiences -->
+        ${CHAR_DINING.map(d=>{
+          const hearts = Array.from({length:5},(_,i)=>i<d.hearts?'❤️':'🤍').join('');
+          return `<div style="background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);">
+            <div style="padding:12px 14px;background:linear-gradient(135deg,#c62828,#E91E63);color:#fff;">
+              <div style="display:flex;align-items:flex-start;gap:10px;">
+                <span style="font-size:28px;">${d.emoji}</span>
+                <div style="flex:1;">
+                  <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;">${d.name}</div>
+                  <div style="font-size:11px;opacity:.8;">${d.restaurant}</div>
+                </div>
+                <span style="font-size:12px;font-weight:800;background:rgba(255,255,255,.2);padding:4px 10px;border-radius:20px;">~$${d.perPerson}/pp</span>
+              </div>
+            </div>
+            <div style="padding:12px 14px;">
+              <div style="font-size:12px;margin-bottom:6px;">${hearts}</div>
+              <div style="font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:4px;">CHARACTERS</div>
+              <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;">
+                ${d.characters.map(c=>`<span style="padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;background:#E91E6318;color:#c62828;">${c}</span>`).join('')}
+              </div>
+              <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+                <span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;background:#E8F5E9;color:#2E7D32;">${d.meal}</span>
+                <span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;background:#FFF8E1;color:#F57F17;">Book: ${d.bookAt}</span>
+                <span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;background:#E3F2FD;color:#1565C0;">${d.type}</span>
+              </div>
+              <div style="background:#f8f8f8;border-radius:10px;padding:8px 10px;display:flex;gap:8px;align-items:flex-start;">
+                <span style="font-size:13px;">💡</span>
+                <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;">${d.tip}</div>
+              </div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>`;
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-char-dining')) buildScreen();
+  const _prevSS_cd = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_cd) _prevSS_cd(name, el);
+    if (name === 'char-dining') {
+      document.querySelectorAll('.screen').forEach(s=>s.style.display='none');
+      const s = document.getElementById('screen-char-dining');
+      if (s) s.style.display='block';
+    }
+  };
+
+  function injectCDCard() {
+    if (document.getElementById('cd-home-card')) return true;
+    const mgCard = document.getElementById('mg-home-card');
+    if (!mgCard) return false;
+    const card = document.createElement('div');
+    card.id = 'cd-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#c62828,#E91E63);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('char-dining');
+    card.innerHTML = `<div style="display:flex;align-items:center;justify-content:space-between;">
+      <div><div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">🍽️ Character Dining Guide</div>
+      <div style="font-size:11px;color:rgba(255,255,255,.8);margin-top:3px;">8 experiences · ADR strategy · booking tips</div></div>
+      <span style="font-size:22px;color:rgba(255,255,255,.6);">›</span></div>`;
+    mgCard.insertAdjacentElement('afterend', card);
+    return true;
+  }
+  let _cdCard = false;
+  setInterval(()=>{ if(!_cdCard) _cdCard=injectCDCard(); }, 4400);
+  setTimeout(()=>{ _cdCard=injectCDCard(); }, 1400);
+  const _prevRH_cd = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_cd) _prevRH_cd.apply(this, arguments);
+    setTimeout(()=>{ _cdCard=false; _cdCard=injectCDCard(); }, 640);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK PPP: Ultimate Food Tour Guide ===== */
+(function initFoodTour() {
+  const CATEGORIES = [
+    { id:'musteat', icon:'🏆', label:'Must-Eat Bites', color:'#FF6B35', items:[
+      { name:'Dole Whip', where:'Aloha Isle, Magic Kingdom', price:'$6–9', tip:'The original pineapple soft-serve. Get there at rope drop before the line forms. Pineapple float version is iconic.' },
+      { name:'Grey Stuff', where:'Be Our Guest, Magic Kingdom', price:'$6', tip:'"Try the grey stuff, it\'s delicious!" — really is. A lavender cream with cookie crumbles. Beauty & the Beast themed.' },
+      { name:'School Bread', where:'Norway Pavilion, EPCOT', price:'$5', tip:'A Norwegian cardamom bun filled with vanilla custard and coated in coconut. One of EPCOT\'s best-kept secrets.' },
+      { name:'Cronuts at the Bakery', where:'Les Halles, EPCOT France', price:'$6–8', tip:'Croissant-donut hybrid. Fresh in the morning. The entire France bakery is exceptional — don\'t skip it.' },
+      { name:'Butterbeer', where:'Hogsmeade & Diagon Alley, Universal', price:'$9–15', tip:'Cold (best), frozen, or hot. The soft-serve float version is the most indulgent. Non-alcoholic butterscotch cream.' },
+      { name:'Loaded Mac & Cheese', where:'Woody\'s Lunch Box, Hollywood Studios', price:'$9', tip:'Serrano ham, bread crumbs, and a hot dog buried in creamy mac. One of the best counter-service dishes in Disney.' },
+      { name:'Tonga Toast', where:'Kona Café, Polynesian Resort', price:'$17', tip:'Strawberry-banana stuffed French toast rolled in cinnamon sugar. A legendary Disney resort breakfast dish.' },
+      { name:'Flame Tree Rotisserie', where:'Animal Kingdom', price:'$16', tip:'Half chicken or ribs with the most gorgeous outdoor waterfront seating in any Disney park. Hidden gem.' },
+    ]},
+    { id:'quickservice', icon:'⚡', label:'Best Quick Service', color:'#1565C0', items:[
+      { name:'Cosmic Ray\'s Starlight Café', where:'Magic Kingdom, Tomorrowland', price:'$12–18', tip:'Largest QS in Magic Kingdom. Three food bays with different options. Sonny Eclipse animatronic entertains while you eat.' },
+      { name:'Satuli Canteen', where:'Pandora, Animal Kingdom', price:'$13–17', tip:'Bowl-based menu with plant-forward options. Best theme-park food for health-conscious guests. Stunning Pandora decor.' },
+      { name:'Ronto Roasters', where:'Galaxy\'s Edge, Hollywood Studios', price:'$13–17', tip:'The Ronto Wrap (roasted pork, sausage, spicy slaw) is the best grab-and-go in all Disney parks. Always a line for good reason.' },
+      { name:'Sunshine Seasons', where:'The Land Pavilion, EPCOT', price:'$12–18', tip:'Uses produce grown in the Living with the Land greenhouse below. Multiple food stations. Hidden gem with shorter lines.' },
+      { name:'Three Broomsticks', where:'Hogsmeade, Islands of Adventure', price:'$14–18', tip:'Great Hall setting with authentic British-themed food. Fish & chips, chicken dinner, and of course Butterbeer.' },
+    ]},
+    { id:'snacks', icon:'🍦', label:'Iconic Snacks & Treats', color:'#7B1FA2', items:[
+      { name:'Mickey Waffles', where:'Every Disney resort breakfast', price:'$4–6', tip:'The ears make breakfast magical. Best versions: Captain America Cafe (EPCOT), 'Ohana, and all resort cafeterias.' },
+      { name:'Churros', where:'Many Disney Park carts', price:'$6–8', tip:'Disney churros are notably good. Seasonal dipping sauces add extra flair. Cinnamon-sugar perfection.' },
+      { name:'LeFou\'s Brew', where:'Gaston\'s Tavern, Magic Kingdom', price:'$6', tip:'Frozen apple juice with passion fruit, marshmallow, mango on top. Non-alcoholic. Gaston\'s Tavern is a great selfie spot.' },
+      { name:'Cheshire Cat Tail', where:'Storybook Treats, Magic Kingdom', price:'$7', tip:'Cream cheese stuffed pastry with strawberry icing. Beautiful colors and excellent photo opportunity.' },
+      { name:'School Bread', where:'Norway, EPCOT', price:'$5', tip:'(Worth repeating — genuinely one of the best baked goods in any theme park worldwide.)' },
+      { name:'Bavarian Pretzels', where:'Germany Pavilion, EPCOT', price:'$9–12', tip:'Giant salted pretzels with beer cheese dip. Pair with a German beer from the pavilion for the full experience.' },
+    ]},
+    { id:'local', icon:'🌴', label:'Off-Site Local Gems', color:'#2E7D32', items:[
+      { name:'4Rivers Smokehouse', where:'Multiple locations (Winter Park, etc)', price:'$15–25', tip:'Legendary Central Florida BBQ. The brisket and burnt ends are extraordinary. Long lines but worth every minute.' },
+      { name:'Tako Cheena', where:'Downtown Orlando', price:'$10–15', tip:'Fusion tacos with Korean-Mexican-Southern influences. Offbeat, creative, and genuinely delicious. Local cult favorite.' },
+      { name:'Keke\'s Breakfast Café', where:'Multiple locations', price:'$12–18', tip:'Best breakfast chain in Central Florida. The pancakes are legendary. Go on weekdays to avoid the Sunday rush.' },
+      { name:'Beefy King', where:'Colonial Drive, Orlando', price:'$8–12', tip:'Old-school Orlando beef and ham sandwiches since 1968. A local institution that visitors rarely discover.' },
+      { name:'Croissant Gourmet', where:'I-Drive', price:'$8–14', tip:'French-owned bakery with real croissants and pastries. Exactly what you need before a long park day.' },
+      { name:'Shin Jung Korean Restaurant', where:'Semoran Blvd', price:'$15–25', tip:'Authentic Korean AYCE BBQ. One of Orlando\'s true hidden gems. Dramatic tableside cooking experience.' },
+    ]},
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-food-tour';
+    s.className = 'screen';
+    s.style.display = 'none';
+    s.innerHTML = `
+      <div style="padding:16px;display:flex;align-items:center;gap:12px;
+        background:linear-gradient(135deg,#E65100,#FF6B35);color:#fff;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div>
+          <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;">Ultimate Food Tour</div>
+          <div style="font-size:11px;opacity:.8;">Must-eats · best QS · iconic snacks · local gems</div>
+        </div>
+      </div>
+      <div style="padding:14px;overflow-y:auto;height:calc(100vh - 68px);-webkit-overflow-scrolling:touch;">
+        ${CATEGORIES.map(cat=>`
+          <div style="margin-bottom:16px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+              <span style="font-size:24px;">${cat.icon}</span>
+              <span style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:${cat.color};">${cat.label}</span>
+            </div>
+            ${cat.items.map(item=>`
+              <div style="background:var(--card-bg,#fff);border-radius:12px;padding:12px;margin-bottom:8px;border:1px solid var(--border,#eee);">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:4px;">
+                  <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${item.name}</div>
+                  <span style="font-size:12px;font-weight:800;color:${cat.color};flex-shrink:0;">${item.price}</span>
+                </div>
+                <div style="font-size:11px;font-weight:600;color:var(--text-secondary,#aaa);margin-bottom:6px;">📍 ${item.where}</div>
+                <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;">${item.tip}</div>
+              </div>`).join('')}
+          </div>`).join('')}
+      </div>`;
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-food-tour')) buildScreen();
+  const _prevSS_ft = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_ft) _prevSS_ft(name, el);
+    if (name === 'food-tour') {
+      document.querySelectorAll('.screen').forEach(s=>s.style.display='none');
+      const s = document.getElementById('screen-food-tour');
+      if (s) s.style.display='block';
+    }
+  };
+
+  function injectFTCard() {
+    if (document.getElementById('ftour-home-card')) return true;
+    const cdCard = document.getElementById('cd-home-card');
+    if (!cdCard) return false;
+    const card = document.createElement('div');
+    card.id = 'ftour-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:var(--card-bg,#fff);border-radius:16px;padding:14px;border:1px solid var(--border,#eee);cursor:pointer;';
+    card.onclick = () => window.showScreen('food-tour');
+    card.innerHTML = `<div style="display:flex;align-items:center;justify-content:space-between;">
+      <div><div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--text-primary,#212121);">🍽️ Ultimate Food Tour</div>
+      <div style="font-size:11px;color:var(--text-secondary,#888);margin-top:3px;">Must-eats · snacks · QS picks · hidden local gems</div></div>
+      <span style="font-size:24px;color:var(--primary,#FF6B35);">›</span></div>`;
+    cdCard.insertAdjacentElement('afterend', card);
+    return true;
+  }
+  let _ftCard = false;
+  setInterval(()=>{ if(!_ftCard) _ftCard=injectFTCard(); }, 4600);
+  setTimeout(()=>{ _ftCard=injectFTCard(); }, 1500);
+  const _prevRH_ft = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_ft) _prevRH_ft.apply(this, arguments);
+    setTimeout(()=>{ _ftCard=false; _ftCard=injectFTCard(); }, 660);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK QQQ: Hidden Gems & Secret Experiences ===== */
+(function initHiddenGems() {
+  const GEMS = [
+    { category:'Magic Kingdom Secrets', emoji:'🔮', color:'#1565C0', items:[
+      { name:'Club 33 — Disney\'s Secret Members Club', secret:true, tip:'Invitation-only private club inside every Disney park. Doors look like ordinary park buildings. Members pay $25,000+ initiation. Spotted by a nondescript "33" sign.' },
+      { name:'Utilidors — Underground Tunnels', secret:false, tip:'Magic Kingdom is built on top of a massive underground tunnel system allowing Cast Members to move between areas without breaking theming. Free tours available.' },
+      { name:'Tom Sawyer Island Ferry', secret:false, tip:'Few guests bother with the raft to Tom Sawyer Island. It has caves, mines, and a fort — and almost zero crowds. Great hidden rest spot midday.' },
+      { name:'Cinderella Suite — Overnight Stay', secret:true, tip:'A full hotel suite inside Cinderella Castle. Not available for booking — Disney gifts it to select families. Worth knowing the magic exists.' },
+      { name:'Talking Trashcan PUSH', secret:false, tip:'A remote-controlled talking trashcan named PUSH used to roam the parks. He\'s retired but his legacy lives on — ask older Cast Members.' },
+    ]},
+    { category:'EPCOT Discoveries', emoji:'🌍', color:'#00695C', items:[
+      { name:'Drinking Around the World', secret:false, tip:'A beloved tradition: have one drink at each World Showcase country. 11 countries = 11 drinks. Get a "Drinking Around the World" passport at the front of World Showcase.' },
+      { name:'Figment\'s Private Meeting Spots', secret:false, tip:'The purple dragon occasionally appears in the Imagination Pavilion for impromptu meets. No schedule — if he\'s there, grab your photo.' },
+      { name:'Walt\'s Window at Main Street EPCOT', secret:false, tip:'Look for the window dedicated to Walt Disney — it faces the same direction as Magic Kingdom\'s, symbolically watching over the park.' },
+      { name:'The Odyssey Events Pavilion', secret:false, tip:'Often closed, but when open this pavilion near Test Track has air conditioning and seating — perfect midday refuge with no crowds.' },
+    ]},
+    { category:'Universal Insider Knowledge', emoji:'🎬', color:'#7B1FA2', items:[
+      { name:'Diagon Alley Hidden Passages', secret:false, tip:'A brick wall passage connects the two Harry Potter lands (Diagon Alley and Hogsmeade) via the Hogwarts Express. Requires 2-park ticket — the train itself is a full attraction.' },
+      { name:'Free Butterbeer at Hogsmeade Events', secret:true, tip:'During some holiday and preview events, Universal offers complimentary Butterbeer tastings. Follow @UniversalORL on Instagram for announcements.' },
+      { name:'Cabana Bay Lazy River (Non-Guest Access)', secret:false, tip:'Cabana Bay is a Universal on-site hotel with a spectacular lazy river. Day passes available even if you\'re not staying there.' },
+      { name:'Mel\'s Diner Photo Op', secret:false, tip:'The 1950s car outside Mel\'s Diner can be sat in for photos. Families rarely notice it — great spontaneous photo.' },
+    ]},
+    { category:'Off the Beaten Path', emoji:'🌿', color:'#2E7D32', items:[
+      { name:'Leu Gardens, Orlando', secret:false, tip:'25 acres of stunning botanical gardens 5 minutes from downtown. $15 admission. Monday mornings are nearly empty. Extraordinary rose garden.' },
+      { name:'Enzian Theater', secret:false, tip:'A historic independent cinema in Winter Park with table service and meals during the film. Serves alcohol. The most unique movie experience in Florida.' },
+      { name:'Central Park, Winter Park (Free)', secret:false, tip:'The most beautiful park in the Orlando area. Free. Swan boats on the lake, walking paths, weekend art festivals. Europeans particularly love it.' },
+      { name:'Hollerbach\'s Willow Tree Café', secret:false, tip:'A German restaurant in Sanford (30 min from Orlando) with live polka music on weekends. Extraordinary schnitzel, German beer, and chaotic fun.' },
+      { name:'Wekiwa Springs State Park', secret:false, tip:'Crystal-clear natural springs 30 minutes from Disney. The water is a constant 68°F. Kayak, swim, and spot manatees. Florida at its most pure.' },
+    ]},
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-hidden-gems';
+    s.className = 'screen';
+    s.style.display = 'none';
+    s.innerHTML = `
+      <div style="padding:16px;display:flex;align-items:center;gap:12px;
+        background:linear-gradient(135deg,#2D1B69,#4A148C);color:#fff;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div>
+          <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;">Hidden Gems & Secrets</div>
+          <div style="font-size:11px;opacity:.8;">Things most visitors never discover</div>
+        </div>
+      </div>
+      <div style="padding:14px;overflow-y:auto;height:calc(100vh - 68px);-webkit-overflow-scrolling:touch;">
+        <div style="background:linear-gradient(135deg,#2D1B69,#4A148C);border-radius:14px;padding:14px;margin-bottom:14px;color:#fff;">
+          <div style="font-size:14px;font-weight:700;margin-bottom:6px;">🔍 The Explorer's Edge</div>
+          <div style="font-size:12px;opacity:.9;line-height:1.6;">These are the experiences that separate first-time visitors from true Orlando insiders. Some are free, some are priceless, and some are genuinely secret.</div>
+        </div>
+        ${GEMS.map(cat=>`
+          <div style="margin-bottom:16px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+              <span style="font-size:22px;">${cat.emoji}</span>
+              <span style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:${cat.color};">${cat.category}</span>
+            </div>
+            ${cat.items.map(item=>`
+              <div style="background:var(--card-bg,#fff);border-radius:12px;padding:12px;margin-bottom:8px;border:1px solid var(--border,#eee);">
+                <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:6px;">
+                  <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);flex:1;">${item.name}</div>
+                  ${item.secret?'<span style="font-size:9px;font-weight:800;padding:2px 7px;border-radius:20px;background:#7B1FA218;color:#7B1FA2;flex-shrink:0;">SECRET</span>':''}
+                </div>
+                <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;">${item.tip}</div>
+              </div>`).join('')}
+          </div>`).join('')}
+      </div>`;
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-hidden-gems')) buildScreen();
+  const _prevSS_hg = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_hg) _prevSS_hg(name, el);
+    if (name === 'hidden-gems') {
+      document.querySelectorAll('.screen').forEach(s=>s.style.display='none');
+      const s = document.getElementById('screen-hidden-gems');
+      if (s) s.style.display='block';
+    }
+  };
+
+  function injectHGCard2() {
+    if (document.getElementById('hg2-home-card')) return true;
+    const ftCard = document.getElementById('ftour-home-card');
+    if (!ftCard) return false;
+    const card = document.createElement('div');
+    card.id = 'hg2-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#2D1B69,#4A148C);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('hidden-gems');
+    card.innerHTML = `<div style="display:flex;align-items:center;justify-content:space-between;">
+      <div><div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">🔮 Hidden Gems & Secrets</div>
+      <div style="font-size:11px;color:rgba(255,255,255,.8);margin-top:3px;">Things most visitors never discover</div></div>
+      <span style="font-size:22px;color:rgba(255,255,255,.6);">›</span></div>`;
+    ftCard.insertAdjacentElement('afterend', card);
+    return true;
+  }
+  let _hg2Card = false;
+  setInterval(()=>{ if(!_hg2Card) _hg2Card=injectHGCard2(); }, 4800);
+  setTimeout(()=>{ _hg2Card=injectHGCard2(); }, 1600);
+  const _prevRH_hg2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_hg2) _prevRH_hg2.apply(this, arguments);
+    setTimeout(()=>{ _hg2Card=false; _hg2Card=injectHGCard2(); }, 680);
+  };
+})();
+</script>
