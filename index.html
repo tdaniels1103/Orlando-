@@ -41926,3 +41926,210 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK OOO2: What's New in 2025/2026 Guide ===== */
+(function initWhatsNew() {
+
+  const NEW_2025 = [
+    {
+      name:'Universal Epic Universe — OPEN',
+      park:'Universal Orlando',
+      emoji:'🌟',
+      status:'OPEN',
+      statusColor:'#1B5E20',
+      openDate:'May 22, 2025',
+      category:'New Theme Park',
+      desc:"Universal's first new theme park in 25 years. 5 worlds: Ministry of Magic (Harry Potter 1920s Paris), Isle of Berk (How to Train Your Dragon), Universal Monsters, Mario World, and Celestial Park (hub). A landmark moment in theme park history.",
+      mustKnow:['3-park ticket required to visit (Studios + IoA + Epic)','Hotel Express Pass now covers Epic Universe','Ministry of Magic is the standout land — book ILL immediately for the flagship attraction','Starfall Racers in Celestial Park is a launched inverted coaster — the hub ride'],
+    },
+    {
+      name:"Tiana's Bayou Adventure — OPEN",
+      park:"Disney's Magic Kingdom",
+      emoji:'🐸',
+      status:'OPEN',
+      statusColor:'#1B5E20',
+      openDate:'June 28, 2024',
+      category:'New Attraction',
+      desc:"Splash Mountain reimagined as a Princess and the Frog story. Same beloved ride system with new story, theming, characters, and music. The final drop is spectacular. A genuinely excellent reimagining that honors the beloved classic while introducing a new story.",
+      mustKnow:['Same height requirement: 40 inches','Will get you wet — bring rain poncho or plan for last ride of day','Lightning Lane Premier — book it','Music is exceptional — the original songs are by the film composers'],
+    },
+    {
+      name:'TRON Lightcycle / Run — FULLY OPERATIONAL',
+      park:"Disney's Magic Kingdom",
+      emoji:'🏍️',
+      status:'OPEN',
+      statusColor:'#1B5E20',
+      openDate:'April 4, 2023 (now fully integrated)',
+      category:'Established New Attraction',
+      desc:"Disney's fastest and most technologically advanced ride. Now fully operational with Virtual Queue and Lightning Lane Premier integration. The outdoor section at 60 mph over the Tomorrowland skyline is extraordinary.",
+      mustKnow:['Virtual queue at 7 AM via My Disney Experience is primary access method','Height: 48 inches','The boarding vehicle (motorcycle position) is genuinely unique','Single rider line sometimes available — check at the ride'],
+    },
+    {
+      name:'Moana: Journey of Water — OPEN',
+      park:"Disney's EPCOT — World Discovery",
+      emoji:'🌊',
+      status:'OPEN',
+      statusColor:'#1B5E20',
+      openDate:'October 16, 2023',
+      category:'New Attraction',
+      desc:"Disney's first non-ride attraction in decades — a walk-through experience where you interact with water spirits from Moana. Kids love it. Adults are moved by the beautiful theming and music. A uniquely gentle, tactile experience.",
+      mustKnow:['No height requirement — accessible to all','15–20 minutes walk-through · No Virtual Queue or Lightning Lane needed','Best experienced with young children who love the Moana characters','The water interaction elements genuinely respond to your gestures'],
+    },
+    {
+      name:"Disney's Fantasia Gardens & Fairways Mini Golf — Renovated",
+      park:'Disney Springs Area',
+      emoji:'⛳',
+      status:'OPEN',
+      statusColor:'#1B5E20',
+      openDate:'2024 renovation complete',
+      category:'Entertainment Update',
+      desc:"Disney's beloved miniature golf facility near the BoardWalk has been significantly updated with new theming and course elements. A fun add-on activity on a rest day or for families with kids who need a park break.",
+      mustKnow:['$14–16/person · Two 18-hole courses','Book in advance during peak season via Disney app','Open most days 10 AM–11 PM','Excellent choice for an afternoon activity between park visits'],
+    },
+    {
+      name:"Epic Universe's Celestial Park — Grand Opening Events",
+      park:'Universal Epic Universe',
+      emoji:'✨',
+      status:'HAPPENING NOW (2025)',
+      statusColor:'#E65100',
+      openDate:'Grand Opening: May 22, 2025',
+      category:'Special Event',
+      desc:"Epic Universe is celebrating its opening year with continuous events, entertainment, and programming through 2025. Year 1 content will be unlike anything available after the park settles into normal operation.",
+      mustKnow:['Year 1 ticket prices are at premium — expect $149–200/day','Opening year crowds are extreme May–August 2025','Best first visit: September 2025 or beyond when crowds ease','Hotel Express Pass essential in Year 1'],
+    },
+    {
+      name:"SeaWorld's Pipeline: The Surf Coaster",
+      park:'SeaWorld Orlando',
+      emoji:'🏄',
+      status:'OPEN',
+      statusColor:'#1B5E20',
+      openDate:'June 2023',
+      category:'Established New Attraction',
+      desc:"The world's first surf coaster. Riders stand in surfboard-style seats and the coaster swings as it traverses the track. A genuinely new sensation in the roller coaster world. SeaWorld's most innovative attraction.",
+      mustKnow:['Height: 54 inches · Minimum weight requirements apply','The surf sensation comes from the swinging seats on each inversion','Pair with Mako and Manta for a full SeaWorld thrill day','SeaWorld crowds are dramatically lower than Disney/Universal'],
+    },
+  ];
+
+  const COMING_SOON = [
+    { name:'Disney Villains Land (Magic Kingdom)', year:'2026–2027', emoji:'😈', desc:'A new area dedicated to Disney villains. Confirmed attraction: Villain-themed dark ride based on multiple Disney antagonists.' },
+    { name:"Universal's Wizarding World Expansion (IoA)", year:'2025–2026', emoji:'⚡', desc:'Additional Hogsmeade expansion with new shops and at least one new attraction confirmed.' },
+    { name:'Disney Tropical Americas (Animal Kingdom)', year:'2027+', emoji:'🌿', desc:"An expansion of Animal Kingdom with Indiana Jones and Encanto-themed areas — Disney's largest single-phase expansion since Pandora." },
+    { name:'Busch Gardens Serengeti Expansion', year:'2025', emoji:'🦒', desc:'New immersive Serengeti area with expanded walkthrough safari experience and new animal habitats.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-whats-new';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;';
+    s.innerHTML = `
+      <div style="background:linear-gradient(135deg,#1A237E,#283593,#7986CB);padding:18px 14px 20px;
+        display:flex;align-items:center;gap:12px;flex-shrink:0;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;
+          border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#fff;">What's New in 2025–2026</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">New parks · New rides · Grand openings · Coming soon</div>
+        </div>
+        <span style="font-size:28px;">🆕</span>
+      </div>
+      <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;">
+
+        <div style="background:linear-gradient(135deg,#1A237E,#283593);border-radius:16px;padding:14px;margin-bottom:14px;color:#fff;">
+          <div style="font-size:13px;line-height:1.6;opacity:.9;">
+            2025 is a landmark year for Orlando. Epic Universe opens May 22 — the biggest theme park event since Islands of Adventure. Here's every major opening, update, and what's coming next.
+          </div>
+        </div>
+
+        ${NEW_2025.map(item => `
+          <div style="background:var(--card-bg,#fff);border-radius:14px;margin-bottom:10px;
+            border:1px solid var(--border,#eee);overflow:hidden;">
+            <div style="background:linear-gradient(135deg,#1A237E,#283593);padding:10px 14px;">
+              <div style="display:flex;align-items:flex-start;gap:8px;">
+                <span style="font-size:22px;">${item.emoji}</span>
+                <div style="flex:1;">
+                  <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:#fff;">${item.name}</div>
+                  <div style="font-size:10px;color:rgba(255,255,255,.7);">${item.park} · ${item.category}</div>
+                  <div style="font-size:10px;color:rgba(255,255,255,.6);">📅 ${item.openDate}</div>
+                </div>
+                <span style="font-size:10px;font-weight:800;padding:3px 8px;border-radius:20px;
+                  background:${item.statusColor};color:#fff;flex-shrink:0;">${item.status}</span>
+              </div>
+            </div>
+            <div style="padding:10px 14px;">
+              <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;margin-bottom:8px;">${item.desc}</div>
+              <div style="font-size:10px;font-weight:700;color:#283593;margin-bottom:4px;">MUST KNOW</div>
+              ${item.mustKnow.map(mk => `<div style="font-size:12px;color:var(--text-secondary,#555);padding:2px 0;">→ ${mk}</div>`).join('')}
+            </div>
+          </div>`).join('')}
+
+        <!-- Coming soon -->
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;
+          color:var(--text-primary,#212121);margin:16px 0 10px;">🔮 Coming Soon</div>
+        ${COMING_SOON.map(cs => `
+          <div style="background:var(--card-bg,#fff);border-radius:12px;margin-bottom:8px;
+            border:1px solid var(--border,#eee);padding:10px 12px;display:flex;gap:10px;align-items:flex-start;">
+            <span style="font-size:22px;flex-shrink:0;">${cs.emoji}</span>
+            <div style="flex:1;">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);flex:1;">${cs.name}</div>
+                <span style="font-size:10px;font-weight:700;background:#1A237E20;color:#1A237E;padding:2px 8px;border-radius:20px;flex-shrink:0;margin-left:6px;">${cs.year}</span>
+              </div>
+              <div style="font-size:12px;color:var(--text-secondary,#555);margin-top:3px;">${cs.desc}</div>
+            </div>
+          </div>`).join('')}
+
+        <div style="background:linear-gradient(135deg,#1A237E,#283593);border-radius:14px;padding:14px;margin-top:14px;margin-bottom:20px;color:#fff;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:8px;">📱 Stay Current</div>
+          <div style="font-size:12px;color:rgba(255,255,255,.85);line-height:1.6;">
+            Orlando's attractions change constantly. For the most current information: <strong>AllEars.net</strong> (Disney), <strong>Inside Universal</strong> (Universal), and <strong>Theme Park Insider</strong> (all parks) are the most reliable real-time sources. The official park apps always have the most current operational status.
+          </div>
+        </div>
+      </div>`;
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-whats-new')) buildScreen();
+
+  const _prevSS_ooo2 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_ooo2) _prevSS_ooo2(name, el);
+    if (name === 'whats-new') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-whats-new');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectNewCard() {
+    if (document.getElementById('new-home-card')) return true;
+    const ref = document.getElementById('fireworks-home-card') || document.getElementById('thrill-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'new-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#1A237E,#283593,#7986CB);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('whats-new');
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:28px;">🆕</span>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">What's New in 2025–2026</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.85);">Epic Universe open · New rides · Coming soon</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _newCard = false;
+  setInterval(() => { if (!_newCard) _newCard = injectNewCard(); }, 18500);
+  setTimeout(() => { _newCard = injectNewCard(); }, 15000);
+
+  const _prevRH_ooo2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_ooo2) _prevRH_ooo2.apply(this, arguments);
+    setTimeout(() => { _newCard = false; _newCard = injectNewCard(); }, 3500);
+  };
+})();
+</script>
