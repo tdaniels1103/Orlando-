@@ -58980,3 +58980,396 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK XXXXXX: Orlando for Teens & Tweens Guide ===== */
+(function initOrlandoTeens() {
+
+  const TEEN_EXPERIENCES = [
+    {
+      name:'Velocicoaster', park:'Islands of Adventure', emoji:'🦕', color:'#1565C0',
+      ageRange:'13–17 (and adults)',
+      why:'The #1 coaster in Florida by virtually every ranking system. 155 feet, 70 mph, four inversions, zero-G roll over water. Lap-bar only — no shoulder harness. Teens who ride coasters will talk about this for years.',
+      intensityLevel:5,
+      tip:'Front row for the full visual experience over the water. Back row for maximum airtime. Single rider line cuts the wait by 50% and splits groups by only 5–10 minutes.',
+    },
+    {
+      name:'Rise of the Resistance', park:'Hollywood Studios', emoji:'⭐', color:'#1a1a2e',
+      ageRange:'All ages (especially ages 10+)',
+      why:'Teenagers who grew up with Star Wars experience the galaxy. Full-size AT-AT walker, captured by the First Order, Kylo Ren in person. 15–18 minute ride. The most ambitious theme park experience in the United States.',
+      intensityLevel:3,
+      tip:'Buy Lightning Lane Premier immediately at park opening or the day before. Rise sells out in minutes. Teens who love Star Wars (or don\'t) are universally affected by this ride.',
+    },
+    {
+      name:'Halloween Horror Nights', park:'Universal Studios Florida', emoji:'🎃', color:'#6A1B9A',
+      ageRange:'15+ (strong 16+ recommendation)',
+      why:'10+ professionally produced haunted houses using real Hollywood horror properties. Scare zones with professional monsters throughout. Live entertainment. The best Halloween event in the country and an annual tradition for local teens.',
+      intensityLevel:5,
+      tip:'NOT for young teens or those with anxiety. Designed for adults. A 17-year-old who loves horror films will consider this a peak life experience. The Stranger Things and Blumhouse houses are among the most well-produced.',
+    },
+    {
+      name:'Andretti Indoor Karting', location:'International Drive', emoji:'🏎️', color:'#E65100',
+      ageRange:'13+ (52" for adult karts)',
+      why:'Multi-level indoor kart racing reaching 50 mph. Not a kiddie attraction — the karts are fast enough to feel genuinely competitive. Races run 8–10 minutes. Teens consistently rank this as their favorite non-theme-park activity.',
+      intensityLevel:4,
+      tip:'Wednesday–Thursday are least crowded for racing. Speed karts require 52" height minimum. The Junior karts for under-52" are significantly slower. Group competitions with real timing available.',
+    },
+    {
+      name:'Tron Lightcycle / Run', park:'Magic Kingdom', emoji:'🏍️', color:'#003087',
+      ageRange:'All ages (especially 12+)',
+      why:'Straddled motorcycle seating, launched coaster under a massive iconic canopy structure. 60 mph. The fastest ride at Magic Kingdom. Teens who dismiss Disney as a kids park get silenced at Tron.',
+      intensityLevel:4,
+      tip:'Lightning Lane Premier or extremely early arrival required. The virtual queue on peak days adds strategy. The motorcycle seated position is unique — you\'re crouched forward like a real rider.',
+    },
+    {
+      name:'Bioluminescent Kayaking', location:'Merritt Island', emoji:'🌌', color:'#0d47a1',
+      ageRange:'14+ recommended',
+      why:'Paddling through electric blue-green bioluminescent water at night. A completely unique natural phenomenon. The kind of experience teens share on social media for months and describe to friends for years.',
+      intensityLevel:2,
+      tip:'Summer evenings (June–September) peak bioluminescence. Book 2+ weeks in advance. Departure near midnight on moonless nights. The 90-minute drive to Merritt Island is worth it.',
+    },
+    {
+      name:'iFly Indoor Skydiving', location:'I-Drive', emoji:'🪂', color:'#C62828',
+      ageRange:'3+ (teens especially)',
+      why:'A vertical wind tunnel that simulates skydiving freefall. First-time flyers do two flights — coached by an instructor. Teens who try this almost universally want to go again immediately.',
+      intensityLevel:3,
+      tip:'The "more powerful" flight tunnel is worth the upgrade — the basic wind speed for adults is slightly underwhelming. The 2-minute pre-flight training video is mandatory but quick.',
+    },
+  ];
+
+  const TEEN_PARKS = [
+    {
+      park:'Islands of Adventure', why:'VelociCoaster + Hulk + Hagrid\'s = the best coaster lineup in Florida. For ride-obsessed teens, this is the top park.' ,
+    },
+    {
+      park:'Hollywood Studios', why:'Rise of the Resistance + Galaxy\'s Edge + Tower of Terror. The Star Wars immersion alone justifies the day. Build-a-lightsaber at Savi\'s Workshop ($299) is peak teen activity.'},
+    {
+      park:'Universal Studios Florida', why:'Halloween Horror Nights (fall only). Year-round: Gringotts, Mummy, Velocicoaster. The Springfield and Simpsons content hits differently for teens who grew up with the show.'},
+    {
+      park:'Busch Gardens Tampa (day trip)', why:'Iron Gwazi (top 10 coaster in the world), Montu, Kumba — the best thrill coaster collection within 90 minutes of Orlando. 100% worth a day trip for coaster fans.'},
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-teens';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#1a1a2e,#C62828,#E65100);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Orlando for Teens & Tweens</div>
+          <div style="font-size:11px;opacity:.8;">VelociCoaster · Rise · HHN · Andretti · Bioluminescence</div>
+        </div>
+        <span style="font-size:28px;">⚡</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        Teenagers need experiences that challenge, thrill, and feel genuinely earned — not baby rides and character meets. Orlando delivers some of the most intense roller coasters, haunted experiences, and natural phenomena that teens will genuinely be excited about.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    TEEN_EXPERIENCES.forEach(exp => {
+      const stars = '🔥'.repeat(exp.intensityLevel) + '⬜'.repeat(5-exp.intensityLevel);
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:10px 14px;background:${exp.color}18;border-left:4px solid ${exp.color};">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div style="display:flex;gap:8px;align-items:center;">
+              <span style="font-size:20px;">${exp.emoji}</span>
+              <div>
+                <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${exp.name}</div>
+                <div style="font-size:10px;color:var(--text-secondary,#888);">${exp.park || exp.location} · ${exp.ageRange}</div>
+              </div>
+            </div>
+            <div style="font-size:12px;">${stars}</div>
+          </div>
+        </div>
+        <div style="padding:9px 14px;">
+          <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;margin-bottom:5px;">${exp.why}</div>
+          <div style="display:flex;gap:5px;background:${exp.color}0d;border-radius:8px;padding:6px;">
+            <span style="font-size:11px;flex-shrink:0;">💡</span>
+            <div style="font-size:11px;color:var(--text-secondary,#555);">${exp.tip}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const parkCard = document.createElement('div');
+    parkCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+    parkCard.innerHTML = `<div style="padding:10px 14px;background:linear-gradient(135deg,#1a1a2e,#C62828);color:#fff;">
+      <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;">🏆 Best Parks for Teens (Ranked)</div>
+    </div>
+    <div style="padding:10px 14px;">
+      ${TEEN_PARKS.map((p,i)=>`<div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
+        <div style="font-size:14px;font-weight:800;color:${['#C9A96E','#C62828','#7B1FA2','#1565C0'][i]};flex-shrink:0;width:20px;">${i+1}.</div>
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);">${p.park}</div>
+          <div style="font-size:11px;color:var(--text-secondary,#666);">${p.why}</div>
+        </div>
+      </div>`).join('')}
+    </div>`;
+    body.appendChild(parkCard);
+
+    const tipCard = document.createElement('div');
+    tipCard.style.cssText = 'background:linear-gradient(135deg,#1a1a2e,#C62828);border-radius:14px;margin-bottom:20px;padding:14px;color:#fff;';
+    tipCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;margin-bottom:8px;">📱 Teen Trip Planning Tips</div>
+    ${[
+      {icon:'👤', tip:'Teens old enough to navigate parks independently (15+) have more fun when allowed to operate without parents hovering. Set a meeting time and location at the end of the day and let them run.'},
+      {icon:'💳', tip:'Give teens a dedicated budget for the day — their own MagicBand loaded with spending money. The ownership changes the trip from being passengers to being participants.'},
+      {icon:'⏰', tip:'Teens are most engaged with early morning rides (rope drop) and evening events. The afternoon is when everyone is most miserable in the heat — this is when a hotel pool break actually works.'},
+      {icon:'🤙', tip:'The most successful teen Orlando trips involve at least one genuinely intense experience — Velocicoaster, HHN, or bioluminescent kayaking. Something that earns bragging rights beyond "we went to Disney."'},
+    ].map(t=>`<div style="display:flex;gap:10px;margin-bottom:7px;align-items:flex-start;">
+      <span style="font-size:18px;flex-shrink:0;">${t.icon}</span>
+      <div style="font-size:11px;opacity:.9;line-height:1.5;">${t.tip}</div>
+    </div>`).join('')}`;
+    body.appendChild(tipCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-teens')) buildScreen();
+
+  const _prevSS_xxxxxx = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_xxxxxx) _prevSS_xxxxxx(name, el);
+    if (name === 'teens') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-teens');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectTeensCard() {
+    if (document.getElementById('teens-home-card')) return true;
+    const ref = document.getElementById('seasonal-home-card') || document.getElementById('photography-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'teens-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#1a1a2e,#C62828,#E65100 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('teens');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">⚡</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Orlando for Teens & Tweens</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">VelociCoaster · Rise · Horror Nights · Andretti Karting</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _teensCard = false;
+  setInterval(() => { if (!_teensCard) _teensCard = injectTeensCard(); }, 84000);
+  setTimeout(() => { _teensCard = injectTeensCard(); }, 80500);
+  const _prevRH_xxxxxx = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_xxxxxx) _prevRH_xxxxxx.apply(this, arguments);
+    setTimeout(() => { _teensCard = false; _teensCard = injectTeensCard(); }, 28600);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK YYYYYY: Orlando Theme Park Height Requirements & Ride Intensity Guide ===== */
+(function initRideIntensity() {
+
+  const RIDE_GUIDE = [
+    {
+      park:'Magic Kingdom', emoji:'🏰', color:'#003087',
+      rides:[
+        {name:'Tron Lightcycle/Run', height:'40"', intensity:4, type:'Launched coaster', note:'Motorcycle position, 60 mph. Fast and disorienting.'},
+        {name:'Space Mountain', height:'44"', intensity:4, type:'Indoor coaster', note:'Complete darkness, unpredictable turns, bumpy. Deceivingly intense.'},
+        {name:'Seven Dwarfs Mine Train', height:'38"', intensity:3, type:'Family coaster', note:'Swinging mine cars, moderate speed. Best family coaster at Disney.'},
+        {name:'Big Thunder Mountain', height:'40"', intensity:3, type:'Mine train coaster', note:'Fast outdoor coaster, no inversions. Great for coaster beginners.'},
+        {name:'Tiana\'s Bayou Adventure', height:'40"', intensity:3, type:'Flume ride', note:'Final 52-foot drop gets front rows soaked. Moderate intensity overall.'},
+        {name:'Haunted Mansion', height:'None', intensity:1, type:'Dark ride', note:'Tame and atmospheric. The queue is scarier than the ride.'},
+        {name:'Pirates of the Caribbean', height:'None', intensity:1, type:'Boat dark ride', note:'Completely accessible for all ages and abilities.'},
+      ],
+    },
+    {
+      park:'EPCOT', emoji:'🌐', color:'#1565C0',
+      rides:[
+        {name:'Guardians: Cosmic Rewind', height:'42"', intensity:4, type:'Reverse-launch coaster', note:'Reverse launch + forward launch. Top heavy with backwards motion.'},
+        {name:'Test Track', height:'40"', intensity:2, type:'Simulator + track', note:'65 mph at end, but straight track. More exciting than intense.'},
+        {name:'Mission: SPACE Orange', height:'44"', intensity:5, type:'Centrifuge simulator', note:'2.5G force centrifuge. Real nausea risk. Avoid after meals.'},
+        {name:'Mission: SPACE Green', height:'40"', intensity:2, type:'Motion simulator (gentle)', note:'Non-spinning version of the ride. Safe for sensitive guests.'},
+        {name:'Soarin\' Around the World', height:'40"', intensity:1, type:'Hang glider sim', note:'Gentle, beautiful, universally loved. No intensity.'},
+        {name:'Frozen Ever After', height:'None', intensity:1, type:'Boat dark ride', note:'Gentle boat ride with singing and characters.'},
+      ],
+    },
+    {
+      park:'Hollywood Studios', emoji:'🎬', color:'#C62828',
+      rides:[
+        {name:'Rise of the Resistance', height:'40"', intensity:3, type:'Trackless dark ride', note:'Some drops and motion but mainly gentle. Feels epic, not intense.'},
+        {name:'Slinky Dog Dash', height:'38"', intensity:3, type:'Family launched coaster', note:'Smooth, fun, surprising. Best family coaster at Disney.'},
+        {name:'Tower of Terror', height:'40"', intensity:5, type:'Drop tower', note:'Random drop sequences. Intense psychological and physical.'},
+        {name:'Rock \'n\' Roller Coaster', height:'48"', intensity:5, type:'Launched indoor coaster', note:'0–60 mph in 2.8 seconds, 3 inversions. Most intense at Disney.'},
+        {name:'Millennium Falcon', height:'38"', intensity:2, type:'Motion ride', note:'Cockpit simulator. Intensity varies by group performance.'},
+      ],
+    },
+    {
+      park:'Animal Kingdom', emoji:'🌿', color:'#2E7D32',
+      rides:[
+        {name:'Avatar Flight of Passage', height:'44"', intensity:4, type:'Banshee simulator', note:'Extreme motion simulation — like riding a living creature. Intense.'},
+        {name:'Expedition Everest', height:'44"', intensity:4, type:'Steel coaster (forward/backward)', note:'Backward section in darkness. Fast, intense, classic Disney coaster.'},
+        {name:'Kali River Rapids', height:'38"', intensity:3, type:'River rapids', note:'Get completely soaked. Unpredictable water exposure. All skill levels.'},
+        {name:'DINOSAUR', height:'40"', intensity:4, type:'Dark ride (rough)', note:'Extremely rough ride with loud jump scares. Not recommended for young children.'},
+        {name:'Na\'vi River Journey', height:'None', intensity:1, type:'Boat dark ride', note:'Gentle nighttime boat ride through Pandora. Accessible for all.'},
+      ],
+    },
+    {
+      park:'Islands of Adventure', emoji:'🏝️', color:'#1565C0',
+      rides:[
+        {name:'Velocicoaster', height:'51"', intensity:5, type:'Launched inverted coaster', note:'155 ft, 70 mph, 4 inversions, lap bar only. Most intense ride in Florida.'},
+        {name:'Incredible Hulk', height:'54"', intensity:5, type:'Launched steel coaster', note:'Seven inversions after a magnetic launch. Ear protection available.'},
+        {name:'Hagrid\'s Motorbike', height:'48"', intensity:3, type:'Multi-launch coaster', note:'Multiple speed changes, backward section. Thrilling but accessible.'},
+        {name:'Jurassic World Ride', height:'42"', intensity:3, type:'Water dark ride', note:'85-foot drop at end. Front seats get completely soaked.'},
+        {name:'Forbidden Journey', height:'48"', intensity:3, type:'Trackless dark ride', note:'Flying + screen elements. Motion sensitive — look at horizon if queasy.'},
+        {name:'Cat in the Hat', height:'None', intensity:1, type:'Family dark ride', note:'Spinning family ride. Gentle enough for toddlers.'},
+      ],
+    },
+  ];
+
+  const INTENSITY_LEGEND = [
+    {level:1, label:'Gentle — All ages', note:'No height restrictions typically. Safe for very young children and seniors.'},
+    {level:2, label:'Mild — Most ages', note:'Some light motion. Suitable for ages 4+.'},
+    {level:3, label:'Moderate — Ages 6+', note:'Some drops or speed. Parents judge based on child\'s thrill tolerance.'},
+    {level:4, label:'Intense — Ages 10+', note:'Significant drops, speed, or motion. Not for those with heart or back conditions.'},
+    {level:5, label:'Extreme — Thrill seekers', note:'Maximum intensity. Not suitable for motion sickness, back/heart conditions, or those who simply don\'t like intense rides.'},
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-ride-intensity';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#003087,#C62828,#2E7D32);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Ride Intensity & Height Guide</div>
+          <div style="font-size:11px;opacity:.8;">Height requirements · Intensity ratings · What to expect on every major ride</div>
+        </div>
+        <span style="font-size:28px;">📏</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        Every major attraction across all five parks with height requirements and an honest intensity rating. Plan your day around what your group can handle — no surprises at the ride entrance.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    const legendCard = document.createElement('div');
+    legendCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+    legendCard.innerHTML = `<div style="padding:10px 14px;background:linear-gradient(135deg,#003087,#C62828);color:#fff;">
+      <div style="font-size:13px;font-weight:700;">🔥 Intensity Scale Legend</div>
+    </div>
+    <div style="padding:8px 14px;">
+      ${INTENSITY_LEGEND.map(l=>`<div style="display:flex;gap:8px;margin-bottom:5px;align-items:flex-start;">
+        <div style="font-size:12px;flex-shrink:0;">${'🔥'.repeat(l.level)}${'⬜'.repeat(5-l.level)}</div>
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--text-primary,#212121);">${l.label}</div>
+          <div style="font-size:10px;color:var(--text-secondary,#666);">${l.note}</div>
+        </div>
+      </div>`).join('')}
+    </div>`;
+    body.appendChild(legendCard);
+
+    RIDE_GUIDE.forEach(park => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:10px 14px;background:${park.color}18;border-left:4px solid ${park.color};">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:20px;">${park.emoji}</span>
+            <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--text-primary,#212121);">${park.park}</div>
+          </div>
+        </div>
+        <div style="padding:6px 14px 10px;">
+          ${park.rides.map(r=>`<div style="display:flex;align-items:flex-start;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border,#f0f0f0);">
+            <div style="flex:1;min-width:0;margin-right:8px;">
+              <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);">${r.name}</div>
+              <div style="font-size:10px;color:var(--text-secondary,#666);">${r.note}</div>
+            </div>
+            <div style="flex-shrink:0;text-align:right;">
+              <div style="font-size:10px;font-weight:700;color:${park.color};">${r.height}</div>
+              <div style="font-size:10px;">${'🔥'.repeat(r.intensity)}</div>
+            </div>
+          </div>`).join('')}
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const footCard = document.createElement('div');
+    footCard.style.cssText = 'background:linear-gradient(135deg,#003087,#C62828);border-radius:14px;margin-bottom:20px;padding:14px;color:#fff;';
+    footCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;margin-bottom:8px;">⚠️ Health & Safety Notes</div>
+    ${[
+      'All rides with motion: avoid immediately after eating. Wait 30–60 minutes after a full meal before intense rides.',
+      'Height requirements are strictly enforced. Measure children at home before the trip. Disney has baby swap (rider switch) for any ride with a height requirement.',
+      'Pregnancy: Avoid all rides rated 3+ (drops, inversions, launches, simulators). Na\'vi River Journey, Gran Fiesta Tour, Haunted Mansion, and Pirates are safe.',
+      'Heart/back conditions: Avoid rides rated 4–5. Test Track and Green Mission: SPACE are borderline — consult your doctor.',
+    ].map(n=>`<div style="display:flex;gap:8px;margin-bottom:6px;align-items:flex-start;">
+      <span style="font-size:12px;flex-shrink:0;">⚠️</span>
+      <div style="font-size:11px;opacity:.9;line-height:1.4;">${n}</div>
+    </div>`).join('')}`;
+    body.appendChild(footCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-ride-intensity')) buildScreen();
+
+  const _prevSS_yyyyyy = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_yyyyyy) _prevSS_yyyyyy(name, el);
+    if (name === 'ride-intensity') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-ride-intensity');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectRICard() {
+    if (document.getElementById('ride-intensity-home-card')) return true;
+    const ref = document.getElementById('teens-home-card') || document.getElementById('seasonal-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'ride-intensity-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#003087,#C62828,#2E7D32 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('ride-intensity');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">📏</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Ride Intensity & Height Guide</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Height requirements · Intensity ratings · All 5 parks</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _riCard = false;
+  setInterval(() => { if (!_riCard) _riCard = injectRICard(); }, 85000);
+  setTimeout(() => { _riCard = injectRICard(); }, 81500);
+  const _prevRH_yyyyyy = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_yyyyyy) _prevRH_yyyyyy.apply(this, arguments);
+    setTimeout(() => { _riCard = false; _riCard = injectRICard(); }, 29000);
+  };
+})();
+</script>
