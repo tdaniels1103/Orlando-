@@ -63060,3 +63060,325 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK TTTTTTT: Orlando for Foodies — Fine Dining & Culinary Guide ===== */
+(function initOrlandoFineDining() {
+
+  const RESTAURANT_TIERS = [
+    {
+      tier:'Special Occasion / Destination Dining', emoji:'⭐', color:'#C9A96E',
+      restaurants:[
+        {name:'Victoria & Albert\'s', location:'Grand Floridian Resort', price:'$350+/person', note:'Disney World\'s only AAA Five Diamond restaurant. 8–10 course tasting menu with live harp music. 60 guests per night maximum. One of the most exclusive restaurant reservations in the US — book exactly at 60 days.'},
+        {name:'Kadence', location:'Audubon Park, Orlando', price:'$150–200/person', note:'The finest omakase sushi in Florida by most accounts. 12-seat chef\'s counter, market-driven courses, exceptional sake program. The most Michelin-worthy restaurant in Central Florida — chef Lordfer Lalicon\'s work is extraordinary.'},
+        {name:'The Ravenous Pig', location:'Winter Park', price:'$50–90/person', note:'The restaurant that launched Orlando\'s farm-to-table scene in 2007. Chef-owners James and Julie Petrakis remain hands-on. Charcuterie program, craft cocktails, American gastropub elevated to genuine culinary seriousness.'},
+        {name:'Capa', location:'Four Seasons Orlando', price:'$80–150/person', note:'Spanish steakhouse on the 17th floor. The most spectacular restaurant view in Central Florida — Magic Kingdom fireworks from the window seats. Ibérico pork, Spanish octopus, exceptional wine list.'},
+      ],
+    },
+    {
+      tier:'Serious Local Dining', emoji:'🍽️', color:'#C62828',
+      restaurants:[
+        {name:'The Osprey Tavern', location:'Baldwin Park, Orlando', price:'$40–70/person', note:'Seasonal menu, wood-fired cooking, best wine program at a neighborhood restaurant in Orlando. The cheese and charcuterie boards are the best in the city. Warm atmosphere.'},
+        {name:'Reyes Mezcalería', location:'Audubon Park', price:'$30–60/person', note:'The best mezcal program in Florida. Small plates — tacos, ceviche, quesadillas made with serious technique. The bar program matches the kitchen. Best mezcal flight outside of Mexico City in this part of the US.'},
+        {name:'Se7en Bites', location:'Milk District', price:'$10–25/person', note:'Brunch-only bakery with queues. The buttermilk biscuits, bread pudding, and rotating breakfast plates are legitimately life-changing. Arrive at opening — sells out of popular items by 10 AM.'},
+        {name:'Maxine\'s on Shine', location:'Thornton Park', price:'$30–50/person', note:'Neighborhood dinner restaurant with the most consistent cooking in Thornton Park. Craft cocktails, local sourcing, the kind of unpretentious excellence that defines the best neighborhood restaurants.'},
+      ],
+    },
+    {
+      tier:'Casual Excellence', emoji:'🌮', color:'#2E7D32',
+      restaurants:[
+        {name:'Hunger Street Tacos', location:'Mills 50', price:'$12–20/person', note:'Best tacos in Orlando. Simple concept — 6–8 rotating tacos using Central Florida sourced ingredients. The al pastor and smoked brisket tacos are exceptional. Tiny space, cash only, worth any wait.'},
+        {name:'4 Rivers Smokehouse', location:'Multiple Orlando locations', price:'$15–30/person', note:'The most acclaimed barbecue in Florida. Kansas City-style with Florida influence. The brisket, burnt ends, and banana pudding have a devoted following. Multiple locations make it accessible from anywhere in the metro.'},
+        {name:'East End Market', location:'Audubon Park', price:'$10–30/person', note:'Artisan food market with permanent vendors — Lineage Coffee, Domu ramen, Kelly\'s Homemade Ice Cream. The best destination for sampling Orlando\'s food culture in one space.'},
+        {name:'Domu', location:'East End Market + other locations', price:'$15–25/person', note:'Best ramen in Florida. The black garlic ramen and spicy Ninja ramen are the standard by which all Florida ramen is measured. Long queues on weekend evenings — arrive at opening.'},
+      ],
+    },
+    {
+      tier:'Disney Park Dining Worth Doing', emoji:'🏰', color:'#003087',
+      restaurants:[
+        {name:'Be Our Guest Restaurant', location:'Magic Kingdom', price:'$55–70/person (dinner)', note:'The most atmospheric restaurant at Disney World — inside the Beast\'s castle. Three dining rooms including the ballroom. Dinner (table service) is the premium experience. The Grey Stuff dessert is mandatory.'},
+        {name:'Space 220', location:'EPCOT', price:'$50–80/person', note:'Themed as a space station in Earth orbit. The theming execution is exceptional — elevator "launch" takes you to the restaurant where Earth is visible below through floor-to-ceiling windows. Prices are high; atmosphere is unmatched.'},
+        {name:'Oga\'s Cantina', location:'Galaxy\'s Edge, Hollywood Studios', price:'$15–25/person (drinks only)', note:'Galaxy\'s Edge bar in the Star Wars universe. The only bar within a Disney park where alcohol is served. Standing room only, 45-minute maximum stay policy. The Ronto Roaster pork-wrapped in flatbread from the adjacent cart is the best park food at Disney World.'},
+        {name:'Topolino\'s Terrace', location:'Riviera Resort', price:'$40–65/person', note:'Rooftop Italian restaurant on the EPCOT-area Riviera Resort. The best view of EPCOT from any restaurant table. Skyliner access from EPCOT gate. Characters at breakfast (Mickey, Minnie in artist costumes). Worth booking 60 days out.'},
+      ],
+    },
+  ];
+
+  const FOOD_TIPS = [
+    {icon:'📅', tip:'For any Orlando table-service restaurant booking: call or reserve online 60 days before your date for Disney restaurants; 30 days for most local restaurants. The best tables at Kadence, Victoria & Albert\'s, and The Ravenous Pig book out weeks in advance.'},
+    {icon:'🍷', tip:'Orlando\'s restaurant wine programs have dramatically improved in the past decade. The Osprey Tavern, Quantum Leap Winery, and Capa at Four Seasons have genuinely excellent wine lists. Florida doesn\'t produce wine in volume, but the sommelier talent is nationally competitive.'},
+    {icon:'🌮', tip:'The Audubon Park Garden District (around Corrine Drive) is the single densest concentration of quality independent restaurants in Orlando. Kadence, Hunger Street, Reyes Mezcalería, and East End Market are all within 1/2 mile.'},
+    {icon:'🍳', tip:'Orlando brunch culture is strong. Se7en Bites (Milk District), Maxine\'s on Shine (Thornton Park), and Hawkers Asian Street Fare (Mills 50) are the best non-hotel brunch experiences. All require arriving early or accepting queues.'},
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-fine-dining';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#C9A96E,#C62828,#2E7D32);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Orlando Fine Dining & Food Guide</div>
+          <div style="font-size:11px;opacity:.8;">Victoria & Albert\'s · Kadence · Ravenous Pig · Se7en Bites · Domu</div>
+        </div>
+        <span style="font-size:28px;">🍽️</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        Orlando's culinary scene has grown dramatically beyond resort dining. From Victoria & Albert's (one of America's most exclusive restaurants) to Kadence omakase to the Audubon Park taco and ramen corridor — the city now competes with any mid-sized American culinary destination.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    RESTAURANT_TIERS.forEach(tier => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:9px 14px;background:${tier.color}18;border-left:4px solid ${tier.color};">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:20px;">${tier.emoji}</span>
+            <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${tier.tier}</div>
+          </div>
+        </div>
+        <div style="padding:8px 14px;">
+          ${tier.restaurants.map(r=>`<div style="margin-bottom:9px;padding-bottom:9px;border-bottom:1px solid var(--border,#f5f5f5);padding-left:8px;border-left:3px solid ${tier.color};">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:2px;">
+              <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);">${r.name}</div>
+              <div style="font-size:10px;font-weight:700;color:${tier.color};flex-shrink:0;margin-left:6px;">${r.price}</div>
+            </div>
+            <div style="font-size:10px;color:var(--text-secondary,#888);margin-bottom:2px;">${r.location}</div>
+            <div style="font-size:10px;color:var(--text-secondary,#555);line-height:1.5;">${r.note}</div>
+          </div>`).join('')}
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const tipsCard = document.createElement('div');
+    tipsCard.style.cssText = 'background:linear-gradient(135deg,#C9A96E,#C62828);border-radius:14px;margin-bottom:20px;padding:14px;color:#fff;';
+    tipsCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;margin-bottom:8px;">🍽️ Dining Intelligence</div>
+    ${FOOD_TIPS.map(t=>`<div style="display:flex;gap:10px;margin-bottom:7px;align-items:flex-start;">
+      <span style="font-size:18px;flex-shrink:0;">${t.icon}</span>
+      <div style="font-size:11px;opacity:.95;line-height:1.5;">${t.tip}</div>
+    </div>`).join('')}`;
+    body.appendChild(tipsCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-fine-dining')) buildScreen();
+
+  const _prevSS_ttttttt = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_ttttttt) _prevSS_ttttttt(name, el);
+    if (name === 'fine-dining') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-fine-dining');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectFDCard() {
+    if (document.getElementById('fine-dining-home-card')) return true;
+    const ref = document.getElementById('ak-deep-home-card') || document.getElementById('hotels-location-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'fine-dining-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#C9A96E,#C62828,#2E7D32 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('fine-dining');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🍽️</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Fine Dining & Culinary Guide</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Victoria & Albert\'s · Kadence omakase · Ravenous Pig · Se7en Bites</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _fdCard = false;
+  setInterval(() => { if (!_fdCard) _fdCard = injectFDCard(); }, 106000);
+  setTimeout(() => { _fdCard = injectFDCard(); }, 102500);
+  const _prevRH_ttttttt = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_ttttttt) _prevRH_ttttttt.apply(this, arguments);
+    setTimeout(() => { _fdCard = false; _fdCard = injectFDCard(); }, 37400);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK UUUUUUU: Universal Studios Florida Complete Guide ===== */
+(function initUSFDeep() {
+
+  const USF_LANDS = [
+    {
+      land:'The Wizarding World of Harry Potter — Diagon Alley', emoji:'⚡', color:'#1a1a2e',
+      desc:'The second (and more elaborate) Harry Potter land at Universal. Diagon Alley is hidden inside a brick wall — discovering the entrance is part of the experience. More retail and dining depth than Hogsmeade.',
+      rides:[
+        {name:'Harry Potter and the Escape from Gringotts', height:'42"', intensity:4, note:'Multi-sensory dark ride with dragons, Voldemort, and Gringotts bank. The combination of screen immersion, physical movement, and fire effects is the most technically complex ride at Universal. Less motion-sick inducing than Forbidden Journey despite the intensity.'},
+        {name:'Hogwarts Express (London → Hogsmeade)', height:'None', intensity:1, note:'One-way train with unique show elements — you need a park-to-park ticket. The journey is different in each direction; both ways are worth experiencing.'},
+      ],
+      tip:'The Wizarding Interactive Wand ($55) allows you to cast spells at marked locations throughout Diagon Alley and Hogsmeade. Spell locations are marked with bronze medallions. The wand interaction is the best active engagement experience Universal offers — children spend 30–45 minutes working through all the spell locations.',
+    },
+    {
+      land:'Springfield — Home of the Simpsons', emoji:'🍩', color:'#F57F17',
+      desc:'The Simpsons\' hometown recreated in full — Moe\'s Tavern, Krusty Burger, Kwik-E-Mart, and the Simpsons ride anchor the most detailed and comedy-dense land at Universal.',
+      rides:[
+        {name:'The Simpsons Ride', height:'40"', intensity:3, note:'Simulated coaster on a simulator — inside Krustyland. The Simpsons writing team created the ride\'s script, resulting in genuinely funny gags throughout. The Sideshow Bob antagonist story arc is legitimately clever.'},
+        {name:'Kang & Kodos\' Twirl \'n\' Hurl', height:'None', intensity:1, note:'Gentle Simpsons alien spinner. Best for young children; adults can skip.'},
+      ],
+      tip:'Lard Lad Donuts serves a genuine giant donut. Moe\'s Tavern has the Flaming Moe (non-alcoholic orange soda with dry ice) and alcoholic versions. The Duff Beer at the World of Beer kiosk is a real product. One of the best themed quick-service food zones at any theme park.',
+    },
+    {
+      land:'Minion Land', emoji:'💛', color:'#F9D923',
+      desc:'New land (2023) replacing Shrek — Despicable Me and Minion themed with the best family ride and highest-capacity attraction at Universal Studios Florida.',
+      rides:[
+        {name:'Villain-Con Minion Blast', height:'None', intensity:2, note:'Interactive shooting experience with Minions — the best scoring/competitive ride at Universal. Each wand controller tracks individual score. High replay value for competitive families.'},
+        {name:'Despicable Me: Minion Mayhem', height:'40"', intensity:2, note:'Motion simulator turning guests into Minions. The pre-show with Gru is among the best ride pre-shows at Universal. Can be intense for motion-sensitive guests.'},
+      ],
+      tip:'The Minion Café is one of Universal\'s best quick-service restaurants — theming is fully immersive and the food options are legitimately good. The BFFF (Best Friend Forever Fondue) is a highlight.',
+    },
+    {
+      land:'Hollywood / Production Central', emoji:'🎬', color:'#C62828',
+      desc:'The entertainment industry-themed central area connecting Minion Land, Horror Makeup Show, and multiple major attractions.',
+      rides:[
+        {name:'Hollywood Rip Ride Rockit', height:'51"', intensity:5, note:'The most visually dramatic coaster at Universal Studios Florida — a vertical elevator launch straight up, then a loop-the-loop. The music system lets you choose your song. The tallest coaster visible from I-4.'},
+        {name:'MEN IN BLACK: Alien Attack', height:'42"', intensity:2, note:'Competitive shooting ride where your car\'s score matters. Teams compete. The finale score display creates rivalry between cars. Better than the movie.'},
+        {name:'Revenge of the Mummy', height:'48"', intensity:4, note:'Indoor psychological coaster. The final backward launch in complete darkness before the flaming ceiling is one of the most satisfying finale moments of any coaster. The "mind eraser" scene resets guest expectations brilliantly.'},
+      ],
+      tip:'Horror Makeup Show (if running) is one of Universal\'s most underrated live performances — professional makeup artists demonstrate prosthetics and transformation in a 30-minute live show. Often overlooked.',
+    },
+    {
+      land:'World Expo / San Francisco / New York', emoji:'🗽', color:'#0277BD',
+      desc:'The remaining back half of Universal Studios Florida transitions between themed areas with notable individual attractions.',
+      rides:[
+        {name:'Race Through New York Starring Jimmy Fallon', height:'40"', intensity:2, note:'The best waiting experience at any Universal ride — the Tonight Show-themed queue has interactive games, photo moments, and a waiting lounge. The ride itself is fun but the queue is exceptional.'},
+        {name:'Fast & Furious: Supercharged', height:'40"', intensity:2, note:'Tram ride finale experience. High guest capacity makes waits short. The Vin Diesel narrated finale is earnest in its enthusiasm.'},
+        {name:'Men in Black: Alien Attack', height:'42"', intensity:2, note:'(Located in World Expo area) Best competitive shooting game at Universal.'},
+      ],
+      tip:'The back of USF (San Francisco, New York areas) tends to have the shortest waits at any time of day. Front-loaded with the most-wanted rides, guests deplete fast toward the back. MIB and Jimmy Fallon are often walkons.',
+    },
+  ];
+
+  const USF_STRATEGY = [
+    {icon:'🎢', tip:'Rope drop order: Escape from Gringotts first (immediately to Diagon Alley), then Hollywood Rip Ride Rockit, then Revenge of the Mummy. All three before 10 AM on arrival.'},
+    {icon:'⚡', tip:'The Hogwarts Express (requires park-to-park ticket) is worth riding in both directions. London → Hogsmeade and Hogsmeade → London have different show elements. Both are 7–12 minutes.'},
+    {icon:'🍺', tip:'Butterbeer is available in multiple forms: cold (like a cream soda float), frozen, hot (winter seasonal), and Butterbeer Fudge. The frozen version on a hot Florida day is the definitive theme park food experience.'},
+    {icon:'📱', tip:'Universal\'s app shows virtual queue status for Hagrid\'s at IOA. Set phone notifications — boarding groups drop at 7 AM and 1 PM and fill within 2–3 minutes.'},
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-usf-deep';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#1a1a2e,#C62828,#F57F17);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Universal Studios Florida — Deep Dive</div>
+          <div style="font-size:11px;opacity:.8;">Diagon Alley · Gringotts · Rip Ride Rockit · Mummy · Minion Land</div>
+        </div>
+        <span style="font-size:28px;">🎬</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        Universal Studios Florida houses Diagon Alley — the most detailed themed land in the country — alongside some of the best indoor coasters in America. The park rewards those who know where to go first.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    USF_LANDS.forEach(land => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:9px 14px;background:${land.color}18;border-left:4px solid ${land.color};">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:20px;">${land.emoji}</span>
+            <div>
+              <div style="font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${land.land}</div>
+              <div style="font-size:10px;color:var(--text-secondary,#555);">${land.desc}</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:8px 14px;">
+          ${land.rides.map(r=>`<div style="background:var(--bg,#f9f9f9);border-radius:8px;padding:8px;margin-bottom:5px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;">
+              <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);">${r.name}</div>
+              <div style="font-size:10px;font-weight:700;color:${r.height==='None'?'#2E7D32':land.color};">${r.height}</div>
+            </div>
+            <div style="font-size:10px;color:var(--text-secondary,#555);">${r.note}</div>
+          </div>`).join('')}
+          <div style="font-size:10px;font-style:italic;color:var(--text-secondary,#888);margin-top:4px;">${land.tip}</div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const stratCard = document.createElement('div');
+    stratCard.style.cssText = 'background:linear-gradient(135deg,#1a1a2e,#C62828);border-radius:14px;margin-bottom:20px;padding:14px;color:#fff;';
+    stratCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;margin-bottom:8px;">🎬 Universal Studios Florida Strategy</div>
+    ${USF_STRATEGY.map(s=>`<div style="display:flex;gap:10px;margin-bottom:7px;align-items:flex-start;">
+      <span style="font-size:18px;flex-shrink:0;">${s.icon}</span>
+      <div style="font-size:11px;opacity:.95;line-height:1.5;">${s.tip}</div>
+    </div>`).join('')}`;
+    body.appendChild(stratCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-usf-deep')) buildScreen();
+
+  const _prevSS_uuuuuuu = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_uuuuuuu) _prevSS_uuuuuuu(name, el);
+    if (name === 'usf-deep') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-usf-deep');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectUSFCard() {
+    if (document.getElementById('usf-deep-home-card')) return true;
+    const ref = document.getElementById('fine-dining-home-card') || document.getElementById('ak-deep-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'usf-deep-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#1a1a2e,#C62828,#F57F17 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('usf-deep');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🎬</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Universal Studios Florida — Deep Dive</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Diagon Alley · Gringotts · Rip Ride Rockit · Mummy · Minions</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _usfCard = false;
+  setInterval(() => { if (!_usfCard) _usfCard = injectUSFCard(); }, 107000);
+  setTimeout(() => { _usfCard = injectUSFCard(); }, 103500);
+  const _prevRH_uuuuuuu = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_uuuuuuu) _prevRH_uuuuuuu.apply(this, arguments);
+    setTimeout(() => { _usfCard = false; _usfCard = injectUSFCard(); }, 37800);
+  };
+})();
+</script>
