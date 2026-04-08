@@ -47465,3 +47465,186 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK SSSS2: Orlando Best Breakfast & Brunch Guide ===== */
+(function initBreakfastGuide() {
+
+  const SPOTS = [
+    {
+      name:'The Ravenous Pig', neighborhood:'Winter Park', price:'$$', type:'Brunch',
+      emoji:'🐷', color:'#5D4037',
+      must:['Porchetta Toast (signature item)','Smoked Salmon Benedict','Housemade Granola with Florida Honey'],
+      tip:'One of the best brunches in the state of Florida. Reserve 2+ weeks out on OpenTable. Weekend waits without reservation are 45-90 min.',
+    },
+    {
+      name:'4 Rivers Smokehouse (Breakfast)', neighborhood:'Winter Park / Multiple', price:'$', type:'Breakfast',
+      emoji:'🥩', color:'#6D4C41',
+      must:['Brisket Breakfast Burrito','Smoked Brisket Hash','Homemade Biscuits with Gravy'],
+      tip:'Breakfast menu served until 10:30am. Arrive early — the line is worth it and moves fast. The brisket items are extraordinary.',
+    },
+    {
+      name:'Se7en Bites', neighborhood:'Milk District', price:'$', type:'Bakery & Brunch',
+      emoji:'🥐', color:'#E65100',
+      must:['Sweet or Savory Hand Pies','Breakfast Biscuit Sandwich','Daily Rotating Cakes and Pastries'],
+      tip:'A local legend. Tiny space, usually a wait. Best pastries in Orlando by common consensus. Check the daily specials board.',
+    },
+    {
+      name:'Reyes Mezcaleria', neighborhood:'Downtown Orlando', price:'$$', type:'Brunch',
+      emoji:'🌮', color:'#c62828',
+      must:['Chorizo & Egg Tacos','Mezcal Bloody Mary','Huevos Rancheros'],
+      tip:'The best Mexican brunch in Orlando. Creative mezcal-forward cocktail menu. Open on Sunday from 10am — arrive 30 min before to get on the list.',
+    },
+    {
+      name:'Stardust Video & Coffee', neighborhood:'Mills 50', price:'$', type:'Café & Brunch',
+      emoji:'☕', color:'#7B1FA2',
+      must:['Weekend Brunch Menu (varies)','Local Coffee Roast','Pastries from local bakeries'],
+      tip:'Beloved local institution. Come for the atmosphere — this is where Orlando locals actually gather. Outdoor seating, art on the walls, no pretense.',
+    },
+    {
+      name:'Homecomin\' by Art Smith (Disney Springs)', neighborhood:'Disney Springs', price:'$$', type:'Brunch',
+      emoji:'🍳', color:'#E65100',
+      must:['Fried Chicken & Doughnuts (signature)','Art\'s Famous Fried Chicken','Hummingbird Cake'],
+      tip:'No park ticket required. James Beard Award-winning chef. The fried chicken is legitimately one of the best in Florida. Weekend brunch is excellent.',
+    },
+    {
+      name:'The Boheme (Grand Bohemian Hotel)', neighborhood:'Downtown Orlando', price:'$$$', type:'Brunch',
+      emoji:'🎨', color:'#4A148C',
+      must:['Sunday Jazz Brunch (full menu)','Eggs Benedict variations','Bloody Mary Bar'],
+      tip:'Sunday Jazz Brunch is one of Orlando\'s most elegant experiences. Live jazz, beautiful art hotel interior, excellent cocktails. Book in advance.',
+    },
+    {
+      name:'Breakfast at Disney\'s Grand Floridian', neighborhood:'Magic Kingdom Resort Area', price:'$$$', type:'Character Breakfast',
+      emoji:'🏰', color:'#003087',
+      must:['1900 Park Fare character breakfast (Mary Poppins, Alice, Mad Hatter)','Grand Floridian Cafe full breakfast (no characters, cheaper)'],
+      tip:'1900 Park Fare gets you extremely rare character meets in a dining setting. Disney hotel guests can book 60 days out; day guests 60 days out too. Requires park ticket or hotel stay.',
+    },
+    {
+      name:'Greenery Cakes', neighborhood:'Audubon Park', price:'$', type:'Bakery',
+      emoji:'🎂', color:'#2E7D32',
+      must:['Seasonal Cakes and Tarts','Croissants and Pastries','Coffee'],
+      tip:'Small, beloved neighborhood bakery. Products sell out — arrive by 9am on weekends. One of Orlando\'s most Instagram-worthy bakeries but also genuinely excellent.',
+    },
+    {
+      name:'Lineage Coffee Roasting', neighborhood:'Audubon Park', price:'$', type:'Coffee & Light Bites',
+      emoji:'☕', color:'#5D4037',
+      must:['Single Origin Pour-Overs','Espresso Drinks','Light Pastries'],
+      tip:'The finest specialty coffee in Orlando. If you care about coffee, make a pilgrimage here. Multiple locations including Winter Park and Ivanhoe.',
+    },
+  ];
+
+  const PRE_PARK_SPOTS = [
+    { name:'Polite Pig (Disney Springs)', note:'Opens 11am — too late for early parks but great for Disney Springs arrival breakfast.' },
+    { name:'Starbucks (inside all parks)', note:'Available at park open. Mobile order to skip the line.' },
+    { name:'Sleepy Hollow Refreshments (MK)', note:'Open at rope drop. Funnel cake waffle sandwiches — the best quick park breakfast.' },
+    { name:'Sunshine Seasons (EPCOT)', note:'Opens with park. Excellent hot breakfast items, lower prices than most park restaurants.' },
+    { name:'Ronto Roasters (HS)', note:'Opens early and the Ronto Morning Wrap (egg, sausage, morning sauce) is outstanding.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-breakfast-guide';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const header = document.createElement('div');
+    header.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#E65100,#F4511E,#FFB300);padding:16px 14px 14px;';
+    header.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:#fff;">Best Breakfast & Brunch</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.85);">Local spots · Character dining · Park breakfasts</div>
+        </div>
+        <span style="font-size:24px;">🥞</span>
+      </div>`;
+
+    const content = document.createElement('div');
+    content.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    SPOTS.forEach(spot => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:10px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="background:${spot.color};padding:10px 14px;display:flex;align-items:center;gap:8px;">
+          <span style="font-size:22px;">${spot.emoji}</span>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:700;color:#fff;">${spot.name}</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.8);">📍 ${spot.neighborhood} · ${spot.type} · ${spot.price}</div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:7px;">
+            ${spot.must.map(m=>`<span style="padding:2px 8px;border-radius:20px;font-size:10px;background:${spot.color}12;color:${spot.color};font-weight:600;">${m}</span>`).join('')}
+          </div>
+          <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;font-style:italic;">"${spot.tip}"</div>
+        </div>`;
+      content.appendChild(card);
+    });
+
+    // Park breakfasts
+    const ppHeader = document.createElement('div');
+    ppHeader.style.cssText = 'font-size:13px;font-weight:800;color:#E65100;margin:14px 0 8px;';
+    ppHeader.textContent = '🎢 BEST PARK BREAKFASTS';
+    content.appendChild(ppHeader);
+
+    PRE_PARK_SPOTS.forEach(pp => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:12px;margin-bottom:8px;padding:10px 13px;border:1px solid var(--border,#eee);border-left:3px solid #E65100;';
+      card.innerHTML = `
+        <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:2px;">${pp.name}</div>
+        <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.4;">${pp.note}</div>`;
+      content.appendChild(card);
+    });
+
+    const spacer = document.createElement('div');
+    spacer.style.height = '20px';
+    content.appendChild(spacer);
+
+    s.appendChild(header);
+    s.appendChild(content);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-breakfast-guide')) buildScreen();
+
+  const _prevSS_ssss2 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_ssss2) _prevSS_ssss2(name, el);
+    if (name === 'breakfast-guide') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-breakfast-guide');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectBkfstCard() {
+    if (document.getElementById('bkfst-home-card')) return true;
+    const ref = document.getElementById('nature-home-card') || document.getElementById('ent-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'bkfst-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#E65100,#F4511E,#FFB300);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('breakfast-guide');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:3px;">🥞 Best Breakfast & Brunch</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.9);">Ravenous Pig · Se7en Bites · Character dining</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.5);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _bkfstCard = false;
+  setInterval(() => { if (!_bkfstCard) _bkfstCard = injectBkfstCard(); }, 33500);
+  setTimeout(() => { _bkfstCard = injectBkfstCard(); }, 30000);
+
+  const _prevRH_ssss2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_ssss2) _prevRH_ssss2.apply(this, arguments);
+    setTimeout(() => { _bkfstCard = false; _bkfstCard = injectBkfstCard(); }, 8300);
+  };
+})();
+</script>
