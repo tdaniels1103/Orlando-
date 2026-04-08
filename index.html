@@ -64376,3 +64376,326 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK BBBBBBBB: Orlando Honeymoon & Romance Guide ===== */
+(function initOrlandoRomance() {
+
+  const ROMANCE_EXPERIENCES = [
+    {
+      experience:'Cinderella Castle Suite', emoji:'🏰', color:'#C9A96E',
+      price:'Cannot be purchased — Disney gift only',
+      desc:'The suite inside Cinderella Castle is not available for standard booking. Disney awards it as a prize and gift to select guests — social media contests, Cast Member nominations, and surprise upgrades. If awarded, it\'s a two-bedroom suite with the most iconic view in theme park history.',
+      tip:'While the suite can\'t be purchased, staying at the Grand Floridian with a Castle-view room offers the next best Magic Kingdom morning view. Club Level at the Contemporary Hotel provides a similar luxury Disney experience.',
+    },
+    {
+      experience:'Private Fireworks Cruise', emoji:'🎆', color:'#003087',
+      price:'$399/hour (2-hour minimum) for up to 10 guests',
+      desc:'Private pontoon boat on the Seven Seas Lagoon during Disney\'s nighttime fireworks. Your boat captain positions you on the water between the Grand Floridian and Magic Kingdom for an unobstructed fireworks view above the lagoon. Champagne and snacks available.',
+      tip:'Book through Disney\'s direct recreation line. The 2-hour minimum includes the pre-fireworks sunset cruise around the lagoon. Couples typically book just the 2 hours centered on the fireworks show. The most romantic Disney experience money can actually buy.',
+    },
+    {
+      experience:'Victoria & Albert\'s Chef\'s Table Dinner', emoji:'⭐', color:'#7B1FA2',
+      price:'$450–650/person (wine pairings + 10-course tasting menu)',
+      desc:'Disney\'s only AAA Five Diamond restaurant. The Chef\'s Table is inside the kitchen — 4 seats maximum, directly adjacent to where the dishes are being prepared. Chef Matthew Sowers creates a personalized menu for each table. The most exclusive dining experience in Orlando.',
+      tip:'The Chef\'s Table (not the main dining room) requires a direct phone reservation: 407-939-3862. The main dining room opens at 60 days via MDE. Chef\'s Table requires weeks of advance planning and a phone call — but it\'s genuinely worth it for a milestone.',
+    },
+    {
+      experience:'Sunrise at Cinderella Castle', emoji:'🌅', color:'#E65100',
+      price:'Free (with park admission + Early Theme Park Entry)',
+      desc:'Arrive at Magic Kingdom at 7 AM (during Early Entry for Disney resort guests). The castle is fully lit and operational; the park is nearly empty. Photograph the castle with no crowds, experience the park\'s opening show, and walk Main Street in solitude before the masses arrive.',
+      tip:'Main Street USA at park open (7 AM with Early Entry) is one of the genuinely magical unscheduled Disney moments. Bring a quality camera. The light at dawn on the castle facade is extraordinary. Walk hand-in-hand down a completely empty Main Street.',
+    },
+    {
+      experience:'BoardWalk Evening Stroll', emoji:'🎡', color:'#2E7D32',
+      price:'Free',
+      desc:'Disney\'s BoardWalk resort area along Crescent Lake is a pedestrian boardwalk with restaurants, bars, street performers, and a view of EPCOT\'s fireworks. ESPN Club, Jellyrolls dueling pianos bar, and the open-air Atlantic Dance Hall are all along the water.',
+      tip:'The BoardWalk is technically accessible from EPCOT\'s International Gateway for free after 5 PM (walk out the back of the park). The EPCOT fireworks visible from the water are exceptional. Have dinner at the BoardWalk\'s Flying Fish restaurant and watch fireworks from the dock.',
+    },
+    {
+      experience:'Polynesian Villa Overwater Bungalow', emoji:'🌴', color:'#8B4513',
+      price:'$2,800–3,500+/night',
+      desc:'The Bora Bora Bungalows at Disney\'s Polynesian are built over the Seven Seas Lagoon on stilts — the only overwater bungalows at a US theme park resort. Private deck over the lagoon, views of Magic Kingdom, and fireworks visible from your private hot tub.',
+      tip:'The bungalows are among the most sought-after Disney accommodations. Book at 500 days for peak dates if you have a Disney resort reservation. The cost is substantial but the experience of watching fireworks from your private hot tub over the lagoon is genuinely singular.',
+    },
+  ];
+
+  const ROMANCE_DINING = [
+    {name:'Narcoossee\'s', note:'Waterfront seafood at the Grand Floridian. Outdoor dock seating. Fireworks visible from the water. Disney\'s most romantic restaurant setting.', price:'$$$'},
+    {name:'Capa at Four Seasons', note:'17th floor Spanish steakhouse. Window seats with Magic Kingdom fireworks view. Best non-Disney romantic dining in Orlando.', price:'$$$$'},
+    {name:'Ama-Ama at Four Seasons', note:'Pool deck restaurant. Dinner under the stars with Magic Kingdom fireworks visible. More casual than Capa.', price:'$$$'},
+    {name:'Citricos at Grand Floridian', note:'Mediterranean cuisine inside the Grand Floridian. Club Level access lobby piano music drifts in. Elegant and Disney-romantic.', price:'$$$'},
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-romance';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#C9A96E,#7B1FA2,#003087);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Honeymoon & Romance Guide</div>
+          <div style="font-size:11px;opacity:.8;">Fireworks cruise · V&A\'s · Bungalows · Castle sunrise · BoardWalk</div>
+        </div>
+        <span style="font-size:28px;">💕</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        Orlando is surprisingly excellent for romantic travel — Disney's nighttime atmosphere, private fireworks cruises, the Grand Floridian's Victorian elegance, and Victoria & Albert's are genuinely world-class romantic experiences.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    ROMANCE_EXPERIENCES.forEach(exp => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:9px 14px;background:${exp.color}18;border-left:4px solid ${exp.color};">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:20px;">${exp.emoji}</span>
+              <div style="font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${exp.experience}</div>
+            </div>
+            <div style="font-size:10px;font-weight:700;color:${exp.color};">${exp.price}</div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          <div style="font-size:11px;color:var(--text-secondary,#444);line-height:1.6;margin-bottom:7px;">${exp.desc}</div>
+          <div style="display:flex;gap:5px;background:${exp.color}0d;border-radius:8px;padding:7px;">
+            <span style="font-size:11px;flex-shrink:0;">💡</span>
+            <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${exp.tip}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const diningCard = document.createElement('div');
+    diningCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+    diningCard.innerHTML = `<div style="padding:9px 14px;background:#C9A96E18;border-left:4px solid #C9A96E;">
+      <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">🕯️ Romantic Dinner Destinations</div>
+    </div>
+    <div style="padding:8px 14px;">
+      ${ROMANCE_DINING.map(d=>`<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--border,#f5f5f5);">
+        <div style="flex:1;margin-right:8px;">
+          <div style="font-size:12px;font-weight:700;color:#C9A96E;">${d.name}</div>
+          <div style="font-size:10px;color:var(--text-secondary,#555);">${d.note}</div>
+        </div>
+        <div style="font-size:12px;font-weight:700;color:#C9A96E;flex-shrink:0;">${d.price}</div>
+      </div>`).join('')}
+    </div>`;
+    body.appendChild(diningCard);
+
+    const tipsCard = document.createElement('div');
+    tipsCard.style.cssText = 'background:linear-gradient(135deg,#C9A96E,#7B1FA2);border-radius:14px;margin-bottom:20px;padding:14px;color:#fff;';
+    tipsCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;margin-bottom:8px;">💕 Romance Tips</div>
+    ${[
+      {icon:'💐', text:'Many Disney hotels offer honeymoon/anniversary decoration packages — rose petals, champagne, cake in the room. Book through the Disney Floral & Gifts line (407-939-4438) at least 2 weeks before arrival.'},
+      {icon:'🎪', text:'The Electrical Water Pageant (7-star lagoon light parade) is a free nightly show on Seven Seas Lagoon visible from the Grand Floridian, Polynesian, and Wilderness Lodge. 9 PM most evenings.'},
+      {icon:'📸', text:'Disney\'s PhotoPass photographers are positioned at the castle and Main Street arch specifically for romantic photos. They\'re skilled at couples photography — ask for a specific pose or setting.'},
+    ].map(t=>`<div style="display:flex;gap:10px;margin-bottom:7px;align-items:flex-start;">
+      <span style="font-size:18px;flex-shrink:0;">${t.icon}</span>
+      <div style="font-size:11px;opacity:.95;line-height:1.5;">${t.text}</div>
+    </div>`).join('')}`;
+    body.appendChild(tipsCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-romance')) buildScreen();
+
+  const _prevSS_bbbbbbbb = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_bbbbbbbb) _prevSS_bbbbbbbb(name, el);
+    if (name === 'romance') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-romance');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectRomCard() {
+    if (document.getElementById('romance-home-card')) return true;
+    const ref = document.getElementById('solo-travel-home-card') || document.getElementById('accessibility-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'romance-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#C9A96E,#7B1FA2,#003087 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('romance');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">💕</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Honeymoon & Romance Guide</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Fireworks cruise · V&A\'s · Bungalows · Castle sunrise · BoardWalk</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _romCard = false;
+  setInterval(() => { if (!_romCard) _romCard = injectRomCard(); }, 114000);
+  setTimeout(() => { _romCard = injectRomCard(); }, 110500);
+  const _prevRH_bbbbbbbb = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_bbbbbbbb) _prevRH_bbbbbbbb.apply(this, arguments);
+    setTimeout(() => { _romCard = false; _romCard = injectRomCard(); }, 40600);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK CCCCCCCC: Orlando for Groups — Corporate & Family Reunions ===== */
+(function initOrlandoGroups() {
+
+  const GROUP_TIERS = [
+    {
+      type:'Family Reunion (15–50 people)', emoji:'👨‍👩‍👧‍👦', color:'#003087',
+      logistics:[
+        {label:'Best park choice', value:'Magic Kingdom (widest age range appeal) or EPCOT (World Showcase provides natural group dispersal without forced togetherness)'},
+        {label:'Disney Group Reservations', value:'Groups of 10+ qualify for group ticket discounts (typically 5–15%). Contact Disney Group Sales: 407-939-7129 or through authorized travel agents who handle groups.'},
+        {label:'Splitting the group', value:'Large family reunions rarely succeed as a single unit all day. Plan an agreed meeting point (specific restaurant or attraction) at noon and 6 PM. Between those times, sub-groups explore independently.'},
+        {label:'Character dining', value:'Advance reservations for 20+ people require calling Disney dining at 407-939-3463. Chef Mickey\'s (Contemporary) accommodates large tables and provides 5 character interactions — the most character coverage per person at a single sitting.'},
+      ],
+      tip:'The most successful family reunions at Disney designate one person as the "logistics coordinator" — the only one with the My Disney Experience app open, making restaurant calls, and managing Lightning Lane. Everyone else enjoys the parks.',
+    },
+    {
+      type:'Corporate Groups (50–500 people)', emoji:'💼', color:'#7B1FA2',
+      logistics:[
+        {label:'Private park events', value:'Disney\'s After Hours events for corporate groups can reserve Magic Kingdom exclusively (minimum 1,500 guests, $500,000+). Smaller corporate events (200+) can reserve specific venues: EPCOT\'s American Adventure Pavilion, Animal Kingdom\'s Discovery Island.'},
+        {label:'Hard Rock Hotel buyout', value:'Universal\'s Hard Rock Hotel hosts corporate events and convention groups. The pool area and private event space are among the best convention hotel venues in Florida.'},
+        {label:'ESPN Wide World of Sports', value:'Disney\'s sports complex (formerly Wide World of Sports) hosts corporate events, team-building activities, and large group functions outside the main parks.'},
+        {label:'Disney Private Dining', value:'For groups of 25–300, private spaces at Disney\'s resort restaurants can be reserved. The Contemporary Resort\'s California Grill private dining room has the most dramatic setting for corporate dinners.'},
+      ],
+      tip:'Convention Center hotels (Disney\'s Coronado Springs, Rosen Shingle Creek, Marriott World Center) are within 15 minutes of all parks. They provide the meeting infrastructure while the parks provide group activities without additional coordination.',
+    },
+    {
+      type:'Bachelorette / Bachelor Group (8–20 people)', emoji:'🥂', color:'#C62828',
+      logistics:[
+        {label:'Magic Kingdom / EPCOT combo', value:'Drinking around EPCOT\'s World Showcase (11 countries, 1 drink each) is the most popular Disney bachelorette activity. Food & Wine Festival makes this even better.'},
+        {label:'Universal after-hours', value:'Universal\'s Hard Rock Hotel pool area for daytime, then CityWalk bar-hopping (Antojitos, NBC Sports, Rising Star karaoke) for evening. Within walking distance.'},
+        {label:'Specialty items', value:'Savi\'s Workshop lightsaber experience ($299) for the group\'s Star Wars fans. Butterbeer bar-crawl in Diagon Alley and Hogsmeade is a legitimate organized activity.'},
+        {label:'Airboat + Tampa combo', value:'Boggy Creek airboat tours (near Disney, 20 people max per tour) followed by Ybor City dinner in Tampa. Best non-park bachelor/bachelorette day trip in the area.'},
+      ],
+      tip:'Disney celebrates bachelorette parties enthusiastically — Cast Members often upgrade desserts, send complimentary items, and arrange special moments when informed of the occasion. Always let dining and hotel staff know.',
+    },
+  ];
+
+  const GROUP_TIPS = [
+    {icon:'📱', tip:'Create a shared group chat before arrival. Share the daily plan, meeting points, and emergency contacts. The group chat prevents 30 separate "where are you?" texts and establishes a real-time coordination system.'},
+    {icon:'🎟️', tip:'Group tickets must typically be purchased through Disney Group Sales (10+ people) or authorized travel agents. DO NOT buy individual tickets for a group — the group rate can save $10–30/person. For 20+ people, this is $200–600+ in savings.'},
+    {icon:'🍽️', tip:'Restaurant reservations for groups of 8+ require calling. The MDE app caps party size at 10 online. For parties of 11–20, always call the restaurant directly 60 days before. Some Disney restaurants have private dining rooms for groups of 20+.'},
+    {icon:'⏰', tip:'Groups move 2–3× slower than individuals. A 10-minute attraction takes 25 minutes for a group of 15 to coordinate entry, return, and regroup. Plan your day with 50% fewer activities than you think you need.'},
+    {icon:'🎉', tip:'Disney\'s Wishes program (for corporate events) and Disney Celebrations (for personal milestones) can arrange private character appearances, personalized fireworks viewing, and custom park experiences. Start planning 6+ months in advance.'},
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-groups';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#003087,#7B1FA2,#C62828);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Groups, Reunions & Corporate Events</div>
+          <div style="font-size:11px;opacity:.8;">Family reunions · Corporate groups · Bachelorette · Group tickets</div>
+        </div>
+        <span style="font-size:28px;">👥</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        Groups of 10+ qualify for Disney and Universal's dedicated group ticketing programs with discounts, private venue bookings, and coordinated logistics support. The key is knowing the group sales channels before you arrive.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    GROUP_TIERS.forEach(tier => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:9px 14px;background:${tier.color}18;border-left:4px solid ${tier.color};">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:20px;">${tier.emoji}</span>
+            <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${tier.type}</div>
+          </div>
+        </div>
+        <div style="padding:8px 14px;">
+          ${tier.logistics.map(l=>`<div style="margin-bottom:7px;padding-bottom:7px;border-bottom:1px solid var(--border,#f5f5f5);">
+            <div style="font-size:10px;font-weight:700;color:${tier.color};margin-bottom:2px;">${l.label}</div>
+            <div style="font-size:10px;color:var(--text-secondary,#555);line-height:1.5;">${l.value}</div>
+          </div>`).join('')}
+          <div style="display:flex;gap:5px;background:${tier.color}0d;border-radius:8px;padding:6px;margin-top:4px;">
+            <span style="font-size:11px;flex-shrink:0;">💡</span>
+            <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${tier.tip}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const tipsCard = document.createElement('div');
+    tipsCard.style.cssText = 'background:linear-gradient(135deg,#003087,#C62828);border-radius:14px;margin-bottom:20px;padding:14px;color:#fff;';
+    tipsCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;margin-bottom:8px;">👥 Group Success Tips</div>
+    ${GROUP_TIPS.map(t=>`<div style="display:flex;gap:10px;margin-bottom:7px;align-items:flex-start;">
+      <span style="font-size:18px;flex-shrink:0;">${t.icon}</span>
+      <div style="font-size:11px;opacity:.95;line-height:1.5;">${t.tip}</div>
+    </div>`).join('')}`;
+    body.appendChild(tipsCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-groups')) buildScreen();
+
+  const _prevSS_cccccccc = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_cccccccc) _prevSS_cccccccc(name, el);
+    if (name === 'groups') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-groups');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectGRPCard() {
+    if (document.getElementById('groups-home-card')) return true;
+    const ref = document.getElementById('romance-home-card') || document.getElementById('solo-travel-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'groups-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#003087,#7B1FA2,#C62828 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('groups');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">👥</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Groups, Reunions & Corporate Events</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Family reunions · Corporate · Bachelorette · Group tickets</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _grpCard = false;
+  setInterval(() => { if (!_grpCard) _grpCard = injectGRPCard(); }, 115000);
+  setTimeout(() => { _grpCard = injectGRPCard(); }, 111500);
+  const _prevRH_cccccccc = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_cccccccc) _prevRH_cccccccc.apply(this, arguments);
+    setTimeout(() => { _grpCard = false; _grpCard = injectGRPCard(); }, 41000);
+  };
+})();
+</script>
