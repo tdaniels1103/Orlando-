@@ -49366,3 +49366,186 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK CCCCC: Animal Kingdom Deep Dive Guide ===== */
+(function initAnimalKingdom() {
+
+  const LANDS = [
+    {
+      name:"Discovery Island", emoji:'🌳', color:'#2E7D32',
+      desc:'The hub of Animal Kingdom. Home to the iconic Tree of Life and the transition point to all other lands.',
+      highlights:[
+        { name:'Tree of Life', note:'325 animal carvings in the bark. Sit underneath and look for animals you know.' },
+        { name:"It's Tough to Be a Bug!", note:'3D bug show inside the Tree of Life. Genuinely frightening for very young children (consider skipping for under 4s).' },
+        { name:'Discovery Island Trail', note:'Walking trail around the Tree of Life. Actual animals including meerkats, kangaroos (wallabies), and reptiles in naturalistic habitats.' },
+      ]
+    },
+    {
+      name:'Africa', emoji:'🦁', color:'#E65100',
+      desc:'The largest "land" at Animal Kingdom. Houses Kilimanjaro Safaris and extensive animal viewing.',
+      highlights:[
+        { name:'Kilimanjaro Safaris', note:'The crown jewel. Open-vehicle safari through 110 acres with free-roaming animals. Do at rope drop for the most active animals.' },
+        { name:'Gorilla Falls Exploration Trail', note:'Free walking trail through gorilla, hippo, and bird habitats. Most guests skip this — a genuine missed opportunity.' },
+        { name:"Harambe Market", note:'Outdoor food market with excellent counter-service (ribs, corn, African-spiced chicken). Some of the best quick-service food in any Disney park.' },
+        { name:'Dawa Bar', note:'Outdoor bar in the Africa area. African-inspired cocktails, craft beer. Hidden gem for adults who need a break from rides.' },
+      ]
+    },
+    {
+      name:'Asia', emoji:'🐯', color:'#1565C0',
+      desc:'Home to the park\'s two major thrill rides and Kali River Rapids.',
+      highlights:[
+        { name:'Expedition Everest', note:'The park\'s signature coaster. Forward and backward sections, Yeti encounter. Height: 44". Get LL or arrive at rope drop.' },
+        { name:'Kali River Rapids', note:'Raft ride — you WILL get wet. Best on hot days. Height: 38". Change of clothes recommended.' },
+        { name:'Maharajah Jungle Trek', note:'Free walking trail through tiger, bat, and bird habitats. The tigers can often be seen up close through glass panels.' },
+        { name:'Finding Nemo: The Big Blue... and Beyond!', note:'Musical show in a 1,500-seat theater. Seasonal schedule. Good for resting feet during the heat of the day.' },
+      ]
+    },
+    {
+      name:'Pandora – The World of Avatar', emoji:'🌿', color:'#7B1FA2',
+      desc:'The most immersive land Disney has ever built. Based on the Avatar film franchise. Best at night.',
+      highlights:[
+        { name:'Avatar Flight of Passage', note:'The #1 ride at Animal Kingdom. Motorcycle banshee flight over Pandora. The single most immersive ride Disney has made. Height: 44".' },
+        { name:"Na'vi River Journey", note:'Gentle boat ride through glowing Pandora rivers. Best experienced in the dark (evening). Queue rarely exceeds 20 min after 7pm.' },
+        { name:'Pongu Pongu Bar', note:'Outdoor bar with bioluminescent cocktails. The Night Blossom (non-alcoholic) is beautiful. Get a photo of the glowing Luminous Lekku drink.' },
+        { name:'Pandora at Night', note:'After dark, the entire land glows with bio-luminescent lighting. Ground panels, plant walls, and building surfaces all transform. Stay until closing.' },
+      ]
+    },
+    {
+      name:'DinoLand U.S.A.', emoji:'🦕', color:'#F57F17',
+      desc:'Dinosaur-themed land. Somewhat dated but has the park\'s best dark ride.',
+      highlights:[
+        { name:'DINOSAUR', note:'Intense time-travel dark ride to the Cretaceous era. Height: 40". Loud and dark — younger children (under 6) are often frightened.' },
+        { name:'The Boneyard', note:'Free-play archaeological dig for kids. Best for ages 3–9. Great way for adults to relax while kids burn energy.' },
+        { name:'Dino-Soar', note:'Standard flying dumbo-style ride for younger kids. No height requirement.' },
+      ]
+    },
+  ];
+
+  const AK_TIPS = [
+    { icon:'🌅', tip:'Kilimanjaro Safaris first — always. Animals are most active in the morning cool. Waits are shortest at rope drop.' },
+    { icon:'⚡', tip:'Avatar Flight of Passage Lightning Lane is the most essential at AK. Buy it before entering the park.' },
+    { icon:'🦁', tip:'The African wildlife viewing at Gorilla Falls is as impressive as many dedicated zoos — and completely free with your park admission. Don\'t skip it.' },
+    { icon:'🌙', tip:'Pandora at night is Animal Kingdom\'s best-kept secret. The bioluminescence transforms the land. Plan your second visit to Pandora after 7pm.' },
+    { icon:'🍖', tip:'Harambe Market serves some of the best quick-service food in any Disney park. The Ribs and Mac & Cheese platter is extraordinary.' },
+    { icon:'🐅', tip:'Tigers at Maharajah Jungle Trek are most active in the morning. The habitat has multiple viewing windows — spend 10 minutes here.' },
+    { icon:'📸', tip:'The best Animal Kingdom photo: the Tree of Life at golden hour (6-7pm). The animal carvings catch warm light beautifully.' },
+    { icon:'🦒', tip:'Kilimanjaro Safaris animals include giraffes, elephants, hippos, lions, and cheetahs — all in 110 acres that feel completely wild. No fences visible from the vehicle.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-animal-kingdom';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const header = document.createElement('div');
+    header.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#1B5E20,#2E7D32,#558B2F);padding:16px 14px 14px;';
+    header.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:#fff;">Animal Kingdom Deep Dive</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">5 lands · Safari · Avatar · Pro tips</div>
+        </div>
+        <span style="font-size:24px;">🦁</span>
+      </div>
+      <div style="background:rgba(255,255,255,.12);border-radius:8px;padding:7px 12px;font-size:11px;color:rgba(255,255,255,.9);">
+        Animal Kingdom is regularly underestimated. Flight of Passage is Disney's best ride, the safari is genuinely wild, and Pandora at night is breathtaking. One full day is the minimum.
+      </div>`;
+
+    const content = document.createElement('div');
+    content.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    // Tips card
+    const tipsCard = document.createElement('div');
+    tipsCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;padding:12px 14px;margin-bottom:14px;border:1px solid var(--border,#eee);';
+    tipsCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:8px;">🌿 AK Expert Tips</div>`;
+    AK_TIPS.forEach(t => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;gap:8px;margin-bottom:7px;align-items:flex-start;';
+      row.innerHTML = `<span style="font-size:16px;">${t.icon}</span><div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${t.tip}</div>`;
+      tipsCard.appendChild(row);
+    });
+    content.appendChild(tipsCard);
+
+    // Lands
+    LANDS.forEach(land => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+
+      const lh = document.createElement('div');
+      lh.style.cssText = `background:${land.color};padding:10px 14px;display:flex;align-items:center;gap:8px;`;
+      lh.innerHTML = `
+        <span style="font-size:22px;">${land.emoji}</span>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:#fff;">${land.name}</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.8);">${land.desc.substring(0,60)}...</div>
+        </div>`;
+      card.appendChild(lh);
+
+      const lb = document.createElement('div');
+      lb.style.cssText = 'padding:10px 14px;';
+      land.highlights.forEach((h, idx) => {
+        const row = document.createElement('div');
+        row.style.cssText = `padding:6px 0;${idx < land.highlights.length-1 ? 'border-bottom:1px solid var(--border,#f0f0f0);' : ''}`;
+        row.innerHTML = `
+          <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:2px;">${h.name}</div>
+          <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.4;">${h.note}</div>`;
+        lb.appendChild(row);
+      });
+      card.appendChild(lb);
+      content.appendChild(card);
+    });
+
+    const spacer = document.createElement('div');
+    spacer.style.height = '20px';
+    content.appendChild(spacer);
+
+    s.appendChild(header);
+    s.appendChild(content);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-animal-kingdom')) buildScreen();
+
+  const _prevSS_ccccc = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_ccccc) _prevSS_ccccc(name, el);
+    if (name === 'animal-kingdom') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-animal-kingdom');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectAKCard() {
+    if (document.getElementById('ak-home-card')) return true;
+    const ref = document.getElementById('kids-act-home-card') || document.getElementById('secret-rest-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'ak-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#1B5E20,#2E7D32,#558B2F);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('animal-kingdom');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:3px;">🦁 Animal Kingdom Deep Dive</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.85);">Safari · Avatar · Pandora at night · Expert tips</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.5);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _akCard = false;
+  setInterval(() => { if (!_akCard) _akCard = injectAKCard(); }, 38500);
+  setTimeout(() => { _akCard = injectAKCard(); }, 35000);
+
+  const _prevRH_ccccc = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_ccccc) _prevRH_ccccc.apply(this, arguments);
+    setTimeout(() => { _akCard = false; _akCard = injectAKCard(); }, 10300);
+  };
+})();
+</script>
