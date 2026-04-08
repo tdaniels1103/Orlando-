@@ -56252,3 +56252,421 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK JJJJJJ: Orlando Fireworks & Nighttime Shows Guide ===== */
+(function initOrlandoFireworks() {
+
+  const SHOWS = [
+    {
+      name:'Disney Enchantment', park:'Magic Kingdom', emoji:'✨', color:'#003087',
+      time:'Usually 9 PM (check schedule)',
+      duration:'16 minutes',
+      desc:'Magic Kingdom\'s signature nighttime spectacular. Cinderella Castle transforms through projection mapping while fireworks explode overhead. Tinker Bell flies across the sky at the opening.',
+      bestSpot:'Main Street USA, centered in front of the castle. Arrive 45–60 minutes early for front-center position.',
+      secret:'The Plaza Restaurant area and the bridge between the hub and Tomorrowland both have excellent unobstructed views with less crowd density than Main Street center. The Polynesian resort beach gives a unique lagoon-framed perspective.',
+      tip:'Lightning Lane Premier (LLP) now includes a reserved fireworks viewing area in front of the castle. Worth considering if you arrive late or want guaranteed front-row access.',
+    },
+    {
+      name:'EPCOT Forever / Luminous', park:'EPCOT', emoji:'🎆', color:'#1565C0',
+      time:'Usually 9 PM (seasonal)',
+      duration:'12–15 minutes',
+      desc:'World Showcase lagoon show combining fireworks, lasers, and massive projection illumination. The lagoon acts as a mirror for the colors. One of the most technically complex shows at any park.',
+      bestSpot:'Between the France and UK pavilions on the World Showcase promenade — lagoon-edge position. Or rose garden area near Italy Pavilion for a slightly elevated view.',
+      secret:'The Japanese Torii gate reflection in the lagoon during the show is a legendary photograph. Position yourself with the gate framing the fireworks over the water. It requires Japan Pavilion lakeside positioning.',
+      tip:'The EPCOT show schedule changes seasonally. During festivals (Food & Wine, Flower & Garden), the show may be modified or replaced. Check the official schedule within 24 hours of your visit.',
+    },
+    {
+      name:'Fantasmic!', park:'Hollywood Studios', emoji:'🔥', color:'#C62828',
+      time:'Usually 8 PM + 10 PM on busy nights',
+      duration:'26 minutes',
+      desc:'The longest nighttime show at Walt Disney World. Mickey Mouse dreams — then the villains try to take over. Water screens, projection mapping, live characters, and pyrotechnics in a dedicated amphitheater.',
+      bestSpot:'Center of the Hollywood Hills Amphitheater, 10–15 rows up. Far enough back to see the full water screen without neck strain.',
+      secret:'The Fantasmic Dining Package at Hollywood & Vine or Mama Melrose\'s includes reserved seating in the Fantasmic! VIP section. The included meal is average, but the seating position is premium.',
+      tip:'Fantasmic! is CANCELLED in rain. Hollywood Studios afternoon thunderstorms can kill the show. Have a backup plan. The show can be extremely hot — the amphitheater traps heat on summer nights.',
+    },
+    {
+      name:'Rivers of Light', park:'Animal Kingdom', emoji:'🌿', color:'#2E7D32',
+      time:'Usually 8:30 PM (select nights)',
+      duration:'17 minutes',
+      desc:'Animal Kingdom\'s lantern-based water show on Discovery River. Less pyrotechnic, more meditative. Giant floating spirit animals, water fountain effects, and nature-themed projections.',
+      bestSpot:'Any seat in the dedicated amphitheater is good. The show is visible from Discovery Island waterside — some guests watch from outside the ticketed seating area.',
+      secret:'Animal Kingdom closes earlier than other parks — Rivers of Light often runs on limited nights. Always verify the park\'s schedule as it may not operate every night.',
+      tip:'The show has a different energy than other Disney nighttime shows — quieter, more atmospheric. Perfect for ending an Animal Kingdom day on a peaceful note rather than a high-energy fireworks show.',
+    },
+    {
+      name:'Universal\'s Cinematic Spectacular', park:'Universal Studios Florida', emoji:'🎬', color:'#7B1FA2',
+      time:'Park closing time',
+      duration:'18 minutes',
+      desc:'Water screen show on the lagoon in front of the park. Universal film music synchronized to projection mapping and water fountains. Scenes from Universal\'s biggest franchises.',
+      bestSpot:'Central Park area in Universal Studios. The entire lagoon-facing area provides good views.',
+      secret:'The Cinematic Spectacular is only shown on select nights and during peak seasons. Not a nightly event — check the Universal app day-of for show times.',
+      tip:'Universal occasionally runs special event shows (New Year\'s Eve, Mardi Gras) that surpass the standard Cinematic Spectacular in production value. Mardi Gras concerts are free with park admission.',
+    },
+    {
+      name:'SeaWorld\'s Ignite', park:'SeaWorld Orlando', emoji:'🐋', color:'#0277BD',
+      time:'Park closing (select nights)',
+      duration:'20 minutes',
+      desc:'SeaWorld\'s nighttime spectacular features projection mapping on a giant water curtain with fireworks and marine life imagery. Unique perspective compared to the Disney/Universal shows.',
+      bestSpot:'Center of the lagoon viewing area near Shamu Stadium. Arrive 20 minutes before showtime.',
+      secret:'SeaWorld\'s shows vary significantly by season. Summer and holiday periods get the full production; spring shoulder season may have a reduced show or none at all.',
+      tip:'SeaWorld\'s crowd is much smaller than Disney or Universal for nighttime shows. You can often walk up 5 minutes before with a perfectly good spot — a rare luxury in Orlando entertainment.',
+    },
+  ];
+
+  const VIEWING_SPOTS = [
+    {
+      name:'Seven Seas Lagoon (Polynesian Beach)', emoji:'🌊', park:'Magic Kingdom',
+      desc:'Watch Enchantment from the Polynesian or Grand Floridian resort beach. No park ticket required for resort beach access. The castle appears smaller but the lagoon reflection and firework spread across the sky is extraordinary.',
+      access:'Free for resort guests; day visitors can walk to the beach from the TTC area.',
+    },
+    {
+      name:'Contemporary Resort Rooftop Bar', emoji:'🍹', park:'Magic Kingdom',
+      desc:'California Grill restaurant on the 15th floor of the Contemporary Resort dims its lights and plays the fireworks soundtrack during Enchantment. Hotel guests can access the observation deck.',
+      access:'Dinner reservation at California Grill includes rooftop fireworks access.',
+    },
+    {
+      name:'EPCOT Japan Pavilion Lagoon Edge', emoji:'⛩️', park:'EPCOT',
+      desc:'The Torii gate at night with fireworks reflects over the lagoon. The most iconic EPCOT fireworks photograph location. Competitive for position.',
+      access:'Park ticket required. Arrive 30+ minutes before show.',
+    },
+    {
+      name:'Disney Springs Rooftop Parking', emoji:'🅿️', park:'Magic Kingdom area',
+      desc:'On clear nights, you can sometimes see distant Magic Kingdom fireworks from the top level of Disney Springs parking structures. Zero cost, zero crowds.',
+      access:'Free parking at Disney Springs.',
+    },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-fireworks';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:#060612;flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;color:#fff;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#060612,#1a1a4a,#003087);padding:16px 14px 14px;border-bottom:1px solid rgba(100,100,255,.2);';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Fireworks & Nighttime Shows</div>
+          <div style="font-size:11px;opacity:.7;">Enchantment · EPCOT Forever · Fantasmic! · Best viewing spots</div>
+        </div>
+        <span style="font-size:28px;">🎆</span>
+      </div>
+      <div style="background:rgba(255,255,255,.1);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;color:rgba(255,255,255,.9);">
+        Orlando's nighttime shows are some of the most technically advanced entertainment in the world. Knowing where to stand — and which spots outside the parks give views for free — transforms the experience.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    SHOWS.forEach(show => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:16px;margin-bottom:14px;overflow:hidden;';
+      card.innerHTML = `
+        <div style="padding:10px 14px;background:${show.color}50;border-left:4px solid ${show.color};">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div style="display:flex;gap:8px;align-items:center;">
+              <span style="font-size:22px;">${show.emoji}</span>
+              <div>
+                <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:#fff;">${show.name}</div>
+                <div style="font-size:10px;color:rgba(255,255,255,.6);">${show.park} · ${show.time}</div>
+              </div>
+            </div>
+            <span style="font-size:10px;background:rgba(255,255,255,.15);padding:3px 8px;border-radius:20px;color:rgba(255,255,255,.8);">${show.duration}</span>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          <div style="font-size:12px;color:rgba(255,255,255,.8);line-height:1.6;margin-bottom:8px;">${show.desc}</div>
+          <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.4);margin-bottom:3px;">BEST VIEWING SPOT</div>
+          <div style="font-size:12px;color:rgba(255,255,255,.75);margin-bottom:8px;">${show.bestSpot}</div>
+          <div style="display:flex;gap:6px;background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.2);border-radius:8px;padding:7px;margin-bottom:6px;">
+            <span style="font-size:12px;flex-shrink:0;">🌟</span>
+            <div style="font-size:11px;color:rgba(255,215,0,.9);line-height:1.5;">${show.secret}</div>
+          </div>
+          <div style="display:flex;gap:6px;background:rgba(255,255,255,.06);border-radius:8px;padding:7px;">
+            <span style="font-size:11px;flex-shrink:0;">💡</span>
+            <div style="font-size:11px;color:rgba(255,255,255,.6);line-height:1.5;">${show.tip}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const freeCard = document.createElement('div');
+    freeCard.style.cssText = 'background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:16px;margin-bottom:14px;overflow:hidden;';
+    freeCard.innerHTML = `<div style="padding:12px 14px;background:linear-gradient(135deg,#1a1a4a,#003087);">
+      <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;">🆓 Free & Off-Site Viewing Spots</div>
+    </div>
+    <div style="padding:12px 14px;">
+      ${VIEWING_SPOTS.map(v=>`<div style="margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.07);">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+          <span style="font-size:18px;">${v.emoji}</span>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:#fff;">${v.name}</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.5);">${v.park}</div>
+          </div>
+        </div>
+        <div style="font-size:12px;color:rgba(255,255,255,.7);line-height:1.5;padding-left:26px;margin-bottom:4px;">${v.desc}</div>
+        <div style="font-size:11px;color:rgba(100,200,100,.9);padding-left:26px;">${v.access}</div>
+      </div>`).join('')}
+    </div>`;
+    body.appendChild(freeCard);
+
+    const calCard = document.createElement('div');
+    calCard.style.cssText = 'background:linear-gradient(135deg,#060612,#1a1a4a,#003087);border:1px solid rgba(100,100,255,.3);border-radius:16px;margin-bottom:20px;padding:14px;';
+    calCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">📅 Show Schedule Tips</div>
+    ${[
+      {icon:'📱', tip:'Always check the My Disney Experience and Universal apps day-of. Shows are subject to cancellation due to weather, technical issues, or special events. Never assume.'},
+      {icon:'⛈️', tip:'Afternoon thunderstorms (June–September) frequently delay or cancel evening shows. Shows usually resume if storms clear by 7 PM, but get delayed by 30–60 minutes.'},
+      {icon:'🗓️', tip:'Disney runs nighttime shows every night during peak season but may reduce to select nights during slower periods (January, February, September). Verify for your exact dates.'},
+      {icon:'🌟', tip:'Holiday overlays are the best versions of these shows. Mickey\'s Very Merry Christmas Party fireworks (Enchantment holiday version) are significantly enhanced compared to the standard show.'},
+    ].map(t=>`<div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
+      <span style="font-size:18px;flex-shrink:0;">${t.icon}</span>
+      <div style="font-size:12px;opacity:.9;line-height:1.5;">${t.tip}</div>
+    </div>`).join('')}`;
+    body.appendChild(calCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-fireworks')) buildScreen();
+
+  const _prevSS_jjjjjj = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_jjjjjj) _prevSS_jjjjjj(name, el);
+    if (name === 'fireworks') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-fireworks');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectFireworksCard() {
+    if (document.getElementById('fireworks-home-card')) return true;
+    const ref = document.getElementById('resort-hotels-home-card') || document.getElementById('uap-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'fireworks-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#060612,#1a1a4a,#003087);border-radius:16px;padding:14px;cursor:pointer;border:1px solid rgba(100,100,255,.3);';
+    card.onclick = () => window.showScreen('fireworks');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🎆</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Fireworks & Nighttime Shows</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.75);">Enchantment · EPCOT Forever · Fantasmic! · Free viewing spots</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.5);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _fireworksCard = false;
+  setInterval(() => { if (!_fireworksCard) _fireworksCard = injectFireworksCard(); }, 70000);
+  setTimeout(() => { _fireworksCard = injectFireworksCard(); }, 66500);
+  const _prevRH_jjjjjj = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_jjjjjj) _prevRH_jjjjjj.apply(this, arguments);
+    setTimeout(() => { _fireworksCard = false; _fireworksCard = injectFireworksCard(); }, 23000);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK KKKKKK: Disney Dining Plan Complete Guide ===== */
+(function initDisneyDiningPlan() {
+
+  const DDP_TIERS = [
+    {
+      name:'Quick-Service Dining Plan', emoji:'🍔', color:'#F57F17',
+      price:'~$57/person/night (adults), ~$24/person/night (ages 3–9)',
+      includes:'2 Quick-Service meals per night + 2 snack/drink credits per night',
+      bestFor:'Families with younger children, casual eaters, visitors who prefer flexibility',
+      NOT:'Does not include table service restaurants, character dining, or signature restaurants',
+      math:'A typical quick-service meal at Disney runs $15–20/person. Two meals = $30–40. The plan costs $57/night — value requires you to use every credit and order high-priced items.',
+      tip:'Only worth it if you are disciplined about using every single credit. Miss one QS meal? You\'ve likely broken even or lost money. Best used for counter-service family visits where kids eat the full kids\' meal each time.',
+    },
+    {
+      name:'Disney Dining Plan', emoji:'🍽️', color:'#1565C0',
+      price:'~$94/person/night (adults), ~$36/person/night (ages 3–9)',
+      includes:'1 Table Service meal + 1 Quick-Service meal + 1 snack/drink credit per night',
+      bestFor:'Families wanting one sit-down meal per day, visitors to character dining',
+      NOT:'Does not include signature restaurants (2-credit), EPCOT festivals food booths, or alcohol',
+      math:'A typical table service meal (including appetizer, entree, dessert, non-alcoholic drink) runs $55–75/person. A QS meal $15–20. Add a snack ($6). Total value: ~$80–105 for a $94 plan cost.',
+      tip:'Table service credits are the engine of this plan. Book a character dining experience (which charges 1 TS credit per person) and the entertainment value dramatically increases the math. Cinderella\'s Royal Table at $65+/person becomes much more justifiable.',
+    },
+    {
+      name:'Deluxe Dining Plan', emoji:'👑', color:'#C9A96E',
+      price:'~$129/person/night (adults), ~$49/person/night (ages 3–9)',
+      includes:'3 Table Service meals per night + 2 snack/drink credits per night',
+      bestFor:'Serious foodies planning multiple fine dining experiences, honeymooners, anniversary visitors',
+      NOT:'Signature restaurants (2-credit) consume your credits rapidly at the Deluxe tier',
+      math:'If you use 3 TS credits at high-value restaurants: Topolino\'s ($75) + Monsieur Paul ($90) + Victoria & Albert\'s ($350+) — the plan value explodes. But this requires precise pre-planning.',
+      tip:'Victoria & Albert\'s requires 2 credits per person at the Deluxe level. A couple spending 2 nights × Deluxe plan (6 TS credits total) can use 4 credits for V&A\'s table for two. The math heavily favors this approach.',
+    },
+  ];
+
+  const DDP_STRATEGY = [
+    {
+      icon:'🔑', title:'The Booking Window Secret',
+      tip:'Disney Dining Plan reservations open at 60 days before arrival for Disney hotel guests. To maximize plan value, book high-demand, expensive restaurants (character dining, signature restaurants) immediately at 60 days. These are the restaurants where the plan value is highest.',
+    },
+    {
+      icon:'🎭', title:'Character Dining Hack',
+      tip:'All-you-can-eat character dining experiences (Cinderella\'s Royal Table, Chef Mickey\'s, Akershus, Tusker House) cost 1 TS credit per person. Adult prices range from $55–$75. A family of 4 at Chef Mickey\'s spends $220–300 cash but only 4 TS credits. Outstanding value.',
+    },
+    {
+      icon:'🍰', title:'The Dessert Party Math',
+      tip:'Disney dessert parties (fireworks watching with desserts and reserved viewing) cost 1 TS credit. They\'re not traditional restaurant dining — they include unlimited desserts and a premium fireworks spot. Price if purchased: $80–120/person. Excellent credit usage.',
+    },
+    {
+      icon:'📋', title:'Snack Credit Maximization',
+      tip:'Snack credits can be used on: entire Dole Whips ($6), Mickey waffles ($8), churros ($6), Starbucks specialty drinks ($7), Amorette\'s pastries ($7), cupcakes ($8). Use them on the highest-priced single-serve items rather than small cookies or ice cream bars.',
+    },
+    {
+      icon:'🚫', title:'When the Plan Does NOT Make Sense',
+      tip:'If you\'re visiting with Annual Passes: the dining discount (15–20%) on every meal purchase often beats the dining plan math, especially for smaller meals. Run the numbers for YOUR specific eating patterns. The plan favors high-volume, consistent restaurant diners.',
+    },
+    {
+      icon:'🍷', title:'Alcohol Note',
+      tip:'The 2024 Disney Dining Plan now includes one alcoholic beverage per table service meal for guests 21+. This changed the value calculation significantly — add $12–18 per included drink per meal for adult visitors.',
+    },
+  ];
+
+  const TOP_TS_VALUE = [
+    { name:'Victoria & Albert\'s', credits:'2 per person', cashPrice:'$350+', emoji:'👑', note:'Highest value TS experience — prix-fixe tasting menu. Requires months advance booking.' },
+    { name:'Monsieur Paul (EPCOT)', credits:'2 per person', cashPrice:'$90–130', emoji:'🇫🇷', note:'French fine dining in the France Pavilion. Use Deluxe plan credits.' },
+    { name:'Be Our Guest (dinner)', credits:'1 per person', cashPrice:'$60–80', emoji:'🌹', note:'Most desired Disney restaurant reservation. Beast\'s castle setting.' },
+    { name:'Cinderella\'s Royal Table', credits:'1 per person', cashPrice:'$65–80', emoji:'🏰', note:'Character dining inside the actual castle. Exceptional for children and adults alike.' },
+    { name:'Topolino\'s Terrace Breakfast', credits:'1 per person', cashPrice:'$55–65', emoji:'🎨', note:'Character breakfast with Minnie, Mickey, Daisy, Donald in artist costumes on the EPCOT rooftop.' },
+    { name:'Tusker House (character)', credits:'1 per person', cashPrice:'$55–70', emoji:'🦁', note:'Donald\'s Safari breakfast/lunch. All-you-can-eat African-inspired food. Excellent character interaction.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-dining-plan';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#C9A96E,#003087,#1565C0);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Disney Dining Plan Guide</div>
+          <div style="font-size:11px;opacity:.8;">QS · Standard · Deluxe — is the plan worth it?</div>
+        </div>
+        <span style="font-size:28px;">🍽️</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        The Disney Dining Plan is one of the most debated topics in Disney trip planning. For some families it's an excellent value; for others it's an overpriced constraint. The difference is entirely in how you use it.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    DDP_TIERS.forEach(tier => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:12px 14px;background:${tier.color}18;border-left:4px solid ${tier.color};">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:22px;">${tier.emoji}</span>
+            <div>
+              <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--text-primary,#212121);">${tier.name}</div>
+              <div style="font-size:11px;font-weight:800;color:${tier.color};">${tier.price}</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          <div style="font-size:11px;color:var(--text-secondary,#666);margin-bottom:5px;"><strong>Includes:</strong> ${tier.includes}</div>
+          <div style="font-size:11px;color:#C62828;margin-bottom:5px;"><strong>Does NOT include:</strong> ${tier.NOT}</div>
+          <div style="background:#2E7D3218;border-radius:8px;padding:7px;margin-bottom:6px;">
+            <div style="font-size:10px;font-weight:700;color:#2E7D32;margin-bottom:2px;">💰 THE MATH</div>
+            <div style="font-size:11px;color:var(--text-secondary,#555);">${tier.math}</div>
+          </div>
+          <div style="display:flex;gap:5px;background:${tier.color}0d;border-radius:8px;padding:7px;">
+            <span style="font-size:11px;flex-shrink:0;">💡</span>
+            <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${tier.tip}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const valueCard = document.createElement('div');
+    valueCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+    valueCard.innerHTML = `<div style="padding:12px 14px;background:linear-gradient(135deg,#C9A96E,#003087);color:#fff;">
+      <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;">🏆 Best Table Service Credit Values</div>
+    </div>
+    <div style="padding:12px 14px;">
+      ${TOP_TS_VALUE.map(r=>`<div style="display:flex;gap:8px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border,#eee);align-items:flex-start;">
+        <span style="font-size:20px;">${r.emoji}</span>
+        <div style="flex:1;">
+          <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);">${r.name}</div>
+          <div style="font-size:10px;color:#C62828;font-weight:700;">${r.credits} · Cash price: ${r.cashPrice}</div>
+          <div style="font-size:11px;color:var(--text-secondary,#666);">${r.note}</div>
+        </div>
+      </div>`).join('')}
+    </div>`;
+    body.appendChild(valueCard);
+
+    const stratCard = document.createElement('div');
+    stratCard.style.cssText = 'background:linear-gradient(135deg,#003087,#1565C0);border-radius:16px;margin-bottom:20px;padding:14px;color:#fff;';
+    stratCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">🎯 Dining Plan Strategy Guide</div>
+    ${DDP_STRATEGY.map(t=>`<div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.1);">
+      <div style="font-size:12px;font-weight:700;margin-bottom:4px;">${t.icon} ${t.title}</div>
+      <div style="font-size:12px;opacity:.9;line-height:1.5;">${t.tip}</div>
+    </div>`).join('')}`;
+    body.appendChild(stratCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-dining-plan')) buildScreen();
+
+  const _prevSS_kkkkkk = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_kkkkkk) _prevSS_kkkkkk(name, el);
+    if (name === 'dining-plan') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-dining-plan');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectDPCard() {
+    if (document.getElementById('dining-plan-home-card')) return true;
+    const ref = document.getElementById('fireworks-home-card') || document.getElementById('resort-hotels-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'dining-plan-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#C9A96E,#003087,#1565C0 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('dining-plan');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🍽️</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Disney Dining Plan Guide</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">QS · Standard · Deluxe — credit values & strategy</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _dpCard = false;
+  setInterval(() => { if (!_dpCard) _dpCard = injectDPCard(); }, 71000);
+  setTimeout(() => { _dpCard = injectDPCard(); }, 67500);
+  const _prevRH_kkkkkk = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_kkkkkk) _prevRH_kkkkkk.apply(this, arguments);
+    setTimeout(() => { _dpCard = false; _dpCard = injectDPCard(); }, 23400);
+  };
+})();
+</script>
