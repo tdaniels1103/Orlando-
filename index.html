@@ -45874,3 +45874,197 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK JJJJ2: Theme Park Food & Snack Bucket List ===== */
+(function initFoodBucketList() {
+
+  const FOODS = [
+    {
+      park:'Magic Kingdom', emoji:'🏰', color:'#003087',
+      items:[
+        { name:'Dole Whip Float', location:'Aloha Isle', price:'$7', icon:'🍍',
+          desc:'The most iconic theme park snack in history. Soft-serve pineapple float in pineapple juice. Get there before 10am or the line is brutal.' },
+        { name:'Mickey Premium Ice Cream Bar', location:'Various carts', price:'$6', icon:'🍫',
+          desc:'Chocolate-dipped vanilla ice cream in Mickey shape. Every kid\'s first Disney food memory.' },
+        { name:'Churro', location:'Fantasyland carts', price:'$5', icon:'🥐',
+          desc:'Park churros — perfectly warm, cinnamon-sugared. Unremarkable by expert standards but deeply nostalgic.' },
+        { name:'Liberty Square Market Corn', location:'Liberty Square', price:'$5', icon:'🌽',
+          desc:'Roasted corn on the cob at an outdoor market. Simple, delicious, underrated.' },
+      ]
+    },
+    {
+      park:'EPCOT', emoji:'🌍', color:'#005B9A',
+      items:[
+        { name:'School Bread (Norway)', location:'Kringla Bakeri (Norway Pavilion)', price:'$5', icon:'🍞',
+          desc:'Cardamom bun filled with vanilla custard, topped with coconut. One of EPCOT\'s all-time legendary snacks. Get there early — they sell out.' },
+        { name:'Croissant Donut (France)', location:'Les Halles (France Pavilion)', price:'$6', icon:'🥐',
+          desc:'The original cronut. Flaky, buttery, perfect. Every Food & Wine Festival version is good too but this is the baseline.' },
+        { name:'Lobster Roll (Canada)', location:'Le Cellier or outdoor stand', price:'$18', icon:'🦞',
+          desc:'A proper Maritime-style lobster roll. One of the most satisfying expensive snacks at any Disney park.' },
+        { name:'Kakigori (Japan)', location:'Kabuki Cafe (Japan Pavilion)', price:'$7', icon:'🧊',
+          desc:'Japanese shaved ice with authentic flavors — green tea, plum wine, strawberry. Refreshing on hot days.' },
+        { name:'Food & Wine Festival Booths', location:'Various (seasonal)', price:'$4–12', icon:'🍷',
+          desc:'The festival runs Aug–Nov. Every booth serves 2–4 items. Budget $80–120/person for a proper exploration of all pavilions.' },
+      ]
+    },
+    {
+      park:'Hollywood Studios', emoji:'🎬', color:'#37474F',
+      items:[
+        { name:'Ronto Wrap', location:'Ronto Roasters (Galaxy\'s Edge)', price:'$13', icon:'🌯',
+          desc:'Spit-roasted pork and grilled sausage wrapped in warm flatbread with tangy slaw. Widely considered the best quick-service food item at any Disney park.' },
+        { name:'Blue/Green Milk', location:'Milk Stand (Galaxy\'s Edge)', price:'$7', icon:'🥛',
+          desc:'The drinks from the Star Wars films. Creamy frozen beverages — blue is sweeter, green is more citrus. A bucket-list sip for fans.' },
+        { name:'Totchos', location:'Woody\'s Lunch Box (Toy Story Land)', price:'$11', icon:'🥔',
+          desc:'Tater tots loaded with pulled pork, chili, queso, and coleslaw. Absurdly indulgent. A cult classic.' },
+        { name:'Hollywood Brown Derby Grapefruit Cake', location:'Hollywood Brown Derby', price:'$13', icon:'🎂',
+          desc:'The signature dessert of the 1920s Hollywood restaurant. Cream cheese frosting, fresh grapefruit. Elegant and worth every penny.' },
+      ]
+    },
+    {
+      park:'Animal Kingdom', emoji:'🦁', color:'#33691E',
+      items:[
+        { name:'Pongu Pongu Luminous Lekku', location:'Pongu Pongu (Pandora)', price:'$8', icon:'🍹',
+          desc:'A glowing passion fruit frozen cocktail (alcoholic or not) in Pandora. One of the most Instagram-worthy drinks in any theme park.' },
+        { name:'Harambe Market Food', location:'Africa area', price:'$12–16', icon:'🍖',
+          desc:'Ribs, corn, and African-spiced items at the outdoor market. Some of the best counter-service food at any Disney park.' },
+        { name:'Kusafiri Coffee Shop', location:'Africa area', price:'$5', icon:'☕',
+          desc:'The African-spiced baked goods here are excellent and overlooked. The cheese Danish is better than most dedicated bakeries.' },
+        { name:'Satu\'li Bowls', location:'Satu\'li Canteen (Pandora)', price:'$14', icon:'🥗',
+          desc:'Customizable grain bowls in Pandora. The cheeseburger pod is the crowd favorite. Consistently voted best counter-service at AK.' },
+      ]
+    },
+    {
+      park:'Universal (Wizarding World)', emoji:'⚡', color:'#1a237e',
+      items:[
+        { name:'Butterbeer (frozen)', location:'Multiple Hogsmeade/Diagon Alley stands', price:'$7', icon:'🍺',
+          desc:'The most famous theme park drink. Cream soda base with butterscotch foam. Frozen version is far superior to cold or hot. Non-alcoholic.' },
+        { name:'Chocolate Wands', location:'Honeydukes (Hogsmeade)', price:'$13', icon:'🪄',
+          desc:'Solid chocolate wands in multiple flavors. Both edible and collectible. Packaged to take home as gifts.' },
+        { name:'Butterbeer Ice Cream', location:'Florean Fortescue\'s Ice-Cream (Diagon Alley)', price:'$6', icon:'🍦',
+          desc:'Unique Butterbeer soft-serve. More complex than the drink — actually a sophisticated flavor. Often overlooked.' },
+        { name:'Leaky Cauldron Breakfast', location:'Leaky Cauldron (Diagon Alley)', price:'$18', icon:'🍳',
+          desc:'Full English breakfast in the iconic pub setting. One of the most atmospheric dining experiences in any theme park.' },
+      ]
+    },
+  ];
+
+  const TIPS = [
+    { icon:'⏰', tip:'Mobile order is essential at Disney parks. Order 15 min ahead and skip all queues. Saves 20–40 min per meal on busy days.' },
+    { icon:'🎟️', tip:'Disney Dining Plan includes credits for snacks, quick service, and table service. Calculate based on what you actually plan to eat — it rarely saves money for adults who drink alcohol.' },
+    { icon:'💰', tip:'Water is free at all Disney quick-service locations (ask for a cup of water — they\'ll give it). Stay hydrated without spending $5 per bottle.' },
+    { icon:'🌮', tip:'The best value meals at Disney: Ronto Wrap ($13), Satu\'li Bowls ($14), Yak & Yeti Local Food Cafes ($12). All excellent and under $15.' },
+    { icon:'🍷', tip:'EPCOT is the only Disney park where you can walk around drinking publicly. Lean into it — it\'s a rite of passage to do a "World Showcase drinking tour."' },
+    { icon:'🥗', tip:'Allergies are handled expertly at Disney. Alert CMs and kitchen managers will prepare completely separate allergy-safe meals. No need to fear eating at Disney with dietary restrictions.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-food-bucket';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const header = document.createElement('div');
+    header.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#BF360C,#E64A19,#FF7043);padding:16px 14px 14px;';
+    header.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:#fff;">Park Food Bucket List</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">5 parks · 20+ must-try items · Pro tips</div>
+        </div>
+        <span style="font-size:24px;">🍽️</span>
+      </div>`;
+
+    const content = document.createElement('div');
+    content.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    // Tips first
+    const tipsCard = document.createElement('div');
+    tipsCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;padding:12px 14px;margin-bottom:14px;border:1px solid var(--border,#eee);';
+    tipsCard.innerHTML = `<div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:8px;">🧠 Park Dining Tips</div>`;
+    TIPS.forEach(t => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;gap:8px;margin-bottom:6px;align-items:flex-start;';
+      row.innerHTML = `<span style="font-size:14px;">${t.icon}</span><div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${t.tip}</div>`;
+      tipsCard.appendChild(row);
+    });
+    content.appendChild(tipsCard);
+
+    FOODS.forEach(park => {
+      const parkHeader2 = document.createElement('div');
+      parkHeader2.style.cssText = `background:${park.color};border-radius:10px 10px 0 0;padding:8px 14px;margin-top:12px;display:flex;align-items:center;gap:8px;`;
+      parkHeader2.innerHTML = `<span style="font-size:18px;">${park.emoji}</span><div style="font-size:13px;font-weight:700;color:#fff;">${park.park}</div>`;
+      content.appendChild(parkHeader2);
+
+      park.items.forEach((item, idx) => {
+        const row = document.createElement('div');
+        const isLast = idx === park.items.length - 1;
+        row.style.cssText = `background:var(--card-bg,#fff);padding:10px 14px;${isLast ? 'border-radius:0 0 10px 10px;margin-bottom:4px;' : 'border-bottom:1px solid var(--border,#f0f0f0);'}`;
+        row.innerHTML = `
+          <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:3px;">
+            <span style="font-size:18px;">${item.icon}</span>
+            <div style="flex:1;">
+              <div style="display:flex;justify-content:space-between;">
+                <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);">${item.name}</div>
+                <div style="font-size:12px;font-weight:800;color:${park.color};">${item.price}</div>
+              </div>
+              <div style="font-size:10px;color:var(--text-secondary,#aaa);margin-bottom:3px;">📍 ${item.location}</div>
+              <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.4;">${item.desc}</div>
+            </div>
+          </div>`;
+        content.appendChild(row);
+      });
+    });
+
+    const spacer = document.createElement('div');
+    spacer.style.height = '20px';
+    content.appendChild(spacer);
+
+    s.appendChild(header);
+    s.appendChild(content);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-food-bucket')) buildScreen();
+
+  const _prevSS_jjjj2 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_jjjj2) _prevSS_jjjj2(name, el);
+    if (name === 'food-bucket') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-food-bucket');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectFoodBucketCard() {
+    if (document.getElementById('food-bucket-home-card')) return true;
+    const ref = document.getElementById('sports2-home-card') || document.getElementById('arts-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'food-bucket-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#BF360C,#E64A19,#FF7043);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('food-bucket');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:3px;">🍽️ Park Food Bucket List</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.85);">Dole Whip · Ronto Wrap · Butterbeer · 20+ musts</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.5);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _foodBucketCard = false;
+  setInterval(() => { if (!_foodBucketCard) _foodBucketCard = injectFoodBucketCard(); }, 29000);
+  setTimeout(() => { _foodBucketCard = injectFoodBucketCard(); }, 25500);
+
+  const _prevRH_jjjj2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_jjjj2) _prevRH_jjjj2.apply(this, arguments);
+    setTimeout(() => { _foodBucketCard = false; _foodBucketCard = injectFoodBucketCard(); }, 6500);
+  };
+})();
+</script>
