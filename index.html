@@ -63382,3 +63382,381 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK VVVVVVV: SeaWorld Orlando Complete Guide ===== */
+(function initSeaWorldDeep() {
+
+  const SW_ZONES = [
+    {
+      zone:'Thrill Coasters', emoji:'🎢', color:'#0277BD',
+      desc:'SeaWorld has quietly assembled one of the best coaster collections in Florida — Ice Breaker, Mako, Manta, and Kraken compete with anything at Universal or Disney for thrill.',
+      rides:[
+        {name:'Mako', height:'54"', intensity:5, note:'Consistently ranked among the top 10 steel coasters in the world. A true hypercoaster — 200 feet tall, 73 mph, and enormous airtime on every hill. The most purely exhilarating coaster in Orlando. For coaster enthusiasts, Mako alone justifies a SeaWorld ticket.'},
+        {name:'Kraken', height:'54"', intensity:5, note:'Floorless coaster — your feet dangle as you go through 7 inversions. One of the first and still best floorless coasters in the world. The mythological sea monster theming and the roar of the train create atmosphere. VR headset optional (skip it — it reduces the experience).'},
+        {name:'Manta', height:'54"', intensity:5, note:'Flying coaster where you ride face-down in the position of a flying manta ray. The swoop over the lagoon and the underground tunnel sequence are the best elements. Looking straight down at the water while inverted is the defining moment.'},
+        {name:'Ice Breaker', height:'48"', intensity:4, note:'Launched roller coaster with the steepest beyond-vertical drop in Florida (93 degrees past vertical). Four launches, two spikes. The back-row reverse launch on the final spike is sensational.'},
+      ],
+      tip:'SeaWorld\'s coasters have shorter queues than comparable rides at Disney or Universal — Mako and Kraken routinely run 20–40 minute waits even on busy days vs. 60–90 minutes for similar-quality Disney coasters. For coaster-focused visitors, SeaWorld is the most efficient park per dollar.',
+    },
+    {
+      zone:'Animal Habitats & Shows', emoji:'🐬', color:'#2E7D32',
+      desc:'SeaWorld\'s original purpose — marine animal habitats and wildlife education. The dolphin and stingray pools, orca Orca Encounter, and penguin exhibit form the park\'s educational core.',
+      exhibits:[
+        {name:'Orca Encounter', note:'Educational presentation with orcas (not a performance show). The trainers and narrators explain natural behaviors, cognition, and conservation. More nuanced than the historic Shamu shows. The orca pool is 1.7 million gallons.'},
+        {name:'Dolphin Nursery & Cove', note:'Shallow touch pool where you can interact with bottlenose dolphins. Interaction add-ons available for direct dolphin encounters. The nursery has young dolphins with their mothers.'},
+        {name:'Penguin Trek', note:'Walk-through penguin exhibit with 250+ Antarctic and Magellanic penguins. Climate-controlled to Antarctic temperatures. One of the most comprehensive penguin exhibits in the US.'},
+        {name:'Shark Encounter', note:'Tunneling walkway through an actual shark exhibit. Multiple species including nurse sharks, sandbar sharks, and sawfish. The underwater ceiling view is the defining moment of the exhibit.'},
+      ],
+      tip:'SeaWorld\'s animal care reputation has improved significantly post-Blackfish. The park\'s veterinary team is respected in the zoological community. The animal rescue program (over 40,000 animals rescued since 1965) provides genuine conservation value.',
+    },
+    {
+      zone:'Discovery Cove (Adjacent)', emoji:'🐠', color:'#C9A96E',
+      desc:'SeaWorld\'s premium ticketed day resort — all-inclusive: dolphin swim, snorkeling with thousands of fish and rays, aviary walk-through, unlimited food and drinks. Maximum 1,300 guests per day.',
+      price:'$159–299/person (all-inclusive)',
+      highlights:[
+        'Dolphin swim: 30 minutes in the water with trainers and dolphins',
+        'Grand Reef snorkeling: tropical fish, rays, and sharks behind glass',
+        'Freshwater oasis with otters and marmosets',
+        'Wind-away river lazy river through habitat',
+        'Avian Paradise free-flight aviary: hundreds of tropical birds',
+        'All food, drinks (including alcohol), wetsuit, mask, and gear included',
+      ],
+      tip:'Discovery Cove is the best value all-inclusive day resort in Orlando. The combination of dolphin interaction, snorkeling, aviary, and unlimited food/drinks for $159–299 is genuinely good value compared to a $130 Disney park ticket without any premium experiences. Book 30+ days in advance.',
+    },
+  ];
+
+  const SW_TIPS = [
+    {icon:'🎢', tip:'The coaster triple crown: ride Mako, Manta, and Kraken before 11 AM. All three in order are usually achievable in 2 hours at park open. After 11, lines build considerably.'},
+    {icon:'🐋', tip:'Orca Encounter shows run 2–3 times daily. Arrive 15 minutes early for seating. The splash zone (first 20 rows) is real — guests in those rows regularly get soaked. Intentional for some visitors.'},
+    {icon:'💰', tip:'SeaWorld Annual Passes ($99–299) include parking and often admission to Aquatica water park. The annual pass math works at 2 visits per year. SeaWorld APs also include Busch Gardens admission on some tiers.'},
+    {icon:'🌅', tip:'SeaWorld opens at 10 AM most days — arrive at 9:30 to be in line at gates. The first 30 minutes (10:00–10:30 AM) has the lowest wait times for Mako and Manta before crowds build.'},
+    {icon:'🦈', tip:'Shark Encounter has a dedicated nighttime light-up effect. The sharks circle under blue LED lighting that activates at dusk — a different experience from the daytime exhibit.'},
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-seaworld-deep';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#0277BD,#2E7D32,#C9A96E);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">SeaWorld Orlando — Complete Guide</div>
+          <div style="font-size:11px;opacity:.8;">Mako · Manta · Kraken · Orca Encounter · Discovery Cove</div>
+        </div>
+        <span style="font-size:28px;">🐋</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        SeaWorld Orlando combines world-class roller coasters (Mako is a top-10 global steel coaster) with genuine animal habitats. Shorter lines than Disney or Universal for comparable thrills, and Discovery Cove next door is the best all-inclusive day resort in Orlando.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    SW_ZONES.forEach(zone => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+      if (zone.rides) {
+        card.innerHTML = `
+          <div style="padding:9px 14px;background:${zone.color}18;border-left:4px solid ${zone.color};">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:20px;">${zone.emoji}</span>
+              <div>
+                <div style="font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${zone.zone}</div>
+                <div style="font-size:10px;color:var(--text-secondary,#555);">${zone.desc}</div>
+              </div>
+            </div>
+          </div>
+          <div style="padding:8px 14px;">
+            ${zone.rides.map(r=>`<div style="background:var(--bg,#f9f9f9);border-radius:8px;padding:8px;margin-bottom:5px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;">
+                <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);">${r.name}</div>
+                <div style="font-size:10px;font-weight:700;color:${zone.color};">${r.height}</div>
+              </div>
+              <div style="font-size:10px;color:var(--text-secondary,#555);">${r.note}</div>
+            </div>`).join('')}
+            <div style="display:flex;gap:5px;background:${zone.color}0d;border-radius:8px;padding:6px;margin-top:5px;">
+              <span style="font-size:11px;flex-shrink:0;">💡</span>
+              <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${zone.tip}</div>
+            </div>
+          </div>`;
+      } else if (zone.exhibits) {
+        card.innerHTML = `
+          <div style="padding:9px 14px;background:${zone.color}18;border-left:4px solid ${zone.color};">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:20px;">${zone.emoji}</span>
+              <div>
+                <div style="font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${zone.zone}</div>
+                <div style="font-size:10px;color:var(--text-secondary,#555);">${zone.desc}</div>
+              </div>
+            </div>
+          </div>
+          <div style="padding:8px 14px;">
+            ${zone.exhibits.map(e=>`<div style="margin-bottom:7px;padding-bottom:7px;border-bottom:1px solid var(--border,#f5f5f5);">
+              <div style="font-size:12px;font-weight:700;color:${zone.color};">${e.name}</div>
+              <div style="font-size:10px;color:var(--text-secondary,#555);">${e.note}</div>
+            </div>`).join('')}
+            <div style="font-size:10px;font-style:italic;color:var(--text-secondary,#888);">${zone.tip}</div>
+          </div>`;
+      } else {
+        card.innerHTML = `
+          <div style="padding:9px 14px;background:${zone.color}18;border-left:4px solid ${zone.color};">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-size:20px;">${zone.emoji}</span>
+                <div>
+                  <div style="font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${zone.zone}</div>
+                  <div style="font-size:10px;color:var(--text-secondary,#555);">${zone.desc}</div>
+                </div>
+              </div>
+              <div style="font-size:11px;font-weight:700;color:${zone.color};">${zone.price}</div>
+            </div>
+          </div>
+          <div style="padding:8px 14px;">
+            ${zone.highlights.map(h=>`<div style="display:flex;gap:6px;margin-bottom:4px;align-items:flex-start;">
+              <span style="font-size:10px;flex-shrink:0;color:${zone.color};">✓</span>
+              <div style="font-size:10px;color:var(--text-secondary,#555);">${h}</div>
+            </div>`).join('')}
+            <div style="display:flex;gap:5px;background:${zone.color}0d;border-radius:8px;padding:6px;margin-top:6px;">
+              <span style="font-size:11px;flex-shrink:0;">💡</span>
+              <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${zone.tip}</div>
+            </div>
+          </div>`;
+      }
+      body.appendChild(card);
+    });
+
+    const tipsCard = document.createElement('div');
+    tipsCard.style.cssText = 'background:linear-gradient(135deg,#0277BD,#2E7D32);border-radius:14px;margin-bottom:20px;padding:14px;color:#fff;';
+    tipsCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;margin-bottom:8px;">🐋 SeaWorld Strategy</div>
+    ${SW_TIPS.map(t=>`<div style="display:flex;gap:10px;margin-bottom:7px;align-items:flex-start;">
+      <span style="font-size:18px;flex-shrink:0;">${t.icon}</span>
+      <div style="font-size:11px;opacity:.95;line-height:1.5;">${t.tip}</div>
+    </div>`).join('')}`;
+    body.appendChild(tipsCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-seaworld-deep')) buildScreen();
+
+  const _prevSS_vvvvvvv = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_vvvvvvv) _prevSS_vvvvvvv(name, el);
+    if (name === 'seaworld-deep') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-seaworld-deep');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectSWCard() {
+    if (document.getElementById('seaworld-deep-home-card')) return true;
+    const ref = document.getElementById('usf-deep-home-card') || document.getElementById('fine-dining-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'seaworld-deep-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#0277BD,#2E7D32,#C9A96E 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('seaworld-deep');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🐋</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">SeaWorld Orlando — Complete Guide</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Mako · Manta · Kraken · Discovery Cove · Orca Encounter</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _swCard = false;
+  setInterval(() => { if (!_swCard) _swCard = injectSWCard(); }, 108000);
+  setTimeout(() => { _swCard = injectSWCard(); }, 104500);
+  const _prevRH_vvvvvvv = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_vvvvvvv) _prevRH_vvvvvvv.apply(this, arguments);
+    setTimeout(() => { _swCard = false; _swCard = injectSWCard(); }, 38200);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK WWWWWWW: Orlando Crowd Calendar & Best Visit Timing ===== */
+(function initOrlandoCrowds() {
+
+  const CROWD_MONTHS = [
+    {month:'January', crowd:2, emoji:'❄️', color:'#0277BD',
+     summary:'Best month to visit. Post-New Year\'s crowds drop immediately after Jan 1. Martin Luther King weekend is the exception (very crowded). Mid-January weekdays are the lightest crowds of the year.',
+     events:['Martin Luther King weekend (3rd Mon) — avoid','EPCOT Festival of the Arts begins mid-January'],
+     parkTip:'This is the only time of year you can genuinely ride everything at Magic Kingdom in a single day without Lightning Lane.',
+    },
+    {month:'February', crowd:2, emoji:'🌸', color:'#7B1FA2',
+     summary:'Second-best month. President\'s Day weekend (mid-Feb) is busy. Super Bowl weekend crowds are unpredictable. Valentines Day weekend is crowded at EPCOT. Otherwise excellent.',
+     events:['President\'s Day weekend — moderately crowded','Super Bowl weekend — unpredictable but often elevated','EPCOT Festival of the Arts runs through late February'],
+     parkTip:'EPCOT\'s Festival of the Arts (January–February) adds world-class art exhibits and food booths to an already calm park.',
+    },
+    {month:'March', crowd:5, emoji:'🎓', color:'#C62828',
+     summary:'Spring Break ruins March. The first week is manageable; mid-March through early April is among the worst crowd weeks of the year. If you must visit in March, go the first 5 days only.',
+     events:['Spring Break (mid-March through April 3 approx) — highest crowds','EPCOT Festival of the Arts ends in early March'],
+     parkTip:'If visiting during Spring Break, use Lightning Lane aggressively. Hollywood Studios (Galaxy\'s Edge) and Universal are slightly less impacted than Magic Kingdom.',
+    },
+    {month:'April', crowd:4, emoji:'🐣', color:'#F57F17',
+     summary:'Easter and early April are peak crowd. After Easter, April calms significantly. Late April is one of the best times of year — lower crowds, comfortable temperatures, before summer heat arrives.',
+     events:['Easter week — peak crowds','Late April (after Easter) — near-perfect conditions'],
+     parkTip:'If you have flexibility, target the week immediately after Easter for MK and EPCOT. Crowds drop 50% within 48 hours of Easter ending.',
+    },
+    {month:'May', crowd:3, emoji:'🌺', color:'#2E7D32',
+     summary:'Good month before Memorial Day. The first three weeks of May are generally uncrowded. Memorial Day weekend is busy. Heat begins to be a real factor by mid-May.',
+     events:['Memorial Day weekend (last Mon) — busy','EPCOT Flower & Garden Festival runs through late May'],
+     parkTip:'EPCOT Flower & Garden Festival (March–May) transforms the park with topiaries, outdoor kitchens, and garden exhibits. A beautiful time to visit.',
+    },
+    {month:'June', crowd:4, emoji:'☀️', color:'#E65100',
+     summary:'Summer starts. Crowds build from the first week and stay elevated through August. Heat and afternoon storms (3–4 PM daily) are consistent. Very long park days.',
+     events:['Summer season begins — school\'s out nationally','Pride Month at Disney Springs (special events)'],
+     parkTip:'June mornings (park open to noon) are the most efficient time. Take a break at noon. Return for evening fireworks.',
+    },
+    {month:'July', crowd:5, emoji:'🔥', color:'#C62828',
+     summary:'Peak summer. July 4th week is one of the busiest periods of the year. Very hot (94–96°F), humid, with daily storms. Park capacity limits are common on weekends. Compensated by extended hours and water parks at their best.',
+     events:['July 4th — peak crowds, extended fireworks','Full summer capacity throughout month'],
+     parkTip:'July at Typhoon Lagoon or Volcano Bay is actually excellent — the water park experience is why you\'re here in peak heat.',
+    },
+    {month:'August', crowd:4, emoji:'🌊', color:'#0277BD',
+     summary:'Crowds moderate after mid-August as school resumes in many states. Florida schools resume early August, reducing local crowds. International visitors (Europe, South America) maintain elevated attendance through August.',
+     events:['Mickey\'s Not-So-Scary Halloween Party tickets go on sale in August','School year starts (state by state — reducing crowds week by week)'],
+     parkTip:'Late August is an underrated sweet spot — heat but manageable crowds. International visitors are present but domestic crowds drop as school resumes.',
+    },
+    {month:'September', crowd:1, emoji:'🍂', color:'#5D4037',
+     summary:'The absolute best month for crowd levels. Florida hurricane season (September peak) keeps some visitors away. Otherwise: lowest crowds of the year combined with excellent extended park hours for Halloween events.',
+     events:['Mickey\'s Not-So-Scary Halloween Party (select evenings)', 'Halloween Horror Nights at Universal begins in September','Hurricane season peaks mid-September — minor scheduling risk'],
+     parkTip:'September weekdays at Magic Kingdom: standby waits of 5–10 minutes for most rides. This happens once a year. If you can visit in September, do it.',
+    },
+    {month:'October', crowd:3, emoji:'🎃', color:'#E65100',
+     summary:'Good October through Columbus Day. Halloween events drive elevated crowds on event nights (Tuesday, Thursday, Friday, Sunday at MK). Non-event nights are calm. Universal\'s HHN makes Universal evenings very busy.',
+     events:['Mickey\'s Not-So-Scary Halloween Party (select nights — sold separately)','Halloween Horror Nights at Universal (Fri/Sat throughout October)','Columbus Day weekend — moderately elevated'],
+     parkTip:'On non-Halloween party nights at Magic Kingdom in October, the park is remarkably calm. Halloween parties (separate ticket) require advance purchase.',
+    },
+    {month:'November', crowd:3, emoji:'🍁', color:'#8B4513',
+     summary:'Good until Thanksgiving. Early November is quiet. Thanksgiving week (Wednesday–Sunday) is the second-busiest period of the year. A tale of two halves.',
+     events:['Veteran\'s Day weekend — slightly elevated','Thanksgiving week — very busy','EPCOT International Food & Wine Festival ends early November','Holiday decorations appear after early November'],
+     parkTip:'November 1–19: excellent. November 20–30: avoid if possible. The park transforms for Christmas starting mid-November.',
+    },
+    {month:'December', crowd:5, emoji:'🎄', color:'#003087',
+     summary:'Christmas magic — but Christmas week (Dec 25 – Jan 1) is the single busiest week of the year with maximum park capacity and maximum prices. Early December (Dec 1–20) is wonderful — full Christmas decorations with manageable crowds.',
+     events:['Mickey\'s Very Merry Christmas Party (select nights through Dec 22)','Christmas week (Dec 25 – Jan 1) — maximum crowds of the year','New Year\'s Eve at Disney — not recommended due to closures and extreme crowds'],
+     parkTip:'Dec 1–20 is legitimately wonderful. Christmas decorations are fully deployed, Mickey\'s Christmas Party events are running, and park capacity hasn\'t reached Christmas-week peaks. The best "Christmas magic" timing.',
+    },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-crowd-calendar';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#003087,#C62828,#2E7D32);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Crowd Calendar & Best Timing</div>
+          <div style="font-size:11px;opacity:.8;">Month-by-month guide · Events · Crowd levels · Strategic advice</div>
+        </div>
+        <span style="font-size:28px;">📅</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        When you visit changes the Orlando experience more than almost any other decision. A September weekday and a Christmas week are the same parks with completely different realities.
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
+        ${[[1,'Low'],[2,'Best'],[3,'Moderate'],[4,'Busy'],[5,'Peak']].map(([n,l])=>`<div style="display:flex;align-items:center;gap:4px;">
+          <div style="width:24px;height:10px;border-radius:3px;background:${['#2E7D32','#2E7D32','#F57F17','#F57F17','#C62828'][n-1]};opacity:${[.4,.7,.4,.7,1][n-1]};"></div>
+          <span style="font-size:10px;opacity:.9;">${l}</span>
+        </div>`).join('')}
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    CROWD_MONTHS.forEach(m => {
+      const crowdColors = ['','#2E7D32','#4CAF50','#F57F17','#FF7043','#C62828'];
+      const crowdLabels = ['','Lowest','Low','Moderate','Busy','Peak'];
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:12px;margin-bottom:9px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:8px 14px;background:${m.color}12;border-left:4px solid ${m.color};display:flex;align-items:center;justify-content:space-between;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:18px;">${m.emoji}</span>
+            <div style="font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${m.month}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:4px;">
+            ${[1,2,3,4,5].map(i=>`<div style="width:8px;height:8px;border-radius:50%;background:${i<=m.crowd?crowdColors[m.crowd]:'#ddd'};"></div>`).join('')}
+            <span style="font-size:10px;font-weight:700;color:${crowdColors[m.crowd]};margin-left:2px;">${crowdLabels[m.crowd]}</span>
+          </div>
+        </div>
+        <div style="padding:7px 14px;">
+          <div style="font-size:11px;color:var(--text-secondary,#444);line-height:1.5;margin-bottom:5px;">${m.summary}</div>
+          ${m.events.length ? `<div style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:5px;">${m.events.map(e=>`<span style="font-size:9px;padding:2px 6px;background:${m.color}12;color:${m.color};border-radius:10px;">${e}</span>`).join('')}</div>` : ''}
+          <div style="font-size:10px;font-style:italic;color:var(--text-secondary,#888);">💡 ${m.parkTip}</div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const spacer = document.createElement('div');
+    spacer.style.cssText = 'height:20px;';
+    body.appendChild(spacer);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-crowd-calendar')) buildScreen();
+
+  const _prevSS_wwwwwww = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_wwwwwww) _prevSS_wwwwwww(name, el);
+    if (name === 'crowd-calendar') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-crowd-calendar');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectCCCard() {
+    if (document.getElementById('crowd-calendar-home-card')) return true;
+    const ref = document.getElementById('seaworld-deep-home-card') || document.getElementById('usf-deep-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'crowd-calendar-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#003087,#C62828,#2E7D32 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('crowd-calendar');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">📅</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Crowd Calendar & Best Timing</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Month-by-month · Events calendar · January best · September lowest</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _ccCard = false;
+  setInterval(() => { if (!_ccCard) _ccCard = injectCCCard(); }, 109000);
+  setTimeout(() => { _ccCard = injectCCCard(); }, 105500);
+  const _prevRH_wwwwwww = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_wwwwwww) _prevRH_wwwwwww.apply(this, arguments);
+    setTimeout(() => { _ccCard = false; _ccCard = injectCCCard(); }, 38600);
+  };
+})();
+</script>
