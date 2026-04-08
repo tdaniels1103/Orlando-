@@ -42133,3 +42133,194 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK PPP2: Quick Reference Card — The Ultimate Cheat Sheet ===== */
+(function initQuickReference() {
+
+  const CHEATSHEET = {
+    heights: [
+      { ride:'Velocicoaster (Universal IoA)', height:'51"', note:'Most intense coaster' },
+      { ride:'Hollywood Rip Ride Rockit', height:'51"', note:'Solo ride experience' },
+      { ride:'TRON Lightcycle / Run', height:'48"', note:'Disney\'s fastest' },
+      { ride:'Hagrid\'s Motorbike', height:'48"', note:'Most themed ride' },
+      { ride:"Guardians: Cosmic Rewind", height:'42"', note:'First backward coaster' },
+      { ride:'Avatar: Flight of Passage', height:'44"', note:'Most popular Disney ride' },
+      { ride:"Tiana's Bayou Adventure", height:'40"', note:'Will get you wet' },
+      { ride:'Seven Dwarfs Mine Train', height:'38"', note:'Best family coaster' },
+      { ride:'Slinky Dog Dash', height:'38"', note:'Toy Story Land coaster' },
+      { ride:'Mako (SeaWorld)', height:'54"', note:"Florida's fastest coaster" },
+    ],
+    times: [
+      { task:'Book Disney Dining reservations', time:'6:00 AM Eastern · 60 days before visit' },
+      { task:'Disney Virtual Queue (TRON / Guardians)', time:'7:00 AM Eastern · Day of visit' },
+      { task:"Book Universal Hagrid's Virtual Queue", time:'Park opening time · Walk in first' },
+      { task:'Lightning Lane Multi Pass opens', time:'7:00 AM for hotel guests · Park open for others' },
+      { task:'Best rope drop arrival time', time:'45 minutes before park open' },
+      { task:'Order Mobile Order lunch', time:'30 min before you\'re hungry' },
+      { task:'Claim fireworks viewing spot', time:'35–45 min before show' },
+      { task:'Order Uber from park', time:'15 min before you plan to leave (beat surge)' },
+    ],
+    phones: [
+      { label:'Disney Dining Reservations', number:'407-WDW-DINE (939-3463)' },
+      { label:'Disney Guest Services', number:'407-939-5277' },
+      { label:'Universal Guest Services', number:'407-363-8000' },
+      { label:'SeaWorld Guest Services', number:'407-545-5550' },
+      { label:'MCO Airport Info', number:'407-825-2001' },
+      { label:'Turner Drug (hotel delivery)', number:'407-828-8125' },
+      { label:"AdventHealth Celebration (closest hospital)", number:'407-303-4000' },
+      { label:'Orange County Non-Emergency Police', number:'407-836-HELP (4357)' },
+    ],
+    apps: [
+      { app:'My Disney Experience', use:'Disney tickets, dining, LL, wait times, mobile order' },
+      { app:'Universal Orlando', use:'Universal tickets, virtual queues, wait times' },
+      { app:'Touring Plans / Lines', use:'Crowd predictions, optimized itineraries' },
+      { app:'Google Maps', use:'Offline navigation, rideshare routes' },
+      { app:'Uber & Lyft', use:'Rideshare between parks and hotels' },
+      { app:'OpenTable / Resy', use:'Off-property restaurant reservations' },
+    ],
+    moneyTips: [
+      'Disney parking: $30/day → free for resort guests (save $210+ on 7-day trip)',
+      'Ticket discount: Costco / Sam\'s Club saves $15–25 per person vs. gate price',
+      'Annual pass upgrade: possible any day at Guest Relations — day ticket credited',
+      'Dining: Mobile Order QS saves time + money vs. table service every meal',
+      'Hotel: Stay on-site for 2 or fewer nights; drive in from off-site if 3+ day stay',
+      'Souvenirs: Same items cheaper at Disney Springs and hotel gift shops than in parks',
+      'Water: Reusable bottle + free water refills at any QS restaurant (say "cup of water")',
+      'Snacks: Can bring your own food into Disney and Universal parks (no alcohol)',
+    ],
+    emergencyPhrases: [
+      { situation:'Medical emergency', action:'Any Cast Member can radio first aid · Universal Team Members same · All parks have fully staffed medical stations' },
+      { situation:'Lost child', action:'Every theme park has a dedicated Lost Children Center — ask any staff member immediately. Disney has sophisticated reunification systems.' },
+      { situation:'Ride evacuation', action:'Follow all staff instructions · Stay seated until instructed · Never attempt self-evacuation' },
+      { situation:'Violent weather', action:'Disney: tunnels under Magic Kingdom are storm shelters. Universal: large indoor shows serve as shelters. SeaWorld: head to indoor aquarium buildings.' },
+      { situation:'Stolen wallet/phone', action:'Nearest First Aid station can provide emergency resources. Disney can contact MDE support for digital ticket recovery.' },
+    ],
+  };
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-quick-reference';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;';
+    s.innerHTML = `
+      <div style="background:linear-gradient(135deg,#212121,#424242,#9E9E9E);padding:18px 14px 20px;
+        display:flex;align-items:center;gap:12px;flex-shrink:0;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;
+          border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#fff;">Quick Reference Card</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">Heights · Times · Numbers · Apps · Tips</div>
+        </div>
+        <span style="font-size:28px;">📋</span>
+      </div>
+      <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;">
+
+        <!-- Height requirements -->
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:8px;">📏 Height Requirements</div>
+        <div style="background:var(--card-bg,#fff);border-radius:12px;margin-bottom:14px;border:1px solid var(--border,#eee);overflow:hidden;">
+          ${CHEATSHEET.heights.map((h, i) => `
+            <div style="padding:8px 12px;display:flex;gap:10px;align-items:center;${i < CHEATSHEET.heights.length-1?'border-bottom:1px solid var(--border,#f5f5f5)':''}">
+              <div style="font-size:15px;font-weight:800;color:#B71C1C;min-width:36px;">${h.height}</div>
+              <div style="flex:1;">
+                <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);">${h.ride}</div>
+                <div style="font-size:10px;color:var(--text-secondary,#888);">${h.note}</div>
+              </div>
+            </div>`).join('')}
+        </div>
+
+        <!-- Key times -->
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:8px;">⏰ Critical Times</div>
+        <div style="background:var(--card-bg,#fff);border-radius:12px;margin-bottom:14px;border:1px solid var(--border,#eee);overflow:hidden;">
+          ${CHEATSHEET.times.map((t, i) => `
+            <div style="padding:8px 12px;${i < CHEATSHEET.times.length-1?'border-bottom:1px solid var(--border,#f5f5f5)':''}">
+              <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);">${t.task}</div>
+              <div style="font-size:11px;font-weight:700;color:#E65100;">${t.time}</div>
+            </div>`).join('')}
+        </div>
+
+        <!-- Key phone numbers -->
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:8px;">📞 Key Phone Numbers</div>
+        <div style="background:var(--card-bg,#fff);border-radius:12px;margin-bottom:14px;border:1px solid var(--border,#eee);overflow:hidden;">
+          ${CHEATSHEET.phones.map((p, i) => `
+            <div style="padding:8px 12px;display:flex;justify-content:space-between;align-items:center;${i < CHEATSHEET.phones.length-1?'border-bottom:1px solid var(--border,#f5f5f5)':''}">
+              <div style="font-size:12px;color:var(--text-secondary,#555);flex:1;">${p.label}</div>
+              <div style="font-size:12px;font-weight:700;color:#1565C0;flex-shrink:0;margin-left:8px;">${p.number}</div>
+            </div>`).join('')}
+        </div>
+
+        <!-- Apps -->
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:8px;">📱 Essential Apps</div>
+        <div style="background:var(--card-bg,#fff);border-radius:12px;margin-bottom:14px;border:1px solid var(--border,#eee);overflow:hidden;">
+          ${CHEATSHEET.apps.map((a, i) => `
+            <div style="padding:8px 12px;${i < CHEATSHEET.apps.length-1?'border-bottom:1px solid var(--border,#f5f5f5)':''}">
+              <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);">${a.app}</div>
+              <div style="font-size:11px;color:var(--text-secondary,#666);">${a.use}</div>
+            </div>`).join('')}
+        </div>
+
+        <!-- Money tips -->
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:8px;">💰 Quick Money Tips</div>
+        <div style="background:var(--card-bg,#fff);border-radius:12px;margin-bottom:14px;border:1px solid var(--border,#eee);padding:4px 0;">
+          ${CHEATSHEET.moneyTips.map((tip, i) => `
+            <div style="padding:6px 12px;font-size:12px;color:var(--text-secondary,#555);${i < CHEATSHEET.moneyTips.length-1?'border-bottom:1px solid var(--border,#f5f5f5)':''}">
+              ✓ ${tip}
+            </div>`).join('')}
+        </div>
+
+        <!-- Emergency actions -->
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:8px;">🆘 Emergency Quick Actions</div>
+        <div style="background:var(--card-bg,#fff);border-radius:12px;margin-bottom:20px;border:1px solid var(--border,#eee);overflow:hidden;">
+          ${CHEATSHEET.emergencyPhrases.map((ep, i) => `
+            <div style="padding:8px 12px;${i < CHEATSHEET.emergencyPhrases.length-1?'border-bottom:1px solid var(--border,#f5f5f5)':''}">
+              <div style="font-size:12px;font-weight:700;color:#B71C1C;">${ep.situation}</div>
+              <div style="font-size:11px;color:var(--text-secondary,#555);margin-top:2px;">${ep.action}</div>
+            </div>`).join('')}
+        </div>
+      </div>`;
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-quick-reference')) buildScreen();
+
+  const _prevSS_ppp2 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_ppp2) _prevSS_ppp2(name, el);
+    if (name === 'quick-reference') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-quick-reference');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectQRCard() {
+    if (document.getElementById('qr-home-card')) return true;
+    const ref = document.getElementById('new-home-card') || document.getElementById('fireworks-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'qr-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#212121,#424242,#9E9E9E);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('quick-reference');
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:28px;">📋</span>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Quick Reference Card</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">Heights · Times · Numbers · Emergency guide</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _qrCard = false;
+  setInterval(() => { if (!_qrCard) _qrCard = injectQRCard(); }, 19000);
+  setTimeout(() => { _qrCard = injectQRCard(); }, 15500);
+
+  const _prevRH_ppp2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_ppp2) _prevRH_ppp2.apply(this, arguments);
+    setTimeout(() => { _qrCard = false; _qrCard = injectQRCard(); }, 3600);
+  };
+})();
+</script>
