@@ -48557,3 +48557,237 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK YYYY2: Ultimate Orlando Trip Checklist ===== */
+(function initTripChecklist() {
+
+  const PHASES = [
+    {
+      phase:'12 Months Before', icon:'📅', color:'#7B1FA2',
+      tasks:[
+        { task:'Create Disney account (disneyworld.disney.go.com)', critical:true },
+        { task:'Create Universal account (universalorlando.com)', critical:true },
+        { task:'Book hotel — Disney resort if going during busy season', critical:true },
+        { task:'Book Victoria & Albert\'s reservation (if applicable)', critical:true },
+        { task:'Book Savi\'s Workshop lightsaber experience (Hollywood Studios)', critical:false },
+        { task:'Check Kennedy Space Center launch calendar', critical:false },
+        { task:'Set Google calendar alert for 60-day Disney dining booking window', critical:true },
+      ]
+    },
+    {
+      phase:'6 Months Before', icon:'✈️', color:'#1565C0',
+      tasks:[
+        { task:'Book flights — prices are often best 6 months out', critical:true },
+        { task:'Research and buy theme park tickets (multi-day packages)', critical:true },
+        { task:'Buy travel insurance if flying', critical:false },
+        { task:'Book Disney Dining Plan if applicable (calculate if worth it first)', critical:false },
+        { task:'Sign up for Disney Visa if planning to maximize annual pass or hotel discounts', critical:false },
+        { task:'Plan rough park schedule (which parks which days)', critical:true },
+        { task:'Download My Disney Experience and Universal Orlando apps', critical:true },
+      ]
+    },
+    {
+      phase:'60 Days Before', icon:'🍽️', color:'#c62828',
+      tasks:[
+        { task:'Book ALL Disney dining reservations at exactly 6:00 AM (60 days before check-in)', critical:true },
+        { task:'Book Be Our Guest, Cinderella\'s Royal Table, and Le Cellier FIRST — they book out in minutes', critical:true },
+        { task:'Book Cirque du Soleil at Disney Springs', critical:false },
+        { task:'Book Fireworks Dessert Party', critical:false },
+        { task:'Book Disney\'s After Hours (if available)', critical:false },
+        { task:'Reserve Oga\'s Cantina (Galaxy\'s Edge) — opens 60 days out', critical:false },
+        { task:'Book Bibbidi Bobbidi Boutique (if applicable)', critical:false },
+        { task:'Set alert for Universal dining reservations (30 days out)', critical:true },
+      ]
+    },
+    {
+      phase:'30 Days Before', icon:'🏨', color:'#2E7D32',
+      tasks:[
+        { task:'Book Universal dining reservations (30-day window opens)', critical:false },
+        { task:'Order Disney MagicBand+ if not purchasing at resort', critical:false },
+        { task:'Purchase Lightning Lane Multi Pass / Genie+ days if planning to use', critical:false },
+        { task:'Research Port Canaveral shuttle if adding a cruise', critical:false },
+        { task:'Print or save all confirmation numbers to phone (backup)', critical:true },
+        { task:'Confirm all dining reservations are correct', critical:true },
+        { task:'Buy ponchos, sunscreen, portable charger for the trip', critical:true },
+        { task:'Wear your walking shoes on 5+ occasions to break them in', critical:true },
+      ]
+    },
+    {
+      phase:'7 Days Before', icon:'🧳', color:'#E65100',
+      tasks:[
+        { task:'Confirm all reservations one final time', critical:true },
+        { task:'Notify hotel of any special occasions (birthday, anniversary, honeymoon)', critical:true },
+        { task:'Pack bags — weigh them if checking to avoid overweight fees', critical:false },
+        { task:'Charge all electronics: camera, portable battery, MagicBands', critical:true },
+        { task:'Download Disney and Universal park maps for offline use', critical:false },
+        { task:'Set phone alert for 7am on park days for Lightning Lane booking', critical:true },
+        { task:'Know your hotel check-in time and plan arrival accordingly', critical:false },
+      ]
+    },
+    {
+      phase:'Morning of Each Park Day', icon:'🌅', color:'#F57F17',
+      tasks:[
+        { task:'7:00 AM SHARP: Buy Lightning Lane Single Pass for Rise of the Resistance / Guardians', critical:true },
+        { task:'7:00 AM: Book first Lightning Lane Multi Pass attraction', critical:true },
+        { task:'Eat hotel breakfast — never arrive hungry with no plan', critical:true },
+        { task:'Apply sunscreen before leaving room', critical:true },
+        { task:'Pack daypack: water bottle, snacks, ponchos, portable charger, meds', critical:true },
+        { task:'Double-check park reservation is linked to tickets in app', critical:true },
+        { task:'Leave hotel 45 min before park opens', critical:true },
+      ]
+    },
+    {
+      phase:'Inside the Park', icon:'🎢', color:'#003087',
+      tasks:[
+        { task:'Mobile order lunch at 11:30 AM before you\'re hungry', critical:true },
+        { task:'Book next Lightning Lane the moment you scan into a previous one', critical:true },
+        { task:'Check app every 30 min for LL availability on sold-out rides (cancellations open up)', critical:false },
+        { task:'Take a 30-min rest break every 4 hours — sit in A/C or grab a snack', critical:true },
+        { task:'Stay for the closing show / fireworks — parks thin out in the last hour', critical:false },
+        { task:'Photograph your child at the beginning of the day (not just tired evening shots)', critical:false },
+      ]
+    },
+  ];
+
+  let completedTasks = {};
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-trip-checklist';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const header = document.createElement('div');
+    header.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#1a1a1a,#263238,#37474F);padding:16px 14px 14px;';
+    header.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:#fff;">Ultimate Trip Checklist</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.7);">7 phases · Tap to check off · Critical tasks marked</div>
+        </div>
+        <span style="font-size:24px;">✅</span>
+      </div>
+      <div style="background:rgba(255,255,255,.1);border-radius:8px;padding:7px 12px;font-size:11px;color:rgba(255,255,255,.85);">
+        A complete planning checklist from 12 months before your trip through your park days. Tap items to mark them complete.
+      </div>`;
+
+    const content = document.createElement('div');
+    content.id = 'checklist-content';
+    content.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    PHASES.forEach((phase, pIdx) => {
+      const phaseHeader2 = document.createElement('div');
+      phaseHeader2.style.cssText = `display:flex;align-items:center;gap:8px;margin:${pIdx===0?'0':'16px'} 0 8px;`;
+      phaseHeader2.innerHTML = `
+        <span style="font-size:22px;">${phase.icon}</span>
+        <div>
+          <div style="font-size:14px;font-weight:800;color:${phase.color};">${phase.phase}</div>
+        </div>`;
+      content.appendChild(phaseHeader2);
+
+      phase.tasks.forEach((task, tIdx) => {
+        const taskId = `task-${pIdx}-${tIdx}`;
+        const row = document.createElement('div');
+        row.id = taskId;
+        row.style.cssText = `background:var(--card-bg,#fff);border-radius:10px;margin-bottom:5px;padding:9px 13px;border:1px solid var(--border,#eee);display:flex;align-items:flex-start;gap:10px;cursor:pointer;${task.critical ? 'border-left:3px solid ' + phase.color + ';' : ''}`;
+
+        const checkbox = document.createElement('div');
+        checkbox.style.cssText = `min-width:20px;height:20px;border-radius:5px;border:2px solid ${phase.color};display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;`;
+
+        const label = document.createElement('div');
+        label.style.cssText = 'flex:1;';
+        label.innerHTML = `<span style="font-size:11px;color:var(--text-primary,#212121);">${task.task}</span>${task.critical ? '<span style="margin-left:6px;font-size:9px;font-weight:800;color:' + phase.color + ';">CRITICAL</span>' : ''}`;
+
+        row.appendChild(checkbox);
+        row.appendChild(label);
+
+        row.onclick = function() {
+          const key = taskId;
+          completedTasks[key] = !completedTasks[key];
+          if (completedTasks[key]) {
+            checkbox.innerHTML = `<span style="font-size:14px;color:${phase.color};">✓</span>`;
+            checkbox.style.background = phase.color + '20';
+            label.querySelector('span').style.textDecoration = 'line-through';
+            label.querySelector('span').style.color = 'var(--text-secondary,#999)';
+            row.style.opacity = '0.7';
+          } else {
+            checkbox.innerHTML = '';
+            checkbox.style.background = 'transparent';
+            label.querySelector('span').style.textDecoration = 'none';
+            label.querySelector('span').style.color = 'var(--text-primary,#212121)';
+            row.style.opacity = '1';
+          }
+        };
+
+        content.appendChild(row);
+      });
+    });
+
+    const resetBtn = document.createElement('button');
+    resetBtn.style.cssText = 'margin:12px 0 20px;width:100%;padding:10px;border-radius:12px;border:1px solid var(--border,#ddd);background:transparent;color:var(--text-secondary,#888);font-size:12px;cursor:pointer;';
+    resetBtn.textContent = 'Reset All Checkboxes';
+    resetBtn.onclick = function() {
+      completedTasks = {};
+      const allRows = content.querySelectorAll('[id^="task-"]');
+      allRows.forEach(row => {
+        row.click(); // this would toggle... instead just rebuild
+      });
+      // Simply rebuild content
+      if (document.getElementById('screen-trip-checklist')) {
+        document.getElementById('screen-trip-checklist').remove();
+        window._checklistBuilt = false;
+        buildScreen();
+        window.showScreen('trip-checklist');
+      }
+    };
+    content.appendChild(resetBtn);
+
+    s.appendChild(header);
+    s.appendChild(content);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-trip-checklist')) buildScreen();
+
+  const _prevSS_yyyy2 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_yyyy2) _prevSS_yyyy2(name, el);
+    if (name === 'trip-checklist') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-trip-checklist');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectChecklistCard() {
+    if (document.getElementById('checklist-home-card')) return true;
+    const ref = document.getElementById('scavenger-home-card') || document.getElementById('souvenir-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'checklist-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#1a1a1a,#263238,#37474F);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('trip-checklist');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:3px;">✅ Ultimate Trip Checklist</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.75);">7 phases · Tap to check off · Critical tasks</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.4);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _checklistCard = false;
+  setInterval(() => { if (!_checklistCard) _checklistCard = injectChecklistCard(); }, 36500);
+  setTimeout(() => { _checklistCard = injectChecklistCard(); }, 33000);
+
+  const _prevRH_yyyy2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_yyyy2) _prevRH_yyyy2.apply(this, arguments);
+    setTimeout(() => { _checklistCard = false; _checklistCard = injectChecklistCard(); }, 9500);
+  };
+})();
+</script>
