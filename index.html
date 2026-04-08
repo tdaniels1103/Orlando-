@@ -59780,3 +59780,392 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK BBBBBBB: Orlando Water Parks Complete Guide ===== */
+(function initOrlandoWaterParks() {
+
+  const WATER_PARKS = [
+    {
+      name:'Typhoon Lagoon', emoji:'🌊', color:'#0277BD',
+      operator:'Disney',
+      price:'$59–109/person',
+      headline:'A tropical cyclone destroyed a resort — and left behind the world\'s largest inland surf lagoon. The theming tells a story; every waterpark should aspire to this.',
+      rides:[
+        {name:'Wave Pool', note:'The iconic 2.75-acre wave pool creates 6-foot ocean swells every 90 seconds. Guests line up for the waves. The most exciting wave pool experience at any American waterpark.'},
+        {name:'Crush \'n\' Gusher', note:'Three water coasters with uphill and downhill sections. Fast and unexpected. The Banana Blaster and Pineapple Plunger are the most intense slides at Typhoon Lagoon.'},
+        {name:'Humunga Kowabunga', note:'Three 214-foot body slides that descend 51 feet. Near-vertical drop sections. The fastest slides at Disney.'},
+        {name:'Miss Adventure Falls', note:'The park\'s major family tube ride — narrated adventure through a treasure-hunting story. The most family-immersive ride at any Disney water park.'},
+        {name:'Ketchakiddee Creek', note:'Dedicated children\'s water play area. Slides, water cannons, and shallow pools designed for ages 2–5.'},
+      ],
+      bestFor:'Families, wave pool enthusiasts, Disney immersion seekers',
+      tip:'Typhoon Lagoon allows outside food. Pack a cooler (no glass, no alcohol). The park fills capacity by 11 AM on peak summer days — arrive at opening (10 AM typically) or by 9:30 to get chairs.',
+    },
+    {
+      name:'Blizzard Beach', emoji:'❄️', color:'#1565C0',
+      operator:'Disney',
+      price:'$59–109/person',
+      headline:'A ski resort that melted in the Florida sun — now the only ski-themed water park in existence. The novelty of ski chairlift access to water slides is genuinely delightful.',
+      rides:[
+        {name:'Summit Plummet', note:'At 120 feet, this is the tallest body slide at Walt Disney World and one of the fastest in the United States. 60 mph descent. One of the most intense waterpark slides in Florida.'},
+        {name:'Slush Gusher', note:'Sister slide to Summit Plummet at 90 feet. Still extreme, but slightly more approachable for first-timers.'},
+        {name:'Teamboat Springs', note:'The longest family white-water raft ride in the world (at 1,400 feet). For 4–6 riders. Excellent for families.'},
+        {name:'Chair Lift', note:'The ski-resort theme is carried through with an actual chair lift that carries guests to the top of Mount Gushmore. One of the most unique ways to access a waterpark attraction.'},
+        {name:'Tike\'s Peak', note:'Dedicated children\'s area modeled after a miniature ski resort. Slides sized for ages 2–6.'},
+      ],
+      bestFor:'Thrill seekers, families with mixed ages, Disney completionists',
+      tip:'Blizzard Beach has more shade structures than Typhoon Lagoon — better for avoiding the Florida sun. The chair lift provides seating and views between rides. Summit Plummet has a significant wait on peak days — ride immediately at opening.',
+    },
+    {
+      name:'Aquatica', emoji:'🐬', color:'#E65100',
+      operator:'SeaWorld Parks',
+      price:'$45–79/person',
+      headline:'SeaWorld\'s water park — the best value of the major Orlando water parks. Combines genuine water park thrills with an open-ocean aesthetic and encounters with actual marine animals.',
+      rides:[
+        {name:'Ihu\'s Breakaway Falls', note:'Trap doors open and drop you nearly vertically — 40-foot drop — into a slide. Multiple body slide tubes with individual random releases. The most intense drop experience in Orlando waterparks.'},
+        {name:'Omaka Rocka', note:'A water coaster with 3 half-pipe style curved sections. Riders accelerate through repeated curves. Unique format not found at Disney water parks.'},
+        {name:'Taumata Racer', note:'Side-by-side racing body slides — you race 8-at-a-time. 245-foot racing slide. Competitive and social.'},
+        {name:'Dolphin Plunge', note:'You slide through a tube passing through an actual dolphin habitat. Bottlenose dolphins swim alongside you as you pass. No other water park experience like it.'},
+        {name:'Walkabout Waters', note:'The largest family water play structure in Florida. Multi-level climbing structure with 60+ water elements, a tipping bucket, and zero-depth splash areas.'},
+      ],
+      bestFor:'Value seekers, SeaWorld Annual Pass holders, marine animal fans',
+      tip:'SeaWorld Annual Passes include Aquatica access on most tiers. Aquatica\'s crowds are lighter than Disney water parks on weekdays — a 2-hour morning at Aquatica can mean riding everything twice.',
+    },
+    {
+      name:'Volcano Bay', emoji:'🌋', color:'#C62828',
+      operator:'Universal',
+      price:'$79–109/person',
+      headline:'Universal\'s water park with a 200-foot volcano centerpiece and app-based virtual queue for every attraction. No standing in line — use the TapuTapu wristband to reserve your spot digitally.',
+      rides:[
+        {name:'Ko\'okiri Body Plunge', note:'The world\'s first 125-foot body slide with a drop door. You stand in a capsule, a door opens, and you fall nearly straight down. 70-degree angle descent.'},
+        {name:'Krakatau Aqua Coaster', note:'The signature attraction — a water coaster through the volcano with uphill and downhill sections. Both front and back seats have different experiences.'},
+        {name:'Punga Racers', note:'Four-lane racing mat slides with the fastest finish speeds at Volcano Bay. The race format adds social competition.'},
+        {name:'TeAwa The Fearless River', note:'A fast-flowing river with white-water rapids sections — not a lazy river. You must wear a life vest. More intense than typical river attractions.'},
+        {name:'Puka Uli Lagoon', note:'Wave pool with a Polynesian village aesthetic. The lagoon calm at the far end is ideal for children; the wave zone adds energy.'},
+      ],
+      bestFor:'Universal Annual Pass holders, tech-forward visitors who like virtual queue, families wanting the newest park',
+      tip:'The TapuTapu virtual queue system means you can be in line for 3 different attractions simultaneously. Plan your day by accessing the app before getting to the park. Ko\'okiri and the Aqua Coaster virtual queues fill within 30 minutes of opening.',
+    },
+  ];
+
+  const WATER_TIPS = [
+    {icon:'☀️', tip:'Florida UV is extreme — apply SPF 50+ water-resistant sunscreen every 90 minutes. Waterproof sunscreen is less effective after repeated water immersion. Reapply at the chair.'},
+    {icon:'👕', tip:'Rash guards are more effective than sunscreen for all-day water park visits. Aquatic SPF clothing has become standard for Florida families. Reduces sunscreen cost and burn risk dramatically.'},
+    {icon:'💳', tip:'Disney water parks are included in Disney Annual Passes (except Pixie Dust tier). If you have an AP, the water parks become free park days. On a 7-day trip, use a resort rest day at the water park.'},
+    {icon:'🎒', tip:'Lockers are mandatory for slides at Disney water parks — no loose items. Rent a locker ($15–20/day) near your home base chairs. The daily locker (vs. per-use) is better value for families.'},
+    {icon:'🌧️', tip:'Water parks close at the first lightning detection within 8 miles and do not reopen for 30 minutes after the last lightning strike. Florida afternoon storms frequently cause 30–60 minute park closures in summer.'},
+    {icon:'🥶', tip:'Blizzard Beach is more comfortable on cooler Florida days (winter) since it\'s out in the open with less shade. Typhoon Lagoon\'s theming and shade structures make it better for midsummer scorching days.'},
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-water-parks';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#0277BD,#1565C0,#E65100);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Water Parks Complete Guide</div>
+          <div style="font-size:11px;opacity:.8;">Typhoon Lagoon · Blizzard Beach · Aquatica · Volcano Bay</div>
+        </div>
+        <span style="font-size:28px;">🌊</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        Orlando has four major water parks — two Disney, one SeaWorld, one Universal. Each has a distinct identity: the world's best wave pool, a 120-foot nearly vertical drop, virtual queue technology, and actual dolphin encounters. One trip can't cover all four.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    WATER_PARKS.forEach(wp => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:10px 14px;background:${wp.color}18;border-left:4px solid ${wp.color};">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div style="display:flex;gap:8px;align-items:center;">
+              <span style="font-size:22px;">${wp.emoji}</span>
+              <div>
+                <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--text-primary,#212121);">${wp.name}</div>
+                <div style="font-size:10px;color:var(--text-secondary,#888);">${wp.operator} · ${wp.bestFor}</div>
+              </div>
+            </div>
+            <div style="font-size:11px;font-weight:700;color:${wp.color};">${wp.price}</div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;margin-bottom:8px;font-style:italic;">"${wp.headline}"</div>
+          <div style="font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:4px;">SIGNATURE ATTRACTIONS</div>
+          ${wp.rides.map(r=>`<div style="margin-bottom:5px;padding-left:8px;border-left:3px solid ${wp.color};">
+            <div style="font-size:11px;font-weight:700;color:var(--text-primary,#212121);">${r.name}</div>
+            <div style="font-size:10px;color:var(--text-secondary,#666);">${r.note}</div>
+          </div>`).join('')}
+          <div style="display:flex;gap:5px;background:${wp.color}0d;border-radius:8px;padding:7px;margin-top:7px;">
+            <span style="font-size:11px;flex-shrink:0;">💡</span>
+            <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${wp.tip}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const tipCard = document.createElement('div');
+    tipCard.style.cssText = 'background:linear-gradient(135deg,#0277BD,#1565C0);border-radius:16px;margin-bottom:20px;padding:14px;color:#fff;';
+    tipCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">☀️ Water Park Survival Guide</div>
+    ${WATER_TIPS.map(t=>`<div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
+      <span style="font-size:18px;flex-shrink:0;">${t.icon}</span>
+      <div style="font-size:12px;opacity:.95;line-height:1.5;">${t.tip}</div>
+    </div>`).join('')}`;
+    body.appendChild(tipCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-water-parks')) buildScreen();
+
+  const _prevSS_bbbbbbb = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_bbbbbbb) _prevSS_bbbbbbb(name, el);
+    if (name === 'water-parks') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-water-parks');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectWPCard() {
+    if (document.getElementById('water-parks-home-card')) return true;
+    const ref = document.getElementById('airport-home-card') || document.getElementById('winter-park-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'water-parks-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#0277BD,#1565C0,#E65100 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('water-parks');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🌊</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Water Parks Complete Guide</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Typhoon Lagoon · Blizzard Beach · Aquatica · Volcano Bay</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _wpCard = false;
+  setInterval(() => { if (!_wpCard) _wpCard = injectWPCard(); }, 88000);
+  setTimeout(() => { _wpCard = injectWPCard(); }, 84500);
+  const _prevRH_bbbbbbb = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_bbbbbbb) _prevRH_bbbbbbb.apply(this, arguments);
+    setTimeout(() => { _wpCard = false; _wpCard = injectWPCard(); }, 30200);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK CCCCCCC: Orlando Family Emergency & Practical Guide ===== */
+(function initOrlandoPractical() {
+
+  const EMERGENCY_INFO = [
+    {
+      category:'Medical Emergencies', emoji:'🏥', color:'#C62828',
+      info:[
+        {name:'Disney First Aid', note:'Every Disney park has a fully-staffed first aid station. Magic Kingdom: near the Harmony Barber Shop on Main Street. EPCOT: near the Odyssey Events Pavilion. AK: Discovery Island. HS: near the park entrance. Cast Members can direct you.'},
+        {name:'AdventHealth Centra Care (multiple locations)', note:'Urgent care closest to Disney World: AdventHealth Centra Care on Osceola Pkwy (5 minutes from Disney). No appointment needed. Accepts most insurance. For non-emergency medical care.'},
+        {name:'Orlando Regional Medical Center', note:'Level I Trauma Center in downtown Orlando (25 minutes from Disney). The highest level trauma facility in Central Florida.'},
+        {name:'Nemours Children\'s Hospital', note:'Pediatric specialty hospital at Lake Nona (30 minutes from Disney). Best option for serious pediatric emergencies.'},
+      ],
+    },
+    {
+      category:'Pharmacy & Essentials', emoji:'💊', color:'#1565C0',
+      info:[
+        {name:'Walgreens (multiple I-Drive locations)', note:'Open 24 hours. Multiple locations near major hotel corridors on I-Drive and US-192.'},
+        {name:'CVS (Sand Lake Road / Dr. Phillips)', note:'Full pharmacy with photo printing. Open late most locations.'},
+        {name:'Garden Grocer', note:'Grocery delivery service that specializes in Disney resort hotel deliveries. Order liquor, snacks, sunscreen, diapers. Delivers to your hotel room or Disney resort bell services.'},
+        {name:'Publix (multiple locations)', note:'Florida\'s dominant grocery chain. Excellent deli, prepared foods, and pharmacy. Best Orlando grocery option. Orange Lake Blvd location near Disney is the most convenient.'},
+      ],
+    },
+    {
+      category:'Lost Child Procedures', emoji:'👶', color:'#2E7D32',
+      info:[
+        {name:'Disney Lost Child Protocol', note:'Disney Cast Members are trained extensively in lost child procedures. Any CM can initiate a lost child search. The child is taken to Baby Care Center or the nearest CM hub. A description is radioed park-wide. Resolution average: 12 minutes.'},
+        {name:'Meet at a pre-arranged landmark', note:'Brief children before entering: "If you get lost, stay where you are or find a person in a uniform. Tell them your name and the name of our hotel." Designate a specific landmark (Cinderella Castle entrance, a specific store).'},
+        {name:'MagicBand safety', note:'A child\'s MagicBand is registered to your My Disney Experience account. If a lost child is found, Cast Members can read the MagicBand to identify the reservation and contact information.'},
+      ],
+    },
+  ];
+
+  const PRACTICAL_INFO = [
+    {
+      category:'Florida Sun & Heat', emoji:'☀️', color:'#E65100',
+      tips:[
+        'UV index in June–August regularly exceeds 10 (extreme). Sunburn in 10 minutes without protection at peak hours.',
+        'Drink water before you feel thirsty. Adults need 1 liter per hour in peak heat. Children: 0.5 liter/hour minimum.',
+        'Heat exhaustion warning signs: heavy sweating, dizziness, nausea, pale skin, fast/weak pulse. Move to shade, cool with water.',
+        'Schedule a 2-hour midday hotel break (noon–2 PM) — pools, air conditioning, and rest. Parks empty noticeably. Return at 4 PM when sun is lower.',
+        'Cooling towels ($8 at Target/Walgreens) are one of the most useful theme park purchases. Wet, drape on neck, instant relief.',
+      ],
+    },
+    {
+      category:'Florida Thunderstorms', emoji:'⛈️', color:'#6A1B9A',
+      tips:[
+        'Florida has more lightning strikes per square mile than any US state. Theme parks TAKE THIS SERIOUSLY — rides stop at the first warning.',
+        'Summer storm pattern: clear morning → building clouds noon → storm 2–4 PM → clearing by 5–6 PM. Plan around this cycle.',
+        'Outdoor rides close at first lightning warning. Indoor rides stay open. Head to indoor attractions when you hear thunder.',
+        'Water parks close at first lightning and reopen 30 minutes after the last strike. Plan for 45-minute closures on summer afternoons.',
+        'Keep a rain poncho ($8–12 at any Disney shop) in your bag. The brief storms are intense but short.',
+      ],
+    },
+    {
+      category:'Crowds & Timing', emoji:'👥', color:'#7B1FA2',
+      tips:[
+        'Busiest days at Disney: Saturday, Sunday, any holiday. Slowest: Tuesday–Thursday excluding school breaks.',
+        'Biggest crowds of the year: Christmas week (Dec 26–Jan 1), Spring Break (March–April), Fourth of July week, Thanksgiving weekend.',
+        'Lowest crowds with open schools: mid-January to Presidents Day weekend, first two weeks of September.',
+        'Arrive 30 minutes before park opening. The most popular rides have 10–20 minute waits at opening and 60–90 minute waits by 11 AM.',
+        'The Crowd Calendar at TouringPlans.com is the most accurate predictor of Disney crowd levels with daily predictions going months out.',
+      ],
+    },
+    {
+      category:'Money & Spending', emoji:'💰', color:'#C9A96E',
+      tips:[
+        'Average family of 4 spends: park tickets ($1,200+), hotels ($200–600/night), food ($200–300/day), extras ($100–200/day). Total for 7 nights: $6,000–12,000.',
+        'The biggest money-saving move: pack snacks and water. Bringing your own granola bars and water bottles into the parks saves $30–50/day for a family of 4.',
+        'Disney allows outside food. Universal does not (no outside food policy — though enforcement is minimal for snacks).',
+        'Souvenirs: kids want them, they lose or forget them. The best souvenir strategy: 1 item per child, chosen on the last day when they know what they actually want.',
+        'Gift cards purchased at Target/Costco often have Disney/Universal discounts (5% Target RedCard, bulk savings at Costco).',
+      ],
+    },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-practical';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#C62828,#1565C0,#2E7D32);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Practical & Emergency Guide</div>
+          <div style="font-size:11px;opacity:.8;">Medical · Pharmacies · Heat safety · Storms · Lost child · Budgets</div>
+        </div>
+        <span style="font-size:28px;">🛡️</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        The information you need before you need it. Medical facilities, heat safety, storm protocols, and the real cost breakdown of an Orlando trip. This guide covers what the marketing materials don't.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    EMERGENCY_INFO.forEach(section => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:10px 14px;background:${section.color}18;border-left:4px solid ${section.color};">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:20px;">${section.emoji}</span>
+            <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${section.category}</div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          ${section.info.map(i=>`<div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--border,#f0f0f0);">
+            <div style="font-size:12px;font-weight:700;color:${section.color};margin-bottom:2px;">${i.name}</div>
+            <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${i.note}</div>
+          </div>`).join('')}
+        </div>`;
+      body.appendChild(card);
+    });
+
+    PRACTICAL_INFO.forEach(section => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:10px 14px;background:${section.color}18;border-left:4px solid ${section.color};">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:20px;">${section.emoji}</span>
+            <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${section.category}</div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          ${section.tips.map(t=>`<div style="display:flex;gap:7px;margin-bottom:6px;align-items:flex-start;">
+            <span style="font-size:11px;flex-shrink:0;color:${section.color};">•</span>
+            <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${t}</div>
+          </div>`).join('')}
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const footCard = document.createElement('div');
+    footCard.style.cssText = 'background:linear-gradient(135deg,#C62828,#1565C0);border-radius:14px;margin-bottom:20px;padding:14px;color:#fff;';
+    footCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;margin-bottom:8px;">📞 Key Numbers to Save</div>
+    ${[
+      {name:'Disney Security', num:'407-560-7959'},
+      {name:'Universal Security', num:'407-363-8000'},
+      {name:'AdventHealth Centra Care (Disney area)', num:'407-397-7032'},
+      {name:'Poison Control', num:'1-800-222-1222'},
+      {name:'Florida non-emergency police', num:'407-836-4357'},
+    ].map(n=>`<div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+      <div style="font-size:12px;opacity:.9;">${n.name}</div>
+      <div style="font-size:12px;font-weight:700;color:#C9A96E;">${n.num}</div>
+    </div>`).join('')}`;
+    body.appendChild(footCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-practical')) buildScreen();
+
+  const _prevSS_ccccccc = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_ccccccc) _prevSS_ccccccc(name, el);
+    if (name === 'practical') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-practical');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectPracticalCard() {
+    if (document.getElementById('practical-home-card')) return true;
+    const ref = document.getElementById('water-parks-home-card') || document.getElementById('airport-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'practical-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#C62828,#1565C0,#2E7D32 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('practical');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🛡️</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Practical & Emergency Guide</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Medical · Heat safety · Storm protocols · Budget breakdown</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _practicalCard = false;
+  setInterval(() => { if (!_practicalCard) _practicalCard = injectPracticalCard(); }, 89000);
+  setTimeout(() => { _practicalCard = injectPracticalCard(); }, 85500);
+  const _prevRH_ccccccc = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_ccccccc) _prevRH_ccccccc.apply(this, arguments);
+    setTimeout(() => { _practicalCard = false; _practicalCard = injectPracticalCard(); }, 30600);
+  };
+})();
+</script>
