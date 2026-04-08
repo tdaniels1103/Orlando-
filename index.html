@@ -61610,3 +61610,316 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK LLLLLLL: Orlando Parking Complete Guide ===== */
+(function initOrlandoParking() {
+
+  const PARKING_GUIDES = [
+    {
+      park:'Walt Disney World', emoji:'🏰', color:'#003087',
+      lots:[
+        {name:'Magic Kingdom — Transportation & Ticket Center', cost:'$30/day standard, $50/day preferred', notes:'MK has no direct car access. Park at TTC, then monorail (12 min) or ferry (15 min) to the park. The ferry is underrated — magical approach to the castle. Arrive 45 min before park open to get through parking → transport → park entrance.'},
+        {name:'EPCOT Parking', cost:'$30/day standard, $50/day preferred', notes:'Large surface lot directly adjacent to the park gates. Simple and straightforward. Preferred lot saves 5–10 minute walk. Note lot row: the lot is enormous and cars get lost frequently.'},
+        {name:'Hollywood Studios Parking', cost:'$30/day standard, $50/day preferred', notes:'Multi-level garage structure with surface overflow. Skyliner gondola picks up guests from near the parking area. Preferred spots are closest to the main entrance.'},
+        {name:'Animal Kingdom Parking', cost:'$30/day standard, $50/day preferred', notes:'Largest parking lot at Disney World — multiple named sections. Note your section and row every time. The walk from far lots to the park entrance is 10–15 minutes.'},
+        {name:'Disney Springs', cost:'FREE in multi-story garages', notes:'Orange Garage and Lime Garage are centrally located. Free for all guests — no park ticket required. Evenings on weekends fill by 7 PM. Arrive before 6 PM or use satellite lots.'},
+      ],
+      tip:'Disney Annual Passholders (Gold, Platinum, Incredi-Pass) get free standard parking at all Disney parks. This saves $30/day — on a 7-day trip, that\'s $210 in parking savings. Factor this into the Annual Pass value calculation.',
+    },
+    {
+      park:'Universal Orlando', emoji:'🎬', color:'#C62828',
+      lots:[
+        {name:'Universal Main Parking Structure', cost:'$30/day standard, $50/day preferred', notes:'Enormous multi-level garage connecting to CityWalk. From the garage, walk through CityWalk (15 min) to reach either Universal Studios Florida or Islands of Adventure. Preferred parking is on the top floors closest to CityWalk entrance.'},
+        {name:'Cabana Bay Parking', cost:'$20/day (resort guest free)', notes:'The Cabana Bay Beach Resort has its own parking lot with a walking path to the parks. Cheaper than the main structure and an easy 10-minute walk. Popular hack for budget-conscious visitors.'},
+        {name:'CityWalk', cost:'FREE after 6 PM for dining/entertainment', notes:'After 6 PM, Universal validates parking for CityWalk restaurant guests. The first 3 hours are often free or discounted if dining. Check with the CityWalk information desk.'},
+      ],
+      tip:'Universal Annual Passholders (Power, Seasonal, Annual, Premier) get free self-parking. Premier Annual Pass includes free preferred parking — the most valuable annual pass parking benefit in Orlando.',
+    },
+    {
+      park:'SeaWorld Orlando', emoji:'🐋', color:'#0277BD',
+      lots:[
+        {name:'SeaWorld Main Lot', cost:'$25/day standard, $45/day preferred', notes:'Single surface lot. Straightforward — no complex structure. Preferred parking is front row closest to the park entrance. On most days the walk from general parking is 5–10 minutes.'},
+        {name:'Aquatica Parking', cost:'$25/day (included with SeaWorld combo)', notes:'Adjacent to SeaWorld, shared lot section. SeaWorld Annual Passholders often get parking included.'},
+      ],
+      tip:'SeaWorld parking is generally simpler and cheaper than Disney or Universal. Annual Passes include parking. The park is directly accessible from I-4 (exit 72) with straightforward signage.',
+    },
+    {
+      park:'LEGOLAND Florida', emoji:'🧱', color:'#E65100',
+      lots:[
+        {name:'LEGOLAND Main Lot', cost:'$20/day standard, $30/day preferred', notes:'Located in Winter Haven, 45 minutes from Orlando. Large surface lot with tram service to the entrance. LEGOLAND is a half-day park for older children — arrive at opening, see everything by 2 PM.'},
+      ],
+      tip:'LEGOLAND is 45 minutes from Disney. Worth combining with a Legoland Hotel stay for LEGO-obsessed ages 3–12. Not worth the drive for thrill-seeking families or adults without young children.',
+    },
+  ];
+
+  const PARKING_HACKS = [
+    {icon:'💡', hack:'Arrive at any Disney park at least 45 minutes before official open. The parking lot often opens 60–90 minutes before the park. Early arrival = front lot + shortest security lines.'},
+    {icon:'📱', hack:'Both My Disney Experience and Universal apps show current parking availability in real-time. Check before driving — on peak days, preferred lots sell out before 10 AM.'},
+    {icon:'🚌', hack:'For Magic Kingdom specifically: Disney resort guests can take a bus directly to Magic Kingdom (bypassing TTC entirely). This saves 20–30 minutes vs. the TTC parking lot approach.'},
+    {icon:'📝', hack:'Photo your parking spot immediately upon parking. Even better: drop a pin on your phone. Disney lots span 100+ acres and parking confusion adds 20–30 minutes to the end of an already exhausting day.'},
+    {icon:'🔄', hack:'Parking is valid all day for park-hopping. If hopping from MK to EPCOT, you can drive your car to EPCOT rather than waiting for Disney transportation — faster if you have a car on property.'},
+    {icon:'💰', hack:'Purchase Universal Annual Pass for $419 (Seasonal) if visiting 2+ days. The pass includes free parking ($30 × 2 days = $60 savings), which nearly pays for itself against the alternative.'},
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-parking';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#003087,#C62828,#E65100);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Orlando Parking Complete Guide</div>
+          <div style="font-size:11px;opacity:.8;">Disney · Universal · SeaWorld · LEGOLAND · Free parking hacks</div>
+        </div>
+        <span style="font-size:28px;">🚗</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        Parking costs at Orlando theme parks add up to $150–$300 per week for a typical family trip. Knowing the lots, the hacks, and when Annual Pass parking pays off can eliminate this cost entirely.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    PARKING_GUIDES.forEach(guide => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:9px 14px;background:${guide.color}18;border-left:4px solid ${guide.color};">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:20px;">${guide.emoji}</span>
+            <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${guide.park}</div>
+          </div>
+        </div>
+        <div style="padding:8px 14px;">
+          ${guide.lots.map(lot=>`<div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--border,#f5f5f5);">
+            <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);">${lot.name}</div>
+            <div style="font-size:10px;font-weight:700;color:${guide.color};margin-bottom:2px;">${lot.cost}</div>
+            <div style="font-size:10px;color:var(--text-secondary,#666);">${lot.notes}</div>
+          </div>`).join('')}
+          <div style="display:flex;gap:5px;background:${guide.color}0d;border-radius:8px;padding:6px;margin-top:4px;">
+            <span style="font-size:11px;flex-shrink:0;">💡</span>
+            <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${guide.tip}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const hacksCard = document.createElement('div');
+    hacksCard.style.cssText = 'background:linear-gradient(135deg,#003087,#E65100);border-radius:14px;margin-bottom:20px;padding:14px;color:#fff;';
+    hacksCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;margin-bottom:8px;">🚗 Parking Hacks & Money Savers</div>
+    ${PARKING_HACKS.map(h=>`<div style="display:flex;gap:10px;margin-bottom:7px;align-items:flex-start;">
+      <span style="font-size:16px;flex-shrink:0;">${h.icon}</span>
+      <div style="font-size:11px;opacity:.95;line-height:1.5;">${h.hack}</div>
+    </div>`).join('')}`;
+    body.appendChild(hacksCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-parking')) buildScreen();
+
+  const _prevSS_lllllll = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_lllllll) _prevSS_lllllll(name, el);
+    if (name === 'parking') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-parking');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectParkingCard() {
+    if (document.getElementById('parking-home-card')) return true;
+    const ref = document.getElementById('first-timer-home-card') || document.getElementById('character-meets-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'parking-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#003087,#C62828,#E65100 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('parking');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🚗</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Orlando Parking Guide</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Disney · Universal · SeaWorld · Free hacks · AP savings</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _parkingCard = false;
+  setInterval(() => { if (!_parkingCard) _parkingCard = injectParkingCard(); }, 98000);
+  setTimeout(() => { _parkingCard = injectParkingCard(); }, 94500);
+  const _prevRH_lllllll = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_lllllll) _prevRH_lllllll.apply(this, arguments);
+    setTimeout(() => { _parkingCard = false; _parkingCard = injectParkingCard(); }, 34200);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK MMMMMMM: MagicBand & My Disney Experience App Guide ===== */
+(function initMagicBandMDE() {
+
+  const MAGICBAND_GUIDE = [
+    {
+      topic:'What is MagicBand+?', emoji:'⌚', color:'#003087',
+      content:'MagicBand+ is a wristband that serves as your Disney World admission ticket, hotel room key, and payment method — all in one. The + version (2022 update) adds gesture recognition, haptic feedback, and interactive features with select park elements (statues in Galaxy\'s Edge, Fab 50 golden statues throughout the parks).',
+      details:[
+        {label:'Cost', value:'$34.99 for basic colors; $44.99 for special designs; free for Annual Passholders (1 complimentary per year)'},
+        {label:'Where to buy', value:'Walt Disney World website, My Disney Experience app, or Disney Springs World of Disney store'},
+        {label:'Battery life', value:'Approximately 30 hours of active use; longer if gestures/haptics not actively used'},
+        {label:'Water resistance', value:'Yes — safe for swimming, rain, water parks (though not rated for diving depth)'},
+      ],
+    },
+    {
+      topic:'MagicBand vs. MagicMobile', emoji:'📱', color:'#1565C0',
+      content:'MagicMobile (added 2021) lets you use your iPhone or Apple Watch as your MagicBand equivalent. Android support added later. For visitors who don\'t want to buy a MagicBand+, MagicMobile provides the same functionality via NFC on your existing device.',
+      details:[
+        {label:'MagicMobile setup', value:'Add your Disney ticket to Apple Wallet or Google Wallet through the MDE app'},
+        {label:'Advantage over MagicBand', value:'Free (uses your existing phone); no wristband to buy or lose'},
+        {label:'Disadvantage', value:'Phone must have battery charge; can\'t pay without unlocking your phone; MagicBand+ interactive features not available'},
+        {label:'Recommendation', value:'Bring both: MagicBand for park access, MagicMobile as backup. Never rely solely on your phone battery'},
+      ],
+    },
+    {
+      topic:'My Disney Experience App', emoji:'📲', color:'#C62828',
+      content:'MDE is the essential Disney World operating system. It handles Lightning Lane reservations, dining reservations, virtual queues, mobile ordering, wait times, park maps, and PhotoPass photos. Every Disney visitor needs this app set up before arriving.',
+      details:[
+        {label:'Link your tickets', value:'Add park tickets to MDE before arrival — avoids ticket desk lines'},
+        {label:'Morning Lightning Lane', value:'Purchase Genie+ at 7 AM (resort guests) or park open (day visitors). Grab your first LL reservation immediately'},
+        {label:'Mobile order', value:'Order food at quick-service restaurants before you arrive — skip the counter line. Open the order window at mobile order arrival time'},
+        {label:'Wait times', value:'MDE shows real-time posted wait times. Actual waits are often 10–20% shorter than posted (Disney over-estimates to manage expectations)'},
+        {label:'PhotoPass', value:'Photos taken by Disney photographers appear in MDE under "Photos." Link Memory Maker here for unlimited digital downloads'},
+      ],
+    },
+    {
+      topic:'Lightning Lane Strategy', emoji:'⚡', color:'#7B1FA2',
+      content:'Lightning Lane is the paid system replacing FastPass+. Two components: Genie+ (multiple LL reservations throughout the day, $35–45/day) and Individual Lightning Lane (single expensive rides, $7–25 each). Both are purchased through MDE.',
+      details:[
+        {label:'Genie+ best strategy', value:'Buy at 7 AM. Immediately book your highest-priority attraction. Rebook every 2 hours (or immediately after tapping in to your current LL). Maximize by booking 5–6 attractions per day'},
+        {label:'Top Individual LL rides', value:'Tron Lightcycle Run, Guardians of the Galaxy, ROTR, Cosmic Rewind — these are NOT in Genie+. Individual purchase required ($15–25/person)'},
+        {label:'Skip Genie+ if', value:'Visiting in January or September on a weekday — standby lines are under 20 minutes for most rides. Check crowd calendars before purchasing'},
+        {label:'Best value day', value:'Hollywood Studios on a busy day — Genie+ unlocks MFSR, SDD, TSMM, Star Tours, Rock \'n\' Roller Coaster in one day. High throughput for the price'},
+      ],
+    },
+  ];
+
+  const MDE_TIPS = [
+    {icon:'⏰', tip:'Set up your MDE account and link all tickets 2 weeks before your trip. Download the app, add your hotel reservation, and familiarize yourself with the interface. First-day confusion with the app costs 30–60 minutes.'},
+    {icon:'👨‍👩‍👧‍👦', tip:'Create a Family & Friends list in MDE and add all travel companions before the trip. This allows you to make LL reservations for everyone in your party simultaneously from one phone.'},
+    {icon:'🔔', tip:'Enable push notifications for MDE. Virtual queue boarding group announcements (TRON, Guardians) drop at 7 AM and sell out in under 2 minutes. Notifications ensure you see the alert immediately.'},
+    {icon:'📷', tip:'After each Disney PhotoPass photo is taken, ask the photographer to scan your MagicBand or provide your party\'s MDE link code. Photos not linked within 45 days are lost permanently.'},
+    {icon:'💡', tip:'The "Tip Board" in MDE shows predicted wait times for the rest of the day based on historical data. Use this to plan when to visit specific attractions — the algorithm is surprisingly accurate.'},
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-magicband-mde';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#003087,#7B1FA2,#C62828);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">MagicBand+ & MDE App Guide</div>
+          <div style="font-size:11px;opacity:.8;">MagicBand+ setup · Lightning Lane strategy · MagicMobile · PhotoPass</div>
+        </div>
+        <span style="font-size:28px;">⌚</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        The My Disney Experience ecosystem (MagicBand+, Lightning Lane, MagicMobile) is the infrastructure that controls your Disney World experience. Mastering it before arrival is worth several hours of saved time per park day.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    MAGICBAND_GUIDE.forEach(item => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:9px 14px;background:${item.color}18;border-left:4px solid ${item.color};">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:20px;">${item.emoji}</span>
+            <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${item.topic}</div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          <div style="font-size:12px;color:var(--text-secondary,#444);line-height:1.6;margin-bottom:8px;">${item.content}</div>
+          ${item.details.map(d=>`<div style="display:flex;gap:8px;margin-bottom:5px;align-items:flex-start;">
+            <div style="font-size:10px;font-weight:700;color:${item.color};flex-shrink:0;min-width:80px;">${d.label}</div>
+            <div style="font-size:10px;color:var(--text-secondary,#555);line-height:1.5;">${d.value}</div>
+          </div>`).join('')}
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const tipsCard = document.createElement('div');
+    tipsCard.style.cssText = 'background:linear-gradient(135deg,#003087,#7B1FA2);border-radius:14px;margin-bottom:20px;padding:14px;color:#fff;';
+    tipsCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;margin-bottom:8px;">📱 MDE Pro Tips</div>
+    ${MDE_TIPS.map(t=>`<div style="display:flex;gap:10px;margin-bottom:7px;align-items:flex-start;">
+      <span style="font-size:18px;flex-shrink:0;">${t.icon}</span>
+      <div style="font-size:11px;opacity:.95;line-height:1.5;">${t.tip}</div>
+    </div>`).join('')}`;
+    body.appendChild(tipsCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-magicband-mde')) buildScreen();
+
+  const _prevSS_mmmmmmm = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_mmmmmmm) _prevSS_mmmmmmm(name, el);
+    if (name === 'magicband-mde') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-magicband-mde');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectMBCard() {
+    if (document.getElementById('magicband-mde-home-card')) return true;
+    const ref = document.getElementById('parking-home-card') || document.getElementById('first-timer-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'magicband-mde-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#003087,#7B1FA2,#C62828 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('magicband-mde');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">⌚</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">MagicBand+ & MDE App Guide</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Lightning Lane strategy · MagicMobile · PhotoPass · Setup tips</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _mbCard = false;
+  setInterval(() => { if (!_mbCard) _mbCard = injectMBCard(); }, 99000);
+  setTimeout(() => { _mbCard = injectMBCard(); }, 95500);
+  const _prevRH_mmmmmmm = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_mmmmmmm) _prevRH_mmmmmmm.apply(this, arguments);
+    setTimeout(() => { _mbCard = false; _mbCard = injectMBCard(); }, 34600);
+  };
+})();
+</script>
