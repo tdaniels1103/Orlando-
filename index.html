@@ -57804,3 +57804,439 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK RRRRRR: Islands of Adventure Deep Dive ===== */
+(function initIOADeep() {
+
+  const IOA_LANDS = [
+    {
+      name:'Marvel Super Hero Island', emoji:'⚡', color:'#C62828',
+      desc:'Your first land after the Port of Entry entrance. Comic book pop-art architecture with Marvel characters throughout. Intense thrill ride concentration.',
+      rides:[
+        {name:'The Incredible Hulk Coaster', type:'Launched steel coaster', wait:'20–40 min', note:'One of the best coasters in Florida — launched from 0–40 mph, seven inversions. Thunderous roar at launch. Ride in the front row for the full sensory experience.'},
+        {name:'Doctor Doom\'s Fearfall', type:'Drop tower', wait:'10–20 min', note:'Hydraulic launch up 200 feet and freefall. Quick but intense. 52" height minimum.'},
+        {name:'The Amazing Adventures of Spider-Man', type:'3D motion dark ride', wait:'20–40 min', note:'The ride that defined immersive dark ride experiences in 1999. Still holds up. A mix of practical sets, 3D screens, and motion — genuinely remarkable technology for its era.'},
+      ],
+      tip:'Marvel Island opens to the right after the entrance archway. Most guests turn left toward Seuss — counterclockwise means you arrive at Hulk when it\'s relatively quiet. Best strategy on busy days.',
+    },
+    {
+      name:'Toon Lagoon', emoji:'🦆', color:'#2196F3',
+      desc:'Classic newspaper comic strip theming — Beetle Bailey, Blondie, Popeye, Dudley Do-Right. Water-heavy attractions. You WILL get soaked.',
+      rides:[
+        {name:'Popeye & Bluto\'s Bilge-Rat Barges', type:'River rapids ride', wait:'20–45 min', note:'River rapids ride through spinning circular boat. Completely random soaking — some riders stay dry, some get drenched. There is no way to predict your fate.'},
+        {name:'Dudley Do-Right\'s Ripsaw Falls', type:'Log flume', wait:'20–40 min', note:'Classic log flume with a 75-foot drop at the end. The water features at the bottom are legendary. 44" height minimum.'},
+      ],
+      tip:'If you want to stay dry in Toon Lagoon, ponchos from nearby gift shops are $12. If you\'re planning to get wet anyway, this is the perfect mid-afternoon activity when Florida heat is at its peak.',
+    },
+    {
+      name:'Skull Island: Reign of Kong', emoji:'🦍', color:'#37474F',
+      desc:'A standalone attraction in its own zone between Toon Lagoon and Jurassic World.',
+      rides:[
+        {name:'Skull Island: Reign of Kong', type:'Motion simulator / open vehicle', wait:'20–50 min', note:'Open-air truck ride through Skull Island with massive Kong animatronic. The outdoor queue is beautiful. The indoor queue with actor scare performers adds a haunted house element. The Kong finale is genuinely massive in scale.'},
+      ],
+      tip:'The queue experience rivals the ride itself. The tribal carvings, atmospheric audio, and actor-performers create a genuinely unsettling experience before you board. Take your time in the queue.',
+    },
+    {
+      name:'Jurassic World', emoji:'🦕', color:'#2E7D32',
+      desc:'Updated from the original Jurassic Park theming to the Jurassic World film series. The most extensive park area.',
+      rides:[
+        {name:'Velocicoaster', type:'Launched inverted coaster (top thrill)', wait:'60–120 min', note:'The #1 coaster in Florida by most rankings. 155 ft tall, 70 mph launch, four inversions including a zero-gravity roll over the water. No shoulder harness — lap bar only for full airtime. The best coaster in the southeastern United States.'},
+        {name:'Jurassic World VelociCoaster', type:'Same as above — see note above', wait:'See above', note:'Ride twice if possible. The front row for the full forward view over the water; the back row for the most violent airtime.'},
+        {name:'Jurassic World Ride', type:'Water dark ride', wait:'20–50 min', note:'Updated version of the original Jurassic Park River Adventure. 85-foot drop finale. Gets wet. T-Rex finale updated to Jurassic World theming.'},
+        {name:'Pteranodon Flyers', type:'Sky ride (family)', wait:'30–90 min (capacity issues)', note:'The most inefficient ride at IOA — tiny capacity means enormous waits. Only worth it if no wait. Children love the bird\'s-eye view. Adults find the wait inexcusable.'},
+      ],
+      tip:'VelociCoaster is the reason to visit Islands of Adventure. Lightning Lane for VelociCoaster on busy days. The single rider line cuts the wait by 40–60% but splits groups. The coaster is visible from the park entrance — the initial launch over the water is visible from multiple spots.',
+    },
+    {
+      name:'The Lost Continent', emoji:'🔱', color:'#6A1B9A',
+      desc:'An ancient mythological realm with Arabian Nights and Greek mythology theming. Transitional zone between Jurassic World and Hogsmeade.',
+      rides:[
+        {name:'Poseidon\'s Fury', type:'Walk-through show', wait:'10–20 min', note:'Large-scale theatrical water fight between Zeus and Poseidon. Practical water effects, fire, and shouting gods. Campy but impressive for a walk-through format.'},
+      ],
+      tip:'The Lost Continent is primarily a transitional area. Mythos Restaurant here is one of IOA\'s better table-service options if you want a sit-down meal away from the Hogsmeade crowds.',
+    },
+    {
+      name:'The Wizarding World — Hogsmeade', emoji:'🏰', color:'#1565C0',
+      desc:'Hogsmeade — the snow-covered wizarding village from the Harry Potter films. The first wizarding world land ever built. Still the most immersive themed environment at Islands of Adventure.',
+      rides:[
+        {name:'Hagrid\'s Magical Creatures Motorbike Adventure', type:'Launched roller coaster (top ride worldwide)', wait:'60–150 min', note:'Widely considered the best theme park ride in the world. Forest environment, bidirectional movement, dragon encounter, Fluffy the three-headed dog. Motorcycle/sidecar seating. The queue is a 20-minute castle walk-through. 48" minimum.'},
+        {name:'Harry Potter and the Forbidden Journey', type:'Trackless dark ride', wait:'30–60 min', note:'Flying above Hogwarts on a broomstick through IMAX-quality film projections and practical sets. The Hogwarts castle queue is a 30-minute tour of the actual castle interiors — portraits, talking pictures, the Defense Against Dark Arts classroom.'},
+        {name:'Flight of the Hippogriff', type:'Junior coaster', wait:'20–40 min', note:'Small outdoor coaster above Hogsmeade with a view of Hogwarts Castle. For families or coaster completionists. Good view of Hogsmeade from above.'},
+      ],
+      food:['Three Broomsticks — British food, large portions, Butterbeer on tap', 'Hog\'s Head Pub — attached to Three Broomsticks, actual alcoholic Butterbeer', 'Butterbeer cart (cold, hot, or frozen)'],
+      tip:'Hagrid\'s is the most sought-after ride in all of Orlando theme parks. It requires Lightning Lane or arrival at park open with immediate sprint. The ride itself is 20+ minutes of content — more substantial than any other theme park ride in Florida.',
+    },
+  ];
+
+  const IOA_STRATEGY = [
+    {icon:'🚀', tip:'Rope drop: Enter IOA and immediately run (walk fast — running prohibited) to Hagrid\'s Magical Creatures. The queue fills to 90+ minute wait by 10 AM on most days. Ride before buying Butterbeer.'},
+    {icon:'💡', tip:'VelociCoaster is the second rope drop priority. Both Hagrid\'s and VelociCoaster together give you the two best rides in Florida completed before 10 AM.'},
+    {icon:'🔗', tip:'IOA + Universal Studios park-to-park is mandatory to ride the Hogwarts Express in both directions. Each direction tells a completely different story — the train itself is a fully realized Harry Potter attraction.'},
+    {icon:'🍺', tip:'Butterbeer comes in four versions: frozen (sweetest), cold (most popular), hot (best in winter), and alcoholic at the Hog\'s Head. Start with frozen — the whipped cream head is the distinguishing feature.'},
+    {icon:'📱', tip:'The interactive wand experience spans both Hogsmeade and Diagon Alley. Locations throughout both lands activate water, fire, and moving objects with specific wand movements. Wands available for $60 or included with some packages.'},
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-ioa-deep';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#C62828,#1565C0,#2E7D32);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Islands of Adventure — Deep Dive</div>
+          <div style="font-size:11px;opacity:.8;">Hagrid\'s · VelociCoaster · Hulk · Hogsmeade</div>
+        </div>
+        <span style="font-size:28px;">🏝️</span>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:15px;font-weight:800;">6</div><div style="font-size:9px;opacity:.8;">ISLANDS</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:15px;font-weight:800;">Hagrid</div><div style="font-size:9px;opacity:.8;">#1 WORLDWIDE</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:15px;font-weight:800;">Velo</div><div style="font-size:9px;opacity:.8;">#1 FLORIDA</div>
+        </div>
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    IOA_LANDS.forEach(land => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+      let ridesHTML = land.rides.filter((r,i)=>!(land.id==='jurassic' && i===1)).map(r=>`<div style="background:var(--bg,#f8f8f8);border-radius:10px;padding:9px;margin-bottom:5px;">
+        <div style="font-size:12px;font-weight:800;color:var(--text-primary,#212121);">${r.name}</div>
+        <div style="font-size:10px;font-weight:600;color:${land.color};margin:2px 0;">${r.type} · ${r.wait}</div>
+        <div style="font-size:11px;color:var(--text-secondary,#666);">${r.note}</div>
+      </div>`).join('');
+      let foodHTML = land.food ? `<div style="display:flex;flex-wrap:wrap;gap:3px;margin:5px 0;">${land.food.map(f=>`<span style="font-size:10px;padding:2px 7px;background:${land.color}18;color:${land.color};border-radius:20px;">${f}</span>`).join('')}</div>` : '';
+      card.innerHTML = `
+        <div style="padding:10px 14px;background:${land.color}18;border-left:4px solid ${land.color};">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:22px;">${land.emoji}</span>
+            <div>
+              <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--text-primary,#212121);">${land.name}</div>
+              <div style="font-size:11px;color:var(--text-secondary,#555);">${land.desc}</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          ${ridesHTML}
+          ${foodHTML}
+          <div style="display:flex;gap:5px;background:${land.color}0d;border-radius:8px;padding:7px;margin-top:5px;">
+            <span style="font-size:11px;flex-shrink:0;">💡</span>
+            <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${land.tip}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const stratCard = document.createElement('div');
+    stratCard.style.cssText = 'background:linear-gradient(135deg,#C62828,#1565C0);border-radius:16px;margin-bottom:20px;padding:14px;color:#fff;';
+    stratCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">🎯 Islands of Adventure Strategy</div>
+    ${IOA_STRATEGY.map(t=>`<div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
+      <span style="font-size:18px;flex-shrink:0;">${t.icon}</span>
+      <div style="font-size:12px;opacity:.95;line-height:1.5;">${t.tip}</div>
+    </div>`).join('')}`;
+    body.appendChild(stratCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-ioa-deep')) buildScreen();
+
+  const _prevSS_rrrrrr = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_rrrrrr) _prevSS_rrrrrr(name, el);
+    if (name === 'ioa-deep') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-ioa-deep');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectIOADeepCard() {
+    if (document.getElementById('ioa-deep-home-card')) return true;
+    const ref = document.getElementById('food-scene-home-card') || document.getElementById('daytrips-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'ioa-deep-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#C62828,#1565C0,#2E7D32 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('ioa-deep');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🏝️</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Islands of Adventure — Deep Dive</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Hagrid\'s · VelociCoaster · Hogsmeade · Hulk</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _ioaDeepCard = false;
+  setInterval(() => { if (!_ioaDeepCard) _ioaDeepCard = injectIOADeepCard(); }, 78000);
+  setTimeout(() => { _ioaDeepCard = injectIOADeepCard(); }, 74500);
+  const _prevRH_rrrrrr = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_rrrrrr) _prevRH_rrrrrr.apply(this, arguments);
+    setTimeout(() => { _ioaDeepCard = false; _ioaDeepCard = injectIOADeepCard(); }, 26200);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK SSSSSS: Orlando Golf & Recreation Guide ===== */
+(function initOrlandoGolf() {
+
+  const GOLF_COURSES = [
+    {
+      name:'Bay Hill Club & Lodge', emoji:'⛳', color:'#2E7D32',
+      type:'Private/Guest',
+      designer:'Dick Wilson (1961); Arnold Palmer renovation',
+      location:'Dr. Phillips / Sand Lake area',
+      par:'Par 72, 7,207 yards',
+      difficulty:'Championship (hosts the Arnold Palmer Invitational)',
+      rate:'$200–350 (resort guest access)',
+      why:'Arnold Palmer\'s home course. The 18th hole finishing island green is one of the most photographed in golf. Staying at Bay Hill Lodge gives full course access. The Palmer Course and Champions Course together create a world-class resort golf experience.',
+      tip:'Book the Lodge to guarantee tee time access. Arrive 45 minutes early — the practice facilities (range, short game area) are exceptional. Request the Palmer tee box markers — the course staff will point out where Arnold played his regular rounds.',
+    },
+    {
+      name:'ChampionsGate Golf Club', emoji:'🏆', color:'#C9A96E',
+      type:'Semi-private / Resort',
+      designer:'Greg Norman (International Course); David Leadbetter Academy on-site',
+      location:'ChampionsGate (30 min south of Disney)',
+      par:'Par 72, 7,328 yards (International)',
+      difficulty:'Championship — hosts PGA Tour qualifiers',
+      rate:'$60–120 (varies widely by season)',
+      why:'Two championship Greg Norman courses with one of the best teaching academies in the world (David Leadbetter). The International Course is nationally ranked. Best value championship golf near Orlando.',
+      tip:'The Greg Norman International Course at sunrise (early morning tee times) is the best value championship golf in the Orlando area. The course dries quickly after rain — afternoon afternoon tee times can be surprisingly good quality after morning storms clear.',
+    },
+    {
+      name:'Walt Disney World Golf', emoji:'🏰', color:'#003087',
+      type:'Public (Disney resort)',
+      designer:'Joe Lee (multiple courses)',
+      location:'Walt Disney World property',
+      par:'Par 72 (Magnolia, Palm, Lake Buena Vista)',
+      difficulty:'Resort-level — accessible for all skill levels',
+      rate:'$50–120 depending on course and season',
+      why:'Four Disney-operated courses on the Walt Disney World property. Magnolia Course is the flagship — hosts the PGA Tour\'s Shriners Children\'s Open. Lake Buena Vista is the most forgiving for recreational golfers. Disney transportation from all resorts.',
+      tip:'Disney hotel guests can use Disney transportation to reach the golf complex. The Magnolia Course has the famous Mickey Mouse bunker on hole 6 — visible from above in aerial photography. The pro shop has excellent Disney golf merchandise.',
+    },
+    {
+      name:'Reunion Resort Golf', emoji:'🌴', color:'#1565C0',
+      type:'Semi-private / Resort',
+      designer:'Arnold Palmer, Tom Watson, Jack Nicklaus — each with a signature course',
+      location:'Reunion (15 min south of Disney)',
+      par:'Par 72 (all three)',
+      difficulty:'Championship — three distinct design philosophies',
+      rate:'$85–175 depending on course',
+      why:'Three signature courses from three legends of golf on one resort property. The chance to play a Nicklaus, Palmer, AND Watson course on consecutive days is extraordinary and only possible here.',
+      tip:'Book a three-day package to play all three courses. The Watson course plays longest and toughest. The Palmer is most playable for mid-handicap players. The Nicklaus has the best visual scenery with the preserve holes.',
+    },
+    {
+      name:'Shingle Creek Golf Club', emoji:'🎯', color:'#37474F',
+      type:'Public',
+      designer:'David Harman',
+      location:'International Drive / Convention Center area',
+      par:'Par 72, 7,228 yards',
+      difficulty:'Resort-level championship',
+      rate:'$60–110',
+      why:'Best location for I-Drive hotel guests — walking distance from dozens of hotels. A legitimate championship course (9,000 acres of natural preserve surround it) that rewards skill. Best public course within 5 miles of Universal.',
+      tip:'Early morning tee times have almost zero wait and the best course conditions. Shingle Creek\'s 27th hole finishing area is exceptionally photogenic — the historic Shingle Creek headwaters are protected habitat adjacent to the 18th green.',
+    },
+  ];
+
+  const OTHER_RECREATION = [
+    {
+      name:'Topgolf Orlando (I-Drive)', emoji:'🎯', color:'#C62828',
+      type:'Driving range / Entertainment',
+      desc:'Five-level, climate-controlled driving range with tech-tracked bays and restaurant/bar service. Golf without the course — great for non-golfers who want the experience. Games for all skill levels.',
+      tip:'Book bays online — walk-in waits reach 2+ hours on weekend evenings. The food and drinks are better than expected for a driving range concept.',
+    },
+    {
+      name:'Horseback Trail Rides', emoji:'🐴', color:'#8B4513',
+      type:'Nature recreation',
+      desc:'Multiple stables around the Orlando area offer guided trail rides through Florida\'s natural landscape. Horse World Riding Stables and nearby Kissimmee preserve rides.',
+      tip:'Best for families with children 8+ and adult couples. Morning rides (8–10 AM) have the best wildlife sightings. Wear closed-toe shoes.',
+    },
+    {
+      name:'Wakeboarding & Water Sports — Lake Bryan', emoji:'🏄', color:'#0277BD',
+      type:'Water sports',
+      desc:'Multiple water sports outfitters operate on the I-Drive area lakes. Wakeboarding, kayaking, paddleboarding, and jet ski rentals on private lakes away from public boat traffic.',
+      tip:'Cable wakeboard parks (no boat required, cable system pulls you) are the safest and most affordable way to try wakeboarding. Beginner lessons take 30 minutes to get comfortable.',
+    },
+    {
+      name:'Mini Golf (I-Drive)', emoji:'⛳', color:'#7B1FA2',
+      type:'Family entertainment',
+      desc:'Multiple themed mini golf courses on I-Drive including Pirates Cove (tropical pirate theming, 2 courses) and WonderWorks mini golf.',
+      tip:'Pirates Cove Adventure Golf is genuinely well-designed mini golf. The water feature holes are creative. Evening rounds (after dark, lights up) are the best experience.',
+    },
+    {
+      name:'Orlando City Soccer — Exploria Stadium', emoji:'⚽', color:'#5D1E8B',
+      type:'Professional sports',
+      desc:'Orlando City SC (MLS) plays at Exploria Stadium in downtown Orlando. Passionate supporter section (Northern Legions), lively atmosphere, affordable tickets.',
+      tip:'The supporter section (North End) is the most fun place to watch. Tickets from $25. The pre-game atmosphere in downtown Orlando has improved significantly since the stadium opened.',
+    },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-golf-rec';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#2E7D32,#C9A96E,#1565C0);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Golf & Recreation Guide</div>
+          <div style="font-size:11px;opacity:.8;">Bay Hill · ChampionsGate · Topgolf · Water Sports · Soccer</div>
+        </div>
+        <span style="font-size:28px;">⛳</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        Orlando is one of the world's premier golf destinations — over 170 courses within 90 minutes, including Arnold Palmer's home course, three Jack Nicklaus/Arnold Palmer/Tom Watson signatures at one resort, and the best public golf value in Florida.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    const gHdr = document.createElement('div');
+    gHdr.style.cssText = 'font-family:"Playfair Display",serif;font-size:15px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:10px;';
+    gHdr.textContent = '⛳ Championship Golf Courses';
+    body.appendChild(gHdr);
+
+    GOLF_COURSES.forEach(course => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:10px 14px;background:${course.color}18;border-left:4px solid ${course.color};">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+            <div style="display:flex;gap:8px;align-items:center;">
+              <span style="font-size:20px;">${course.emoji}</span>
+              <div>
+                <div style="font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${course.name}</div>
+                <div style="font-size:10px;color:var(--text-secondary,#888);">${course.type} · ${course.location}</div>
+              </div>
+            </div>
+            <div style="text-align:right;flex-shrink:0;">
+              <div style="font-size:11px;font-weight:700;color:${course.color};">${course.rate}</div>
+              <div style="font-size:10px;color:var(--text-secondary,#aaa);">${course.par}</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          <div style="font-size:10px;color:var(--text-secondary,#888);margin-bottom:3px;">Designer: ${course.designer}</div>
+          <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;margin-bottom:6px;">${course.why}</div>
+          <div style="display:flex;gap:5px;background:${course.color}0d;border-radius:8px;padding:6px;">
+            <span style="font-size:11px;flex-shrink:0;">💡</span>
+            <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${course.tip}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const recHdr = document.createElement('div');
+    recHdr.style.cssText = 'font-family:"Playfair Display",serif;font-size:15px;font-weight:700;color:var(--text-primary,#212121);margin:6px 0 10px;';
+    recHdr.textContent = '🏃 Other Recreation';
+    body.appendChild(recHdr);
+
+    OTHER_RECREATION.forEach(rec => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:12px;margin-bottom:10px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:10px 14px;background:${rec.color}18;border-left:4px solid ${rec.color};">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:18px;">${rec.emoji}</span>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${rec.name}</div>
+              <div style="font-size:10px;color:var(--text-secondary,#888);">${rec.type}</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:8px 14px;">
+          <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;margin-bottom:5px;">${rec.desc}</div>
+          <div style="display:flex;gap:5px;background:${rec.color}0d;border-radius:8px;padding:6px;">
+            <span style="font-size:10px;flex-shrink:0;">💡</span>
+            <div style="font-size:10px;color:var(--text-secondary,#555);">${rec.tip}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const footCard = document.createElement('div');
+    footCard.style.cssText = 'background:linear-gradient(135deg,#2E7D32,#C9A96E);border-radius:14px;margin-bottom:20px;padding:14px;color:#fff;';
+    footCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;margin-bottom:8px;">⛳ Golf in Orlando: Quick Facts</div>
+    ${[
+      '170+ golf courses within 90 minutes of Orlando — more than any US metro area',
+      'Average golf rate: $50–120 for a quality public round year-round',
+      'Best season for golf: October–April (cooler, less humidity, minimal afternoon thunderstorms)',
+      'Summer golf tip: Tee off by 7 AM to avoid the afternoon storms and extreme heat',
+      'Disney, Universal, and SeaWorld area resorts all have golf shuttles to nearby courses',
+    ].map(f=>`<div style="display:flex;gap:8px;margin-bottom:5px;">
+      <span style="font-size:12px;">✓</span>
+      <div style="font-size:11px;opacity:.9;line-height:1.4;">${f}</div>
+    </div>`).join('')}`;
+    body.appendChild(footCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-golf-rec')) buildScreen();
+
+  const _prevSS_ssssss = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_ssssss) _prevSS_ssssss(name, el);
+    if (name === 'golf-rec') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-golf-rec');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectGolfCard() {
+    if (document.getElementById('golf-rec-home-card')) return true;
+    const ref = document.getElementById('ioa-deep-home-card') || document.getElementById('food-scene-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'golf-rec-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#2E7D32,#C9A96E,#1565C0 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('golf-rec');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">⛳</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Golf & Recreation Guide</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Bay Hill · Reunion · ChampionsGate · Topgolf · Water sports</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _golfCard = false;
+  setInterval(() => { if (!_golfCard) _golfCard = injectGolfCard(); }, 79000);
+  setTimeout(() => { _golfCard = injectGolfCard(); }, 75500);
+  const _prevRH_ssssss = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_ssssss) _prevRH_ssssss.apply(this, arguments);
+    setTimeout(() => { _golfCard = false; _golfCard = injectGolfCard(); }, 26600);
+  };
+})();
+</script>
