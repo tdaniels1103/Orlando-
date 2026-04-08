@@ -42324,3 +42324,206 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK QQQ2: Disney Dining Plan & Meal Strategy Guide ===== */
+(function initMealStrategy() {
+
+  const MEAL_PLANS = [
+    {
+      name:'Disney Dining Plan (Standard)',
+      emoji:'🍽️',
+      price:'~$94/adult/day + ~$29/child (ages 3–9)',
+      includes:['1 Quick Service meal (entrée + beverage)','1 Table Service meal (entrée + dessert + nonalcoholic beverage)','1 Snack credit (select items)','Refillable resort mug'],
+      verdict:'Worth it for: families ordering high-cost table service meals AND high-end snacks',
+      notWorthIt:'Not worth it for: guests who primarily eat QS or budget meals',
+      breakEven:'You need ~$94/day in food to break even. Heavy table service users often do.',
+      color:'#1565C0',
+      rating:3,
+    },
+    {
+      name:'Disney Dining Plan Plus',
+      emoji:'⭐',
+      price:'~$114/adult/day + ~$43/child',
+      includes:['2 meals per day (QS or Table Service — more flexibility)','Alcoholic beverage included at Table Service (adults)','Refillable resort mug'],
+      verdict:"Worth it for: adults who want 2 table service meals daily and alcoholic beverages included",
+      notWorthIt:'Not worth it if you prefer QS for most meals',
+      breakEven:'~$114/person/day in food + drinks to justify',
+      color:'#7B1FA2',
+      rating:4,
+    },
+  ];
+
+  const BEST_TABLE_SERVICE = [
+    { name:"Be Our Guest (Magic Kingdom)", credits:'1 TS', tip:'The Beast\'s Castle. Best themed restaurant in Disney. Request the West Wing (most dramatic).' },
+    { name:"California Grill (Contemporary)", credits:'1 TS', tip:'Fireworks view at 9 PM. Reserve the 9 PM window specifically.' },
+    { name:"Tiffins (Animal Kingdom)", credits:'1 TS', tip:'Disney\'s most artistically impressive restaurant. Incredible artwork and genuine culinary quality.' },
+    { name:"Via Napoli (EPCOT Italy)", credits:'1 TS', tip:'Best pizza in Disney World by a significant margin. The pizza allegrissima serves 3–4 people.' },
+    { name:"Sanaa (Animal Kingdom Lodge)", credits:'1 TS', tip:'Bread service with 9 condiments is the best bite in Disney World. View of savanna with grazing animals.' },
+    { name:"Kona Café (Polynesian)", credits:'1 TS', tip:'Hidden gem that\'s easier to book than most TS. Excellent breakfast Tonga Toast. Overlooking the lobby waterfall.' },
+    { name:"Le Cellier (EPCOT Canada)", credits:'2 TS!', tip:'Requires 2 TS credits. Worth it for the Canadian cheddar cheese soup alone. Reserve at 60 days.' },
+    { name:"'Ohana (Polynesian)", credits:'1 TS', tip:'Family-style Polynesian feast. Characters at breakfast. Excellent dinner with fire dancers visible from the lodge.' },
+  ];
+
+  const BEST_QS = [
+    { name:"Satu'li Canteen (Animal Kingdom)", why:"The best QS food in all of Disney World. Creative grain bowls and proteins. Always order the Cheeseburger Pods." },
+    { name:"Flame Tree BBQ (Animal Kingdom)", why:"Best outdoor dining location in any Disney park. Waterfront views with the Tree of Life visible. Excellent ribs." },
+    { name:"Regal Eagle Smokehouse (EPCOT)", why:"Southern BBQ done right. Craft beer options. Excellent for American Pavilion lunch during Food & Wine." },
+    { name:"Pecos Bill's (Magic Kingdom)", why:"Hidden gem: extensive toppings bar for fajitas and burgers. Build your own meal for more value." },
+    { name:"Columbia Harbour House (Magic Kingdom)", why:"Two-level building with rarely found quiet seating upstairs. Better-than-average fish and chips for a QS." },
+    { name:"Backlot Express (Hollywood Studios)", why:"Near Star Wars land. Reliable burgers and salads when you need fuel without leaving the area." },
+  ];
+
+  const BEST_SNACKS = [
+    { name:'Dole Whip (Aloha Isle, Magic Kingdom)', note:"The definitive Disney snack. Pineapple soft-serve in cup or cone. Also available at Polynesian." },
+    { name:"Grey Stuff (Be Our Guest / Pinnocchio Village Haus)", note:"'Be our guest... try the grey stuff, it's delicious.' Oreo cookies and vanilla cream." },
+    { name:"School Bread (Kringla Bakeri, EPCOT Norway)", note:"Cardamom bread filled with pastry cream, topped with coconut. Best snack in EPCOT." },
+    { name:"Lobster Rolls at EPCOT Food & Wine (during festival)", note:"Multiple countries serve lobster rolls. Canada's is legendary." },
+    { name:"Mickey Pretzel", note:"Soft, salty, enormous. Available at carts throughout all parks. The iconic park snack." },
+    { name:"Chilled Mickey Waffle (multiple locations)", note:"Allergy-friendly version available. Mickey shaped goodness." },
+  ];
+
+  const DINING_STRATEGY = [
+    { icon:'⏰', strategy:"Rope Drop + Early QS Strategy", detail:"Arrive at park open. First 2 hours: ride everything with no wait. 11 AM: Mobile Order QS lunch. Back to rides. This structure maximizes riding AND eating without competing with crowds on either." },
+    { icon:'💰', strategy:"The $30 QS Day Challenge", detail:"Morning: Publix muffins and coffee from your hotel ($5). Park midday: one QS meal shared or kids meal for an adult ($12–15). Afternoon: snack credit or apple from QS ($3–5). Evening: EPCOT food booth crawl ($15–20). Total: under $40/person." },
+    { icon:'📅', strategy:"Reservation Stacking Strategy", detail:"Book your 3 most-wanted table service restaurants at 60 days for your highest-priority evenings. Fill remaining evenings with QS or Mobile Order. Don't try to book every single dinner — it becomes exhausting." },
+    { icon:'🍹', strategy:"The Adult Beverage Play", detail:"The bar at a Disney restaurant serves full cocktails to non-diners. The lounge at Flying Fish (no reservation), the Enchanted Rose Bar (Grand Floridian), and Nomad Lounge (Animal Kingdom) are walk-up drinking destinations." },
+    { icon:'🥡', strategy:"Mobile Order Mastery", detail:"Open My Disney Experience. Tap the '+' → 'Order Food'. You can order up to 2 hours before your desired time. Select 'Prepare My Order' when you're ready. Food is typically ready in 10–15 minutes." },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-meal-strategy';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;';
+    s.innerHTML = `
+      <div style="background:linear-gradient(135deg,#BF360C,#E64A19,#FFAB91);padding:18px 14px 20px;
+        display:flex;align-items:center;gap:12px;flex-shrink:0;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;
+          border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#fff;">Meal Strategy Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.9);">Dining Plan · Best QS · Best TS · Snacks · Strategy</div>
+        </div>
+        <span style="font-size:28px;">🍴</span>
+      </div>
+      <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;">
+
+        <!-- Dining Plans -->
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:10px;">📊 Dining Plan Analysis</div>
+        ${MEAL_PLANS.map(mp => `
+          <div style="background:var(--card-bg,#fff);border-radius:14px;margin-bottom:10px;
+            border:1px solid var(--border,#eee);overflow:hidden;">
+            <div style="background:${mp.color};padding:10px 14px;display:flex;align-items:center;gap:8px;">
+              <span style="font-size:22px;">${mp.emoji}</span>
+              <div style="flex:1;">
+                <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:#fff;">${mp.name}</div>
+                <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.8);">${mp.price}</div>
+              </div>
+              <div style="font-size:13px;">${'⭐'.repeat(mp.rating)}${'☆'.repeat(5-mp.rating)}</div>
+            </div>
+            <div style="padding:10px 14px;">
+              ${mp.includes.map(inc => `<div style="font-size:12px;color:var(--text-secondary,#555);padding:2px 0;">✓ ${inc}</div>`).join('')}
+              <div style="margin-top:8px;background:#1B5E2010;border-left:3px solid #2E7D32;padding:7px;border-radius:0 6px 6px 0;">
+                <div style="font-size:11px;font-weight:700;color:#2E7D32;">✅ WORTH IT: ${mp.verdict}</div>
+              </div>
+              <div style="margin-top:5px;background:#B71C1C10;border-left:3px solid #D32F2F;padding:7px;border-radius:0 6px 6px 0;">
+                <div style="font-size:11px;font-weight:700;color:#B71C1C;">❌ SKIP IF: ${mp.notWorthIt}</div>
+              </div>
+              <div style="margin-top:5px;font-size:11px;color:var(--text-secondary,#888);">Break-even: ${mp.breakEven}</div>
+            </div>
+          </div>`).join('')}
+
+        <!-- Best Table Service -->
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--text-primary,#212121);margin:14px 0 8px;">🌟 Best Table Service Restaurants</div>
+        <div style="background:var(--card-bg,#fff);border-radius:12px;margin-bottom:14px;border:1px solid var(--border,#eee);overflow:hidden;">
+          ${BEST_TABLE_SERVICE.map((r, i) => `
+            <div style="padding:8px 12px;${i < BEST_TABLE_SERVICE.length-1?'border-bottom:1px solid var(--border,#f5f5f5)':''}">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);flex:1;">${r.name}</div>
+                <span style="font-size:10px;background:#1565C020;color:#1565C0;padding:2px 8px;border-radius:20px;font-weight:700;flex-shrink:0;margin-left:6px;">${r.credits}</span>
+              </div>
+              <div style="font-size:11px;color:var(--text-secondary,#555);margin-top:2px;">${r.tip}</div>
+            </div>`).join('')}
+        </div>
+
+        <!-- Best QS -->
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:8px;">⚡ Best Quick Service Options</div>
+        <div style="background:var(--card-bg,#fff);border-radius:12px;margin-bottom:14px;border:1px solid var(--border,#eee);overflow:hidden;">
+          ${BEST_QS.map((qs, i) => `
+            <div style="padding:8px 12px;${i < BEST_QS.length-1?'border-bottom:1px solid var(--border,#f5f5f5)':''}">
+              <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${qs.name}</div>
+              <div style="font-size:11px;color:var(--text-secondary,#555);margin-top:2px;">${qs.why}</div>
+            </div>`).join('')}
+        </div>
+
+        <!-- Best Snacks -->
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:8px;">🍭 Must-Try Snacks</div>
+        <div style="background:var(--card-bg,#fff);border-radius:12px;margin-bottom:14px;border:1px solid var(--border,#eee);overflow:hidden;">
+          ${BEST_SNACKS.map((snack, i) => `
+            <div style="padding:8px 12px;${i < BEST_SNACKS.length-1?'border-bottom:1px solid var(--border,#f5f5f5)':''}">
+              <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${snack.name}</div>
+              <div style="font-size:11px;color:var(--text-secondary,#555);margin-top:2px;">${snack.note}</div>
+            </div>`).join('')}
+        </div>
+
+        <!-- Dining Strategies -->
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:8px;">🎯 Dining Strategies</div>
+        ${DINING_STRATEGY.map(ds => `
+          <div style="background:var(--card-bg,#fff);border-radius:12px;margin-bottom:8px;
+            border:1px solid var(--border,#eee);padding:10px 12px;display:flex;gap:10px;align-items:flex-start;">
+            <span style="font-size:22px;flex-shrink:0;">${ds.icon}</span>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:3px;">${ds.strategy}</div>
+              <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;">${ds.detail}</div>
+            </div>
+          </div>`).join('')}
+
+        <div style="height:20px;"></div>
+      </div>`;
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-meal-strategy')) buildScreen();
+
+  const _prevSS_qqq2 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_qqq2) _prevSS_qqq2(name, el);
+    if (name === 'meal-strategy') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-meal-strategy');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectMealCard() {
+    if (document.getElementById('meal-home-card')) return true;
+    const ref = document.getElementById('qr-home-card') || document.getElementById('new-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'meal-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#BF360C,#E64A19,#FFAB91);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('meal-strategy');
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:28px;">🍴</span>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Meal Strategy Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.9);">Dining Plan · Best QS & TS · Snacks · Strategies</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _mealCard = false;
+  setInterval(() => { if (!_mealCard) _mealCard = injectMealCard(); }, 19500);
+  setTimeout(() => { _mealCard = injectMealCard(); }, 16000);
+
+  const _prevRH_qqq2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_qqq2) _prevRH_qqq2.apply(this, arguments);
+    setTimeout(() => { _mealCard = false; _mealCard = injectMealCard(); }, 3700);
+  };
+})();
+</script>
