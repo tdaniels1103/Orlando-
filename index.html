@@ -53356,3 +53356,435 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK VVVVV: Orlando Arts, Culture & Museums Guide ===== */
+(function initOrlandoArtsculture() {
+
+  const VENUES = [
+    {
+      name:'Morse Museum of American Art', area:'Winter Park', emoji:'🌺', color:'#7B1FA2',
+      type:'Museum', price:'$6 adults',
+      highlight:'The largest collection of Louis Comfort Tiffany works in the world. Original chapel interior from the 1893 Chicago World\'s Fair was saved, disassembled, and rebuilt here.',
+      mustSee:['Tiffany Chapel (1893 World\'s Fair original)', 'Leaded glass windows spanning 100 years', 'Jewelry and pottery collection', 'The Laurelton Hall loggia'],
+      hours:'Tue–Sun 9:30 AM – 4 PM',
+      tip:'One of the most underrated museums in America. Friday evenings are free (Nov–Apr, 4–8 PM). Plan 1.5–2 hours. The Tiffany Chapel alone justifies the detour.',
+    },
+    {
+      name:'Orlando Museum of Art (OMA)', area:'Loch Haven Cultural Park', emoji:'🎨', color:'#C62828',
+      type:'Museum', price:'$15 adults',
+      highlight:'Florida\'s second-largest art museum with a strong permanent collection spanning African, pre-Columbian, and American art. Rotating exhibitions of national significance.',
+      mustSee:['American art from 18th–21st century', 'African art collection', 'Contemporary rotating exhibitions'],
+      hours:'Tue–Fri 10 AM – 4 PM, Sat–Sun 12 PM – 4 PM',
+      tip:'First Thursdays: $5 admission and evening events. Loch Haven Cultural Park has 3 institutions on one campus — combine with OCSC for a cultural afternoon.',
+    },
+    {
+      name:'Dr. Phillips Center for the Performing Arts', area:'Downtown Orlando', emoji:'🎭', color:'#1565C0',
+      type:'Performing Arts', price:'$25–200+ depending on show',
+      highlight:'World-class performing arts venue hosting Broadway tours, concerts, ballet, and comedy. The acoustics in the Steinmetz Hall are genuinely remarkable.',
+      mustSee:['Steinmetz Hall (intimate acoustic hall)', 'Broadway touring productions', 'Orlando Philharmonic performances', 'Comedy and pop concerts at Walt Disney Theater'],
+      hours:'Box office 10 AM – 6 PM; show nights extended',
+      tip:'Check their schedule before your trip — a Broadway show or symphony evening at Dr. Phillips is one of the most civilized Orlando experiences available. Steinmetz Hall seats only 1,700 and feels incredibly intimate.',
+    },
+    {
+      name:'Rollins Museum of Art', area:'Winter Park (Rollins College campus)', emoji:'🖼️', color:'#2E7D32',
+      type:'Museum', price:'Free',
+      highlight:'Free museum on the beautiful Rollins College campus. Outstanding collection of European and American art spanning the 15th–21st centuries.',
+      mustSee:['European masters from 15th–19th century', 'Permanent American art collection', 'The Olin Library building itself (beautiful Spanish-Mediterranean architecture)'],
+      hours:'Tue–Sat 10 AM – 4 PM',
+      tip:'Free, underrated, and beautiful. The campus itself is one of the most attractive in the Southeast — walk around even if you don\'t enter the museum. Combine with Park Avenue lunch.',
+    },
+    {
+      name:'Orange County Regional History Center', area:'Downtown Orlando', emoji:'🏛️', color:'#5D4037',
+      type:'History Museum', price:'$9 adults',
+      highlight:'Four floors of Florida and Central Florida history in a beautifully restored 1927 courthouse. Native American history, pioneer era, theme park origins.',
+      mustSee:['Florida prehistory and Native American galleries', 'Frontier Florida pioneer life exhibits', 'Early 20th century Orlando commercial district', 'Theme park era development'],
+      hours:'Mon–Sat 10 AM – 5 PM, Sun 12 PM – 5 PM',
+      tip:'Genuinely excellent museum that contextualizes everything else you\'re seeing in Orlando. The building is a historic attraction itself. Typically has low wait times even on busy tourist weekends.',
+    },
+    {
+      name:'The Charles Hosmer Morse Foundation', area:'Winter Park', emoji:'🌿', color:'#00695C',
+      type:'Botanical Gardens', price:'Free',
+      highlight:'Mead Botanical Garden and related Winter Park green spaces provide genuine natural respite in an urban context.',
+      mustSee:['Mead Botanical Garden (50-acre wetland garden)', 'Harry P. Leu Gardens (50 acres of cultivated garden near downtown)', 'Kraft Azalea Garden (lakefront public garden — best in March/April)'],
+      hours:'Dawn to dusk, grounds free',
+      tip:'Harry P. Leu Gardens ($15 admission) has one of the finest camellia collections in the eastern US and beautiful rose gardens. Winter and spring are the peak seasons.',
+    },
+    {
+      name:'SAK Comedy Lab', area:'Downtown Orlando', emoji:'😂', color:'#F57F17',
+      type:'Improv Comedy', price:'$15–25',
+      highlight:'Florida\'s longest-running improv comedy club. Performers trained at Second City and iO. Two shows nightly Thursday–Saturday.',
+      mustSee:['DUEL! (competitive improv show)', 'Wild Cardz (all ages improv)'],
+      hours:'Thu–Sat shows 7:30 PM and 10:00 PM',
+      tip:'Much cheaper than Disney\'s evening entertainment and genuinely excellent. The 10 PM show attracts more mature content and a livelier audience. Book ahead on busy weekends.',
+    },
+    {
+      name:'Mennello Museum of American Art', area:'Loch Haven Cultural Park', emoji:'🌻', color:'#E65100',
+      type:'Museum', price:'$5 adults',
+      highlight:'Intimate museum focused on American folk art and self-taught artists. Exceptional permanent collection of Earl Cunningham\'s Florida landscapes.',
+      mustSee:['Earl Cunningham collection (luminescent Florida landscape paintings)', 'Rotating folk art exhibitions', 'Lakefront sculpture garden'],
+      hours:'Tue–Sat 10:30 AM – 4:30 PM, Sun 12 PM – 4:30 PM',
+      tip:'One of the most charming small museums in Florida. The Cunningham paintings capture a Florida that largely no longer exists. The lakefront garden is peaceful and photogenic.',
+    },
+  ];
+
+  const EVENTS = [
+    { name:'Orlando Fringe Festival', month:'May', desc:'One of the longest-running fringe festivals in the US. 500+ performances over 14 days. Loch Haven Park transforms into an arts village.' },
+    { name:'Florida Film Festival', month:'April', desc:'10-day independent film festival anchored at the Enzian Theater (Maitland). Single-screen art house theater with craft beer and food.' },
+    { name:'Downtown Arts District Gallery Walk', month:'Monthly (1st Thursday)', desc:'Free art walk through downtown Orlando galleries. 25+ venues open late with wine and live music.' },
+    { name:'Winter Park Sidewalk Art Festival', month:'March', desc:'One of the top outdoor art festivals in the US. 225 juried artists, 350,000 visitors. Park Avenue transforms completely.' },
+    { name:'ZMF (Zora Neale Hurston Festival)', month:'January', desc:'Annual arts and humanities festival honoring Zora Neale Hurston in Eatonville (4 miles from Orlando). National cultural significance.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-orlando-arts';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#7B1FA2,#C62828,#1565C0);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Arts, Culture & Museums</div>
+          <div style="font-size:11px;opacity:.8;">Tiffany glass · Performing arts · Comedy · Galleries</div>
+        </div>
+        <span style="font-size:28px;">🎨</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        Orlando is far more than theme parks. The Morse Museum contains the world's greatest Tiffany glass collection. Dr. Phillips Center rivals venues in any major city. Winter Park's arts scene is extraordinary.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    VENUES.forEach(v => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:10px 14px;background:${v.color}18;border-left:4px solid ${v.color};">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:20px;">${v.emoji}</span>
+            <div style="flex:1;">
+              <div style="font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${v.name}</div>
+              <div style="font-size:10px;color:var(--text-secondary,#888);">${v.area} · ${v.type} · <span style="color:${v.color};font-weight:700;">${v.price}</span></div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;margin-bottom:8px;">${v.highlight}</div>
+          <div style="font-size:10px;font-weight:700;color:${v.color};margin-bottom:4px;">MUST-SEE</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:7px;">
+            ${v.mustSee.map(m=>`<span style="font-size:10px;padding:2px 8px;background:${v.color}18;color:${v.color};border-radius:20px;">${m}</span>`).join('')}
+          </div>
+          <div style="font-size:10px;color:var(--text-secondary,#888);margin-bottom:4px;">⏰ ${v.hours}</div>
+          <div style="display:flex;gap:6px;background:${v.color}0d;border-radius:8px;padding:7px;">
+            <span style="font-size:12px;flex-shrink:0;">💡</span>
+            <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${v.tip}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const eventsCard = document.createElement('div');
+    eventsCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+    eventsCard.innerHTML = `<div style="padding:12px 14px;background:linear-gradient(135deg,#7B1FA2,#C62828);color:#fff;">
+      <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;">📅 Annual Cultural Events</div>
+    </div>
+    <div style="padding:12px 14px;">
+      ${EVENTS.map(e=>`<div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border,#eee);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+          <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${e.name}</div>
+          <span style="font-size:10px;font-weight:700;padding:2px 8px;background:#7B1FA218;color:#7B1FA2;border-radius:20px;">${e.month}</span>
+        </div>
+        <div style="font-size:11px;color:var(--text-secondary,#666);">${e.desc}</div>
+      </div>`).join('')}
+    </div>`;
+    body.appendChild(eventsCard);
+
+    const tipCard = document.createElement('div');
+    tipCard.style.cssText = 'background:linear-gradient(135deg,#7B1FA2,#1565C0);border-radius:16px;margin-bottom:20px;padding:14px;color:#fff;';
+    tipCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:8px;">🏆 The Morse Museum — A True Hidden Treasure</div>
+    <div style="font-size:12px;opacity:.95;line-height:1.7;">
+      The Morse Museum deserves special attention. For $6, you'll see the largest collection of Louis Comfort Tiffany works in the world — not prints, not replicas, but original leaded glass windows, pottery, jewelry, and the complete Tiffany Chapel rescued from the 1893 Chicago World's Fair. Art historians travel from around the world to see what most Orlando visitors never find. It is one of the great underrated art experiences in America.
+    </div>`;
+    body.appendChild(tipCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-orlando-arts')) buildScreen();
+
+  const _prevSS_vvvvv = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_vvvvv) _prevSS_vvvvv(name, el);
+    if (name === 'orlando-arts') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-orlando-arts');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectArtsCard() {
+    if (document.getElementById('arts-home-card')) return true;
+    const ref = document.getElementById('food-gems-home-card') || document.getElementById('hotels-guide-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'arts-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#7B1FA2,#C62828,#1565C0);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('orlando-arts');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🎨</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Arts, Culture & Museums</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Morse Museum · Dr. Phillips Center · Performing arts</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _artsCard = false;
+  setInterval(() => { if (!_artsCard) _artsCard = injectArtsCard(); }, 56000);
+  setTimeout(() => { _artsCard = injectArtsCard(); }, 52500);
+  const _prevRH_vvvvv = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_vvvvv) _prevRH_vvvvv.apply(this, arguments);
+    setTimeout(() => { _artsCard = false; _artsCard = injectArtsCard(); }, 17400);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK WWWWW: Disney Genie+, Lightning Lane & Crowd Strategy ===== */
+(function initDisneyGeniePlus() {
+
+  const SYSTEM_EXPLAINER = [
+    {
+      name:'Lightning Lane Multi Pass (LLMP)', price:'$15–35/person/day (varies by date/park)',
+      color:'#1565C0', emoji:'⚡',
+      desc:'Replaces the original Genie+. Select one Lightning Lane time window at a time across a pool of eligible attractions. After you use a selection or 2 hours pass, you can book the next one.',
+      bestFor:'Moderate wait days. Value park days. Families who hate waiting but aren\'t on a budget.',
+      strategy:'Book your first LL at exactly 7 AM when the booking window opens (resort guests) or park open (others). Tier 1 attractions sell out — Tiana\'s Bayou Adventure, Slinky Dog Dash first.',
+    },
+    {
+      name:'Lightning Lane Single (Individual)', price:'$7–35+ per attraction (premium pricing)',
+      color:'#C62828', emoji:'🎟️',
+      desc:'Individual purchase for the most popular attractions not included in LLMP. These sell out within minutes of availability and require separate purchase per person per attraction.',
+      bestFor:'Flagship E-ticket experiences where the wait is 90–120+ minutes regularly.',
+      strategy:'Rise of the Resistance (HS), Tron Lightcycle/Run (MK), and Guardians Cosmic Rewind (EPCOT) are the primary targets. Set app notification and buy the moment your window opens.',
+    },
+    {
+      name:'Virtual Queue (VQ)', price:'Free (included with park admission)',
+      color:'#2E7D32', emoji:'📋',
+      desc:'Random lottery system for select attractions. You join the virtual queue at a specific time (typically 7 AM for resort guests, park open for others) via the MDE app.',
+      bestFor:'Attractions that use this system — Tiana\'s and others on rotation.',
+      strategy:'Set an alarm for 6:58 AM on days when VQ attractions are active. Join the queue at exactly 7:00 AM. Speed matters — the boarding group can fill in 2–3 minutes.',
+    },
+    {
+      name:'Rope Drop Strategy (Free)', price:'Free',
+      color:'#7B1FA2', emoji:'🏃',
+      desc:'Arriving 60–90 minutes before official park opening and walking directly to the most popular attraction. In those first 45 minutes, wait times are dramatically lower than any other point in the day.',
+      bestFor:'Budget-conscious visitors or anyone who naturally wakes up early.',
+      strategy:'Magic Kingdom: TRON → Seven Dwarfs. Hollywood Studios: Rise of the Resistance (no LL day) → Slinky. EPCOT: Guardians → Test Track. Animal Kingdom: Flight of Passage → Na\'vi River Journey.',
+    },
+  ];
+
+  const PARK_TIERS = {
+    mk:[
+      { name:'Tron Lightcycle / Run', tier:'ILL ($20–35)', tip:'Newest and fastest ride in MK. Individual Lightning Lane — worth it. Opens at 7 AM for resort guests.' },
+      { name:'Seven Dwarfs Mine Train', tier:'LLMP Tier 1', tip:'Most popular family coaster at Disney World. LLMP booking opens at 7 AM — book this first.' },
+      { name:'Space Mountain', tier:'LLMP Tier 2', tip:'Classic dark coaster. Rope drop or mid-afternoon has shortest waits. LLMP usually available later in morning.' },
+      { name:'Haunted Mansion', tier:'LLMP Tier 2', tip:'Classic attraction — long but fun queue. Skip the line if you\'re doing LLMP. 25-person doom buggies.' },
+      { name:'Big Thunder Mountain', tier:'LLMP Tier 2', tip:'"Wildest ride in the wilderness." Short, fun, good for all coaster levels. Typically 30–45 min wait.' },
+    ],
+    epcot:[
+      { name:'Guardians of the Galaxy: Cosmic Rewind', tier:'ILL ($18–28)', tip:'Reverse-launch coaster with rotating car. One of the best Disney rides built in the last decade. Sells out fast.' },
+      { name:'Remy\'s Ratatouille Adventure', tier:'LLMP Tier 1', tip:'Wildly popular family ride. LLMP books out early or use virtual queue on busy days.' },
+      { name:'Test Track', tier:'LLMP Tier 2', tip:'Design a virtual car and test it. High throughput so wait times are manageable with LLMP.' },
+      { name:'Frozen Ever After', tier:'LLMP Tier 1', tip:'Norway pavilion Frozen ride. Unexpectedly long waits for an older attraction — popular with families.' },
+      { name:'Soarin\' Around the World', tier:'LLMP Tier 2', tip:'Hang glider simulation over global landmarks. Extremely popular at opening — request Row A (top row) for no feet visible.' },
+    ],
+    hs:[
+      { name:'Rise of the Resistance', tier:'ILL ($25–35)', tip:'The greatest theme park attraction ever built. ILL or Virtual Queue — check which method is active day-of.' },
+      { name:'Slinky Dog Dash', tier:'LLMP Tier 1', tip:'Most popular HS coaster for families. LLMP sells out quickly — book at 7 AM sharp.' },
+      { name:'Tower of Terror', tier:'LLMP Tier 2', tip:'Excellent drop tower with random sequences. LLMP worthwhile on busy days.' },
+      { name:'Rock \'n\' Roller Coaster', tier:'LLMP Tier 2', tip:'Single rider line often available — not LLMP territory if you\'re flexible on grouping.' },
+      { name:'Millennium Falcon', tier:'LLMP Tier 2', tip:'Interactive cockpit ride. 6 roles per ride. Rope drop or LLMP if lines build to 60+ min.' },
+    ],
+    ak:[
+      { name:'Avatar: Flight of Passage', tier:'LLMP Tier 1', tip:'Top-ranked Disney attraction in the world multiple years. Rope drop if no LLMP available. Never skip.' },
+      { name:'Na\'vi River Journey', tier:'LLMP Tier 2', tip:'Short but beautiful bioluminescent river journey. Consistently long wait — LLMP efficient.' },
+      { name:'Expedition Everest', tier:'LLMP Tier 2', tip:'The yeti roller coaster. Backward elements, excellent theming. Rope drop or LLMP.' },
+      { name:'Kilimanjaro Safaris', tier:'LLMP Tier 2', tip:'Morning for most active animals. The sun-heated afternoon makes animals lazier.' },
+    ],
+  };
+
+  const CROWD_CALENDAR = [
+    { period:'January (mid) – February (Presidents\' week)', level:1, label:'Low', color:'#2E7D32',
+      tip:'Best crowds of the year after the holiday rush. January 6–February 10 is the sweet spot. Some minor refurbishments but nothing crucial.' },
+    { period:'Presidents Week (Feb)', level:4, label:'Very High', color:'#C62828',
+      tip:'One of the worst weeks of the year. Schools nationwide have the same week off. Avoid if possible.' },
+    { period:'March (non-spring break weeks)', level:2, label:'Moderate', color:'#F57F17',
+      tip:'Good window before spring break peak. March 1–10 and March 20–31 are manageable.' },
+    { period:'Spring Break (March–April)', level:5, label:'Extreme', color:'#b71c1c',
+      tip:'Peak of the year. 3–4 hour waits for major attractions. Rope drop essential. Budget for LLMP+ILL every day.' },
+    { period:'May (school year)', level:2, label:'Low–Moderate', color:'#F57F17',
+      tip:'Excellent underrated window. Schools are back post-spring break, parks thin out noticeably.' },
+    { period:'Summer (June–August)', level:4, label:'High', color:'#C62828',
+      tip:'Busy but different crowd composition than spring break. Families with younger kids. Heat and afternoon storms. Early park days essential.' },
+    { period:'September – October', level:1, label:'Lowest', color:'#2E7D32',
+      tip:'The single best months to visit Disney World. Lowest crowds, multiple festivals at EPCOT, no spring break competition. Mickey\'s Not-So-Scary runs September–October.' },
+    { period:'Thanksgiving Week', level:5, label:'Extreme', color:'#b71c1c',
+      tip:'2nd worst week of the year. 90-minute waits for nearly everything. Rope drop plus maximum LL strategy required.' },
+    { period:'December (1st–17th)', level:2, label:'Low–Moderate', color:'#F57F17',
+      tip:'Excellent if you miss Christmas week. Christmas decor, Mickey\'s Very Merry Christmas Party, and manageable crowds.' },
+    { period:'Christmas Week (Dec 20–Jan 1)', level:5, label:'Extreme', color:'#b71c1c',
+      tip:'The busiest week of the year, full stop. Park capacity hits max. If you must go, book every LL available and arrive 90 min before open.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-disney-genie';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#1565C0,#7B1FA2,#C62828);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Lightning Lane & Crowd Strategy</div>
+          <div style="font-size:11px;opacity:.8;">Genie+ · ILL · VQ · Crowd calendar · Rope drop</div>
+        </div>
+        <span style="font-size:28px;">⚡</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        Disney's skip-the-line system is complex but learnable. Master this guide and you'll accomplish in 8 hours what unprepared visitors accomplish in 12.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    /* System explainer */
+    SYSTEM_EXPLAINER.forEach(sys => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:10px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:10px 14px;background:${sys.color}18;border-left:4px solid ${sys.color};">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px;">
+            <span style="font-size:18px;">${sys.emoji}</span>
+            <div style="font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${sys.name}</div>
+            <span style="font-size:10px;font-weight:800;color:${sys.color};margin-left:auto;">${sys.price}</span>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;margin-bottom:6px;">${sys.desc}</div>
+          <div style="font-size:10px;font-weight:700;color:${sys.color};margin-bottom:3px;">BEST FOR: ${sys.bestFor}</div>
+          <div style="display:flex;gap:6px;background:${sys.color}0d;border-radius:8px;padding:7px;margin-top:6px;">
+            <span style="font-size:12px;flex-shrink:0;">⚡</span>
+            <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${sys.strategy}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    /* LL by park */
+    const llParksCard = document.createElement('div');
+    llParksCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+    let parksHTML = `<div style="padding:12px 14px;background:linear-gradient(135deg,#1565C0,#7B1FA2);color:#fff;">
+      <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;">🎢 Lightning Lane Priority by Park</div>
+    </div><div style="padding:12px 14px;">`;
+
+    const parkNames = { mk:'🏰 Magic Kingdom', epcot:'🌍 EPCOT', hs:'🎬 Hollywood Studios', ak:'🐘 Animal Kingdom' };
+    const parkColors = { mk:'#1565C0', epcot:'#2E7D32', hs:'#C62828', ak:'#33691E' };
+    Object.entries(PARK_TIERS).forEach(([park, rides]) => {
+      parksHTML += `<div style="font-size:12px;font-weight:800;color:${parkColors[park]};margin:10px 0 6px;">${parkNames[park]}</div>`;
+      rides.forEach(r => {
+        const tierColor = r.tier.includes('ILL') ? '#C62828' : r.tier.includes('Tier 1') ? '#E65100' : '#1565C0';
+        parksHTML += `<div style="display:flex;justify-content:space-between;margin-bottom:6px;align-items:flex-start;">
+          <div style="flex:1;margin-right:6px;">
+            <div style="font-size:11px;font-weight:700;color:var(--text-primary,#212121);">${r.name}</div>
+            <div style="font-size:10px;color:var(--text-secondary,#666);">${r.tip}</div>
+          </div>
+          <span style="font-size:9px;font-weight:800;padding:2px 6px;border-radius:20px;background:${tierColor}18;color:${tierColor};flex-shrink:0;">${r.tier.split('(')[0].trim()}</span>
+        </div>`;
+      });
+    });
+    parksHTML += '</div>';
+    llParksCard.innerHTML = parksHTML;
+    body.appendChild(llParksCard);
+
+    /* Crowd Calendar */
+    const crowdCard = document.createElement('div');
+    crowdCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+    crowdCard.innerHTML = `<div style="padding:12px 14px;background:linear-gradient(135deg,#2E7D32,#C62828);color:#fff;">
+      <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;">📅 Disney Crowd Calendar</div>
+    </div>
+    <div style="padding:12px 14px;">
+      <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+        ${[1,2,3,4,5].map(l=>`<div style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:50%;background:${l<=2?'#2E7D32':l<=3?'#F57F17':'#C62828'};display:inline-block;"></span><span style="font-size:10px;">${l===1?'Low':l===2?'Moderate':l===3?'High':l===4?'Very High':'Extreme'}</span></div>`).join('')}
+      </div>
+      ${CROWD_CALENDAR.map(c=>`<div style="display:flex;gap:8px;margin-bottom:8px;align-items:flex-start;">
+        <span style="width:10px;height:10px;border-radius:50%;background:${c.color};flex-shrink:0;margin-top:4px;"></span>
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--text-primary,#212121);">${c.period} <span style="color:${c.color};">[${c.label}]</span></div>
+          <div style="font-size:10px;color:var(--text-secondary,#666);">${c.tip}</div>
+        </div>
+      </div>`).join('')}
+    </div>`;
+    body.appendChild(crowdCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-disney-genie')) buildScreen();
+
+  const _prevSS_wwwww = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_wwwww) _prevSS_wwwww(name, el);
+    if (name === 'disney-genie') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-disney-genie');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectGenieCard() {
+    if (document.getElementById('genie-home-card')) return true;
+    const ref = document.getElementById('arts-home-card') || document.getElementById('food-gems-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'genie-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#1565C0,#7B1FA2,#C62828);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('disney-genie');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">⚡</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Lightning Lane Strategy</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Genie+ guide · ILL · Crowd calendar · Rope drop</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _genieCard = false;
+  setInterval(() => { if (!_genieCard) _genieCard = injectGenieCard(); }, 57000);
+  setTimeout(() => { _genieCard = injectGenieCard(); }, 53500);
+  const _prevRH_wwwww = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_wwwww) _prevRH_wwwww.apply(this, arguments);
+    setTimeout(() => { _genieCard = false; _genieCard = injectGenieCard(); }, 17800);
+  };
+})();
+</script>
