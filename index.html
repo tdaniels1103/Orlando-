@@ -49184,3 +49184,185 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK BBBBB: Orlando Kids Activity Guide (Non-Park) ===== */
+(function initKidsActivities() {
+
+  const ACTIVITIES = [
+    {
+      name:'Orlando Science Center', type:'Museum', age:'3–16', price:'$21/adult, $15/child',
+      emoji:'🔬', color:'#1565C0', neighborhood:'Loch Haven Cultural Park',
+      desc:'Four floors of interactive science exhibits, a digital planetarium, and hands-on labs. One of the best science museums in the Southeast US.',
+      bestFor:'Science-curious kids of all ages. The planetarium shows are suitable even for toddlers.',
+      tips:['The SciencePlay area (under 5) is excellent for toddlers while older kids explore independently','IMAX documentaries here are far cheaper than commercial IMAX ($5–8 add-on)','Check for special exhibitions — they rotate 3–4 times per year'],
+    },
+    {
+      name:'SEA LIFE Aquarium (ICON Park)', type:'Aquarium', age:'All ages', price:'$34/adult, $26/child (book online)',
+      emoji:'🐠', color:'#0277BD', neighborhood:'International Drive',
+      desc:'Walk-through tunnel aquarium with rays, sharks, and thousands of sea creatures. Interactive touch pools for kids.',
+      bestFor:'Families with kids under 10. The tunnel walk-through is particularly magical for young children.',
+      tips:['Book online — 20–30% cheaper than gate price','Combine with Madame Tussauds next door for a package discount','Touch pools are a highlight — kids can pet stingrays'],
+    },
+    {
+      name:'LEGOLAND Florida (Day Trip)', type:'Theme Park', age:'2–12', price:'$99+/person',
+      emoji:'🧱', color:'#E65100', neighborhood:'Winter Haven (45 min from Orlando)',
+      desc:'An entire theme park built for children under 12. The rides are appropriately thrilling without being terrifying. LEGO models of Florida landmarks.',
+      bestFor:'Families with children 3–10. This is genuinely the best theme park for young children in Florida.',
+      tips:['Book online far in advance — LEGOLAND is cheaper than Disney but still books up','No height requirements on most rides — rare','The LEGO Movie 4D Theater is a highlight for tiny ones','The water park area (included) is excellent on hot days'],
+    },
+    {
+      name:'WonderWorks', type:'Science Entertainment', age:'6–16', price:'$29–33',
+      emoji:'🧠', color:'#7B1FA2', neighborhood:'International Drive',
+      desc:'Upside-down "house" filled with hands-on science and technology activities. Laser tag, ropes course, and interactive exhibits.',
+      bestFor:'Kids 8–14 who want something different from traditional museums. Highly interactive.',
+      tips:['Combo tickets with the magic show are better value if you have more than 90 minutes','Laser tag is included in the base ticket','The 4D motion theater is a fun bonus'],
+    },
+    {
+      name:'Crayola Experience', type:'Creative Activity Center', age:'3–12', price:'$30/person',
+      emoji:'🖍️', color:'#F57F17', neighborhood:'Florida Mall (Sand Lake Rd)',
+      desc:'A 70,000 sq ft creative facility with 26 hands-on activities around art, color, and creativity. Make your own crayon, name it, wrap it.',
+      bestFor:'Creative kids under 12. Art-focused activities that keep them engaged for 2+ hours.',
+      tips:['The "make your own crayon" experience is the highlight — kids design the label, print it, melt the wax, pour and take home','Book ahead during school holidays — capacity limited','Right inside the Florida Mall — can combine with shopping or other mall activities'],
+    },
+    {
+      name:'Icon Park (The Wheel)', type:'Entertainment Complex', age:'All ages', price:'$30–37',
+      emoji:'🎡', color:'#c62828', neighborhood:'International Drive',
+      desc:'The 400-ft observation wheel with climate-controlled gondolas. Views of Orlando from 30 miles in all directions. Multiple other attractions in the complex.',
+      bestFor:'Families who want views and a casual I-Drive experience. Older kids like the adjacent attractions.',
+      tips:['Buy combination tickets for The Wheel + Sea Life or Museum of Illusions','The Wheel at sunset or night is particularly beautiful','Adjacent attractions: Madame Tussauds, Peppa Pig Experience, Museum of Illusions'],
+    },
+    {
+      name:'Gatorland', type:'Wildlife Park', age:'4–adult', price:'$33/adult, $22/child',
+      emoji:'🐊', color:'#2E7D32', neighborhood:'South Orange Blossom Trail',
+      desc:'Florida\'s first wildlife attraction. Alligator shows, zipline over gators, bird sanctuary, and the famous "Gator Wresting." A uniquely Florida experience.',
+      bestFor:'Families who want a Florida wildlife experience without the theme park price tag.',
+      tips:['The GatorZipline passes over hundreds of alligators — thrilling and unique','Feeding shows are free with admission','Far cheaper than any theme park for a genuine Florida wildlife experience','Buy tickets online — usually $5–10 off gate price'],
+    },
+    {
+      name:'Andretti Indoor Karting & Games', type:'Family Entertainment Center', age:'5+', price:'$12–25/activity',
+      emoji:'🏎️', color:'#37474F', neighborhood:'International Drive',
+      desc:'Multi-level indoor go-kart facility plus arcade, laser tag, mini bowling, and escape rooms. Excellent for bad weather days.',
+      bestFor:'Mixed-age groups. Teens and adults enjoy the karts while younger kids enjoy arcade and mini bowling.',
+      tips:['The multi-level indoor kart track is genuinely impressive — not a typical flat track','Wristband packages save money if you plan to do multiple activities','Check for special race nights and events'],
+    },
+    {
+      name:'Peppa Pig Theme Park (LEGOLAND campus)', type:'Theme Park', age:'2–5', price:'$99+/day',
+      emoji:'🐷', color:'#FF6B9D', neighborhood:'Winter Haven (45 min)',
+      desc:'The world\'s first Peppa Pig Theme Park, opened 2022. Entirely designed for children under 5. Every ride is appropriate for the youngest visitors.',
+      bestFor:'Families with toddlers. If your child loves Peppa Pig and is under 6, this is the perfect park.',
+      tips:['Combine with LEGOLAND (they share a campus) for a full day suitable for multiple age groups','Characters appear throughout the day for meets','Very low thrill level — appropriate for first theme park experience'],
+    },
+  ];
+
+  const RAINY_DAY_KIDS = [
+    'Crayola Experience — entirely indoor, 2-3 hours',
+    'WonderWorks — interactive and engaging',
+    'Andretti Indoor Karting — multi-level indoor facility',
+    'Movie at AMC Disney Springs or Universal Cinemark',
+    'Hotel pool (often less crowded in rain)',
+    'Orlando Science Center — 4 floors of indoor exhibits',
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-kids-activities';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const header = document.createElement('div');
+    header.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#FF6B9D,#FF8C69,#FFD700);padding:16px 14px 14px;';
+    header.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:#fff;">Kids Activities Beyond Parks</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.85);">9 activities · No park ticket needed · All budgets</div>
+        </div>
+        <span style="font-size:24px;">🧒</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:8px;padding:7px 12px;font-size:11px;color:rgba(255,255,255,.9);">
+        Rest days from theme parks are important — and Orlando has extraordinary options for kids that don't require $150/day park tickets.
+      </div>`;
+
+    const content = document.createElement('div');
+    content.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    ACTIVITIES.forEach(act => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:10px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="background:${act.color};padding:10px 14px;display:flex;align-items:center;gap:10px;">
+          <span style="font-size:22px;">${act.emoji}</span>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:700;color:#fff;">${act.name}</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.8);">${act.type} · Ages: ${act.age} · ${act.price}</div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          <div style="font-size:12px;color:var(--text-secondary,#555);margin-bottom:6px;line-height:1.5;">${act.desc}</div>
+          <div style="font-size:11px;font-weight:700;color:${act.color};margin-bottom:3px;">Best for: ${act.bestFor}</div>
+          ${act.tips.slice(0,2).map(t=>`<div style="font-size:11px;color:var(--text-secondary,#555);padding:2px 0;">💡 ${t}</div>`).join('')}
+        </div>`;
+      content.appendChild(card);
+    });
+
+    // Rainy day
+    const rainCard = document.createElement('div');
+    rainCard.style.cssText = 'background:linear-gradient(135deg,#1565C0,#0277BD);border-radius:14px;padding:14px;margin-bottom:20px;color:#fff;';
+    rainCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;margin-bottom:8px;">⛈️ Best Rainy Day Options for Kids</div>`;
+    RAINY_DAY_KIDS.forEach(r => {
+      const row = document.createElement('div');
+      row.style.cssText = 'font-size:12px;color:rgba(255,255,255,.85);padding:3px 0;';
+      row.textContent = '☔ ' + r;
+      rainCard.appendChild(row);
+    });
+    content.appendChild(rainCard);
+
+    s.appendChild(header);
+    s.appendChild(content);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-kids-activities')) buildScreen();
+
+  const _prevSS_bbbbb = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_bbbbb) _prevSS_bbbbb(name, el);
+    if (name === 'kids-activities') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-kids-activities');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectKidsCard() {
+    if (document.getElementById('kids-act-home-card')) return true;
+    const ref = document.getElementById('secret-rest-home-card') || document.getElementById('hp-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'kids-act-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#FF6B9D,#FF8C69,#FFD700);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('kids-activities');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:3px;">🧒 Kids Activities Beyond Parks</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.9);">LEGOLAND · Science Center · Gatorland · 9 spots</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.5);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _kidsActCard = false;
+  setInterval(() => { if (!_kidsActCard) _kidsActCard = injectKidsCard(); }, 38000);
+  setTimeout(() => { _kidsActCard = injectKidsCard(); }, 34500);
+
+  const _prevRH_bbbbb = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_bbbbb) _prevRH_bbbbb.apply(this, arguments);
+    setTimeout(() => { _kidsActCard = false; _kidsActCard = injectKidsCard(); }, 10100);
+  };
+})();
+</script>
