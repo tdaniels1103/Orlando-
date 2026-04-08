@@ -37243,3 +37243,1903 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK RRR: Spa & Wellness Guide ===== */
+(function initSpaWellness() {
+
+  const SPAS = [
+    {
+      id:'mandara',
+      name:'Mandara Spa at Loews Royal Pacific',
+      emoji:'🌺',
+      stars:5,
+      price:'$$$',
+      neighborhood:'Universal Orlando Resort',
+      desc:'Award-winning Asian-inspired spa. Serene, world-class, and deeply restorative. The ritual rooms are divine.',
+      services:['Couples Massage','Body Wraps','Facials','Manicure & Pedicure','Hot Stone Therapy'],
+      highlight:'Book the 90-min Harmony Couples Ritual for a once-in-a-lifetime experience.',
+      priceRange:'$150–$450 per person',
+      openHours:'9:00 AM – 8:00 PM daily',
+      tips:['Book 3–4 weeks in advance','Ask for a therapist specializing in deep tissue if you have park fatigue','Hotel guests get priority booking'],
+    },
+    {
+      id:'fourseasons',
+      name:'Spa at Four Seasons Orlando',
+      emoji:'👑',
+      stars:5,
+      price:'$$$$',
+      neighborhood:'Disney World Area',
+      desc:"Florida's finest spa experience. Forbes Five-Star service in a breathtaking setting overlooking the golf course.",
+      services:['Signature Massages','Facial Treatments','Body Rituals','Salon Services','Hydrotherapy'],
+      highlight:"The 'Four Seasons Signature Massage' incorporates proprietary blend oils unique to Orlando.",
+      priceRange:'$200–$600 per person',
+      openHours:'8:00 AM – 8:00 PM daily',
+      tips:['Non-hotel guests can book but availability is limited','The Vitality Pool is incredible — arrive 30 min early','Combine with a round of golf for the ultimate wellness day'],
+    },
+    {
+      id:'senses',
+      name:'Senses Spa at Disney\'s Grand Floridian',
+      emoji:'🏰',
+      stars:5,
+      price:'$$$',
+      neighborhood:'Disney World (Magic Kingdom Area)',
+      desc:'Victorian elegance meets modern wellness. The most romantic spa setting in all of Walt Disney World.',
+      services:['Signature Disney Massages','Magical Facials','Body Treatments','Manicure & Pedicure','Couples Packages'],
+      highlight:'The Relaxation Room overlooks Seven Seas Lagoon. Pure magic.',
+      priceRange:'$130–$380 per person',
+      openHours:'9:00 AM – 9:00 PM daily',
+      tips:['Book via Disney directly for best availability','The "Garden Stone Massage" is their signature service','Combine with Grand Floridian Resort access for a full resort day'],
+    },
+    {
+      id:'waldorfspa',
+      name:'Waldorf Astoria Spa Orlando',
+      emoji:'✨',
+      stars:4,
+      price:'$$$',
+      neighborhood:'Disney World Area',
+      desc:'Classic old-world luxury in a contemporary Florida setting. Impeccable service and expertly trained therapists.',
+      services:['Swedish & Deep Tissue Massage','Signature Facials','Body Scrubs','Couple\'s Suite','Nail Services'],
+      highlight:'The couple\'s suite with private soaking tub and fireplace is extraordinary.',
+      priceRange:'$140–$400 per person',
+      openHours:'9:00 AM – 7:00 PM daily',
+      tips:['Perfect for anniversary or honeymoon packages','Ask about spa + dinner packages at Bull & Bear restaurant','Valet parking included for spa guests'],
+    },
+    {
+      id:'bohemianspa',
+      name:'Poseidon Spa at Grand Bohemian',
+      emoji:'🎨',
+      stars:4,
+      price:'$$',
+      neighborhood:'Downtown Orlando',
+      desc:'Artistic, intimate boutique spa in the heart of downtown. A hidden gem perfect for a romantic afternoon.',
+      services:['Relaxation Massages','Custom Facials','Body Polish','Aromatherapy','Reflexology'],
+      highlight:'The art gallery setting creates a uniquely creative wellness atmosphere.',
+      priceRange:'$90–$250 per person',
+      openHours:'10:00 AM – 7:00 PM daily',
+      tips:['More affordable than resort spas without sacrificing quality','Great for a midday break during a downtown day','Combine with dinner at The Boheme restaurant downstairs'],
+    },
+    {
+      id:'thespa',
+      name:'The Spa at Rosen Shingle Creek',
+      emoji:'🌿',
+      stars:4,
+      price:'$$',
+      neighborhood:'International Drive',
+      desc:'Peaceful creek-side wellness retreat away from the tourist bustle. Genuinely tranquil and very skilled.',
+      services:['Hot Stone Massage','Reflexology','Hydrating Facials','Body Wrap','Scalp Treatments'],
+      highlight:'The only spa in Orlando with outdoor treatment areas overlooking Shingle Creek.',
+      priceRange:'$100–$280 per person',
+      openHours:'9:00 AM – 7:00 PM daily',
+      tips:['Best value resort spa in Orlando','Combine with their championship golf course for a full wellness day','Weekday appointments easier to get and sometimes discounted'],
+    },
+  ];
+
+  const WELLNESS_TIPS = [
+    { icon:'💧', title:'Hydration Strategy', tip:'Florida heat + theme parks = serious dehydration risk. Drink 16oz of water before any spa treatment and 32oz minimum during a park day.' },
+    { icon:'👟', title:'Foot Recovery', tip:"After long park days, soak feet in Epsom salt for 20 min. Request a reflexology add-on to your massage — most spas offer it for $30–50 extra." },
+    { icon:'☀️', title:'Sunburn Protocol', tip:"Florida sun is intense. Wait 24–48 hours after sunburn before any body treatments. Ask for aloe-based services instead of heat therapies." },
+    { icon:'😴', title:'Sleep Optimization', tip:"Orlando's best spa day is Day 2 or 3 of your trip — after initial park excitement settles. Mornings before 11am are least crowded at resort spas." },
+    { icon:'🧘', title:'Mindfulness Break', tip:'EPCOT\'s Japan pavilion has a serene garden perfect for 10 minutes of quiet. Universal\'s lagoon area at sunrise is meditative. Free wellness moments exist everywhere.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-spa-wellness';
+    s.className = 'screen';
+    s.style.display = 'none';
+    s.innerHTML = `
+      <div style="background:linear-gradient(135deg,#1B5E20,#4CAF50,#A5D6A7);padding:18px 14px 20px;
+        display:flex;align-items:center;gap:12px;flex-shrink:0;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;
+          border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div>
+          <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#fff;">Spa & Wellness Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">Recharge · Restore · Renew in Orlando</div>
+        </div>
+        <span style="font-size:28px;">🌿</span>
+      </div>
+      <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;">
+
+        <!-- Intro -->
+        <div style="background:linear-gradient(135deg,#1B5E20,#388E3C);border-radius:16px;padding:16px;margin-bottom:14px;color:#fff;">
+          <div style="font-size:13px;line-height:1.6;opacity:.9;">
+            Theme park days are exhilarating — and exhausting. Orlando's world-class spas exist to transform your recovery into pure indulgence. Here are the best, from five-star resort sanctuaries to hidden boutique gems.
+          </div>
+        </div>
+
+        <!-- Spa cards -->
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:12px;">
+          🌺 Orlando's Finest Spas
+        </div>
+        ${SPAS.map(spa => `
+          <div style="background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;
+            border:1px solid var(--border,#eee);overflow:hidden;">
+            <div style="background:linear-gradient(135deg,#1B5E20,#4CAF50);padding:12px 14px;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-size:26px;">${spa.emoji}</span>
+                <div style="flex:1;">
+                  <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:#fff;">${spa.name}</div>
+                  <div style="font-size:10px;color:rgba(255,255,255,.8);">📍 ${spa.neighborhood}</div>
+                </div>
+                <div style="text-align:right;">
+                  <div style="font-size:14px;">${'⭐'.repeat(spa.stars)}</div>
+                  <div style="font-size:12px;font-weight:800;color:#A5D6A7;">${spa.price}</div>
+                </div>
+              </div>
+            </div>
+            <div style="padding:12px 14px;">
+              <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;margin-bottom:8px;">${spa.desc}</div>
+              <div style="background:#E8F5E918;border-left:3px solid #4CAF50;padding:8px 10px;border-radius:0 8px 8px 0;margin-bottom:8px;">
+                <div style="font-size:11px;font-weight:700;color:#2E7D32;">✨ HIGHLIGHT</div>
+                <div style="font-size:12px;color:var(--text-primary,#333);margin-top:2px;">${spa.highlight}</div>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;">
+                ${spa.services.map(sv => `<span style="padding:3px 9px;background:#1B5E2018;border-radius:20px;font-size:10px;color:#1B5E20;font-weight:700;">${sv}</span>`).join('')}
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                <span style="font-size:11px;color:var(--text-secondary,#888);">⏰ ${spa.openHours}</span>
+                <span style="font-size:13px;font-weight:800;color:#2E7D32;">${spa.priceRange}</span>
+              </div>
+              <div style="border-top:1px solid var(--border,#eee);padding-top:8px;">
+                ${spa.tips.map(t => `<div style="font-size:11px;color:var(--text-secondary,#666);padding:2px 0;">💡 ${t}</div>`).join('')}
+              </div>
+            </div>
+          </div>`).join('')}
+
+        <!-- Wellness tips -->
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;
+          color:var(--text-primary,#212121);margin:16px 0 10px;">🌱 Florida Wellness Tips</div>
+        ${WELLNESS_TIPS.map(w => `
+          <div style="background:var(--card-bg,#fff);border-radius:12px;padding:12px 14px;margin-bottom:8px;
+            border:1px solid var(--border,#eee);display:flex;gap:12px;align-items:flex-start;">
+            <span style="font-size:22px;flex-shrink:0;">${w.icon}</span>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:3px;">${w.title}</div>
+              <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;">${w.tip}</div>
+            </div>
+          </div>`).join('')}
+
+        <!-- DIY Recovery section -->
+        <div style="background:linear-gradient(135deg,#1B5E20,#2E7D32);border-radius:14px;padding:14px;margin-top:16px;margin-bottom:20px;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#A5D6A7;margin-bottom:10px;">
+            🏊 Free & Low-Cost Recovery
+          </div>
+          ${[
+            { icon:'🏊', tip:'All Disney and Universal resort guests get pool access — hydrotherapy for free.' },
+            { icon:'🧂', tip:'Walmart/Publix: Epsom salt $3, aloe vera $5. DIY recovery kit under $15.' },
+            { icon:'🌲', tip:'Wekiwa Springs State Park: natural spring swim (72°F) for $6/person. The ultimate nature recovery.' },
+            { icon:'🧘', tip:'YouTube "Disney Parks ambient sounds" + hotel bathtub = instant spa at no cost.' },
+            { icon:'🥤', tip:'Fresh coconut water from Epcot\'s Refreshment Outpost: natural electrolytes for $5.' },
+          ].map(d => `<div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
+            <span style="font-size:18px;flex-shrink:0;">${d.icon}</span>
+            <div style="font-size:12px;color:rgba(255,255,255,.85);line-height:1.5;">${d.tip}</div>
+          </div>`).join('')}
+        </div>
+      </div>`;
+    s.style.cssText += 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;display:flex;';
+    s.style.display = 'none';
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-spa-wellness')) buildScreen();
+
+  const _prevSS_rrr = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_rrr) _prevSS_rrr(name, el);
+    if (name === 'spa-wellness') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-spa-wellness');
+      if (s) s.style.display = 'flex';
+    }
+  };
+
+  function injectSpaCard() {
+    if (document.getElementById('spa-home-card')) return true;
+    const ref = document.getElementById('eu-home-card') || document.getElementById('dn-home-btn');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'spa-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#1B5E20,#4CAF50,#A5D6A7);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('spa-wellness');
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:28px;">🌿</span>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Spa & Wellness Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.85);">6 top spas · Recovery tips · Free alternatives</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _spaCard = false;
+  setInterval(() => { if (!_spaCard) _spaCard = injectSpaCard(); }, 7000);
+  setTimeout(() => { _spaCard = injectSpaCard(); }, 3500);
+
+  const _prevRH_rrr = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_rrr) _prevRH_rrr.apply(this, arguments);
+    setTimeout(() => { _spaCard = false; _spaCard = injectSpaCard(); }, 1200);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK SSS: Orlando Nightlife Map ===== */
+(function initNightlife() {
+
+  const VENUES = [
+    {
+      id:'church',
+      name:'The Church Street District',
+      emoji:'🎺',
+      type:'Entertainment District',
+      neighborhood:'Downtown Orlando',
+      vibe:'Lively · Historic · Diverse',
+      crowd:'25–40',
+      priceRange:'$–$$',
+      hours:'Opens 4 PM · Live music from 9 PM',
+      highlights:['Tin Roof (live music every night)','Chillers Bar (multi-level)','The Beacham (concerts)','Antigua Bar (Latin nights)'],
+      tip:'Thursday is locals night — cheaper drinks, authentic crowd. Park in the Church Street garage for $5 flat.',
+      rating:5,
+    },
+    {
+      id:'ibar',
+      name:'I-Bar / I-Drive Entertainment Zone',
+      emoji:'🎡',
+      type:'Bar & Club Strip',
+      neighborhood:'International Drive',
+      vibe:'Tourist-friendly · Party · International',
+      crowd:'21–35',
+      priceRange:'$$',
+      hours:'4 PM – 2 AM daily',
+      highlights:['Café Tu Tu Tango (tapas + live art)','Tin Pan Alley (piano bar)','Icebar (world\'s only 27° permanent ice bar)','Howl at the Moon (dueling pianos)'],
+      tip:'The Icebar charges admission (~$15) but includes 1 drink. Best photo opportunity in Orlando nightlife.',
+      rating:4,
+    },
+    {
+      id:'thornton',
+      name:'Thornton Park District',
+      emoji:'🌴',
+      type:'Neighborhood Bars',
+      neighborhood:'Thornton Park (East Downtown)',
+      vibe:'Local · Hipster · Low-key',
+      crowd:'28–45',
+      priceRange:'$–$$',
+      hours:'5 PM – midnight (later on weekends)',
+      highlights:['Bar Mercado (rooftop views)','Dexter\'s Thornton Park (wine + cheese)','Mucho (Latin small plates + cocktails)','Mather\'s Social Gathering (speakeasy vibes)'],
+      tip:'Best neighborhood for an authentic Orlando night. Uber in — street parking is a nightmare on weekends.',
+      rating:5,
+    },
+    {
+      id:'winterpark',
+      name:'Park Avenue Nightlife, Winter Park',
+      emoji:'🌸',
+      type:'Upscale Dining & Bars',
+      neighborhood:'Winter Park',
+      vibe:'Sophisticated · Wine · Upscale',
+      crowd:'30–55',
+      priceRange:'$$$',
+      hours:'Restaurant bars open 5 PM, later closings on weekends',
+      highlights:['The Wine Room (50 self-serve wines)','Luma on Park (stunning cocktail bar)','310 Park South (rooftop terrace)','Prato wine list (100+ Italian wines)'],
+      tip:'The Wine Room lets you try wine by the ounce on a debit card system. Perfect for discovering new labels.',
+      rating:5,
+    },
+    {
+      id:'disney-boardwalk',
+      name:'Disney\'s BoardWalk Entertainment District',
+      emoji:'🎠',
+      type:'Resort Entertainment',
+      neighborhood:'Disney World (EPCOT Area)',
+      vibe:'Family-friendly · Nostalgic · Festive',
+      crowd:'All ages',
+      priceRange:'$$–$$$',
+      hours:'Restaurants open 4 PM · Entertainment from 7 PM',
+      highlights:['Atlantic Dance Hall (DJ nights)','Jellyrolls (dueling pianos, 21+ after 7PM)','Big River Grille (craft beer)','ESPN Club (sports bar)'],
+      tip:"Jellyrolls dueling piano bar is a bucket-list experience. The crowd energy is unmatched. $15 cover is worth every penny.",
+      rating:4,
+    },
+    {
+      id:'citywalk',
+      name:'Universal CityWalk',
+      emoji:'🎸',
+      type:'Entertainment Complex',
+      neighborhood:'Universal Orlando Resort',
+      vibe:'Party · Music · Diverse',
+      crowd:'21–45',
+      priceRange:'$$',
+      hours:'Open until 2 AM Fri–Sat · 1 AM weekdays',
+      highlights:['Hard Rock Live (major concerts)','Rising Star (live karaoke band)','Pat O\'Brien\'s (Hurricane cocktails)','Bob Marley Restaurant (reggae nights)'],
+      tip:'Rising Star is the best karaoke experience in Orlando — a live band backs you. Arrive before 9 PM for a spot.',
+      rating:4,
+    },
+    {
+      id:'millenya',
+      name:'Millennia / Restaurant Row',
+      emoji:'🍸',
+      type:'Upscale Lounge Strip',
+      neighborhood:'Sand Lake Road / Restaurant Row',
+      vibe:'Upscale · Trendy · Date Night',
+      crowd:'25–45',
+      priceRange:'$$$',
+      hours:'5 PM – 1 AM',
+      highlights:['Blu on the Avenue (award-winning cocktails)','The Melting Pot (fondue + wine)','Eddie V\'s Bar (jazz nights)','Kres Chophouse (whiskey lounge)'],
+      tip:'Sand Lake Road is where Orlando professionals go. Dress smart-casual. The bar at Eddie V\'s has live jazz Thu–Sat.',
+      rating:4,
+    },
+  ];
+
+  const SAFETY_TIPS = [
+    { icon:'🚗', tip:'Downtown Orlando has strict parking enforcement. Use Orange Ave garages or ride-share.' },
+    { icon:'📱', tip:'Uber/Lyft surge pricing hits 1:30–2:30 AM when bars close. Order your ride by 1 AM.' },
+    { icon:'💧', tip:'Florida humidity + dancing = rapid dehydration. Alternate alcoholic drinks with water.' },
+    { icon:'👫', tip:'Stick to well-lit areas on Church Street and Orange Ave. Downtown is safe but use common sense.' },
+    { icon:'🌧️', tip:"Florida thunder storms can appear without warning at night — June through September. Check weather before going out and have a Plan B." },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-nightlife';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#0a0a1a);flex-direction:column;overflow:hidden;';
+    s.innerHTML = `
+      <div style="background:linear-gradient(135deg,#0D0221,#4A0E8F,#E91E63);padding:18px 14px 20px;
+        display:flex;align-items:center;gap:12px;flex-shrink:0;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;
+          border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#fff;">Orlando After Dark</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">Nightlife · Bars · Live Music · Clubs</div>
+        </div>
+        <span style="font-size:28px;">🌙</span>
+      </div>
+      <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;background:linear-gradient(180deg,#0a0a1a 0%,#1a0a2e 100%);">
+
+        <!-- Tonight banner -->
+        <div style="background:linear-gradient(135deg,#0D0221,#4A0E8F,#E91E63);border-radius:16px;padding:14px;margin-bottom:14px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+            <span style="font-size:28px;">🌟</span>
+            <div>
+              <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;">Orlando Nights Are Legendary</div>
+              <div style="font-size:11px;color:rgba(255,255,255,.7);">7 districts · 25+ iconic venues · Something for every vibe</div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:rgba(255,255,255,.8);line-height:1.5;">
+            From the dueling pianos of the BoardWalk to the craft cocktails of Thornton Park, Orlando's after-dark scene rivals any major city — and most visitors never discover it.
+          </div>
+        </div>
+
+        ${VENUES.map(v => `
+          <div style="background:rgba(255,255,255,.05);border-radius:14px;margin-bottom:12px;
+            border:1px solid rgba(255,255,255,.1);overflow:hidden;">
+            <div style="padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.08);">
+              <div style="display:flex;align-items:flex-start;gap:10px;">
+                <span style="font-size:26px;">${v.emoji}</span>
+                <div style="flex:1;">
+                  <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:#fff;margin-bottom:2px;">${v.name}</div>
+                  <div style="font-size:10px;color:rgba(255,255,255,.5);">${v.type} · ${v.neighborhood}</div>
+                  <div style="font-size:11px;color:#E91E63;font-weight:700;margin-top:2px;">${v.vibe}</div>
+                </div>
+                <div style="text-align:right;flex-shrink:0;">
+                  <div style="font-size:12px;">${'⭐'.repeat(v.rating)}</div>
+                  <div style="font-size:11px;font-weight:800;color:#C9A96E;">${v.priceRange}</div>
+                </div>
+              </div>
+            </div>
+            <div style="padding:10px 14px;">
+              <div style="font-size:10px;color:rgba(255,255,255,.4);margin-bottom:4px;">⏰ ${v.hours} · 👥 Age: ${v.crowd}</div>
+              <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:8px;">
+                ${v.highlights.map(h => `<div style="font-size:12px;color:rgba(255,255,255,.8);">• ${h}</div>`).join('')}
+              </div>
+              <div style="background:rgba(201,169,110,.1);border-left:3px solid #C9A96E;padding:8px;border-radius:0 8px 8px 0;">
+                <div style="font-size:11px;color:rgba(201,169,110,.9);">💡 ${v.tip}</div>
+              </div>
+            </div>
+          </div>`).join('')}
+
+        <!-- Safety tips -->
+        <div style="background:rgba(255,255,255,.05);border-radius:14px;padding:14px;margin-bottom:20px;border:1px solid rgba(255,255,255,.1);">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:10px;">
+            🛡️ Smart Night Out Tips
+          </div>
+          ${SAFETY_TIPS.map(st => `
+            <div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
+              <span style="font-size:18px;flex-shrink:0;">${st.icon}</span>
+              <div style="font-size:12px;color:rgba(255,255,255,.7);line-height:1.5;">${st.tip}</div>
+            </div>`).join('')}
+        </div>
+      </div>`;
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-nightlife')) buildScreen();
+
+  const _prevSS_sss = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_sss) _prevSS_sss(name, el);
+    if (name === 'nightlife') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-nightlife');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectNightlifeCard() {
+    if (document.getElementById('nightlife-home-card')) return true;
+    const ref = document.getElementById('spa-home-card') || document.getElementById('eu-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'nightlife-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#0D0221,#4A0E8F,#E91E63);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('nightlife');
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:28px;">🌙</span>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Orlando After Dark</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.85);">7 districts · Bars · Live Music · Clubs</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _nlCard = false;
+  setInterval(() => { if (!_nlCard) _nlCard = injectNightlifeCard(); }, 7500);
+  setTimeout(() => { _nlCard = injectNightlifeCard(); }, 4000);
+
+  const _prevRH_sss = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_sss) _prevRH_sss.apply(this, arguments);
+    setTimeout(() => { _nlCard = false; _nlCard = injectNightlifeCard(); }, 1300);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK TTT: Resort Pool Guide ===== */
+(function initPoolGuide() {
+
+  const POOLS = [
+    {
+      id:'yacht-club',
+      name:'Stormalong Bay — Yacht & Beach Club',
+      emoji:'⛱️',
+      rating:5,
+      price:'Hotel guests only',
+      size:'3 acres',
+      desc:"Universally considered the #1 resort pool in all of Walt Disney World — and possibly all of Florida. A lazy river, sand-bottom pool, two waterslides, and a sunken ship slide. This alone is worth staying at Yacht or Beach Club.",
+      features:['Sand-bottom pool (waist-deep)','Lazy river','Ship waterslide','Quiet pool nearby','Full bar service'],
+      insider:"Non-hotel guests occasionally sneak in — don't do it. Security patrols and you will be removed. It's worth paying for a room here at least one night.",
+      themepark:'EPCOT (5-min walk)',
+      bestFor:'Families · Adults · Everyone',
+    },
+    {
+      id:'polynesian',
+      name:'Lava Pool — Disney\'s Polynesian Resort',
+      emoji:'🌺',
+      rating:5,
+      price:'Hotel guests only',
+      size:'Large',
+      desc:"Tropical paradise with a volcanic waterslide and lush Hawaiian landscaping. At night, the torchlight and music create an atmosphere unlike anywhere else in Florida.",
+      features:['Volcanic waterslide','Tiki bar (Oasis Pool Bar)','Hot tub','Beach access on Seven Seas Lagoon','Quiet pool too'],
+      insider:'The Tonga Toast at Kona Café + a morning swim here is the perfect Disney morning. Book the 7:50 AM breakfast.',
+      themepark:'Magic Kingdom (monorail)',
+      bestFor:'Couples · Adults · Romance',
+    },
+    {
+      id:'portofino',
+      name:'Beach Pool — Loews Portofino Bay',
+      emoji:'⛵',
+      rating:5,
+      price:'Hotel guests only',
+      size:'Large',
+      desc:'Three pools including a main villa pool, a smaller kids pool, and a peaceful villa hideaway pool. Italian courtyard setting with evening entertainment and access to the best hotel restaurant corridor at Universal.',
+      features:['Three pool areas','Poolside service','Kids splash zone','Hot tub','Cabana rentals'],
+      insider:'Universal on-site hotel guests get Universal Express Unlimited access — the pool day is bonus on top of that benefit.',
+      themepark:'Universal Orlando (water taxi or 15-min walk)',
+      bestFor:'Families · Adults',
+    },
+    {
+      id:'brettfall',
+      name:'Luna Park Pool — Disney\'s BoardWalk Inn',
+      emoji:'🎠',
+      rating:4,
+      price:'Hotel guests only',
+      size:'Medium',
+      desc:'A slide disguised as a carnival roller coaster makes this the most uniquely themed pool at Walt Disney World. The BoardWalk atmosphere at night with restaurants and entertainment nearby is incredible.',
+      features:['Roller coaster slide','Luna Park theming','Quiet pool','Hot tub','Nearby entertainment district'],
+      insider:'The BoardWalk Ice Cream & Bakery is 100 feet away. Swim → ice cream → BoardWalk stroll is the perfect evening.',
+      themepark:'EPCOT (10-min walk via International Gateway)',
+      bestFor:'Families · Unique experience seekers',
+    },
+    {
+      id:'fourseasons-pool',
+      name:'Five-Star Pool — Four Seasons Orlando',
+      emoji:'👑',
+      rating:5,
+      price:'Hotel guests only · Day pass available',
+      size:'Large resort complex',
+      desc:'10,000 sq ft of aquatic luxury. Two pools, waterslide, lazy river, splash zone, and poolside butler service. The adult-exclusive pool area is a genuine oasis of calm.',
+      features:['Adults-only pool','Lazy river','Waterslide','Poolside butler service','Full F&B menu at pool'],
+      insider:'Day passes occasionally available ($100–200/person, includes F&B credit). Call the hotel directly to ask.',
+      themepark:'Disney World (on-site)',
+      bestFor:'Adults · Luxury seekers · Couples',
+    },
+    {
+      id:'sapphire',
+      name:'Sapphire Falls Pool — Loews Sapphire Falls',
+      emoji:'💎',
+      rating:4,
+      price:'Hotel guests only',
+      size:'Large',
+      desc:'Caribbean-inspired resort with a massive pool, waterfall, 131-foot waterslide, and zero-entry beach. Best value pool hotel at Universal with excellent theming at a mid-range price point.',
+      features:['131-ft waterslide','Zero-entry beach area','Hot tub','Waterfall','Fire pit evenings'],
+      insider:"Often overshadowed by Portofino — but at half the price and with the same Universal Express access, it's the smart choice.",
+      themepark:'Universal Orlando (shuttle every 20 min)',
+      bestFor:'Budget-conscious families · Value seekers',
+    },
+    {
+      id:'bbresortspa',
+      name:'Rooftop Pool — B Resort & Spa at Disney Springs',
+      emoji:'🌊',
+      rating:4,
+      price:'Hotel guests only',
+      size:'Boutique',
+      desc:"The most Instagrammable pool in Orlando — a rooftop infinity-edge pool with views of the Disney Springs area. At sunset it's breathtaking.",
+      features:['Rooftop infinity edge','Sunset views','Bar service','Adults-only vibe in evenings','Cabanas for rent'],
+      insider:'Book a cabana for your last evening at Disney Springs — swim, watch the sunset, then walk to Disney Springs for dinner.',
+      themepark:'Disney Springs (walking distance)',
+      bestFor:'Couples · Adults · Photography lovers',
+    },
+  ];
+
+  const POOL_TIPS = [
+    { icon:'⏰', tip:'Best pool hours: 9–11 AM (before midday rush) and 4–7 PM (after parks, before dinner).' },
+    { icon:'🍹', tip:'Pool bars at Disney resorts use the same premium spirits as park bars. Order a Dole Whip float anywhere on Disney property.' },
+    { icon:'🏊', tip:"Most Disney pools are heated to 82°F year-round. Universal's are typically cooler — great in summer heat." },
+    { icon:'📦', tip:'Pack your own snacks and drinks in a soft-sided cooler bag. Most pools allow it. Save $30+ per family.' },
+    { icon:'📸', tip:'Golden hour pool photos (6–7 PM in summer) give incredible warm light. Worth staying for the sunset swim.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-pool-guide';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f0f8ff);flex-direction:column;overflow:hidden;';
+    s.innerHTML = `
+      <div style="background:linear-gradient(135deg,#006064,#0097A7,#4DD0E1);padding:18px 14px 20px;
+        display:flex;align-items:center;gap:12px;flex-shrink:0;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;
+          border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#fff;">Resort Pool Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">The best pools in Orlando — ranked</div>
+        </div>
+        <span style="font-size:28px;">🏊</span>
+      </div>
+      <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;">
+
+        <div style="background:linear-gradient(135deg,#006064,#0097A7);border-radius:16px;padding:14px;margin-bottom:14px;color:#fff;">
+          <div style="font-size:13px;line-height:1.6;opacity:.9;">
+            Orlando's resort pools aren't an afterthought — they're world-class attractions in their own right. Many guests plan entire pool days as breaks from the parks. Here are the ones worth staying for.
+          </div>
+        </div>
+
+        ${POOLS.map((pool, i) => `
+          <div style="background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;
+            border:1px solid var(--border,#eee);overflow:hidden;">
+            ${i === 0 ? '<div style="background:#FFD700;text-align:center;padding:4px;font-size:11px;font-weight:800;color:#333;">🏆 #1 RATED POOL IN WALT DISNEY WORLD</div>' : ''}
+            <div style="background:linear-gradient(135deg,#006064,#0097A7);padding:12px 14px;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-size:26px;">${pool.emoji}</span>
+                <div style="flex:1;">
+                  <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:#fff;">${pool.name}</div>
+                  <div style="font-size:10px;color:rgba(255,255,255,.7);">📍 ${pool.themepark} · ${pool.size}</div>
+                </div>
+                <div style="text-align:right;">
+                  <div style="font-size:13px;">${'⭐'.repeat(pool.rating)}</div>
+                  <div style="font-size:10px;color:rgba(255,255,255,.7);">${pool.price}</div>
+                </div>
+              </div>
+            </div>
+            <div style="padding:12px 14px;">
+              <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;margin-bottom:8px;">${pool.desc}</div>
+              <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;">
+                ${pool.features.map(f => `<span style="padding:3px 9px;background:#006064 18;border-radius:20px;font-size:10px;color:#006064;font-weight:700;background:rgba(0,97,100,.1);">${f}</span>`).join('')}
+              </div>
+              <div style="display:flex;gap:6px;margin-bottom:6px;">
+                <span style="padding:3px 9px;background:#FF6B3520;border-radius:20px;font-size:10px;color:#FF6B35;font-weight:700;">Best For: ${pool.bestFor}</span>
+              </div>
+              <div style="background:rgba(0,150,136,.08);border-left:3px solid #009688;padding:8px 10px;border-radius:0 8px 8px 0;">
+                <div style="font-size:11px;font-weight:700;color:#00695C;">🤫 INSIDER TIP</div>
+                <div style="font-size:12px;color:var(--text-primary,#333);margin-top:2px;">${pool.insider}</div>
+              </div>
+            </div>
+          </div>`).join('')}
+
+        <!-- Pool tips -->
+        <div style="background:linear-gradient(135deg,#006064,#00838F);border-radius:14px;padding:14px;margin-bottom:20px;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#E0F7FA;margin-bottom:10px;">
+            💡 Pool Strategies
+          </div>
+          ${POOL_TIPS.map(pt => `
+            <div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
+              <span style="font-size:18px;flex-shrink:0;">${pt.icon}</span>
+              <div style="font-size:12px;color:rgba(255,255,255,.85);line-height:1.5;">${pt.tip}</div>
+            </div>`).join('')}
+        </div>
+      </div>`;
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-pool-guide')) buildScreen();
+
+  const _prevSS_ttt = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_ttt) _prevSS_ttt(name, el);
+    if (name === 'pool-guide') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-pool-guide');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectPoolCard() {
+    if (document.getElementById('pool-home-card')) return true;
+    const ref = document.getElementById('nightlife-home-card') || document.getElementById('spa-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'pool-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#006064,#0097A7,#4DD0E1);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('pool-guide');
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:28px;">🏊</span>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Resort Pool Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.85);">7 best pools ranked · Insider tips</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _poolCard = false;
+  setInterval(() => { if (!_poolCard) _poolCard = injectPoolCard(); }, 8000);
+  setTimeout(() => { _poolCard = injectPoolCard(); }, 4500);
+
+  const _prevRH_ttt = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_ttt) _prevRH_ttt.apply(this, arguments);
+    setTimeout(() => { _poolCard = false; _poolCard = injectPoolCard(); }, 1400);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK UUU: Free Entertainment & Budget Wins Guide ===== */
+(function initFreeEntertainment() {
+
+  const FREE_EXPERIENCES = [
+    {
+      category:'Disney Magic — Free',
+      emoji:'✨',
+      color:'#1565C0',
+      items:[
+        { name:'Disney Springs (no admission)', desc:'World-class shopping, dining, live entertainment, and the Cirque du Soleil theater district. Free all day, every day.', time:'Any time', tip:'Live music at House of Blues outdoor stage is free most evenings. Arrive at 7 PM.' },
+        { name:'EPCOT International Gateway Water View', desc:'The view of EPCOT\'s World Showcase lagoon from the BoardWalk is one of the most beautiful free scenes in Orlando.', time:'Evenings', tip:'Walk the 1.5-mile BoardWalk loop after dinner — it\'s serene and free.' },
+        { name:'Disney Resort Lobby Hopping', desc:'Grand Floridian, Wilderness Lodge, and Beach Club have stunning lobbies open to all. No reservation needed.', time:'Any time', tip:'Grand Floridian at Christmas has the most spectacular lobby decor on earth. Free to walk through.' },
+        { name:'Electrical Water Pageant (Lake Bay)', desc:'A free floating light parade on Seven Seas Lagoon visible from Polynesian, Grand Floridian, and other waterfront spots. 9 PM nightly.', time:'9:00 PM', tip:'Best viewed from the Polynesian beach — grab a Dole Whip and watch for free.' },
+        { name:'Fort Wilderness Nature Trail', desc:'A quiet, beautiful nature trail through Disney property with wildlife and no admission fee.', time:'Sunrise–sunset', tip:'Rent a bike here for $12/hour and explore the resort — it\'s huge and beautiful.' },
+      ],
+    },
+    {
+      category:'Universal — Free',
+      emoji:'🎬',
+      color:'#1B5E20',
+      items:[
+        { name:'Universal CityWalk (no admission)', desc:'World-class dining, bars, and entertainment at Universal\'s front door — completely free to enter.', time:'10 AM – 2 AM', tip:'Blue Man Group tickets often go on sale here day-of at a discount. Check at the box office.' },
+        { name:'Street Performers at CityWalk', desc:'High-quality free entertainment including musicians, illusionists, and character interactions all along the promenade.', time:'5 PM – midnight', tip:"Saturday nights have the best street entertainment. Arrive before 7 PM for good spots." },
+        { name:'Universal Complex Water Taxi', desc:'Free boats shuttle between CityWalk and resort hotels — it\'s a beautiful 10-minute boat ride along the lagoon.', time:'All day', tip:'This is the secret to enjoying Universal\'s resort atmosphere without paying for a hotel room.' },
+      ],
+    },
+    {
+      category:'Orlando City — Free',
+      emoji:'🌆',
+      color:'#4A148C',
+      items:[
+        { name:'Lake Eola Park', desc:"Downtown Orlando's crown jewel. Swan boats ($15), walking path, Sunday Farmer's Market, fountains, and city skyline views.", time:'Sunrise to 11 PM', tip:'Sunday Farmer\'s Market (10 AM–4 PM) has incredible local food, music, and crafts. Go hungry.' },
+        { name:'Park Avenue Gallery Walk, Winter Park', desc:"Stroll one of America's most beautiful streets. Public art, gallery windows, gorgeous architecture — all free.", time:'Any time', tip:"Sunday brunch crowd peaks at 11 AM. Go at 9 AM for a peaceful, uncrowded experience." },
+        { name:'Cornell Fine Arts Museum, Rollins College', desc:'Free admission Tuesdays. One of Central Florida\'s finest art collections on a gorgeous Winter Park campus.', time:'Tue free, other days $5', tip:'The campus lagoon walk is stunning. Combine with the Rollins College Chapel tour.' },
+        { name:'Kraft Azalea Garden, Winter Park', desc:'A hidden garden on Lake Maitland with ancient cypress trees and stunning waterfront views. Completely free.', time:'8 AM – 8 PM', tip:'Sunrise here is one of the most beautiful free experiences in all of Florida. Get there by 6:30 AM.' },
+        { name:'Dr. Phillips Center for the Arts — Free Events', desc:"The city's premier arts venue runs a regular schedule of free outdoor concerts, movies, and performances on the plaza.", time:'Varies by event', tip:'Sign up for their email list — Frontyard Festival events are free and world-class.' },
+      ],
+    },
+    {
+      category:'Nature — Free or Nearly Free',
+      emoji:'🌿',
+      color:'#2E7D32',
+      items:[
+        { name:'Wekiwa Springs State Park ($6 car)', desc:'Crystal-clear 72°F springs, canoeing, and old-Florida wilderness. The most restorative experience near Orlando.', time:'8 AM – 8 PM', tip:'Arrive by 8 AM on weekends — the park fills and closes to new visitors by 10 AM in summer.' },
+        { name:'Lake Tohopekaliga Waterfront, Kissimmee', desc:'Stunning lakefront park with walking trails, bird watching, and beautiful sunset views. Completely free.', time:'Any time', tip:'Sunset here rivals any Florida coast view. Bring a blanket and wine for the perfect evening.' },
+        { name:'Blue Spring State Park ($6 car)', desc:'In winter (Nov–Mar), hundreds of manatees gather in the warm springs. One of Florida\'s greatest wildlife spectacles.', time:'8 AM – 8 PM (seasonal manatees)', tip:'Free to view manatees from the boardwalk. Swimming closed when manatees present but the views are incredible.' },
+        { name:'Canaveral National Seashore ($25/car)', desc:'The most pristine, uncrowded beach in Florida — 24 miles of untouched barrier island with sea turtle nesting.', time:'6 AM – 8 PM', tip:'It\'s 70 minutes from Disney. Absolutely worth the drive. Pack lunch — no food vendors.' },
+      ],
+    },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-free-entertainment';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;';
+    s.innerHTML = `
+      <div style="background:linear-gradient(135deg,#1A237E,#283593,#42A5F5);padding:18px 14px 20px;
+        display:flex;align-items:center;gap:12px;flex-shrink:0;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;
+          border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#fff;">Free & Budget Wins</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">Incredible Orlando experiences that cost little or nothing</div>
+        </div>
+        <span style="font-size:28px;">🎁</span>
+      </div>
+      <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;">
+
+        <div style="background:linear-gradient(135deg,#1A237E,#283593);border-radius:16px;padding:14px;margin-bottom:14px;color:#fff;">
+          <div style="font-size:13px;line-height:1.6;opacity:.9;">
+            Orlando has more free and nearly-free world-class experiences than almost any city in America. Most visitors never discover them. Here are the hidden gems that cost nothing — or nearly nothing.
+          </div>
+        </div>
+
+        ${FREE_EXPERIENCES.map(cat => `
+          <div style="margin-bottom:16px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+              <span style="font-size:22px;">${cat.emoji}</span>
+              <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:${cat.color};">${cat.category}</div>
+            </div>
+            ${cat.items.map(item => `
+              <div style="background:var(--card-bg,#fff);border-radius:12px;margin-bottom:8px;
+                border:1px solid var(--border,#eee);overflow:hidden;">
+                <div style="background:${cat.color}10;border-bottom:1px solid ${cat.color}20;padding:10px 12px;">
+                  <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${item.name}</div>
+                  <div style="font-size:10px;color:${cat.color};font-weight:700;margin-top:2px;">⏰ ${item.time}</div>
+                </div>
+                <div style="padding:10px 12px;">
+                  <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;margin-bottom:6px;">${item.desc}</div>
+                  <div style="background:${cat.color}08;border-left:3px solid ${cat.color};padding:6px 8px;border-radius:0 6px 6px 0;">
+                    <div style="font-size:11px;color:var(--text-secondary,#666);">💡 ${item.tip}</div>
+                  </div>
+                </div>
+              </div>`).join('')}
+          </div>`).join('')}
+
+        <!-- Budget hacks footer -->
+        <div style="background:linear-gradient(135deg,#FF6B35,#F7C59F);border-radius:14px;padding:14px;margin-bottom:20px;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:10px;">
+            💰 Quick Budget Hacks
+          </div>
+          ${[
+            'Buy park tickets at Costco or Sam\'s Club — saves $15–25 per person vs. gate price.',
+            'Breakfast at hotel is overpriced. Drive to a nearby Publix or Wawa for $10 instead of $30.',
+            'Disney Quick Service is mandatory 2 credit plan — use it for sit-down CS meals like Satu\'li Canteen, not snacks.',
+            'Parking is $30 at Disney. Stay on a Disney resort and take free transportation instead.',
+            'Universal\'s Express Pass isn\'t needed if you arrive at park opening. First 2 hours = no lines.',
+            'EPCOT World Showcase food booths share portions. Order one and split to try more for less.',
+          ].map(tip => `<div style="font-size:12px;color:rgba(255,255,255,.9);padding:4px 0;border-bottom:1px solid rgba(255,255,255,.15);line-height:1.5;">✓ ${tip}</div>`).join('')}
+        </div>
+      </div>`;
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-free-entertainment')) buildScreen();
+
+  const _prevSS_uuu = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_uuu) _prevSS_uuu(name, el);
+    if (name === 'free-entertainment') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-free-entertainment');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectFreeCard() {
+    if (document.getElementById('free-home-card')) return true;
+    const ref = document.getElementById('pool-home-card') || document.getElementById('nightlife-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'free-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#1A237E,#283593,#42A5F5);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('free-entertainment');
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:28px;">🎁</span>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Free & Budget Wins</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.85);">20+ free experiences · Budget hacks</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _freeCard = false;
+  setInterval(() => { if (!_freeCard) _freeCard = injectFreeCard(); }, 8500);
+  setTimeout(() => { _freeCard = injectFreeCard(); }, 5000);
+
+  const _prevRH_uuu = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_uuu) _prevRH_uuu.apply(this, arguments);
+    setTimeout(() => { _freeCard = false; _freeCard = injectFreeCard(); }, 1500);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK VVV: Sports Tourism & Events Guide ===== */
+(function initSportsTourism() {
+
+  const TEAMS = [
+    {
+      name:'Orlando City SC',
+      emoji:'⚽',
+      sport:'Major League Soccer',
+      venue:'Exploria Stadium',
+      address:'655 W Church St, Orlando (Downtown)',
+      capacity:'25,500',
+      colors:'Purple & Gold',
+      season:'February – November',
+      avgTicket:'$25–$120',
+      tips:['The North End (supporter section) is electric — stand, sing, drums all game','Pre-game bars: City Perch Kitchen (walking distance)','Tailgate starts 3 hours before kick-off in the parking lots','Kids under 3 free with a ticketed adult'],
+      rating:5,
+      mustSee:'The North End supporter experience is unlike anything in American sports.',
+    },
+    {
+      name:'Orlando Pride (NWSL)',
+      emoji:'⚽',
+      sport:"National Women's Soccer League",
+      venue:'Exploria Stadium',
+      address:'655 W Church St, Orlando (Downtown)',
+      capacity:'25,500',
+      colors:'Purple & White',
+      season:'March – October',
+      avgTicket:'$20–$80',
+      tips:['Same stadium as Orlando City SC — often easier to get tickets','Great family atmosphere with excellent soccer skill on display','Combined Orlando City + Pride memberships offer best value'],
+      rating:4,
+      mustSee:'The synergy between both teams sharing a stadium creates year-round soccer energy downtown.',
+    },
+    {
+      name:'Orlando Magic (NBA)',
+      emoji:'🏀',
+      sport:'National Basketball Association',
+      venue:'Kia Center (formerly Amway Center)',
+      address:'400 W Church St, Orlando (Downtown)',
+      capacity:'20,000',
+      colors:'Blue, Black & White',
+      season:'October – April',
+      avgTicket:'$40–$300+',
+      tips:['Lower bowl seats are excellent — worth the premium for first-timers','Church Street dining before the game: Hamburger Mary\'s, Tanqueray\'s','Parking garage on Church St fills quickly — arrive 90+ min early','The DJ setup at Kia Center is legitimately world-class entertainment even at halftime'],
+      rating:4,
+      mustSee:"The arena atmosphere on a packed night rivals any NBA venue. Orlando fans are passionate.",
+    },
+    {
+      name:'Orlando Predators (AFL)',
+      emoji:'🏈',
+      sport:'Arena Football League',
+      venue:'Kia Center',
+      address:'400 W Church St, Orlando (Downtown)',
+      capacity:'20,000 (indoor)',
+      colors:'Blue, Orange & White',
+      season:'March – July',
+      avgTicket:'$15–$60',
+      tips:['Most affordable major team sport in Orlando','Indoor arena football is incredibly fast-paced and loud','Family-friendly atmosphere with great sight lines from any seat','Check for special theme nights and promotions'],
+      rating:3,
+      mustSee:'If you have never seen arena football, this is worth experiencing once — it\'s chaotic and fun.',
+    },
+    {
+      name:'Daytona 500 (nearby)',
+      emoji:'🏎️',
+      sport:'NASCAR / Motorsports',
+      venue:'Daytona International Speedway',
+      address:'Daytona Beach, FL (60 min from Orlando)',
+      capacity:'101,500',
+      colors:'N/A — all teams',
+      season:'February (main race)',
+      avgTicket:'$75–$400+',
+      tips:['The DAYTONA 500 is bucket-list American sports','Book hotels 6+ months in advance — Daytona fills completely','Infield camping is the authentic race experience','General admission allows infield access — incredible atmosphere'],
+      rating:5,
+      mustSee:"The DAYTONA 500 is one of America's greatest sporting events. If your trip aligns with February, go.",
+    },
+    {
+      name:'Spring Training Baseball',
+      emoji:'⚾',
+      sport:'MLB Spring Training (Grapefruit League)',
+      venue:'Multiple venues near Orlando',
+      address:'Osceola County Stadium (Kissimmee) + others',
+      capacity:'8,000–15,000',
+      colors:'Various MLB teams',
+      season:'February – March',
+      avgTicket:'$15–$50',
+      tips:["Atlanta Braves train at CoolToday Park (North Port, 2hrs)", "Houston Astros at The Ballpark of the Palm Beaches (2.5hrs)", "Much cheaper, more intimate than regular season", "Meet players during practice — accessible and relaxed atmosphere"],
+      rating:4,
+      mustSee:'Spring Training is a uniquely American experience. Affordable, relaxed, and the players are accessible.',
+    },
+  ];
+
+  const EVENTS = [
+    { month:'January', events:['Citrus Bowl (college football)','Disney Marathon Weekend','Universal Studios Fan Fest'] },
+    { month:'February', events:['DAYTONA 500 (60 min away)','MLB Spring Training begins','Mardi Gras at Universal'] },
+    { month:'March', events:['Spring Training baseball','Arnold Palmer Invitational (golf, Bay Hill)','St. Patrick\'s Day celebrations'] },
+    { month:'April', events:['Orlando City SC season peaks','Epcot International Flower & Garden Festival','Masters weekend parties (watch parties everywhere)'] },
+    { month:'June–August', events:['NBA Summer League','Soccer tournaments at Exploria','Kids sports tournaments (most active season)'] },
+    { month:'October', events:['Halloween Horror Nights (Universal)','IRONMAN Florida','Fantasy Fest Keys (nearby)'] },
+    { month:'December', events:['Citrus Bowl venue hosts college games','Disney\'s Wide World of Sports events','New Year\'s Eve countdowns everywhere'] },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-sports-tourism';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;';
+    s.innerHTML = `
+      <div style="background:linear-gradient(135deg,#B71C1C,#D32F2F,#EF9A9A);padding:18px 14px 20px;
+        display:flex;align-items:center;gap:12px;flex-shrink:0;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;
+          border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#fff;">Sports Tourism Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">Orlando teams · Events · How to attend</div>
+        </div>
+        <span style="font-size:28px;">🏆</span>
+      </div>
+      <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;">
+
+        <div style="background:linear-gradient(135deg,#B71C1C,#C62828);border-radius:16px;padding:14px;margin-bottom:14px;color:#fff;">
+          <div style="font-size:13px;line-height:1.6;opacity:.9;">
+            Orlando is a world-class sports city hiding behind its theme park reputation. From electric MLS matches downtown to the DAYTONA 500 an hour away, there's always a live game worth attending.
+          </div>
+        </div>
+
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:12px;">
+          🏟️ Teams & Venues
+        </div>
+        ${TEAMS.map(team => `
+          <div style="background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;
+            border:1px solid var(--border,#eee);overflow:hidden;">
+            <div style="background:linear-gradient(135deg,#B71C1C,#D32F2F);padding:12px 14px;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-size:26px;">${team.emoji}</span>
+                <div style="flex:1;">
+                  <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:#fff;">${team.name}</div>
+                  <div style="font-size:10px;color:rgba(255,255,255,.8);">${team.sport}</div>
+                  <div style="font-size:10px;color:rgba(255,255,255,.6);">📍 ${team.venue}</div>
+                </div>
+                <div style="text-align:right;flex-shrink:0;">
+                  <div style="font-size:13px;">${'⭐'.repeat(team.rating)}</div>
+                  <div style="font-size:11px;font-weight:800;color:#FFAB91;">${team.avgTicket}</div>
+                </div>
+              </div>
+            </div>
+            <div style="padding:12px 14px;">
+              <div style="display:flex;gap:12px;margin-bottom:8px;font-size:11px;color:var(--text-secondary,#888);">
+                <span>📅 ${team.season}</span>
+                <span>👥 ${team.capacity}</span>
+              </div>
+              <div style="background:#B71C1C10;border-left:3px solid #D32F2F;padding:8px 10px;border-radius:0 8px 8px 0;margin-bottom:8px;">
+                <div style="font-size:11px;font-weight:700;color:#B71C1C;">⭐ MUST SEE</div>
+                <div style="font-size:12px;color:var(--text-primary,#333);margin-top:2px;">${team.mustSee}</div>
+              </div>
+              ${team.tips.map(t => `<div style="font-size:11px;color:var(--text-secondary,#666);padding:2px 0;">💡 ${t}</div>`).join('')}
+            </div>
+          </div>`).join('')}
+
+        <!-- Events by month -->
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;
+          color:var(--text-primary,#212121);margin:16px 0 10px;">📅 Sports Events Calendar</div>
+        ${EVENTS.map(ev => `
+          <div style="background:var(--card-bg,#fff);border-radius:12px;margin-bottom:8px;
+            border:1px solid var(--border,#eee);padding:10px 12px;display:flex;gap:12px;align-items:flex-start;">
+            <div style="font-size:12px;font-weight:800;color:#B71C1C;min-width:55px;flex-shrink:0;">${ev.month}</div>
+            <div style="flex:1;">
+              ${ev.events.map(e => `<div style="font-size:12px;color:var(--text-secondary,#555);padding:2px 0;">• ${e}</div>`).join('')}
+            </div>
+          </div>`).join('')}
+
+        <div style="background:linear-gradient(135deg,#B71C1C,#D32F2F);border-radius:14px;padding:14px;margin-top:14px;margin-bottom:20px;color:#fff;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">🎟️ Ticket Tips</div>
+          ${[
+            'SeatGeek and StubHub often have last-minute deals under face value for weeknight games.',
+            'Orlando City and Magic both have official team apps with exclusive digital seat deals.',
+            'The best seats for soccer: sections 15–20 (corner, great angle) are cheaper than midfield.',
+            "Walking up to box office day-of-game works at Orlando City SC if it's not a rivalry match.",
+            'Group rates (10+ people) typically save 20–30% at all Orlando venues.',
+          ].map(tip => `<div style="font-size:12px;color:rgba(255,255,255,.9);padding:4px 0;line-height:1.5;">✓ ${tip}</div>`).join('')}
+        </div>
+      </div>`;
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-sports-tourism')) buildScreen();
+
+  const _prevSS_vvv = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_vvv) _prevSS_vvv(name, el);
+    if (name === 'sports-tourism') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-sports-tourism');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectSportsCard() {
+    if (document.getElementById('sports-home-card')) return true;
+    const ref = document.getElementById('free-home-card') || document.getElementById('pool-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'sports-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#B71C1C,#D32F2F,#EF9A9A);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('sports-tourism');
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:28px;">🏆</span>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Sports Tourism Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.85);">6 teams · Events calendar · Ticket tips</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _sportsCard = false;
+  setInterval(() => { if (!_sportsCard) _sportsCard = injectSportsCard(); }, 9000);
+  setTimeout(() => { _sportsCard = injectSportsCard(); }, 5500);
+
+  const _prevRH_vvv = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_vvv) _prevRH_vvv.apply(this, arguments);
+    setTimeout(() => { _sportsCard = false; _sportsCard = injectSportsCard(); }, 1600);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK WWW2: Hurricane & Weather Emergency Guide ===== */
+(function initWeatherGuide() {
+
+  const HURRICANE_GUIDE = {
+    season: 'June 1 – November 30',
+    peak: 'August – October',
+    orlando_advantage: 'Orlando is 60+ miles inland — far safer than coastal Florida. Direct hurricane hits are rare; tropical storms and heavy rain are the main concerns.',
+  };
+
+  const THREAT_LEVELS = [
+    {
+      level:'Tropical Disturbance',
+      color:'#1565C0',
+      emoji:'🌧️',
+      impact:'Heavy afternoon thunderstorms, possible flooding',
+      parkPlan:'Plan indoor rides mid-afternoon (2–5 PM). Have backup indoor dining plan. Ponchos are a must.',
+      probability:'Happens several times per summer season',
+    },
+    {
+      level:'Tropical Storm Watch/Warning',
+      color:'#F57F17',
+      emoji:'⛈️',
+      impact:'Sustained winds 39–73 mph, heavy rain, possible localized flooding',
+      parkPlan:'Parks typically stay open but may close outdoor rides and shows. Check park social media every 2 hours. Magic Kingdom\'s under-ground areas become shelters.',
+      probability:'2–4 times per year near Orlando',
+    },
+    {
+      level:'Hurricane Watch (Category 1–2)',
+      color:'#E65100',
+      emoji:'🌀',
+      impact:'Sustained winds 74–110 mph, major rain, power outages likely',
+      parkPlan:'Disney, Universal, and SeaWorld will close 24–48 hours in advance. Hotels stay open as shelters. Expect to lose 1–2 days of vacation.',
+      probability:'Every 3–5 years for Orlando',
+    },
+    {
+      level:'Hurricane Warning (Category 3+)',
+      color:'#B71C1C',
+      emoji:'🌪️',
+      impact:'Dangerous winds 111+ mph, life-threatening storm surge on coasts',
+      parkPlan:'All parks close. Follow local emergency management orders. Inland Orlando is relatively safe but hunker down in your hotel.',
+      probability:'Rare for Orlando specifically — coastal areas are primary risk',
+    },
+  ];
+
+  const PREP_CHECKLIST = [
+    { item:'Download the WESH 2 or Click Orlando weather app (best local forecasters)', icon:'📱' },
+    { item:'Know your hotel\'s hurricane policy — most offer full refunds within 72 hours of storm', icon:'🏨' },
+    { item:'Screenshot confirmation numbers and travel insurance policies offline', icon:'📸' },
+    { item:'Keep a full tank of gas if you have a rental — stations run out quickly', icon:'⛽' },
+    { item:'Have $200+ cash — ATMs and card terminals go down during power outages', icon:'💵' },
+    { item:'Bottled water: 1 gallon per person per day for 3 days', icon:'💧' },
+    { item:'Phone battery packs (power banks) charged before storms', icon:'🔋' },
+    { item:'Identify the nearest sturdy building — interior rooms, away from windows', icon:'🏢' },
+  ];
+
+  const DAILY_WEATHER = [
+    { time:'7–10 AM', icon:'☀️', desc:'Clear, beautiful. Best time for outdoor rides, Rope Drop strategies, and park photography. Temperatures start cool (70–80°F).', rating:5 },
+    { time:'10 AM–1 PM', icon:'⛅', desc:'Building heat and humidity. Clouds develop. Good for indoor attractions and lunch. 85–92°F in summer.', rating:4 },
+    { time:'1–4 PM', icon:'⛈️', desc:'Peak thunderstorm window. Nearly guaranteed storms in summer (June–September). Perfect for indoor shows, sit-down dining, or hotel pool.', rating:2 },
+    { time:'4–7 PM', icon:'🌤️', desc:'Storms typically clear. Cooler temperatures, beautiful golden light. Second-best outdoor window. Ride standby times also drop.', rating:5 },
+    { time:'7 PM–close', icon:'🌟', desc:'Florida evenings are magical — warm, breezy, often beautiful. Nighttime shows are spectacular. Best time for fireworks photography.', rating:5 },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-weather-guide';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;';
+    s.innerHTML = `
+      <div style="background:linear-gradient(135deg,#37474F,#546E7A,#90A4AE);padding:18px 14px 20px;
+        display:flex;align-items:center;gap:12px;flex-shrink:0;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;
+          border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#fff;">Weather & Storm Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">Florida weather decoded · Hurricane prep · Daily patterns</div>
+        </div>
+        <span style="font-size:28px;">⛈️</span>
+      </div>
+      <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;">
+
+        <!-- Orlando advantage card -->
+        <div style="background:linear-gradient(135deg,#1B5E20,#2E7D32);border-radius:16px;padding:14px;margin-bottom:14px;color:#fff;">
+          <div style="font-size:14px;font-weight:700;margin-bottom:6px;">✅ Orlando's Weather Advantage</div>
+          <div style="font-size:13px;line-height:1.6;opacity:.9;">${HURRICANE_GUIDE.orlando_advantage}</div>
+          <div style="display:flex;gap:20px;margin-top:10px;font-size:11px;opacity:.8;">
+            <div><span style="font-weight:700;">Hurricane Season:</span> ${HURRICANE_GUIDE.season}</div>
+            <div><span style="font-weight:700;">Peak:</span> ${HURRICANE_GUIDE.peak}</div>
+          </div>
+        </div>
+
+        <!-- Daily weather pattern -->
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;
+          color:var(--text-primary,#212121);margin-bottom:10px;">🕐 Daily Pattern (Summer)</div>
+        ${DAILY_WEATHER.map(w => `
+          <div style="background:var(--card-bg,#fff);border-radius:12px;margin-bottom:8px;
+            border:1px solid var(--border,#eee);padding:10px 12px;display:flex;gap:12px;align-items:flex-start;">
+            <span style="font-size:24px;flex-shrink:0;">${w.icon}</span>
+            <div style="flex:1;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${w.time}</div>
+                <div style="font-size:12px;">${'⭐'.repeat(w.rating)}${'☆'.repeat(5-w.rating)}</div>
+              </div>
+              <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;">${w.desc}</div>
+            </div>
+          </div>`).join('')}
+
+        <!-- Threat levels -->
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;
+          color:var(--text-primary,#212121);margin:16px 0 10px;">🌀 Storm Threat Levels</div>
+        ${THREAT_LEVELS.map(t => `
+          <div style="background:var(--card-bg,#fff);border-radius:12px;margin-bottom:8px;
+            border:1px solid var(--border,#eee);overflow:hidden;">
+            <div style="background:${t.color};padding:8px 12px;display:flex;align-items:center;gap:8px;">
+              <span style="font-size:20px;">${t.emoji}</span>
+              <div style="font-size:13px;font-weight:700;color:#fff;">${t.level}</div>
+            </div>
+            <div style="padding:10px 12px;">
+              <div style="font-size:12px;color:var(--text-secondary,#555);margin-bottom:6px;"><strong>Impact:</strong> ${t.impact}</div>
+              <div style="font-size:12px;color:var(--text-secondary,#555);margin-bottom:4px;"><strong>Park Plan:</strong> ${t.parkPlan}</div>
+              <div style="font-size:11px;color:${t.color};font-weight:700;">${t.probability}</div>
+            </div>
+          </div>`).join('')}
+
+        <!-- Prep checklist -->
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;
+          color:var(--text-primary,#212121);margin:16px 0 10px;">✅ Storm Prep Checklist</div>
+        <div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:14px;border:1px solid var(--border,#eee);">
+          ${PREP_CHECKLIST.map(item => `
+            <div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;padding-bottom:8px;border-bottom:1px solid var(--border,#f0f0f0);">
+              <span style="font-size:18px;flex-shrink:0;">${item.icon}</span>
+              <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;">${item.item}</div>
+            </div>`).join('')}
+        </div>
+
+        <!-- Best visit months -->
+        <div style="background:linear-gradient(135deg,#37474F,#455A64);border-radius:14px;padding:14px;margin-bottom:20px;color:#fff;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">📅 Best Months to Visit</div>
+          ${[
+            { months:'Jan–Feb', rating:'⭐⭐⭐⭐⭐', desc:'Cool, dry, low humidity. Best weather in Orlando. Smaller crowds after New Year\'s.' },
+            { months:'Mar–Apr', rating:'⭐⭐⭐⭐⭐', desc:'Perfect weather. Spring break crowds in late March but shoulder periods are excellent.' },
+            { months:'May', rating:'⭐⭐⭐⭐', desc:'Getting warm. Pre-summer prices and manageable crowds before schools out.' },
+            { months:'Jun–Aug', rating:'⭐⭐⭐', desc:'Hot, humid, daily thunderstorms. Peak crowds. But low storm risk and great pool weather.' },
+            { months:'Sep–Oct', rating:'⭐⭐⭐⭐', desc:'Hurricane risk window but parks are least crowded. Prices drop 30%. Great value.' },
+            { months:'Nov–Dec', rating:'⭐⭐⭐⭐⭐', desc:'Cool, beautiful weather. Holiday magic. Crowds build in December but early November is ideal.' },
+          ].map(m => `<div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
+            <div style="min-width:50px;font-size:11px;font-weight:700;color:#90A4AE;">${m.months}</div>
+            <div>
+              <div style="font-size:12px;">${m.rating}</div>
+              <div style="font-size:11px;color:rgba(255,255,255,.8);line-height:1.4;">${m.desc}</div>
+            </div>
+          </div>`).join('')}
+        </div>
+      </div>`;
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-weather-guide')) buildScreen();
+
+  const _prevSS_www2 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_www2) _prevSS_www2(name, el);
+    if (name === 'weather-guide') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-weather-guide');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectWeatherCard() {
+    if (document.getElementById('weather-guide-card')) return true;
+    const ref = document.getElementById('sports-home-card') || document.getElementById('free-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'weather-guide-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#37474F,#546E7A,#90A4AE);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('weather-guide');
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:28px;">⛈️</span>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Weather & Storm Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.85);">Daily patterns · Hurricane prep · Best months</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _wxCard = false;
+  setInterval(() => { if (!_wxCard) _wxCard = injectWeatherCard(); }, 9500);
+  setTimeout(() => { _wxCard = injectWeatherCard(); }, 6000);
+
+  const _prevRH_www2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_www2) _prevRH_www2.apply(this, arguments);
+    setTimeout(() => { _wxCard = false; _wxCard = injectWeatherCard(); }, 1700);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK XXX2: Virtual Queue & Lightning Lane Mastery ===== */
+(function initVirtualQueueMastery() {
+
+  const RIDES_DATA = {
+    disney: [
+      { name:"Tiana's Bayou Adventure", park:'Magic Kingdom', type:'Lightning Lane Premier (ILL)', price:'$7–$25', tips:["Book at 7 AM using My Disney Experience app", "This replaced Splash Mountain — extremely high demand", "Book on the app as soon as the park is selectable (usually 7 days in advance)"] },
+      { name:'Guardians of the Galaxy: Cosmic Rewind', park:'EPCOT', type:'Virtual Queue + Lightning Lane Premier', price:'$12–$20', tips:["Virtual queue released at 7 AM (park open) + 1 PM — be in the app EXACTLY at release time", "ILL purchase opens simultaneously with virtual queue drops", "Best strategy: buy ILL instead of fighting for virtual queue spots"] },
+      { name:'TRON Lightcycle / Run', park:'Magic Kingdom', type:'Virtual Queue + Lightning Lane Premier', price:'$10–$22', tips:["Virtual queue at 7 AM on My Disney Experience", "Best ride on Disney property — worth any price", "Late in the evening standby sometimes opens when virtual queue fills"] },
+      { name:'Star Wars: Rise of the Resistance', park:'Hollywood Studios', type:'Lightning Lane Premier', price:'$10–$20', tips:["Book as soon as the 60-day purchase window opens for your date", "Lightning Lane sold out daily — no standby line available most days", "Evening time slots often available day-of if morning slots sell out"] },
+      { name:'Avatar Flight of Passage', park:'Animal Kingdom', type:'Lightning Lane Multi', price:'Part of bundle', tips:["The single most popular attraction per wait time in all of Disney World", "Book in your Lightning Lane Multi Pass as your very first selection at park open", "Alternatively: arrive 45 min before rope drop. First ride of the day has shortest waits."] },
+    ],
+    universal: [
+      { name:'Hagrid\'s Magical Creatures Motorbike Adventure', park:'Islands of Adventure', type:'No Lightning Lane — Virtual Line only', price:'Free via app', tips:["Universal app virtual line releases at park opening — join the moment you walk in", "Express Pass does NOT work here — only virtual line works", "Best shot: arrive 45 minutes before park open and join virtual line at gates"] },
+      { name:'Velocicoaster', park:'Islands of Adventure', type:'Universal Express Pass', price:'Part of Express Pass', tips:["Best roller coaster in Florida — worth any Express Pass premium", "Rope drop: walk to the back of the park immediately — first 45 minutes you can typically walk on", "After 11 AM, waits often exceed 90 minutes without Express Pass"] },
+      { name:'Revenge of the Mummy', park:'Universal Studios Florida', type:'Universal Express Pass', price:'Part of Express Pass', tips:["A classic that rarely gets shorter queues despite age", "The indoor portion of the line is actually themed and cool", "Express cuts to front of the very long indoor queue"] },
+    ],
+  };
+
+  const STRATEGIES = [
+    {
+      title:"Disney's Lightning Lane System Explained",
+      icon:'⚡',
+      color:'#1565C0',
+      content:"Disney has two Lightning Lane tiers: **Premier** (individual ride purchase, $7–$25 each) and **Multi Pass** (bundle of multiple rides, $13–$35/day). Premier covers the biggest attractions. Multi Pass lets you book one ride at a time with a rolling 2-hour window. The key: buy Premier attractions first, then use Multi Pass for everything else.",
+    },
+    {
+      title:'7 AM Rule — The Golden Window',
+      icon:'⏰',
+      color:'#E65100',
+      content:"At 7 AM Orlando time, Disney opens booking for Lightning Lane and virtual queues. Hotel guests can book at 7 AM 7 days ahead. Off-site guests: day-of at 7 AM. Your phone alarm should be set for 6:59 AM. Have the app open and your party selected. This is the single most important minute of your Disney vacation.",
+    },
+    {
+      title:'Universal Express Pass Decoded',
+      icon:'🚀',
+      color:'#1B5E20',
+      content:"Universal's Express Pass lets you skip the standby line once per ride (regular Express) or unlimited times (Express Unlimited). Hotel guests at Portofino Bay, Hard Rock, and Royal Pacific get Express Unlimited FREE. This is often worth the hotel premium by itself if visiting Universal for 2+ days.",
+    },
+    {
+      title:'Rope Drop Strategy (The Alternative)',
+      icon:'🏃',
+      color:'#6A1B9A',
+      content:"The best way to beat lines without paying: Arrive 45 minutes before park opening. Walk directly to the #1 most-desired ride. Most parks let you board your first ride before official waits build. By 9:30 AM you've ridden the best ride with a 10-minute wait instead of a 120-minute one.",
+    },
+    {
+      title:'Single Rider Lines — The Secret Weapon',
+      icon:'👤',
+      color:'#37474F',
+      content:"Velocicoaster, Hagrid's, Rise of the Resistance, Guardians, and many others have single rider lines. Solo travelers or parties of 2+ willing to split up can ride in 15–20 minutes what takes others 90+ minutes. You may not sit together but the ride itself is worth it.",
+    },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-virtual-queue';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;';
+    s.innerHTML = `
+      <div style="background:linear-gradient(135deg,#1A237E,#283593,#3949AB);padding:18px 14px 20px;
+        display:flex;align-items:center;gap:12px;flex-shrink:0;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;
+          border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#fff;">Virtual Queue & LL Mastery</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">Beat the lines · Save money · Expert strategies</div>
+        </div>
+        <span style="font-size:28px;">⚡</span>
+      </div>
+      <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;">
+
+        <!-- Key strategies -->
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;
+          color:var(--text-primary,#212121);margin-bottom:10px;">🎯 Master Strategies</div>
+        ${STRATEGIES.map(str => `
+          <div style="background:var(--card-bg,#fff);border-radius:14px;margin-bottom:10px;
+            border:1px solid var(--border,#eee);overflow:hidden;">
+            <div style="background:${str.color};padding:10px 14px;display:flex;align-items:center;gap:8px;">
+              <span style="font-size:20px;">${str.icon}</span>
+              <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:#fff;">${str.title}</div>
+            </div>
+            <div style="padding:12px 14px;font-size:12px;color:var(--text-secondary,#555);line-height:1.6;">${str.content}</div>
+          </div>`).join('')}
+
+        <!-- Disney must-book rides -->
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;
+          color:var(--text-primary,#212121);margin:16px 0 10px;">🎢 Disney — Must Book First</div>
+        ${RIDES_DATA.disney.map(ride => `
+          <div style="background:var(--card-bg,#fff);border-radius:12px;margin-bottom:8px;
+            border:1px solid var(--border,#eee);padding:10px 12px;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
+              <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);flex:1;margin-right:8px;">${ride.name}</div>
+              <span style="font-size:10px;font-weight:700;color:#1565C0;background:#1565C020;padding:2px 8px;border-radius:20px;flex-shrink:0;">${ride.price}</span>
+            </div>
+            <div style="font-size:10px;color:#1565C0;font-weight:700;margin-bottom:6px;">${ride.type} · ${ride.park}</div>
+            ${ride.tips.map(t => `<div style="font-size:11px;color:var(--text-secondary,#666);padding:2px 0;">💡 ${t}</div>`).join('')}
+          </div>`).join('')}
+
+        <!-- Universal must-book rides -->
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;
+          color:var(--text-primary,#212121);margin:16px 0 10px;">🦁 Universal — Priority Attractions</div>
+        ${RIDES_DATA.universal.map(ride => `
+          <div style="background:var(--card-bg,#fff);border-radius:12px;margin-bottom:8px;
+            border:1px solid var(--border,#eee);padding:10px 12px;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
+              <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);flex:1;margin-right:8px;">${ride.name}</div>
+              <span style="font-size:10px;font-weight:700;color:#1B5E20;background:#1B5E2020;padding:2px 8px;border-radius:20px;flex-shrink:0;">${ride.price}</span>
+            </div>
+            <div style="font-size:10px;color:#1B5E20;font-weight:700;margin-bottom:6px;">${ride.type} · ${ride.park}</div>
+            ${ride.tips.map(t => `<div style="font-size:11px;color:var(--text-secondary,#666);padding:2px 0;">💡 ${t}</div>`).join('')}
+          </div>`).join('')}
+
+        <!-- Cost comparison -->
+        <div style="background:linear-gradient(135deg,#1A237E,#283593);border-radius:14px;padding:14px;margin-top:14px;margin-bottom:20px;color:#fff;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">💰 Line Skip Cost vs Value</div>
+          ${[
+            { option:'Disney LL Multi Pass (basic)', cost:'$13–$35/day', value:'High — worth it for 4+ rides'},
+            { option:'Disney LL Premier (1 ride)', cost:'$7–$25 per ride', value:'Only for the biggest rides' },
+            { option:'Universal Express Unlimited', cost:'$80–$200/day add-on', value:'Essential for peak season' },
+            { option:'Staying at Universal resort', cost:'Hotel premium ~$100–200/night', value:'Express Unlimited included — often breaks even' },
+            { option:'Rope Drop (free)', cost:'$0 — just arrive early', value:'Best value — first 2 hours walk-ons' },
+          ].map(c => `<div style="border-bottom:1px solid rgba(255,255,255,.15);padding:7px 0;display:flex;gap:10px;">
+            <div style="flex:1;">
+              <div style="font-size:12px;font-weight:700;color:#fff;">${c.option}</div>
+              <div style="font-size:11px;color:rgba(255,255,255,.7);">${c.value}</div>
+            </div>
+            <div style="font-size:13px;font-weight:800;color:#C9A96E;white-space:nowrap;">${c.cost}</div>
+          </div>`).join('')}
+        </div>
+      </div>`;
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-virtual-queue')) buildScreen();
+
+  const _prevSS_xxx2 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_xxx2) _prevSS_xxx2(name, el);
+    if (name === 'virtual-queue') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-virtual-queue');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectVQCard() {
+    if (document.getElementById('vq-home-card')) return true;
+    const ref = document.getElementById('weather-guide-card') || document.getElementById('sports-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'vq-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#1A237E,#283593,#3949AB);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('virtual-queue');
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:28px;">⚡</span>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Virtual Queue & LL Mastery</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.85);">Beat lines · Expert strategies · Cost breakdown</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _vqCard = false;
+  setInterval(() => { if (!_vqCard) _vqCard = injectVQCard(); }, 10000);
+  setTimeout(() => { _vqCard = injectVQCard(); }, 6500);
+
+  const _prevRH_xxx2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_xxx2) _prevRH_xxx2.apply(this, arguments);
+    setTimeout(() => { _vqCard = false; _vqCard = injectVQCard(); }, 1800);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK YYY2: Special Events & Seasonal Guide ===== */
+(function initSeasonalEvents() {
+
+  const EVENTS = [
+    {
+      name:"Mickey's Not-So-Scary Halloween Party",
+      park:'Magic Kingdom',
+      emoji:'🎃',
+      dates:'Select nights, mid-August through October 31',
+      price:'$109–$229/person (separate ticket)',
+      color:'#E65100',
+      rating:5,
+      highlights:['Exclusive parade: Mickey\'s Boo-To-You Parade (runs twice)','Villain-themed fireworks: HalloWishes','Trick-or-treating around the park (free candy is real and generous)','Characters in rare costumes not seen the rest of the year','Haunted Mansion and special overlays','Costume rules: Adults can wear costumes too (PG-13 limit)'],
+      insiderTip:'Buy tickets months in advance — the October weekend dates sell out completely. Tuesday/Wednesday nights have smaller crowds.',
+      bestFor:'Families · Halloween fans · Adults who love costumes',
+    },
+    {
+      name:"Mickey's Very Merry Christmas Party",
+      park:'Magic Kingdom',
+      emoji:'🎄',
+      dates:'Select nights, early November through December 23',
+      price:'$109–$249/person (separate ticket)',
+      color:'#1565C0',
+      rating:5,
+      highlights:['Mickey\'s Once Upon a Christmastime Parade','Holiday Wishes fireworks over Cinderella Castle','Free cookies and hot chocolate (as many as you want)','Snow on Main Street U.S.A. (every night!)','Special holiday characters and costumes','Rare character meet-and-greets'],
+      insiderTip:'The free hot chocolate and cookies are unlimited — budget guests use this as dinner savings. 8 stations around the park.',
+      bestFor:'Families · Christmas lovers · Everyone',
+    },
+    {
+      name:'EPCOT International Food & Wine Festival',
+      park:'EPCOT',
+      emoji:'🍷',
+      dates:'Late August through mid-November (75+ days)',
+      price:'Park admission included · Food/drinks extra (~$6–18 per item)',
+      color:'#6A1B9A',
+      rating:5,
+      highlights:['30+ international marketplaces with exclusive food and drinks','Eat to the Beat Concert Series (free with admission)','Premium paid events: culinary demos, sommelier tastings','Limited-edition festival merchandise','Party for the Senses (exclusive upscale dining event)','Moonlight Magic (FREE for DVC members some nights)'],
+      insiderTip:"Budget $50–80/person for food samples if you want to try 6–8 things. The Global Marketplace stamps (passport book) are free and make a great souvenir.",
+      bestFor:'Foodies · Adults · Date nights · Wine lovers',
+    },
+    {
+      name:'EPCOT International Flower & Garden Festival',
+      park:'EPCOT',
+      emoji:'🌸',
+      dates:'Late February through late May',
+      price:'Park admission included',
+      color:'#2E7D32',
+      rating:5,
+      highlights:['75+ topiaries of Disney characters throughout World Showcase','Outdoor Kitchens (same concept as Food & Wine but spring-themed)','Garden Rocks Concert Series (free with admission)','Butterfly garden walk','Special horticulture tours','Epcot Forever fireworks over the lake'],
+      insiderTip:"This is EPCOT's most beautiful state all year. The Japan and France pavilion topiaries are extraordinary.",
+      bestFor:'Families · Couples · Plant lovers · Photographers',
+    },
+    {
+      name:"Universal's Halloween Horror Nights",
+      park:'Universal Studios Florida',
+      emoji:'👻',
+      dates:'Select nights, early September through early November',
+      price:'$89–$209/person (separate ticket)',
+      color:'#37474F',
+      rating:5,
+      highlights:["10+ professional haunted houses (Hollywood-quality production)", 'Scare zones throughout the park','The rides remain open with themed overlays','Licensed IP houses: Stranger Things, The Walking Dead, A Quiet Place and more','Scaremongers — actors who emerge from unexpected places','RIP tour: private guide who moves you through houses faster'],
+      insiderTip:'Buy the Front of Line Pass for houses — without it, waits are 60–90 minutes per house. The RIP Tour ($175–250) is the ultimate experience.',
+      bestFor:'Horror fans · Adults · Thrill seekers (16+)',
+    },
+    {
+      name:"SeaWorld's Howl-O-Scream",
+      park:'SeaWorld Orlando',
+      emoji:'🦈',
+      dates:'Select nights, September through November',
+      price:'$39–$99/person (often included with annual pass)',
+      color:'#1565C0',
+      rating:4,
+      highlights:['10 haunted houses + 6 scare zones','More affordable than HHN','Rides remain open','Character dining events','Better value for families'],
+      insiderTip:"Less crowded than HHN on the same nights. If you can only do one, HHN wins on production value — but Howl-O-Scream is a solid second choice at a lower price.",
+      bestFor:'Budget-conscious horror fans · Families · Couples',
+    },
+    {
+      name:"Universal Mardi Gras",
+      park:'Universal Studios Florida',
+      emoji:'🎺',
+      dates:'February through mid-April',
+      price:'Included with park admission',
+      color:'#6A1B9A',
+      rating:4,
+      highlights:['Free concert series every Saturday night (major artists)','New Orleans-style parade with beads','Authentic Bourbon Street-inspired food marketplace','Float riders throw beads to guests','International food booths from around the world'],
+      insiderTip:"The concert lineup includes legitimate Grammy-winning artists. Check who's performing before you book your dates — some headliners draw huge crowds.",
+      bestFor:'Music lovers · Adults · Party atmosphere seekers',
+    },
+    {
+      name:'EPCOT International Festival of the Arts',
+      park:'EPCOT',
+      emoji:'🎨',
+      dates:'January through February',
+      price:'Park admission included',
+      color:'#C62828',
+      rating:4,
+      highlights:['Disney on Broadway performer series (free with admission)','Food-as-art dishes (Instagram-worthy, genuinely delicious)','Live painting demonstrations throughout the park','Interactive art installations','Gallery exhibitions in pavilions','Limited-edition artwork merchandise'],
+      insiderTip:"The Broadway performers are A-list cast members — arrive 30 minutes early for the best viewing spots at the American Adventure pavilion.",
+      bestFor:'Art lovers · Music fans · Couples · Foodies',
+    },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-seasonal-events';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;';
+    s.innerHTML = `
+      <div style="background:linear-gradient(135deg,#7B1FA2,#AB47BC,#CE93D8);padding:18px 14px 20px;
+        display:flex;align-items:center;gap:12px;flex-shrink:0;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;
+          border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#fff;">Special Events Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">Seasonal events · Parties · Festivals · How to attend</div>
+        </div>
+        <span style="font-size:28px;">🎉</span>
+      </div>
+      <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;">
+
+        <div style="background:linear-gradient(135deg,#7B1FA2,#8E24AA);border-radius:16px;padding:14px;margin-bottom:14px;color:#fff;">
+          <div style="font-size:13px;line-height:1.6;opacity:.9;">
+            Orlando's parks host some of the world's best seasonal events. Many visitors plan their entire trip around these experiences. Here's everything you need to know to maximize them.
+          </div>
+        </div>
+
+        ${EVENTS.map(ev => `
+          <div style="background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;
+            border:1px solid var(--border,#eee);overflow:hidden;">
+            <div style="background:${ev.color};padding:12px 14px;">
+              <div style="display:flex;align-items:flex-start;gap:8px;">
+                <span style="font-size:26px;">${ev.emoji}</span>
+                <div style="flex:1;">
+                  <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:#fff;margin-bottom:2px;">${ev.name}</div>
+                  <div style="font-size:10px;color:rgba(255,255,255,.8);">${ev.park}</div>
+                  <div style="font-size:10px;color:rgba(255,255,255,.7);margin-top:2px;">📅 ${ev.dates}</div>
+                </div>
+                <div style="text-align:right;flex-shrink:0;">
+                  <div style="font-size:13px;">${'⭐'.repeat(ev.rating)}</div>
+                </div>
+              </div>
+            </div>
+            <div style="padding:12px 14px;">
+              <div style="background:${ev.color}10;border-radius:8px;padding:6px 10px;margin-bottom:8px;">
+                <div style="font-size:11px;font-weight:700;color:${ev.color};">💰 PRICING</div>
+                <div style="font-size:12px;color:var(--text-primary,#333);">${ev.price}</div>
+              </div>
+              <div style="font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:5px;">HIGHLIGHTS</div>
+              ${ev.highlights.map(h => `<div style="font-size:12px;color:var(--text-secondary,#555);padding:2px 0;">✦ ${h}</div>`).join('')}
+              <div style="margin-top:8px;background:${ev.color}08;border-left:3px solid ${ev.color};padding:8px 10px;border-radius:0 8px 8px 0;">
+                <div style="font-size:11px;font-weight:700;color:${ev.color};">🤫 INSIDER TIP</div>
+                <div style="font-size:12px;color:var(--text-primary,#333);margin-top:2px;">${ev.insiderTip}</div>
+              </div>
+              <div style="margin-top:6px;font-size:10px;color:var(--text-secondary,#888);">Best for: ${ev.bestFor}</div>
+            </div>
+          </div>`).join('')}
+
+        <!-- Planning tips footer -->
+        <div style="background:linear-gradient(135deg,#7B1FA2,#8E24AA);border-radius:14px;padding:14px;margin-bottom:20px;color:#fff;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">📋 Event Planning Tips</div>
+          ${[
+            'Book separate-ticket events 60–90 days in advance for best date selection and pricing.',
+            "Disney's party tickets often sell out October weekends by July — don't wait.",
+            'Check the Walt Disney World official site for exact dates: disneyworld.disney.go.com/events-tours/',
+            "Combine park events with restaurant reservations: Christmas party + California Grill fireworks dining = the perfect Disney night.",
+            'Annual passholders get early access to purchase some events — check your pass benefits.',
+          ].map(tip => `<div style="font-size:12px;color:rgba(255,255,255,.9);padding:4px 0;border-bottom:1px solid rgba(255,255,255,.15);line-height:1.5;">✓ ${tip}</div>`).join('')}
+        </div>
+      </div>`;
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-seasonal-events')) buildScreen();
+
+  const _prevSS_yyy2 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_yyy2) _prevSS_yyy2(name, el);
+    if (name === 'seasonal-events') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-seasonal-events');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectSeasonalCard() {
+    if (document.getElementById('seasonal-home-card')) return true;
+    const ref = document.getElementById('vq-home-card') || document.getElementById('weather-guide-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'seasonal-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#7B1FA2,#AB47BC,#CE93D8);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('seasonal-events');
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:28px;">🎉</span>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Special Events Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.85);">8 major events · Halloween · Christmas · Festivals</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _seasonCard = false;
+  setInterval(() => { if (!_seasonCard) _seasonCard = injectSeasonalCard(); }, 10500);
+  setTimeout(() => { _seasonCard = injectSeasonalCard(); }, 7000);
+
+  const _prevRH_yyy2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_yyy2) _prevRH_yyy2.apply(this, arguments);
+    setTimeout(() => { _seasonCard = false; _seasonCard = injectSeasonalCard(); }, 1900);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK ZZZ2: Accessibility & Special Needs Guide ===== */
+(function initAccessibilityGuide() {
+
+  const PARKS_ACCESS = [
+    {
+      park:'Walt Disney World (all 4 parks)',
+      emoji:'🏰',
+      color:'#1565C0',
+      das:'Disability Access Service (DAS)',
+      dasInfo:"Disney's DAS allows guests with disabilities (not just mobility) to get return times instead of waiting in standby. Register at Guest Relations on your first park day, or pre-register online 2–30 days before your visit (recommended).",
+      features:[
+        'Accessibility services at Guest Relations — arrive early morning for shortest wait',
+        'Companion restrooms throughout all parks',
+        'Quiet spaces: Sensory-friendly areas in all 4 parks (ask a cast member)',
+        'Stroller-as-wheelchair designation available free of charge',
+        'American Sign Language interpreters available at select shows (schedule varies)',
+        'Audio Description and Handheld Captioning devices available free at Guest Relations',
+        'First Aid stations in every park with nursing facilities',
+        'Service animals welcome — relief areas mapped on park maps',
+      ],
+      mobilityTips:[
+        'Wheelchair rentals: $12/day, ECVs: $50/day (manual wheelchairs at every park entrance)',
+        "Most attractions accommodate standard wheelchairs directly — check Disney's accessibility guide for specific ride info",
+        'Resort transportation (buses, boats, monorail) all fully accessible',
+        'Magic Kingdom monorail: 100% wheelchair accessible',
+      ],
+      sensoryTips:[
+        'Sensory guides for each park available at Guest Relations (maps showing noise levels, lighting)',
+        'Disney sells sensory-friendly sunglasses, ear protection at Walmart/Target near property',
+        "Remy's Ratatouille Adventure at EPCOT has the smoothest ride system — good for vestibular sensitivity",
+        "Mickey's Not-So-Scary Halloween Party has a sensory-friendly night — check Disney calendar",
+      ],
+    },
+    {
+      park:'Universal Orlando Resort',
+      emoji:'🎬',
+      color:'#1B5E20',
+      das:'Universal Attraction Assistance Pass (AAP)',
+      dasInfo:"Universal's AAP provides return times for guests who cannot wait in traditional queues. Register at Guest Services on arrival. No pre-registration online — must be done in person.",
+      features:[
+        'Guest Services at park entrance — arrive 30 minutes before park opens',
+        'Accessibility brochures available in large print and Braille upon request',
+        'Companion restrooms at regular intervals through both parks',
+        'American Sign Language interpreters: 72-hour advance request via universal.com',
+        'Closed captioning on many rides and shows',
+        'Service animals welcome — relief areas mapped at Guest Services',
+        'Sensory guides available at Guest Services',
+      ],
+      mobilityTips:[
+        'Wheelchair rentals: $15/day, ECV: $55/day (rentals at CityWalk entrance)',
+        "The Wizarding World shops have narrow aisles — ECVs cannot fit in Ollivanders — staff assist with hold areas",
+        'CityWalk and resort hotels 100% wheelchair accessible',
+        "Hagrid's accommodates wheelchairs in the vehicle directly — no transfer needed",
+      ],
+      sensoryTips:[
+        'Harry Potter lands have periodic ambient sound (owls, Quidditch commentary) — can be overwhelming for some',
+        "Skull Island: Reign of Kong has intense dark/loud moments — skip for sensory sensitivity",
+        "ET Adventure is one of Universal's gentlest, most sensory-friendly rides",
+        'Loews Hotels have quiet rooms away from the entertainment areas — request when booking',
+      ],
+    },
+    {
+      park:'SeaWorld & Aquatica',
+      emoji:'🐳',
+      color:'#006064',
+      das:'Ride Accessibility Program',
+      dasInfo:"SeaWorld provides accommodation cards at Guest Services. No pre-registration required — straightforward process with flexible approach to accommodations.",
+      features:[
+        'Most accessible of the major Orlando parks in terms of process simplicity',
+        'Wheelchair accessible viewing areas at all shows (Antarctica, Orca Encounter)',
+        'Free wheelchair loan if you forgot yours (limited supply)',
+        'All-family restroom facilities throughout the park',
+        'Low-stimulation animal viewing paths mapped in the park guide',
+        'Service animals welcome with designated relief areas',
+      ],
+      mobilityTips:[
+        'ECV and wheelchair rentals at the main entrance',
+        'The Antarctic Empire and Orca area are long walks — factor in ECV charging',
+        "SeaWorld's compact size makes it most manageable for mobility-limited guests",
+      ],
+      sensoryTips:[
+        "Manta ray and dolphin encounters: relatively quiet, great for sensory-sensitive guests",
+        "Journey to Atlantis water ride: significant drop — skip for vestibular sensitivity",
+        'The Animal Care Center offers quiet animal interaction with less crowd pressure',
+      ],
+    },
+  ];
+
+  const HEALTH_RESOURCES = [
+    { icon:'🏥', name:"Arnold Palmer Hospital (Children's)", address:'92 W Miller St, Orlando', note:'#1 pediatric hospital in Florida. Less than 20 min from Disney World.' },
+    { icon:'🏥', name:'AdventHealth Celebration', address:'400 Celebration Place, Kissimmee', note:'Closest full hospital to Disney World — 5 minutes from the parks.' },
+    { icon:'🏥', name:'HCA Florida Osceola Hospital', address:'700 W Oak St, Kissimmee', note:'Full emergency services, 15 min from Disney Springs.' },
+    { icon:'💊', name:'Turner Drug — Home Delivery to Hotels', address:'Phone: (407) 828-8125', note:'Delivers prescription medications to Disney and Universal hotels. Life-saver for forgotten meds.' },
+    { icon:'🚑', name:'First Aid in Every Park', address:'Ask any cast member/team member', note:'Fully staffed medical stations with RNs. Can arrange EMT response for serious needs.' },
+    { icon:'🦷', name:'Aspen Dental — Emergency Dental', address:'Multiple locations near I-Drive', note:'Walk-in dental care for dental emergencies. No appointment needed.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-accessibility';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;';
+    s.innerHTML = `
+      <div style="background:linear-gradient(135deg,#004D40,#00695C,#4DB6AC);padding:18px 14px 20px;
+        display:flex;align-items:center;gap:12px;flex-shrink:0;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;
+          border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#fff;">Accessibility Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">DAS programs · Mobility · Sensory · Medical resources</div>
+        </div>
+        <span style="font-size:28px;">♿</span>
+      </div>
+      <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;">
+
+        <div style="background:linear-gradient(135deg,#004D40,#00695C);border-radius:16px;padding:14px;margin-bottom:14px;color:#fff;">
+          <div style="font-size:13px;line-height:1.6;opacity:.9;">
+            Orlando's theme parks are among the most accessibility-forward destinations on earth. With the right knowledge, guests of all abilities can have extraordinary experiences. This guide covers everything.
+          </div>
+        </div>
+
+        ${PARKS_ACCESS.map(park => `
+          <div style="background:var(--card-bg,#fff);border-radius:14px;margin-bottom:14px;
+            border:1px solid var(--border,#eee);overflow:hidden;">
+            <div style="background:${park.color};padding:12px 14px;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-size:24px;">${park.emoji}</span>
+                <div>
+                  <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:#fff;">${park.park}</div>
+                  <div style="font-size:11px;color:rgba(255,255,255,.8);">Program: ${park.das}</div>
+                </div>
+              </div>
+            </div>
+            <div style="padding:12px 14px;">
+              <div style="background:${park.color}10;border-radius:8px;padding:10px;margin-bottom:10px;">
+                <div style="font-size:12px;color:var(--text-secondary,#444);line-height:1.6;">${park.dasInfo}</div>
+              </div>
+
+              <div style="font-size:11px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:5px;">PARK FEATURES</div>
+              ${park.features.map(f => `<div style="font-size:12px;color:var(--text-secondary,#555);padding:2px 0;">♿ ${f}</div>`).join('')}
+
+              <div style="font-size:11px;font-weight:700;color:var(--text-secondary,#888);margin:10px 0 5px;">MOBILITY TIPS</div>
+              ${park.mobilityTips.map(m => `<div style="font-size:12px;color:var(--text-secondary,#555);padding:2px 0;">🦽 ${m}</div>`).join('')}
+
+              <div style="font-size:11px;font-weight:700;color:var(--text-secondary,#888);margin:10px 0 5px;">SENSORY TIPS</div>
+              ${park.sensoryTips.map(st => `<div style="font-size:12px;color:var(--text-secondary,#555);padding:2px 0;">🧠 ${st}</div>`).join('')}
+            </div>
+          </div>`).join('')}
+
+        <!-- Health resources -->
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;
+          color:var(--text-primary,#212121);margin-bottom:10px;">🏥 Medical & Health Resources</div>
+        ${HEALTH_RESOURCES.map(r => `
+          <div style="background:var(--card-bg,#fff);border-radius:12px;margin-bottom:8px;
+            border:1px solid var(--border,#eee);padding:10px 12px;display:flex;gap:10px;align-items:flex-start;">
+            <span style="font-size:22px;flex-shrink:0;">${r.icon}</span>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:2px;">${r.name}</div>
+              <div style="font-size:11px;color:var(--text-secondary,#888);margin-bottom:3px;">📍 ${r.address}</div>
+              <div style="font-size:12px;color:var(--text-secondary,#555);">${r.note}</div>
+            </div>
+          </div>`).join('')}
+
+        <div style="background:linear-gradient(135deg,#004D40,#00695C);border-radius:14px;padding:14px;margin-top:14px;margin-bottom:20px;color:#fff;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">💡 Pro Accessibility Tips</div>
+          ${[
+            'Call your hotel before arrival to request a roll-in shower, lower bed height, or visual smoke alarm.',
+            "Disney's DAS also covers hidden disabilities including autism, ADHD, anxiety disorders, and chronic pain — you do not need to disclose the specific condition.",
+            'AllEars.net has the most comprehensive Disney accessibility guides on the internet — bookmark it.',
+            "Universal's Guest Services are notably quick and understanding — don't hesitate to advocate for your needs.",
+            'Travel insurance is essential for guests with medical conditions. World Nomads and Allianz both cover pre-existing conditions with proper disclosure.',
+          ].map(tip => `<div style="font-size:12px;color:rgba(255,255,255,.9);padding:4px 0;border-bottom:1px solid rgba(255,255,255,.15);line-height:1.5;">✓ ${tip}</div>`).join('')}
+        </div>
+      </div>`;
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-accessibility')) buildScreen();
+
+  const _prevSS_zzz2 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_zzz2) _prevSS_zzz2(name, el);
+    if (name === 'accessibility') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-accessibility');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectAccessCard() {
+    if (document.getElementById('access-home-card')) return true;
+    const ref = document.getElementById('seasonal-home-card') || document.getElementById('vq-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'access-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#004D40,#00695C,#4DB6AC);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('accessibility');
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:28px;">♿</span>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Accessibility Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.85);">DAS · Mobility · Sensory · Medical resources</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _accessCard = false;
+  setInterval(() => { if (!_accessCard) _accessCard = injectAccessCard(); }, 11000);
+  setTimeout(() => { _accessCard = injectAccessCard(); }, 7500);
+
+  const _prevRH_zzz2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_zzz2) _prevRH_zzz2.apply(this, arguments);
+    setTimeout(() => { _accessCard = false; _accessCard = injectAccessCard(); }, 2000);
+  };
+})();
+</script>
