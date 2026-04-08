@@ -50895,3 +50895,421 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK JJJJJ: Florida Beaches Day Trip Guide ===== */
+(function initFloridaBeaches() {
+
+  const BEACHES = [
+    {
+      id:'cocoa', name:'Cocoa Beach', emoji:'🏄', color:'#0277BD',
+      distance:'1 hour east', vibe:'Classic Florida',
+      rating:4, sand:'Light tan', waves:'Moderate',
+      highlights:['Ron Jon Surf Shop (open 24/7)', 'Closest beach to Orlando', 'Good surf breaks', 'Pier with restaurants and fishing'],
+      dining:['Coconuts on the Beach (beachfront bar & grill)', 'Grills Seafood Deck (fresh catch, amazing sunsets)', 'The Shark Pit Bar & Grill (casual beachside)'],
+      tip:'The default Orlando day-trip beach. Practical and fun but not the most beautiful sand or water clarity. Great if you also want KSC nearby. The pier area has good energy.',
+      bestFor:'Families, surfers, easy logistics, KSC combo trips'
+    },
+    {
+      id:'clearwater', name:'Clearwater Beach', emoji:'🌊', color:'#00838F',
+      distance:'1.5 hours west', vibe:'Stunning Gulf Coast',
+      rating:5, sand:'White powder', waves:'Calm, Gulf-gentle',
+      highlights:['Consistently rated #1 US beach', 'Pier 60 sunset celebration nightly', 'Crystal-clear Gulf water', 'Island atmosphere'],
+      dining:['Island Way Grill (seafood institution)', 'Frenchy\'s Rockaway Grill (the quintessential beach bar)', 'Palm Pavilion Beachside Grill (right on the sand)'],
+      tip:'Worth the extra 30 minutes drive over Cocoa Beach. The Gulf water is warmer, calmer, and dramatically clearer. White quartz sand that stays cool in summer. Sunset at Pier 60 with street performers is a nightly event.',
+      bestFor:'Best overall beach day, couples, families seeking calm water, sunsets'
+    },
+    {
+      id:'stpete', name:'St. Pete Beach', emoji:'🌴', color:'#2E7D32',
+      distance:'1.5–2 hours west', vibe:'Laid-back Gulf Elegance',
+      rating:5, sand:'White sugar', waves:'Calm Gulf',
+      highlights:['Less crowded than Clearwater', 'Don CeSar hotel (historic pink palace landmark)', 'Excellent local restaurants', 'Beautiful neighborhood feel'],
+      dining:['Don CeSar Restaurant (inside the Pink Palace — splurge)', 'The Hurricane (legendary dive bar right on the beach)', 'Sea Critters Café (local favorite, fresh seafood)'],
+      tip:'Slightly more refined feel than Clearwater with a better local restaurant scene. Equally stunning sand and water. Don CeSar Pink Palace is a photo icon even if you\'re not staying there.',
+      bestFor:'Couples, foodies, those wanting Gulf beauty with local character'
+    },
+    {
+      id:'newsmyrna', name:'New Smyrna Beach', emoji:'🏡', color:'#5D4037',
+      distance:'1 hour east', vibe:'Artsy & Uncrowded',
+      rating:4, sand:'Natural tan', waves:'Good surf',
+      highlights:['Charming Atlantic Avenue arts district', 'Excellent surf', 'Half the crowds of Cocoa Beach', 'Local restaurants and galleries'],
+      dining:['The Garlic (legendary local seafood)', 'Norwood\'s Treehouse Restaurant (beloved local institution)', 'JB\'s Fish Camp (old Florida experience, river setting)'],
+      tip:'The "insider\'s beach" near Orlando. Less crowded than Cocoa Beach with a genuine small-town art scene worth exploring. Atlantic Avenue has boutiques, galleries, and excellent restaurants within walking distance of the beach.',
+      bestFor:'Travelers who want beaches + culture, surfers, those avoiding crowds'
+    },
+    {
+      id:'canaveral', name:'Canaveral National Seashore', emoji:'🌿', color:'#558B2F',
+      distance:'1.5 hours east', vibe:'Wild & Pristine',
+      rating:5, sand:'Natural, undeveloped', waves:'Atlantic swells',
+      highlights:['24 miles of undeveloped Atlantic coastline', 'Largest undeveloped beach on the US East Coast', 'Turtle nesting site (June–August)', 'Absolutely no development in sight'],
+      dining:['No dining on the seashore — bring everything', 'Titusville restaurants 30 min away'],
+      tip:'If you want to see Florida as it looked before development, this is it. Pristine wilderness beach with no buildings, no vendors, just ocean and sky. Turtle nesting season June–August — guided night walks available. Limited entrance — arrive early.',
+      bestFor:'Nature lovers, photographers, those wanting an authentic wilderness experience'
+    },
+    {
+      id:'siesta', name:'Siesta Key Beach', emoji:'⭐', color:'#7B1FA2',
+      distance:'2 hours southwest', vibe:'World-Famous Sand',
+      rating:5, sand:'Pure white quartz (coolest sand in world)', waves:'Calm Gulf',
+      highlights:['Voted #1 Beach USA multiple times', 'Sand is 99% pure quartz — stays cool in heat', 'Crystal clear Gulf water', 'Vibrant beachside village'],
+      dining:['Siesta Key Oyster Bar (lively beachside institution)', 'The Cottage (refined beachside dining)', 'Siesta Key Beach House (great views, casual plates)'],
+      tip:'Two hours from Orlando but genuinely the most extraordinary sand in the world. The quartz stays cool no matter the temperature. Worth the drive for a special occasion beach day. Siesta Village is a charming walkable area.',
+      bestFor:'Special occasion beach days, those who have seen Gulf beaches and want the absolute best'
+    },
+  ];
+
+  const PACKING = [
+    { icon:'🧴', item:'Reef-safe sunscreen', note:'Florida sun is intense year-round. SPF 50+ minimum. Reapply every 90 min.' },
+    { icon:'🌊', item:'Rash guard or UV shirt', note:'Swim shirts dramatically reduce sunburn while in the water. Highly recommended.' },
+    { icon:'💧', item:'Water (2L minimum per person)', note:'Dehydration happens fast in Florida heat and sun. Bring more than you think you need.' },
+    { icon:'🥪', item:'Packed cooler with food', note:'Beach food is expensive. Sandwiches, fruit, snacks — cooler with ice is the smart move.' },
+    { icon:'🏖️', item:'Beach umbrella + chairs', note:'Shade is essential June–September. Rental chairs run $35+/day. Bring your own.' },
+    { icon:'🚿', item:'Fresh water rinse bottle', note:'A gallon jug for feet rinsing before getting in the car. Game changer.' },
+    { icon:'🎒', item:'Dry bag for valuables', note:'Keep phone and keys in a waterproof bag. Don\'t leave anything visible in your car.' },
+    { icon:'🌅', item:'Plan around the afternoon', note:'Florida thunderstorms arrive between 2–5 PM most summer days. Beach in AM, rest midday, re-emerge at 5 PM for sunset.' },
+  ];
+
+  const SEASONAL = [
+    { season:'November – April', desc:'Best beach season. Temperatures 65–80°F, no humidity, minimal rain, stunning blue skies. Gulf water cool but refreshing. The definitive optimal window.', quality:5 },
+    { season:'May – June', desc:'Water warming up, crowds building. Before summer peak. Still excellent — hot days but beautiful water. Hurricane season starts June 1 but early season risk is low.', quality:4 },
+    { season:'July – August', desc:'Peak summer. Hot (93°F+), humid, afternoon thunderstorms daily. But: warm Gulf water, vibrant energy, and Florida families with kids creating a festive atmosphere.', quality:3 },
+    { season:'September – October', desc:'Hurricane season peak. Potentially the most beautiful weather if storms stay away — warm water, lighter crowds, often spectacular skies post-storm. Monitor forecasts.', quality:3 },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-florida-beaches';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#0277BD,#00838F,#2E7D32);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Florida Beaches Day Trips</div>
+          <div style="font-size:11px;opacity:.8;">Gulf Coast · Atlantic Coast · Wilderness Shores</div>
+        </div>
+        <span style="font-size:28px;">🏖️</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        Orlando sits between the Atlantic and Gulf coasts — both within 1–2 hours. The Gulf beaches (west) have warmer, calmer, clearer water and whiter sand. Atlantic beaches (east) have more energy, better surf, and easier access.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    BEACHES.forEach(b => {
+      const stars = Array.from({length:5},(_,i)=>`<span style="color:${i<b.rating?'#C9A96E':'#ddd'};">★</span>`).join('');
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="height:60px;background:linear-gradient(135deg,${b.color},${b.color}aa);display:flex;align-items:center;justify-content:space-between;padding:0 14px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:28px;">${b.emoji}</span>
+            <div>
+              <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">${b.name}</div>
+              <div style="font-size:10px;color:rgba(255,255,255,.8);">${b.distance} · ${b.vibe}</div>
+            </div>
+          </div>
+          <div style="font-size:16px;">${stars}</div>
+        </div>
+        <div style="padding:12px 14px;">
+          <div style="display:flex;gap:8px;margin-bottom:10px;">
+            <div style="flex:1;background:var(--bg,#f8f8f8);border-radius:8px;padding:7px;text-align:center;">
+              <div style="font-size:10px;color:var(--text-secondary,#888);">SAND</div>
+              <div style="font-size:11px;font-weight:700;color:var(--text-primary,#212121);">${b.sand}</div>
+            </div>
+            <div style="flex:1;background:var(--bg,#f8f8f8);border-radius:8px;padding:7px;text-align:center;">
+              <div style="font-size:10px;color:var(--text-secondary,#888);">WAVES</div>
+              <div style="font-size:11px;font-weight:700;color:var(--text-primary,#212121);">${b.waves}</div>
+            </div>
+          </div>
+          <div style="font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:5px;">HIGHLIGHTS</div>
+          <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;">
+            ${b.highlights.map(h=>`<span style="font-size:10px;padding:3px 8px;background:${b.color}18;color:${b.color};border-radius:20px;font-weight:600;">${h}</span>`).join('')}
+          </div>
+          <div style="font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:5px;">DINING</div>
+          ${b.dining.map(d=>`<div style="font-size:11px;color:var(--text-secondary,#666);padding:2px 0;">🍽️ ${d}</div>`).join('')}
+          <div style="display:flex;gap:8px;background:${b.color}0d;border-radius:10px;padding:8px;margin-top:10px;">
+            <span style="font-size:14px;flex-shrink:0;">💡</span>
+            <div><div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;margin-bottom:4px;">${b.tip}</div>
+            <div style="font-size:10px;font-weight:700;color:${b.color};">Best for: ${b.bestFor}</div></div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    /* Packing list */
+    const packCard = document.createElement('div');
+    packCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+    packCard.innerHTML = `<div style="padding:12px 14px;background:linear-gradient(135deg,#0277BD,#00838F);color:#fff;">
+      <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;">🎒 Florida Beach Packing Guide</div>
+    </div>
+    <div style="padding:12px 14px;">
+      ${PACKING.map(p=>`<div style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start;">
+        <span style="font-size:20px;flex-shrink:0;">${p.icon}</span>
+        <div><div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);">${p.item}</div>
+        <div style="font-size:11px;color:var(--text-secondary,#666);">${p.note}</div></div>
+      </div>`).join('')}
+    </div>`;
+    body.appendChild(packCard);
+
+    /* Seasonal guide */
+    const seasonCard = document.createElement('div');
+    seasonCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:20px;overflow:hidden;border:1px solid var(--border,#eee);';
+    seasonCard.innerHTML = `<div style="padding:12px 14px;background:linear-gradient(135deg,#2E7D32,#558B2F);color:#fff;">
+      <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;">📅 When to Go: Florida Beach Seasons</div>
+    </div>
+    <div style="padding:12px 14px;">
+      ${SEASONAL.map(s=>{
+        const q = Array.from({length:5},(_,i)=>`<span style="color:${i<s.quality?'#2E7D32':'#ddd'};">●</span>`).join('');
+        return `<div style="margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border,#eee);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+            <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${s.season}</div>
+            <div style="font-size:14px;">${q}</div>
+          </div>
+          <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;">${s.desc}</div>
+        </div>`;
+      }).join('')}
+    </div>`;
+    body.appendChild(seasonCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-florida-beaches')) buildScreen();
+
+  const _prevSS_jjjjj = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_jjjjj) _prevSS_jjjjj(name, el);
+    if (name === 'florida-beaches') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-florida-beaches');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectBeachCard() {
+    if (document.getElementById('beaches-home-card')) return true;
+    const ref = document.getElementById('ksc-home-card') || document.getElementById('dining-res-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'beaches-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#0277BD,#00838F,#2E7D32);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('florida-beaches');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🏖️</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Florida Beaches Day Trips</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Clearwater · Cocoa · Siesta Key · Canaveral</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _beachCard = false;
+  setInterval(() => { if (!_beachCard) _beachCard = injectBeachCard(); }, 44000);
+  setTimeout(() => { _beachCard = injectBeachCard(); }, 40500);
+  const _prevRH_jjjjj = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_jjjjj) _prevRH_jjjjj.apply(this, arguments);
+    setTimeout(() => { _beachCard = false; _beachCard = injectBeachCard(); }, 12600);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK KKKKK: Orlando Outlet Shopping & Retail Guide ===== */
+(function initOrlandoShopping() {
+
+  const DESTINATIONS = [
+    {
+      name:'Orlando Premium Outlets – International Drive', emoji:'🛍️', color:'#C62828',
+      type:'Premium Outlets', proximity:'I-Drive (Central)',
+      brands:['Coach','Michael Kors','Gucci','Prada','Versace','Kate Spade','Ralph Lauren','Nike','Adidas','Tory Burch','Burberry','Salvatore Ferragamo'],
+      hours:'10 AM – 10 PM daily',
+      savings:'30–70% off retail',
+      tip:'The flagship luxury outlet in Orlando. Two floors, 180+ stores. Gucci and Prada outlets are genuine finds. Go on a weekday morning — evenings and weekends are packed with tourists. Free parking. Outlet prices are real discounts here.',
+      must:['Gucci Outlet (rare luxury value)', 'Tory Burch (excellent selection)', 'Nike Factory Store (buy ahead of theme park visits)'],
+    },
+    {
+      name:'Orlando Premium Outlets – Vineland Ave', emoji:'👜', color:'#AD1457',
+      type:'Premium Outlets', proximity:'Near Disney Springs (Lake Buena Vista)',
+      brands:['Saks Fifth Avenue OFF 5TH','Tommy Hilfiger','Calvin Klein','Polo Ralph Lauren','Banana Republic','Brooks Brothers','J.Crew','Fossil','Lacoste'],
+      hours:'10 AM – 10 PM daily',
+      savings:'25–65% off retail',
+      tip:'Disney-adjacent location makes it easy to combine with a Disney Springs visit. Slightly less luxury-focused than I-Drive but great for American brands. Saks OFF 5TH here is excellent for finding designer deals.',
+      must:['Saks OFF 5TH (designer finds)', 'Polo Ralph Lauren (consistently stocked well)', 'Banana Republic Factory'],
+    },
+    {
+      name:'Disney Springs', emoji:'✨', color:'#1565C0',
+      type:'Shopping & Entertainment District', proximity:'Walt Disney World Resort',
+      brands:['World of Disney (largest Disney store globally)','Star Wars Galactic Outpost','Marvel Store','Kate Spade','Anthropologie','Free People','UGG','Alex and Ani','Pandora'],
+      hours:'10 AM – 11 PM daily (restaurants later)',
+      savings:'Full retail (some exclusive Disney merchandise)',
+      tip:'Not a discount destination — come for the experience and Disney exclusives. World of Disney is genuinely the largest Disney merchandise store on Earth. Excellent dining options make it a great evening destination.',
+      must:['World of Disney (buy park merchandise here, cheaper than inside parks)', 'The LEGO Store (massive interactive store)', 'Star Wars Galactic Outpost (exclusive merchandise)'],
+    },
+    {
+      name:'Florida Mall', emoji:'🏬', color:'#2E7D32',
+      type:'Traditional Mall', proximity:'S. Orange Blossom Trail (OBT)',
+      brands:['Nordstrom','Macy\'s','JCPenney','H&M','Zara','Apple','Microsoft','Tesla','Uniqlo','Aritzia'],
+      hours:'10 AM – 9 PM Mon–Sat, 11 AM – 7 PM Sun',
+      savings:'Standard retail pricing',
+      tip:'The largest traditional mall in Florida (250+ stores). Less chaotic than the tourist outlets. Great for Nordstrom, Zara, and international brands. The food court is huge. Good alternative to outlet madness.',
+      must:['Nordstrom (well-stocked)','Apple Store','Uniqlo (if not in home city)'],
+    },
+    {
+      name:'Park Avenue, Winter Park', emoji:'🌳', color:'#4E342E',
+      type:'Upscale Boutique Shopping Street', proximity:'Winter Park (20 min from I-Drive)',
+      brands:['Local boutiques','Restoration Hardware','Pottery Barn','Williams-Sonoma','Tiffany & Co.','Chico\'s','White House Black Market','Anthropologie'],
+      hours:'Varies by shop (10 AM – 6 PM typical)',
+      savings:'Full retail — worth it for the experience',
+      tip:'The most charming shopping experience in Central Florida. Tree-lined brick street with independent boutiques, galleries, and excellent restaurants. Not for bargains — for the pleasure of an actual walkable shopping street.',
+      must:['Boutique browsing (no specific chain)', 'Lunch or dinner on the Avenue', 'Morse Museum of American Art nearby (Tiffany glass collection)'],
+    },
+    {
+      name:'I-Drive 360 + ICON Park', emoji:'🎡', color:'#6A1B9A',
+      type:'Entertainment & Retail Complex', proximity:'International Drive',
+      brands:['Multiple pop-up retail shops','Orlando Eye gift shop','Madame Tussauds','Sea Life Aquarium','FlyOver'],
+      hours:'12 PM – midnight weekends, later on weekends',
+      savings:'Entertainment pricing, not shopping bargains',
+      tip:'More entertainment than shopping. The Ferris Wheel area has gift shops and some restaurant-attached retail. Good for a souvenir pick-up or casual evening browse while on I-Drive.',
+      must:['ICON Wheel ride for views', 'Various Orlando souvenir shops'],
+    },
+  ];
+
+  const TIPS = [
+    { icon:'⏰', tip:'Shop outlets on Tuesday, Wednesday, or Thursday mornings (10–11 AM). Avoid weekend afternoons — lines at popular stores can be 20+ minutes.' },
+    { icon:'📧', tip:'Sign up for outlet newsletter/app before your trip. VIP Club at Premium Outlets gives extra 10% discount book. Worth signing up online ahead of time.' },
+    { icon:'💳', tip:'Many outlet stores offer additional credit card discounts (Gap, Banana Republic, etc). Use your store card if you have one.' },
+    { icon:'🧳', tip:'Pack light coming to Orlando — dedicate space in luggage for shopping. Or buy an extra bag at the outlets (many luggage stores with big discounts).' },
+    { icon:'🛒', tip:'Buy Disney merchandise at Disney Springs World of Disney before park visits. Park-specific merchandise (like MK 50th items) must be purchased in-park.' },
+    { icon:'☀️', tip:'Outdoor outlets (both OPO locations) are exposed to Florida heat. Shop in morning, break midday, return in late afternoon.' },
+    { icon:'🎒', tip:'Theme park merchandise inside the parks is 20–30% more expensive than Disney Springs. For non-exclusive items, buy at DS or order online before your trip.' },
+    { icon:'💰', tip:'Authentic luxury outlet pricing (Gucci, Prada, Versace) in Orlando is genuinely 30–50% below full retail. Not replicas — these are season closeouts and overstock.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-orlando-shopping';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#C62828,#AD1457,#6A1B9A);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Orlando Shopping Guide</div>
+          <div style="font-size:11px;opacity:.8;">Outlets · Disney Springs · Park Avenue</div>
+        </div>
+        <span style="font-size:28px;">🛍️</span>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:15px;font-weight:800;">30–70%</div><div style="font-size:9px;opacity:.8;">OUTLET SAVINGS</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:15px;font-weight:800;">350+</div><div style="font-size:9px;opacity:.8;">OUTLET STORES</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:15px;font-weight:800;">Gucci</div><div style="font-size:9px;opacity:.8;">OUTLET VERIFIED</div>
+        </div>
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    DESTINATIONS.forEach(d => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:12px 14px;background:${d.color}18;border-left:4px solid ${d.color};">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:26px;">${d.emoji}</span>
+            <div style="flex:1;">
+              <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--text-primary,#212121);">${d.name}</div>
+              <div style="font-size:10px;color:var(--text-secondary,#888);">${d.type} · ${d.proximity}</div>
+              <div style="font-size:10px;color:${d.color};font-weight:700;margin-top:2px;">${d.savings}</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:12px 14px;">
+          <div style="font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:5px;">KEY BRANDS</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;">
+            ${d.brands.slice(0,8).map(b=>`<span style="font-size:10px;padding:2px 8px;background:var(--bg,#f5f5f5);border-radius:20px;color:var(--text-secondary,#666);">${b}</span>`).join('')}
+            ${d.brands.length > 8 ? `<span style="font-size:10px;padding:2px 8px;background:var(--bg,#f5f5f5);border-radius:20px;color:${d.color};font-weight:700;">+${d.brands.length-8} more</span>` : ''}
+          </div>
+          <div style="font-size:10px;color:var(--text-secondary,#888);margin-bottom:3px;">⏰ ${d.hours}</div>
+          <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;margin-bottom:8px;">${d.tip}</div>
+          <div style="background:${d.color}0d;border-radius:10px;padding:8px;">
+            <div style="font-size:10px;font-weight:700;color:${d.color};margin-bottom:4px;">MUST-DO STOPS</div>
+            ${d.must.map(m=>`<div style="font-size:11px;color:var(--text-secondary,#555);padding:2px 0;">→ ${m}</div>`).join('')}
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const tipsCard = document.createElement('div');
+    tipsCard.style.cssText = 'background:linear-gradient(135deg,#C62828,#AD1457);border-radius:16px;margin-bottom:20px;padding:14px;color:#fff;';
+    tipsCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">🎯 Shopping Strategy Tips</div>
+    ${TIPS.map(t=>`<div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
+      <span style="font-size:18px;flex-shrink:0;">${t.icon}</span>
+      <div style="font-size:12px;opacity:.95;line-height:1.5;">${t.tip}</div>
+    </div>`).join('')}`;
+    body.appendChild(tipsCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-orlando-shopping')) buildScreen();
+
+  const _prevSS_kkkkk = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_kkkkk) _prevSS_kkkkk(name, el);
+    if (name === 'orlando-shopping') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-orlando-shopping');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectShoppingCard() {
+    if (document.getElementById('shopping-home-card')) return true;
+    const ref = document.getElementById('beaches-home-card') || document.getElementById('ksc-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'shopping-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#C62828,#AD1457,#6A1B9A);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('orlando-shopping');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🛍️</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Shopping Guide</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Gucci outlets · Disney Springs · Park Avenue boutiques</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _shopCard = false;
+  setInterval(() => { if (!_shopCard) _shopCard = injectShoppingCard(); }, 45000);
+  setTimeout(() => { _shopCard = injectShoppingCard(); }, 41500);
+  const _prevRH_kkkkk = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_kkkkk) _prevRH_kkkkk.apply(this, arguments);
+    setTimeout(() => { _shopCard = false; _shopCard = injectShoppingCard(); }, 13000);
+  };
+})();
+</script>
