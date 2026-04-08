@@ -51706,3 +51706,415 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK NNNNN: Orlando Budget Travel Guide ===== */
+(function initOrlandoBudget() {
+
+  const BUDGET_PARKS = [
+    {
+      park:'Disney World', emoji:'🏰', color:'#1565C0',
+      fullPrice:'$109–$189/person/day',
+      strategies:[
+        { name:'Tickets.com / Undercover Tourist', saving:'$10–25/ticket', desc:'Authorized third-party resellers consistently offer discounts on multi-day Disney tickets. Never buy from unauthorized scalpers.' },
+        { name:'Off-peak pricing (Sept, Jan–Feb)', saving:'Up to $60/day', desc:'Disney has tiered pricing — the same 4-day ticket can cost $400 less in January vs. spring break. Date flexibility is your most powerful discount.' },
+        { name:'Florida Resident discounts', saving:'$20–50/ticket', desc:'Requires proof of FL residency. Multi-day and annual pass options with genuine discounts year-round.' },
+        { name:'Military discounts (Salute to Service)', saving:'Up to $100/ticket', desc:'Active military, veterans, and families get significant discounts. Available at base ticket offices or through My Disney Experience.' },
+        { name:'Annual Pass for trips 4+ days', saving:'Breaks even at 4 days', desc:'The Incredi-Pass ($1,399) works out cheaper than 4 separate park-hopper tickets if visiting twice within 12 months.' },
+        { name:'Skip park-hopping', saving:'$65–80/ticket', desc:'Park hopper adds $65–80 per ticket. If you arrive rope drop and stay all day at one park, you don\'t need it.' },
+      ]
+    },
+    {
+      park:'Universal Orlando', emoji:'🎢', color:'#2E7D32',
+      fullPrice:'$109–$179/person/day',
+      strategies:[
+        { name:'Annual Pass Seasonal (Seasonal Saver)', saving:'Breaks even at 3–4 days', desc:'Seasonal Annual Pass ($299–399) pays off quickly if visiting during eligible dates. Check blockout calendars carefully.' },
+        { name:'2-Park 2-Day tickets', saving:'Per-day value', desc:'Multi-day tickets offer significantly better per-day pricing. A 3-day ticket is nearly the same price as a 2-day ticket.' },
+        { name:'3-Park bundle with Epic Universe', saving:'Best multi-park value', desc:'When available, the 3-park ticket (Studios + IoA + Epic Universe) offers better value than purchasing parks separately.' },
+        { name:'Orlando hotel guests: Express Pass included', saving:'$80–140/person', desc:'On-site Universal hotels include free Express Unlimited Pass — worth $80–140 per person per day. Often makes staying on-site cheaper overall.' },
+        { name:'Florida Resident prices (monthly payment)', saving:'30–40% off annual pass', desc:'FL residents can get annual passes on monthly payment plans. Easy entry into the Universal annual pass program.' },
+      ]
+    },
+    {
+      park:'SeaWorld Orlando', emoji:'🐬', color:'#0277BD',
+      fullPrice:'$59–$99/person',
+      strategies:[
+        { name:'Online advance pricing', saving:'30–50%', desc:'SeaWorld\'s online ticket price is dramatically lower than gate price. Always buy online. Door pricing is essentially the punishment rate.' },
+        { name:'Fun Card (all-year pass)', saving:'Massive value', desc:'SeaWorld\'s Fun Card ($99–149) provides unlimited visits for the calendar year. For anyone who lives nearby or plans a return visit, it\'s extraordinary value.' },
+        { name:'Combo tickets with Busch Gardens Tampa', saving:'15–25%', desc:'Both parks are owned by the same company (United Parks). Combo tickets for both cost only slightly more than one park.' },
+        { name:'Free for FL residents in slow months', saving:'100%', desc:'SeaWorld occasionally runs promotions where FL residents get free admission. Sign up for their email list and watch for these offers.' },
+      ]
+    },
+    {
+      park:'Kennedy Space Center', emoji:'🚀', color:'#37474F',
+      fullPrice:'~$75 adult',
+      strategies:[
+        { name:'Online booking discount', saving:'$10', desc:'Online tickets are consistently $10 cheaper than gate prices. No coupon needed — just buy online.' },
+        { name:'AAA discount', saving:'$5–10', desc:'AAA members get discounts at KSC. Worth checking your membership benefits.' },
+        { name:'Combine with Cocoa Beach', saving:'Trip efficiency', desc:'One drive east covers both KSC and Cocoa Beach — combine for maximum day value from a single trip.' },
+      ]
+    },
+  ];
+
+  const FREE_CHEAP = [
+    { price:'Free', emoji:'🆓', name:'Disney Springs', desc:'No park admission required. World of Disney, restaurants, entertainment, the LEGO store, and character photo ops — all free.' },
+    { price:'Free', emoji:'🆓', name:'Lake Eola Park (Downtown)', desc:'Beautiful urban lake with paddleboats (affordable rental), swan habitat, Sunday farmers market, free outdoor concerts.' },
+    { price:'Free', emoji:'🆓', name:'Art Gallery Walk – Park Avenue', desc:'Winter Park\'s gallery row with free entry to most galleries. World-class art, zero cost.' },
+    { price:'Free', emoji:'🆓', name:'Universal City Walk', desc:'No admission needed for Universal\'s entertainment district. Live music, restaurants, movie theater.' },
+    { price:'Free', emoji:'🆓', name:'Rocket launches at Cape Canaveral', desc:'Public viewing of SpaceX and NASA launches is free from Titusville and surrounding areas. Check launch schedule.' },
+    { price:'$5–10', emoji:'💰', name:'Cornell Fine Arts Museum (Winter Park)', desc:'Outstanding permanent collection of European and American art. Admission $5–10 — one of Florida\'s best museums.' },
+    { price:'$5–10', emoji:'💰', name:'Wekiwa Springs State Park', desc:'Crystal-clear springs for swimming, kayaking, walking trails. One of Florida\'s best natural experiences at state park price.' },
+    { price:'$20', emoji:'💰', name:'Lake Eola Paddleboat (1 hour)', desc:'The most romantic $20 in Orlando. Swan boats on a gorgeous urban lake at golden hour.' },
+    { price:'Free', emoji:'🆓', name:'Farmer\'s Markets', desc:'Winter Park Saturday Market (every Saturday). Downtown Orlando Sunday Market. Local food, crafts, community.' },
+    { price:'$15', emoji:'💰', name:'Gatorland Day Pass', desc:'Old-school Florida alligator park. More than 2,000 gators, exotic bird exhibits. Surprisingly fun for the price.' },
+  ];
+
+  const MONEY_SAVERS = [
+    { icon:'🍔', tip:'Eat counter service, not table service. An average Disney counter service lunch for two: $35–45. A table service lunch for two: $80–120.' },
+    { icon:'🥪', tip:'Bring snacks into parks. Disney, Universal, and SeaWorld all allow outside sealed snacks and water bottles. A family can save $30–60/day.' },
+    { icon:'🚗', tip:'Drive vs. fly. If within 800 miles, driving saves significantly on flights + luggage fees + car rental at destination.' },
+    { icon:'🏨', tip:'Stay off-site with a kitchen. A 2-bedroom vacation rental 5 miles from Disney with a kitchen often costs less than a standard Disney Value hotel room, with 3x the space.' },
+    { icon:'🎡', tip:'Avoid Genie+ on slower days. Midweek in September, January, or February — most rides are walkable without paying extra. Check wait times before buying.' },
+    { icon:'📅', tip:'Value/off-peak seasons: September, January, first 3 weeks of February, first 2 weeks of May. 40–50% less crowded, lower ticket prices.' },
+    { icon:'🎟️', tip:'Theme park tickets never go on sale. The closest thing to a sale is buying early at locked prices before price increases. Annual pass monthly payments help with cash flow.' },
+    { icon:'🌮', tip:'EPCOT World Showcase is one of the best cheap restaurant collections in Orlando. $12 empanadas in Argentina, $10 tacos in Mexico — world-class food at food-court prices.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-orlando-budget';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#2E7D32,#1565C0,#37474F);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Budget Travel Guide</div>
+          <div style="font-size:11px;opacity:.8;">Discounts · Free things · Money-saving strategies</div>
+        </div>
+        <span style="font-size:28px;">💰</span>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:15px;font-weight:800;">30–50%</div><div style="font-size:9px;opacity:.8;">TYPICAL SAVINGS</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:15px;font-weight:800;">10+</div><div style="font-size:9px;opacity:.8;">FREE THINGS</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:15px;font-weight:800;">Sept</div><div style="font-size:9px;opacity:.8;">BEST BUDGET MONTH</div>
+        </div>
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    BUDGET_PARKS.forEach(bp => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:12px 14px;background:${bp.color}18;border-left:4px solid ${bp.color};">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:22px;">${bp.emoji}</span>
+              <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--text-primary,#212121);">${bp.park}</div>
+            </div>
+            <div style="font-size:11px;color:var(--text-secondary,#888);">Gate: ${bp.fullPrice}</div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          ${bp.strategies.map(strat=>`<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border,#eee);">
+            <div style="flex:1;margin-right:8px;">
+              <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:2px;">${strat.name}</div>
+              <div style="font-size:11px;color:var(--text-secondary,#666);">${strat.desc}</div>
+            </div>
+            <span style="background:#2E7D3218;color:#2E7D32;font-size:10px;font-weight:800;padding:3px 8px;border-radius:20px;flex-shrink:0;">Save ${strat.saving}</span>
+          </div>`).join('')}
+        </div>`;
+      body.appendChild(card);
+    });
+
+    /* Free & Cheap */
+    const freeCard = document.createElement('div');
+    freeCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+    freeCard.innerHTML = `<div style="padding:12px 14px;background:linear-gradient(135deg,#2E7D32,#558B2F);color:#fff;">
+      <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;">🆓 Best Free & Cheap Things in Orlando</div>
+    </div>
+    <div style="padding:12px 14px;">
+      ${FREE_CHEAP.map(f=>`<div style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start;">
+        <span style="font-size:12px;font-weight:800;padding:3px 8px;border-radius:20px;background:${f.price==='Free'?'#2E7D3218':'#1565C018'};color:${f.price==='Free'?'#2E7D32':'#1565C0'};flex-shrink:0;">${f.price}</span>
+        <div><div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);">${f.emoji} ${f.name}</div>
+        <div style="font-size:11px;color:var(--text-secondary,#666);">${f.desc}</div></div>
+      </div>`).join('')}
+    </div>`;
+    body.appendChild(freeCard);
+
+    const savCard = document.createElement('div');
+    savCard.style.cssText = 'background:linear-gradient(135deg,#2E7D32,#1565C0);border-radius:16px;margin-bottom:20px;padding:14px;color:#fff;';
+    savCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">💡 Money-Saving Tactics</div>
+    ${MONEY_SAVERS.map(m=>`<div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
+      <span style="font-size:18px;flex-shrink:0;">${m.icon}</span>
+      <div style="font-size:12px;opacity:.95;line-height:1.5;">${m.tip}</div>
+    </div>`).join('')}`;
+    body.appendChild(savCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-orlando-budget')) buildScreen();
+
+  const _prevSS_nnnnn = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_nnnnn) _prevSS_nnnnn(name, el);
+    if (name === 'orlando-budget') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-orlando-budget');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectBudgetCard() {
+    if (document.getElementById('budget-home-card')) return true;
+    const ref = document.getElementById('kids-home-card') || document.getElementById('nightlife-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'budget-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#2E7D32,#1565C0,#37474F);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('orlando-budget');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">💰</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Budget Travel Guide</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Discounts · Free attractions · Save 30–50%</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _budgetCard = false;
+  setInterval(() => { if (!_budgetCard) _budgetCard = injectBudgetCard(); }, 48000);
+  setTimeout(() => { _budgetCard = injectBudgetCard(); }, 44500);
+  const _prevRH_nnnnn = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_nnnnn) _prevRH_nnnnn.apply(this, arguments);
+    setTimeout(() => { _budgetCard = false; _budgetCard = injectBudgetCard(); }, 14200);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK OOOOO: Orlando Nature & Outdoors Guide ===== */
+(function initOrlandoNature() {
+
+  const SPOTS = [
+    {
+      name:'Wekiwa Springs State Park', emoji:'💦', color:'#00695C',
+      type:'Springs / Swimming', distance:'25 min north',
+      rating:5, price:'$6/vehicle',
+      highlights:['72°F crystal-clear springs year-round', 'Swimming in a natural spring', 'Kayak/canoe rentals on the Wekiva River', 'Wildlife viewing (otters, turtles, birds)', '13+ miles of hiking trails'],
+      bestTime:'Weekday mornings May–September. Cooler months Oct–April for hiking.',
+      tip:'The most accessible natural wonder from Orlando. The spring water is 72°F regardless of season — refreshing in summer, warm in winter. Arrive before 9 AM on summer weekends or you\'ll wait in a line of cars.',
+    },
+    {
+      name:'Canaveral National Seashore', emoji:'🏜️', color:'#558B2F',
+      type:'Wild Beach / Wilderness', distance:'1 hour east',
+      rating:5, price:'$20/vehicle',
+      highlights:['24 miles of undeveloped beach', 'Largest undeveloped East Coast beach south of Cape Hatteras', 'Sea turtle nesting site (June–August)', 'Excellent birding and wildlife', 'Ruins of Eldora — ghost town'],
+      bestTime:'Sunrise for turtle viewing (guided programs available). Nov–Apr for birding. Any season for solitude.',
+      tip:'This is what Florida\'s entire coast once looked like. No buildings, no vendors, no development. Just Atlantic Ocean, sea oats, and sky. Mosquitoes can be intense — bring repellent for the trails.',
+    },
+    {
+      name:'Blue Spring State Park', emoji:'🐬', color:'#1565C0',
+      type:'Springs / Manatees', distance:'45 min north',
+      rating:5, price:'$6/vehicle',
+      highlights:['Manatee refuge November–March', '100+ manatees visible on cold days', '72°F constant temperature spring', 'Swimming allowed when manatees absent (April–Oct)', 'Glass-bottom kayak tours'],
+      bestTime:'December–February for manatees. Cold mornings after a cold front mean 200+ animals visible.',
+      tip:'On a cold January morning with 150 manatees floating in the blue spring run, this is one of the most extraordinary wildlife experiences in the United States. Free to observe from the boardwalk — no fee needed for viewing.',
+    },
+    {
+      name:'Lake Louisa State Park', emoji:'🌊', color:'#2E7D32',
+      type:'Lake / Paddling / Hiking', distance:'30 min southwest',
+      rating:4, price:'$6/vehicle',
+      highlights:['13 interconnected lakes', 'Excellent kayaking and canoeing', 'Rolling hills unusual for flat Florida', 'Camping available', 'Birding and wildlife'],
+      bestTime:'October–April for pleasant hiking. Sunrise paddling year-round.',
+      tip:'The rolling terrain here is genuinely unusual for Central Florida — feels more like North Carolina than Orlando. The cabin camping is excellent for a night or two. Lake Minnehaha has the best kayaking.',
+    },
+    {
+      name:'Ocala National Forest', emoji:'🌲', color:'#33691E',
+      type:'Forest / Springs / Camping', distance:'1.5 hours north',
+      rating:5, price:'$5–6/site',
+      highlights:['Silver Springs (glass-bottom boat tours)', 'Alexander Springs (swimming, camping)', 'Juniper Springs (historic wooden mill, kayaking)', 'Hundreds of miles of hiking trails', 'Wild Florida camping'],
+      bestTime:'October–March for hiking and camping. Springs are enjoyable year-round.',
+      tip:'The largest subtropical national forest in the US. Alexander Springs is a full swimming spring with a natural sand beach — one of the most beautiful swimming spots in Florida. Juniper Springs Run is a 7-mile kayak trip through jungle-like beauty.',
+    },
+    {
+      name:'Merritt Island National Wildlife Refuge', emoji:'🦅', color:'#37474F',
+      type:'Birding / Wildlife / Kayaking', distance:'1 hour east',
+      rating:5, price:'Free',
+      highlights:['500+ bird species recorded', 'Adjacent to Kennedy Space Center', 'Manatees, dolphins, alligators', 'Black Point Wildlife Drive (auto tour)', 'Kayak launch access'],
+      bestTime:'December–February for migrating birds and wintering species. Dawn and dusk for wildlife activity.',
+      tip:'Birding gold. More rare bird sightings per acre than almost anywhere in the US. The auto tour through impoundments can yield 50+ species in a single morning. Pair with KSC visit for a remarkable full day.',
+    },
+    {
+      name:'Lake Tohopekaliga (Lake Toho)', emoji:'🎣', color:'#4527A0',
+      type:'Fishing / Boating / Wildlife', distance:'30 min south',
+      rating:4, price:'Boat launch fees / guide fees',
+      highlights:['World-class bass fishing (trophy largemouth bass)', 'Fishing guide tours available ($300–400/day)', 'Bald eagles, ospreys, herons', 'Sunset cruises available', 'Alligator viewing from shore'],
+      bestTime:'Year-round for bass fishing. Sunrise/sunset for wildlife. Winter for migratory birds.',
+      tip:'Lake Toho is legendary in bass fishing circles — world record catches have come from here. Even without fishing, the sunset cruise on this lake is one of the most beautiful things to do near Orlando.',
+    },
+    {
+      name:'Tibet-Butler Preserve', emoji:'🌿', color:'#558B2F',
+      type:'Nature Preserve / Hiking', distance:'20 min west',
+      rating:4, price:'Free',
+      highlights:['445-acre wilderness preserve', 'Rare Florida scrub habitat', 'Wildlife viewing (gopher tortoises, scrub jays)', 'Multiple trail loops', 'Interpretive nature programs'],
+      bestTime:'Cool months (Nov–March). Early morning year-round.',
+      tip:'The most accessible nature experience from Disney. Five miles from Disney World and feels like untouched wilderness. Florida scrub jays (endemic to Florida) are present here and remarkably tame.',
+    },
+  ];
+
+  const WILDLIFE = [
+    { animal:'Florida Manatee', emoji:'🦭', where:'Blue Spring (Nov–Mar), Crystal River, Indian River Lagoon', tip:'Federally protected — maintain 10 ft distance. Swim-with manatees tours in Crystal River are controversial but legal.' },
+    { animal:'Bald Eagle', emoji:'🦅', where:'Lake Toho, Merritt Island, Lake Eola (yes, in downtown Orlando!)', tip:'Nesting season December–April. Lake Eola has active nesting pair visible from the park.' },
+    { animal:'Florida Scrub Jay', emoji:'🐦', where:'Tibet-Butler Preserve, Ocala National Forest', tip:'Only bird species endemic to Florida. Remarkably fearless — will land on you. Endangered due to habitat loss.' },
+    { animal:'American Alligator', emoji:'🐊', where:'Essentially every body of fresh water in Florida', tip:'Treat as wild animals. Never feed them. Keep pets away from water edges. Most dangerous at dawn, dusk, and after heavy rain.' },
+    { animal:'Sea Turtle', emoji:'🐢', where:'Canaveral Seashore (nesting), Atlantic beaches', tip:'June–August nesting season. Guided night tours to observe nesting females available through KSC programs.' },
+    { animal:'Florida Black Bear', emoji:'🐻', where:'Ocala National Forest, Wekiwa Springs area', tip:'Increasingly bold in suburban areas. Store food securely when camping. Sightings at Wekiwa not uncommon.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-orlando-nature';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#1B5E20,#00695C,#33691E);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Nature & Outdoors</div>
+          <div style="font-size:11px;opacity:.8;">Springs · Wildlife · Wilderness · Parks</div>
+        </div>
+        <span style="font-size:28px;">🌿</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        Orlando's theme parks are extraordinary — but Florida's natural world is equally remarkable. Crystal-clear springs, manatees, bald eagles, and wild beaches are all within 1 hour.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    SPOTS.forEach(spot => {
+      const stars = Array.from({length:5},(_,i)=>`<span style="color:${i<spot.rating?'#C9A96E':'#ddd'};">★</span>`).join('');
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:12px 14px;background:${spot.color}18;border-left:4px solid ${spot.color};">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+            <div style="display:flex;gap:8px;align-items:flex-start;">
+              <span style="font-size:24px;">${spot.emoji}</span>
+              <div>
+                <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--text-primary,#212121);">${spot.name}</div>
+                <div style="font-size:10px;color:var(--text-secondary,#888);">${spot.type} · ${spot.distance} · ${spot.price}</div>
+              </div>
+            </div>
+            <div style="font-size:14px;">${stars}</div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;">
+            ${spot.highlights.map(h=>`<span style="font-size:10px;padding:2px 8px;background:${spot.color}18;color:${spot.color};border-radius:20px;font-weight:600;">${h}</span>`).join('')}
+          </div>
+          <div style="font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:3px;">BEST TIME: <span style="color:${spot.color};">${spot.bestTime}</span></div>
+          <div style="display:flex;gap:8px;background:${spot.color}0d;border-radius:10px;padding:8px;margin-top:6px;">
+            <span style="font-size:14px;flex-shrink:0;">💡</span>
+            <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${spot.tip}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const wildCard = document.createElement('div');
+    wildCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+    wildCard.innerHTML = `<div style="padding:12px 14px;background:linear-gradient(135deg,#1B5E20,#00695C);color:#fff;">
+      <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;">🦅 Wildlife Spotting Guide</div>
+    </div>
+    <div style="padding:12px 14px;">
+      ${WILDLIFE.map(w=>`<div style="margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border,#eee);">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+          <span style="font-size:22px;">${w.emoji}</span>
+          <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${w.animal}</div>
+        </div>
+        <div style="font-size:11px;color:var(--text-secondary,#555);margin-bottom:3px;padding-left:30px;">📍 ${w.where}</div>
+        <div style="font-size:11px;color:var(--text-secondary,#666);padding-left:30px;">${w.tip}</div>
+      </div>`).join('')}
+    </div>`;
+    body.appendChild(wildCard);
+
+    const seasonCard = document.createElement('div');
+    seasonCard.style.cssText = 'background:linear-gradient(135deg,#1B5E20,#33691E);border-radius:16px;margin-bottom:20px;padding:14px;color:#fff;';
+    seasonCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">🌡️ Florida Outdoors by Season</div>
+    ${[
+      { s:'Nov–Mar', desc:'Best hiking and camping weather. Manatees at Blue Spring. Birds migrating through. Springs swimable (cold but refreshing).' },
+      { s:'Apr–May', desc:'Wildflowers blooming. Baby alligators visible. Comfortable temperatures before summer heat. Ideal for kayaking and paddling.' },
+      { s:'Jun–Aug', desc:'Sea turtle nesting on beaches. Afternoon thunderstorms (4–6 PM) make morning outdoors essential. Heat and humidity intense but nature doesn\'t stop.' },
+      { s:'Sep–Oct', desc:'Hurricane season peak — plan around forecasts. Shoulder season with fewer crowds. Butterflies migrating. Wonderful if weather cooperates.' },
+    ].map(s=>`<div style="margin-bottom:8px;"><span style="font-weight:800;">${s.s}:</span> <span style="font-size:12px;opacity:.9;">${s.desc}</span></div>`).join('')}`;
+    body.appendChild(seasonCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-orlando-nature')) buildScreen();
+
+  const _prevSS_ooooo = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_ooooo) _prevSS_ooooo(name, el);
+    if (name === 'orlando-nature') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-orlando-nature');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectNatureCard() {
+    if (document.getElementById('nature-home-card')) return true;
+    const ref = document.getElementById('budget-home-card') || document.getElementById('kids-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'nature-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#1B5E20,#00695C,#33691E);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('orlando-nature');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🌿</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Nature & Outdoors</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Springs · Manatees · Eagles · Wild beaches</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _natureCard = false;
+  setInterval(() => { if (!_natureCard) _natureCard = injectNatureCard(); }, 49000);
+  setTimeout(() => { _natureCard = injectNatureCard(); }, 45500);
+  const _prevRH_ooooo = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_ooooo) _prevRH_ooooo.apply(this, arguments);
+    setTimeout(() => { _natureCard = false; _natureCard = injectNatureCard(); }, 14600);
+  };
+})();
+</script>
