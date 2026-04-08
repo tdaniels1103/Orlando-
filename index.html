@@ -49918,3 +49918,535 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK FFFFF: Hollywood Studios Deep Dive ===== */
+(function initHollywoodStudios() {
+
+  const LANDS = [
+    {
+      id:'galaxy-edge', name:"Galaxy's Edge", emoji:'🚀', color:'#1a237e',
+      desc:"Step into a remote planet on the edge of the galaxy. The most immersive land ever built.",
+      rides:[
+        { name:"Millennium Falcon: Smugglers Run", type:'Interactive cockpit ride', wait:'30–60 min', ll:false,
+          tip:'6 roles across 2 pilots, 2 gunners, 2 engineers. Pilots score highest. Ride multiple times for different roles.' },
+        { name:"Star Wars: Rise of the Resistance", type:'Mega dark ride', wait:'60–120 min', ll:true,
+          tip:'The most ambitious attraction Disney has ever built. 20+ min experience. Use ILL — worth every dollar.' },
+      ],
+      dining:[
+        { name:"Oga's Cantina", tip:'Bar experience with unique cocktails & snacks. Reservations essential — book at 60 days.' },
+        { name:"Docking Bay 7", tip:'Counter service with creative Galaxy-themed dishes. Ronto Wrap is a fan favorite.' },
+        { name:"Milk Stand", tip:'Blue or Green Milk (frozen blended). A must-do for photos and the novelty.' },
+      ],
+      tip:"Rope drop straight here for Rise of the Resistance if you don't have ILL. Build a lightsaber at Savi's ($250, 45-min experience, book far in advance).",
+    },
+    {
+      id:'toy-story', name:'Toy Story Land', emoji:'🤠', color:'#e65100',
+      desc:"Shrink down to Andy's scale in a land built from giant toys and games.",
+      rides:[
+        { name:'Slinky Dog Dash', type:'Family coaster', wait:'60–90 min', ll:true,
+          tip:'Most popular ride in the land. Lightning Lane or rope drop. Smooth and fun for all ages.' },
+        { name:'Toy Story Mania!', type:'Shooting dark ride', wait:'30–60 min', ll:false,
+          tip:'Interactive targets, competitive. Great for groups. Queue features a massive Mr. Potato Head animatronic.' },
+        { name:'Alien Swirling Saucers', type:'Spinner', wait:'20–30 min', ll:false,
+          tip:'Skip if you have limited time. Fun for young kids but not worth a long wait for adults.' },
+      ],
+      dining:[
+        { name:"Woody's Lunch Box", tip:"Counter service with nostalgic lunch box meals. Totchos (tater tot nachos) are legendary. Outdoor seating only." },
+      ],
+      tip:'Best visited during evening hours when rides have shorter waits. The land is visually stunning at night with giant toy lighting.',
+    },
+    {
+      id:'star-wars-launch', name:"Star Wars Launch Bay", emoji:'⚔️', color:'#37474f',
+      desc:"Meet your favorite Star Wars characters and see original props and costumes.",
+      rides:[],
+      dining:[
+        { name:'Launch Bay Cantina', tip:'Standard park food but with themed surroundings. Convenient location.' },
+      ],
+      tip:'Character meets here include Chewbacca, Darth Vader, Kylo Ren. Lines move quickly. Great photo op location.',
+    },
+    {
+      id:'grand-ave', name:'Grand Avenue', emoji:'🎬', color:'#5d4037',
+      desc:"A vibrant urban streetscape inspired by a converted industrial neighborhood.",
+      rides:[
+        { name:'MuppetVision 3D', type:'4D show', wait:'15–20 min', ll:false,
+          tip:'Classic 4D film with practical effects and Muppet humor. Great air-conditioned break. Original 1991 show still delights.' },
+      ],
+      dining:[
+        { name:'PizzeRizzo', tip:'Pizza counter service. Convenient but not a destination dining experience.' },
+        { name:'Mama Melrose', tip:"Table service Italian. Good for lunch. Fantasmic! dining packages available here." },
+      ],
+      tip:'Low-crowd area. Good for eating and resting. The theming quality is a step below newer lands.',
+    },
+    {
+      id:'echo-lake', name:'Echo Lake', emoji:'🎭', color:'#006064',
+      desc:"Classic Hollywood-era theming with some of the park's most beloved shows and attractions.",
+      rides:[
+        { name:'Indiana Jones Epic Stunt Spectacular', type:'Live stunt show', wait:'Showtimes only', ll:false,
+          tip:'40-minute live action show with pyrotechnics and real stunts. One of Disney World\'s best shows. Seats 2000+ — sit toward center.' },
+        { name:'Star Tours – The Adventures Continue', type:'Motion simulator', wait:'20–40 min', ll:false,
+          tip:'50+ random story combinations. Ride multiple times — you\'ll always get a different mission. 3D glasses required.' },
+      ],
+      dining:[
+        { name:'Sci-Fi Dine-In Theater', tip:'Eat in a fake 1950s drive-in car watching B-movie clips. Book ADR — unique concept, decent food.' },
+        { name:"50's Prime Time Café", tip:'Kitschy diner where servers play your mom/aunt. Fun interaction. Classic American comfort food.' },
+      ],
+      tip:'Check show schedule on entry. Indiana Jones runs 3x/day — plan your visit around the show time.',
+    },
+    {
+      id:'sunset', name:'Sunset Boulevard', emoji:'🌅', color:'#b71c1c',
+      desc:"The heart of Hollywood Studios with the park's two signature thrill attractions.",
+      rides:[
+        { name:'The Twilight Zone Tower of Terror', type:'Drop tower', wait:'45–90 min', ll:true,
+          tip:'Randomly sequenced drops make every ride different. Lightning Lane worthwhile. Stay in the center of the elevator for the best drop effect.' },
+        { name:'Rock \'n\' Roller Coaster starring Aerosmith', type:'Indoor launched coaster', wait:'45–90 min', ll:true,
+          tip:'0–60 in 2.8 seconds. Intense for Disney — inversions, darkness, loud rock music. Excellent coaster. Single rider line often available.' },
+      ],
+      dining:[
+        { name:'Fantasmic! Dining Package', tip:'Book Mama Melrose, Hollywood & Vine, or Hollywood Brown Derby for guaranteed Fantasmic seats. Worth it for prime seating.' },
+        { name:'Hollywood Brown Derby', tip:'Table service with signature Cobb Salad and grapefruit cake. Upscale, book at 60 days.' },
+        { name:'Fairfax Fare', tip:'Counter service. Quick grab near the big rides. Decent BBQ options.' },
+      ],
+      tip:'Fantasmic! runs select evenings — check schedule. The 27-minute water/fire/projection show is a Hollywood Studios bucket list item.',
+    },
+  ];
+
+  const PERFECT_DAY = [
+    { time:'7:30 AM', icon:'⏰', action:'Arrive 30 min before park open. Head straight to Galaxy\'s Edge.' },
+    { time:'9:00 AM', icon:'🚀', action:'Rope drop Rise of the Resistance (or use ILL). This is your #1 priority.' },
+    { time:'10:00 AM', icon:'🍌', action:'Grab breakfast at Docking Bay 7 or Woody\'s Lunch Box.' },
+    { time:'10:30 AM', icon:'🤠', action:'Slinky Dog Dash (or use Lightning Lane Multi Pass). Ride twice if wait is short.' },
+    { time:'11:30 AM', icon:'🎠', action:'Toy Story Mania! and Alien Swirling Saucers while crowds are moderate.' },
+    { time:'12:30 PM', icon:'🎬', action:'Indiana Jones Stunt Spectacular (check showtimes — usually 12 PM or 1 PM).' },
+    { time:'1:30 PM', icon:'🍕', action:'Lunch at Sci-Fi Dine-In (if ADR) or PizzeRizzo counter service.' },
+    { time:'2:30 PM', icon:'🎭', action:'Star Tours — ride 2-3 times for different story combinations.' },
+    { time:'3:30 PM', icon:'🛸', action:'MuppetVision 3D — excellent air-conditioned break. Then explore Galaxy\'s Edge shops.' },
+    { time:'4:30 PM', icon:'🎸', action:'Rock \'n\' Roller Coaster (single rider line often fast) and Tower of Terror.' },
+    { time:'6:30 PM', icon:'🌹', action:'Build a lightsaber at Savi\'s Workshop if booked. Or drinks at Oga\'s Cantina.' },
+    { time:'7:00 PM', icon:'🍽️', action:'Dinner at Hollywood Brown Derby or Hollywood & Vine if Fantasmic! package booked.' },
+    { time:'9:00 PM', icon:'✨', action:'Fantasmic! finale. The lagoon fire and projection show is unmissable.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-hollywood-studios';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    /* Header */
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#1a237e,#b71c1c,#e65100);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Hollywood Studios</div>
+          <div style="font-size:11px;opacity:.8;">Galaxy's Edge · Toy Story · Tower of Terror</div>
+        </div>
+        <span style="font-size:28px;">🎬</span>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:18px;font-weight:800;">6</div>
+          <div style="font-size:9px;opacity:.8;">THEMED LANDS</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:18px;font-weight:800;">~9h</div>
+          <div style="font-size:9px;opacity:.8;">TO DO IT RIGHT</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:18px;font-weight:800;">#1</div>
+          <div style="font-size:9px;opacity:.8;">RISE PRIORITY</div>
+        </div>
+      </div>`;
+
+    /* Scrollable content */
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    /* Lands */
+    LANDS.forEach(land => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+      let ridesHTML = '';
+      if (land.rides.length) {
+        ridesHTML = `<div style="font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:6px;">ATTRACTIONS</div>`;
+        land.rides.forEach(r => {
+          ridesHTML += `<div style="background:var(--bg,#f8f8f8);border-radius:10px;padding:10px;margin-bottom:6px;">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px;">
+              <div style="font-size:12px;font-weight:800;color:var(--text-primary,#212121);flex:1;">${r.name}</div>
+              ${r.ll ? '<span style="background:#FF6D0018;color:#FF6D00;font-size:9px;font-weight:800;padding:2px 7px;border-radius:20px;flex-shrink:0;margin-left:6px;">ILL/LLMP</span>' : ''}
+            </div>
+            <div style="font-size:10px;font-weight:600;color:${land.color};margin-bottom:3px;">${r.type} · Typical wait: ${r.wait}</div>
+            <div style="font-size:11px;color:var(--text-secondary,#666);">${r.tip}</div>
+          </div>`;
+        });
+      }
+      let diningHTML = '';
+      if (land.dining.length) {
+        diningHTML = `<div style="font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin:8px 0 5px;">DINING</div>`;
+        land.dining.forEach(d => {
+          diningHTML += `<div style="display:flex;gap:8px;margin-bottom:6px;align-items:flex-start;">
+            <span style="font-size:14px;flex-shrink:0;">🍽️</span>
+            <div><span style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);">${d.name}</span>
+            <div style="font-size:11px;color:var(--text-secondary,#666);">${d.tip}</div></div>
+          </div>`;
+        });
+      }
+      card.innerHTML = `
+        <div style="padding:12px 14px;background:${land.color}18;border-bottom:3px solid ${land.color};">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:26px;">${land.emoji}</span>
+            <div><div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--text-primary,#212121);">${land.name}</div>
+            <div style="font-size:11px;color:var(--text-secondary,#555);margin-top:2px;">${land.desc}</div></div>
+          </div>
+        </div>
+        <div style="padding:12px 14px;">
+          ${ridesHTML}${diningHTML}
+          <div style="display:flex;gap:8px;align-items:flex-start;background:${land.color}0d;border-radius:10px;padding:8px;margin-top:6px;">
+            <span style="font-size:14px;flex-shrink:0;">💡</span>
+            <div style="font-size:11px;color:var(--text-secondary,#555);">${land.tip}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    /* Perfect Day plan */
+    const planCard = document.createElement('div');
+    planCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+    planCard.innerHTML = `<div style="padding:12px 14px;background:linear-gradient(135deg,#1a237e,#b71c1c);color:#fff;">
+      <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;">🎬 Perfect Hollywood Studios Day</div>
+      <div style="font-size:11px;opacity:.8;margin-top:2px;">Optimized rope-drop to Fantasmic! strategy</div>
+    </div>
+    <div style="padding:12px 14px;">
+      ${PERFECT_DAY.map((step,i) => `
+        <div style="display:flex;gap:10px;margin-bottom:${i<PERFECT_DAY.length-1?'12':'0'}px;align-items:flex-start;">
+          <div style="text-align:center;flex-shrink:0;width:50px;">
+            <div style="font-size:16px;">${step.icon}</div>
+            <div style="font-size:9px;font-weight:700;color:#b71c1c;">${step.time}</div>
+          </div>
+          ${i<PERFECT_DAY.length-1?'<div style="width:1px;background:var(--border,#eee);margin:0 0;position:absolute;"></div>':''}
+          <div style="font-size:12px;color:var(--text-primary,#212121);line-height:1.5;padding-top:2px;">${step.action}</div>
+        </div>`).join('')}
+    </div>`;
+    body.appendChild(planCard);
+
+    /* Pro tips */
+    const tipsCard = document.createElement('div');
+    tipsCard.style.cssText = 'background:linear-gradient(135deg,#b71c1c,#e65100);border-radius:16px;margin-bottom:20px;padding:14px;color:#fff;';
+    tipsCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">🎯 Expert Hollywood Studios Tips</div>
+    ${[
+      'Hollywood Studios has the strongest one-two punch in all of Walt Disney World: Rise of the Resistance + Tower of Terror.',
+      'Genie+ (now Lightning Lane Multi Pass) is worth buying here. Tower, Rock \'n\' Roller, and Slinky can eat your whole day in queues.',
+      'Rise of the Resistance ILL sells out by 7:05 AM on busy days. Set an alarm — purchase at midnight (app shows 7 AM) or 7:00 AM exactly.',
+      'Single rider line at Rock \'n\' Roller Coaster saves 30–50 minutes. You just may not sit with your group.',
+      'Fantasmic! returns after renovation — check current schedule. The 27-min show has water screens, live performers, and fire. Essential.',
+      'Early Theme Park Entry (resort guests) opens at 8 AM vs 9 AM regular. Use those 60 minutes for Rise rope drop.',
+    ].map(t=>`<div style="display:flex;gap:8px;margin-bottom:8px;align-items:flex-start;"><span style="font-size:12px;flex-shrink:0;">★</span><div style="font-size:12px;opacity:.95;line-height:1.5;">${t}</div></div>`).join('')}`;
+    body.appendChild(tipsCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-hollywood-studios')) buildScreen();
+
+  const _prevSS_fffff = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_fffff) _prevSS_fffff(name, el);
+    if (name === 'hollywood-studios') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-hollywood-studios');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectHSCard() {
+    if (document.getElementById('hs-home-card')) return true;
+    const ref = document.getElementById('mk-home-card') || document.getElementById('epcot-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'hs-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#1a237e,#b71c1c,#e65100);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('hollywood-studios');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🎬</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Hollywood Studios Guide</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Galaxy's Edge · Rise of the Resistance · Fantasmic!</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _hsCard = false;
+  setInterval(() => { if (!_hsCard) _hsCard = injectHSCard(); }, 40000);
+  setTimeout(() => { _hsCard = injectHSCard(); }, 36500);
+  const _prevRH_fffff = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_fffff) _prevRH_fffff.apply(this, arguments);
+    setTimeout(() => { _hsCard = false; _hsCard = injectHSCard(); }, 11000);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK GGGGG: Islands of Adventure Deep Dive ===== */
+(function initIslandsOfAdventure() {
+
+  const LANDS = [
+    {
+      id:'hogsmeade', name:'The Wizarding World of Harry Potter – Hogsmeade', emoji:'⚡', color:'#1565C0',
+      desc:'Walk through the snow-capped village. Butterbeer in hand, Hogwarts looming above you.',
+      rides:[
+        { name:"Harry Potter and the Forbidden Journey", type:'Dark ride / motion simulator', wait:'45–90 min', ll:false,
+          tip:'Ride inside Hogwarts Castle. One of the greatest theme park attractions ever built. Seat 2 in front for better screen view.' },
+        { name:'Flight of the Hippogriff', type:'Family outdoor coaster', wait:'30–60 min', ll:false,
+          tip:'Quick thrilling ride with great views of Hogsmeade. Shorter wait in evenings. 50" height minimum.' },
+        { name:'Hagrid\'s Magical Creatures Motorbike Adventure', type:'Story coaster', wait:'90–180 min', ll:true,
+          tip:'The greatest theme park ride in the United States. ILL essential — sells out daily by 9 AM. Virtual queue may apply.' },
+      ],
+      dining:[
+        { name:'Three Broomsticks', tip:'Butterbeer and full meals. Counter service. Great atmosphere, large capacity — waits manageable.' },
+        { name:'Hogshead Pub', tip:'Attached to Three Broomsticks. Order Butterbeer here at the bar. Interactive wands work throughout the land.' },
+      ],
+      tip:'Interactive wand locations are marked on the land map. Buy a wand at Ollivanders for full experience ($60). Shows every 30 min — worth attending.',
+    },
+    {
+      id:'jurassic', name:'Jurassic World', emoji:'🦕', color:'#2E7D32',
+      desc:'Dinosaurs roam in a land rebuilt and expanded from classic Jurassic Park to the newer Jurassic World IP.',
+      rides:[
+        { name:'Jurassic World VelociCoaster', type:'Launched coaster (flagship)', wait:'60–120 min', ll:true,
+          tip:'The best coaster in all of Florida. 70mph, 155-ft top hat inversion, zero-gravity roll. Do NOT skip this. Rope drop or ILL.' },
+        { name:'Jurassic Park River Adventure', type:'Water ride', wait:'30–60 min', ll:false,
+          tip:'85-foot plunge into a T-Rex encounter. You WILL get wet. Lockers near entrance — use them. Great summer cool-down.' },
+        { name:'Jurassic World: The Ultimate Reptile', type:'Simulator', wait:'20–30 min', ll:false,
+          tip:'Enclosed motion simulator. Good air-conditioned option during midday heat.' },
+      ],
+      dining:[
+        { name:'Thunder Falls Terrace', tip:'Best counter service at IoA. Rotisserie chicken, ribs, amazing views of River Adventure splashdown.' },
+        { name:'Jurassic World Café', tip:'Full-service dining with park views. ADR recommended.' },
+      ],
+      tip:'VelociCoaster single rider line saves enormous time. Ride it in the morning AND evening — different experience in the dark.',
+    },
+    {
+      id:'toonlagoon', name:'Toon Lagoon', emoji:'🎨', color:'#F57F17',
+      desc:'Cartoon strips come to life in a bright, colorful land with the park\'s wettest water rides.',
+      rides:[
+        { name:"Dudley Do-Right's Ripsaw Falls", type:'Log flume', wait:'20–40 min', ll:false,
+          tip:'Massive drop guaranteed soaking. Ride at end of day or embrace it. Part of the water ride tradition at IoA.' },
+        { name:"Popeye & Bluto's Bilge-Rat Barges", type:'River raft ride', wait:'20–40 min', ll:false,
+          tip:'Spin through rapids and waterfalls. Completely soaking — do after VelociCoaster or save for hot afternoon.' },
+      ],
+      dining:[
+        { name:'Blondie\'s', tip:'Famous for foot-long subs. Large portions, reasonable prices for a theme park.' },
+      ],
+      tip:'This land is pure fun but very wet. Ponchos available at nearby shops. Kids love it — adults embrace the nostalgia.',
+    },
+    {
+      id:'marvel', name:"Marvel Super Hero Island", emoji:'🦸', color:'#b71c1c',
+      desc:'Face off against villains and heroes in the most action-packed land of the park.',
+      rides:[
+        { name:'The Incredible Hulk Coaster', type:'Launched outdoor coaster', wait:'30–60 min', ll:false,
+          tip:'Classic launched coaster with a thunderous roar. Seven inversions. Lockers required for loose articles.' },
+        { name:'The Amazing Adventures of Spider-Man', type:'3D motion dark ride', wait:'30–60 min', ll:false,
+          tip:'Revolutionary when it opened, still brilliant today. Dark ride + simulator + 4D effects = perfect blend.' },
+        { name:'Storm Force Accelatron', type:'Spinner', wait:'10–20 min', ll:false,
+          tip:'Skip if prone to motion sickness. Kid-friendly spinner with short waits.' },
+        { name:'Doctor Doom\'s Fearfall', type:'Drop tower', wait:'15–30 min', ll:false,
+          tip:'Short-but-intense drop tower. More anticipation than actual drop time. Worth a quick ride.' },
+      ],
+      dining:[
+        { name:'Café 4', tip:'Counter service inside a Fantastic Four building. Decent food, convenient to rides.' },
+        { name:'Captain America Diner', tip:'American comfort food counter service. Burgers, hot dogs. Nothing special but convenient.' },
+      ],
+      tip:'Hulk and Spider-Man are IoA classics — don\'t overlook them in your rush to Hagrid\'s. Both are exceptional attractions.',
+    },
+    {
+      id:'seuss', name:"Seuss Landing", emoji:'🐟', color:'#7B1FA2',
+      desc:"Step inside a Dr. Seuss book. Whimsical architecture unlike anything else in theme parks.",
+      rides:[
+        { name:'The High in the Sky Seuss Trolley Train Ride', type:'Elevated train', wait:'20–40 min', ll:false,
+          tip:'Slow-moving aerial tour of Seuss Landing with narration. Great views. Perfect for young kids or as a rest.' },
+        { name:"One Fish, Two Fish, Red Fish, Blue Fish", type:'Spinner', wait:'20–30 min', ll:false,
+          tip:'Steer your fish up and down while water jets spray you. Follow the song instructions to stay dry (or get soaked).' },
+        { name:"The Cat in the Hat", type:'Dark ride', wait:'20–40 min', ll:false,
+          tip:'Charming ride through the storybook. Spinning sections. Best for families with young children.' },
+      ],
+      dining:[
+        { name:"Green Eggs and Ham Café", tip:'Themed counter service. Green eggs and ham — yes, really. Fun novelty for photos and a quick bite.' },
+        { name:"Circus McGurkus", tip:'Large seating area with character dining options. Convenient family stop.' },
+      ],
+      tip:'The architecture here has no straight lines — every building curves and bends like the books. Photo opportunities everywhere.',
+    },
+    {
+      id:'lost-continent', name:'The Lost Continent', emoji:'🏛️', color:'#37474F',
+      desc:'A mythical ancient world between Seuss Landing and Hogsmeade.',
+      rides:[],
+      dining:[
+        { name:'The Mythos Restaurant', tip:'Award-winning table service inside a cave. One of the best restaurants in all of theme park history. Book 60 days in advance.' },
+        { name:'Enchanted Oak Tavern', tip:'Counter service with a medieval forest atmosphere.' },
+      ],
+      tip:'Mythos is genuinely one of the best theme park restaurants ever built — the food, atmosphere, and architecture are extraordinary. Make the reservation.',
+    },
+  ];
+
+  const STRATEGY = [
+    { icon:'🚀', tip:'Rope drop to Hagrid\'s Motorbike Adventure. Use ILL if purchased overnight — it sells out by 9 AM most days.' },
+    { icon:'⚡', tip:'Immediately after Hagrid\'s, walk to Hogsmeade for Forbidden Journey (shorter early morning wait).' },
+    { icon:'🦕', tip:'VelociCoaster third — use single rider or Lightning Lane. The line builds quickly by 10 AM.' },
+    { icon:'🦸', tip:'Marvel land and Hulk/Spider-Man in late morning when Jurassic crowds shift.' },
+    { icon:'🍺', tip:'Butterbeer at Three Broomsticks for lunch. Try both original and frozen — they taste different.' },
+    { icon:'💧', tip:'Water rides (Toon Lagoon, River Adventure) in early afternoon when it\'s hottest. Embrace the wet.' },
+    { icon:'🌙', tip:'Return to VelociCoaster at night — the night ride is dramatically different with city lights visible.' },
+    { icon:'🍽️', tip:'Dinner at Mythos if you have a reservation. Otherwise Thunder Falls Terrace for sunset views.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-islands-adventure';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#1565C0,#2E7D32,#7B1FA2);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Islands of Adventure</div>
+          <div style="font-size:11px;opacity:.8;">Hagrid's · VelociCoaster · Hogsmeade</div>
+        </div>
+        <span style="font-size:28px;">🎡</span>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:18px;font-weight:800;">6</div><div style="font-size:9px;opacity:.8;">LANDS</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:18px;font-weight:800;">#1</div><div style="font-size:9px;opacity:.8;">BEST COASTER FL</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:18px;font-weight:800;">~9h</div><div style="font-size:9px;opacity:.8;">FULL DAY</div>
+        </div>
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    LANDS.forEach(land => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+      let ridesHTML = '';
+      if (land.rides.length) {
+        ridesHTML = `<div style="font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:6px;">ATTRACTIONS</div>`;
+        land.rides.forEach(r => {
+          ridesHTML += `<div style="background:var(--bg,#f8f8f8);border-radius:10px;padding:10px;margin-bottom:6px;">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px;">
+              <div style="font-size:12px;font-weight:800;color:var(--text-primary,#212121);flex:1;">${r.name}</div>
+              ${r.ll ? '<span style="background:#FF6D0018;color:#FF6D00;font-size:9px;font-weight:800;padding:2px 7px;border-radius:20px;flex-shrink:0;margin-left:6px;">ILL/LLMP</span>' : ''}
+            </div>
+            <div style="font-size:10px;font-weight:600;color:${land.color};margin-bottom:3px;">${r.type} · Wait: ${r.wait}</div>
+            <div style="font-size:11px;color:var(--text-secondary,#666);">${r.tip}</div>
+          </div>`;
+        });
+      }
+      let diningHTML = land.dining.map(d => `<div style="display:flex;gap:8px;margin-bottom:6px;">
+        <span style="font-size:14px;flex-shrink:0;">🍽️</span>
+        <div><div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);">${d.name}</div>
+        <div style="font-size:11px;color:var(--text-secondary,#666);">${d.tip}</div></div>
+      </div>`).join('');
+      card.innerHTML = `
+        <div style="padding:12px 14px;background:${land.color}18;border-bottom:3px solid ${land.color};">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:26px;">${land.emoji}</span>
+            <div><div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--text-primary,#212121);">${land.name}</div>
+            <div style="font-size:11px;color:var(--text-secondary,#555);margin-top:2px;">${land.desc}</div></div>
+          </div>
+        </div>
+        <div style="padding:12px 14px;">
+          ${ridesHTML}
+          ${land.dining.length ? `<div style="font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin:8px 0 5px;">DINING</div>${diningHTML}` : ''}
+          <div style="display:flex;gap:8px;background:${land.color}0d;border-radius:10px;padding:8px;margin-top:6px;">
+            <span style="font-size:14px;flex-shrink:0;">💡</span>
+            <div style="font-size:11px;color:var(--text-secondary,#555);">${land.tip}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const stratCard = document.createElement('div');
+    stratCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+    stratCard.innerHTML = `<div style="padding:12px 14px;background:linear-gradient(135deg,#1565C0,#2E7D32);color:#fff;">
+      <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;">🎯 IoA Perfect Day Strategy</div>
+    </div>
+    <div style="padding:12px 14px;">
+      ${STRATEGY.map(s=>`<div style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start;">
+        <span style="font-size:20px;flex-shrink:0;">${s.icon}</span>
+        <div style="font-size:12px;color:var(--text-primary,#212121);line-height:1.5;">${s.tip}</div>
+      </div>`).join('')}
+    </div>`;
+    body.appendChild(stratCard);
+
+    const velCard = document.createElement('div');
+    velCard.style.cssText = 'background:linear-gradient(135deg,#2E7D32,#1B5E20);border-radius:16px;margin-bottom:20px;padding:14px;color:#fff;';
+    velCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:8px;">🦕 VelociCoaster — Why It's the Best Coaster in Florida</div>
+    ${['Launched from 0 to 50 mph in 2.8 seconds on the launch track.',
+      '155-foot top hat element with a twisting inversion at the peak.',
+      'Zero-gravity roll over the lagoon — hang upside down with water below you.',
+      'Fully open-air seating — no floor, wind rushing, incredibly intense.',
+      'Ninja roll and corkscrew elements add variety. Intelligently designed pacing.',
+      'Night ride: city lights visible, darkness intensifies every element. Dramatically different experience.',
+    ].map(t=>`<div style="display:flex;gap:8px;margin-bottom:6px;"><span>⚡</span><div style="font-size:12px;opacity:.95;">${t}</div></div>`).join('')}`;
+    body.appendChild(velCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-islands-adventure')) buildScreen();
+
+  const _prevSS_ggggg = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_ggggg) _prevSS_ggggg(name, el);
+    if (name === 'islands-adventure') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-islands-adventure');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectIoACard() {
+    if (document.getElementById('ioa-home-card')) return true;
+    const ref = document.getElementById('hs-home-card') || document.getElementById('mk-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'ioa-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#1565C0,#2E7D32,#7B1FA2);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('islands-adventure');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🎡</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Islands of Adventure</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Hagrid's · VelociCoaster · Hogsmeade · Mythos</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _ioaCard = false;
+  setInterval(() => { if (!_ioaCard) _ioaCard = injectIoACard(); }, 41000);
+  setTimeout(() => { _ioaCard = injectIoACard(); }, 37500);
+  const _prevRH_ggggg = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_ggggg) _prevRH_ggggg.apply(this, arguments);
+    setTimeout(() => { _ioaCard = false; _ioaCard = injectIoACard(); }, 11400);
+  };
+})();
+</script>
