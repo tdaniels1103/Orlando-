@@ -59373,3 +59373,410 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK ZZZZZZ: Orlando Winter Park Complete Guide ===== */
+(function initWinterPark() {
+
+  const WP_ATTRACTIONS = [
+    {
+      name:'Park Avenue', emoji:'🌳', color:'#2E7D32',
+      type:'Shopping & Dining Street',
+      desc:'The most charming urban street in Central Florida. Lined with independent boutiques, art galleries, and acclaimed restaurants under mature oak trees. One of the few "main streets" in Florida that doesn\'t feel manufactured.',
+      highlights:['1 mile of restaurants and boutiques', 'Independent bookshop (Bookmark It)', 'Galleries representing local Florida artists', 'No chain restaurants in the historic core', 'Sunday Farmer\'s Market (8 AM–1 PM every week of the year)'],
+      tip:'Park Avenue is best Sunday morning. The Farmer\'s Market runs 8 AM–1 PM and features Central Florida producers — citrus, strawberries, tropical flowers, and exceptional local coffee. Crowds arrive after 10 AM; be there at 8 for the best selection and space.',
+    },
+    {
+      name:'Morse Museum of American Art', emoji:'🎨', color:'#C9A96E',
+      type:'World-class Art Museum',
+      desc:'Home to the world\'s most comprehensive collection of works by Louis Comfort Tiffany — the stained glass windows, lamps, jewelry, and pottery from the legendary American designer. A destination museum that surprises visitors expecting something regional.',
+      highlights:['Complete Tiffany Chapel (1893 World\'s Fair original)', 'The largest collection of Tiffany Studios glass in existence', 'Tiffany\'s personal art collection and commissioned paintings', 'The restored windows from his own estate (Laurelton Hall)', 'Free admission on Friday evenings 4–8 PM (except summer)'],
+      tip:'The Tiffany Chapel, dismantled and reconstructed here in its entirety, is one of the great architectural achievements in an American museum. The light through the windows changes throughout the day — morning light is the most dramatic.',
+    },
+    {
+      name:'Rollins College Campus', emoji:'🎓', color:'#8B1A1A',
+      type:'Historic University',
+      desc:'The oldest college in Florida (1885), built in a Mediterranean Revival style on the shore of Lake Virginia. The campus is consistently ranked among the most beautiful in the United States. Free to walk through.',
+      highlights:['Cornell Fine Arts Museum (on campus, nationally ranked collection)', 'Walk of Fame: stones from homes/tombs of famous people', 'Crummer Graduate School of Business building', 'Spanish-Mediterranean architecture along the lakefront', 'Olin Library collection of Florida history'],
+      tip:'The Cornell Fine Arts Museum is one of the hidden gems of Florida — a nationally ranked permanent collection on a college campus that most visitors to the state never encounter. Free admission. The lakefront path between the college and Lake Virginia is one of the most beautiful short walks in Orlando.',
+    },
+    {
+      name:'Winter Park Scenic Boat Tour', emoji:'⛵', color:'#0277BD',
+      type:'Lake Chain Boat Tour',
+      desc:'A one-hour narrated boat tour through Winter Park\'s interconnected chain of lakes, past the mansions, through the cypress-canopied canals, to Rollins College\'s lakefront. Running continuously since 1938.',
+      highlights:['Narrated history of Winter Park estates', 'Cypress-draped canals connecting the lakes', 'The most beautiful homes in Central Florida visible from water', 'Access to lakes not visible from land', 'Completely calm water — no seasickness risk'],
+      tip:'Boats depart every hour from the dock at the end of Morse Boulevard. First departure at 10 AM. The noon and 2 PM tours have more natural light. $16 adults / $8 children. One of the most underrated experiences in the entire Orlando metro area.',
+    },
+    {
+      name:'Alfond Inn', emoji:'🌺', color:'#7B1FA2',
+      type:'Boutique Hotel / Art Hotel',
+      desc:'Winter Park\'s finest hotel — a boutique property that also functions as a contemporary art gallery. Every room displays original art from the Alfond Collection of Contemporary Art. The bar and restaurant attract Winter Park locals as much as hotel guests.',
+      highlights:['Original contemporary art in every room', 'The bar is a local gathering spot (not a hotel bar atmosphere)', 'Walking distance to Park Avenue restaurants', 'Garden courtyard for evening cocktails', 'Brunch on Sundays is a Winter Park institution'],
+      tip:'Staying at the Alfond Inn places you 2 blocks from Park Avenue\'s restaurants and the Morse Museum. The hotel concierge will get you reservations at The Ravenous Pig and Prato (same ownership group). Worth the premium over I-Drive hotel rates for the quality-of-life difference.',
+    },
+    {
+      name:'The Ravenous Pig', emoji:'🐷', color:'#C62828',
+      type:'Restaurant (James Beard recognized)',
+      desc:'The restaurant that single-handedly transformed Orlando\'s culinary reputation when it opened in 2007. Chef-driven gastropub with seasonal menus, locally sourced ingredients, and one of Florida\'s finest craft cocktail programs.',
+      highlights:['Seasonal menus that change weekly', 'Craft cocktail program recognized nationally', 'Sunday brunch is the most coveted reservation in Winter Park', 'The charcuterie board is a destination in itself', 'Pig ear salad became a Florida signature dish'],
+      tip:'Reservations are essential — same-week walk-in is nearly impossible on weekends. Book 2–3 weeks ahead for weekend dinners. The bar seats are first-come, first-served for cocktails only. The brunch (Saturday–Sunday) is worth a separate Orlando day.',
+    },
+  ];
+
+  const WP_NEIGHBORHOODS = [
+    {name:'Park Avenue Historic Core', desc:'The main street shopping and restaurant corridor. Most attractions are within 3 blocks.'},
+    {name:'Hannibal Square', desc:'West Winter Park\'s historic African American neighborhood. Restaurants, boutiques, live music at The Wine Room.'},
+    {name:'Lakefront at Maitland', desc:'Adjacent to Winter Park — the Audubon Center for Birds of Prey rehabilitates bald eagles and owls visible to visitors.'},
+    {name:'Mead Garden', desc:'A 47-acre wilderness park between Winter Park and Maitland. Rare Florida native plant species, birding, free entry.'},
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-winter-park';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#2E7D32,#C9A96E,#8B1A1A);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Winter Park Complete Guide</div>
+          <div style="font-size:11px;opacity:.8;">Park Avenue · Morse Museum · Boat Tour · The Ravenous Pig</div>
+        </div>
+        <span style="font-size:28px;">🌳</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        Winter Park is Orlando's most charming and sophisticated community — a historic city of art museums, Tiffany glass, lakefront mansions, and the best restaurant street in Central Florida. 15 minutes from the theme parks and worth a full day.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    WP_ATTRACTIONS.forEach(att => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:10px 14px;background:${att.color}18;border-left:4px solid ${att.color};">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:22px;">${att.emoji}</span>
+            <div>
+              <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--text-primary,#212121);">${att.name}</div>
+              <div style="font-size:10px;color:var(--text-secondary,#888);">${att.type}</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;margin-bottom:7px;">${att.desc}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:7px;">
+            ${att.highlights.map(h=>`<span style="font-size:10px;padding:2px 7px;background:${att.color}18;color:${att.color};border-radius:20px;">${h}</span>`).join('')}
+          </div>
+          <div style="display:flex;gap:5px;background:${att.color}0d;border-radius:8px;padding:7px;">
+            <span style="font-size:11px;flex-shrink:0;">💡</span>
+            <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${att.tip}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const nCard = document.createElement('div');
+    nCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+    nCard.innerHTML = `<div style="padding:10px 14px;background:linear-gradient(135deg,#2E7D32,#C9A96E);color:#fff;">
+      <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;">🗺️ Winter Park Neighborhoods</div>
+    </div>
+    <div style="padding:10px 14px;">
+      ${WP_NEIGHBORHOODS.map(n=>`<div style="margin-bottom:7px;padding-bottom:7px;border-bottom:1px solid var(--border,#eee);">
+        <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);">${n.name}</div>
+        <div style="font-size:11px;color:var(--text-secondary,#666);">${n.desc}</div>
+      </div>`).join('')}
+    </div>`;
+    body.appendChild(nCard);
+
+    const dayCard = document.createElement('div');
+    dayCard.style.cssText = 'background:linear-gradient(135deg,#2E7D32,#8B1A1A);border-radius:14px;margin-bottom:20px;padding:14px;color:#fff;';
+    dayCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;margin-bottom:8px;">☀️ Perfect Winter Park Sunday</div>
+    ${[
+      {time:'8:00 AM', note:'Farmer\'s Market on Park Avenue — citrus, coffee, flowers. Best selection of the day.'},
+      {time:'9:30 AM', note:'Walk along Park Avenue window-shopping. No crowds yet. Café de France for croissant.'},
+      {time:'10:30 AM', note:'Morse Museum opens. Budget 2 hours. The Tiffany Chapel requires time to absorb.'},
+      {time:'12:30 PM', note:'Lunch at Prato (Park Ave) or The Ravenous Pig (book ahead). Park Ave Sundays are a local tradition.'},
+      {time:'2:00 PM', note:'Winter Park Scenic Boat Tour departs hourly. The 2 PM tour has excellent afternoon light.'},
+      {time:'3:30 PM', note:'Cornell Fine Arts Museum at Rollins College campus. Walk the lakefront.'},
+      {time:'5:00 PM', note:'Cocktails at the Alfond Inn bar or The Wine Room in Hannibal Square.'},
+    ].map(p=>`<div style="display:flex;gap:10px;margin-bottom:6px;align-items:flex-start;">
+      <div style="font-size:10px;font-weight:800;color:rgba(255,255,255,.7);flex-shrink:0;width:50px;">${p.time}</div>
+      <div style="font-size:11px;opacity:.9;line-height:1.5;">${p.note}</div>
+    </div>`).join('')}`;
+    body.appendChild(dayCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-winter-park')) buildScreen();
+
+  const _prevSS_zzzzzz = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_zzzzzz) _prevSS_zzzzzz(name, el);
+    if (name === 'winter-park') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-winter-park');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectWPCard() {
+    if (document.getElementById('winter-park-home-card')) return true;
+    const ref = document.getElementById('ride-intensity-home-card') || document.getElementById('teens-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'winter-park-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#2E7D32,#C9A96E,#8B1A1A 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('winter-park');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🌳</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Winter Park Complete Guide</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Park Avenue · Morse Museum · Boat Tour · Ravenous Pig</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _wpCard = false;
+  setInterval(() => { if (!_wpCard) _wpCard = injectWPCard(); }, 86000);
+  setTimeout(() => { _wpCard = injectWPCard(); }, 82500);
+  const _prevRH_zzzzzz = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_zzzzzz) _prevRH_zzzzzz.apply(this, arguments);
+    setTimeout(() => { _wpCard = false; _wpCard = injectWPCard(); }, 29400);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK AAAAAAA: Orlando Airport & Arrival Guide ===== */
+(function initOrlandoAirport() {
+
+  const MCO_TERMINALS = [
+    {
+      name:'Terminal A (Gates 1–29, 100–129)', emoji:'✈️', color:'#003087',
+      airlines:'Spirit, Frontier, Southwest, others',
+      features:'Main Terminal A. SunRail commuter rail connection. Lynx bus connection to downtown Orlando.',
+      tip:'Terminal A was the original terminal — more compact than B/C/D. Most domestic budget carrier arrivals. The Hyatt Regency is connected to Terminal A with sky bridge access.',
+    },
+    {
+      name:'Terminal B (Gates 70–99)', emoji:'🌴', color:'#2E7D32',
+      airlines:'American, Delta, United, JetBlue, British Airways, Air Canada, international',
+      features:'The primary international arrivals terminal. Customs and Border Protection processing. International Arrivals Hall.',
+      tip:'International arrivals through Terminal B can experience 45–90 minute customs waits at peak times. The CBP Mobile Passport app (free) can reduce wait by 50% for eligible passengers. Friday and Saturday afternoon international arrival peaks are the longest.',
+    },
+    {
+      name:'Terminal C (Gates 200–259)', emoji:'🚀', color:'#C62828',
+      airlines:'Amazon Air, charter operators, future United gates',
+      features:'Newest terminal complex. Under continuous expansion. Some commercial service transitioning here.',
+      tip:'Terminal C is newer and less congested. If your airline operates here, the experience is significantly smoother than the older terminals.',
+    },
+    {
+      name:'Terminal D (Gates 300+)', emoji:'⭐', color:'#7B1FA2',
+      airlines:'Southwest Airlines primary terminal (gates 300+)',
+      features:'Southwest\'s dedicated terminal with direct connections to rental cars and SunRail.',
+      tip:'Southwest operates entirely from Terminal D. The SunRail connection to Orlando is available from Terminal D and Terminal A sky bridges.',
+    },
+  ];
+
+  const TRANSPORT_FROM_MCO = [
+    {
+      method:'Rental Car', emoji:'🚗', price:'$45–120/day',
+      time:'25–40 min to Disney, 20–30 min to Universal (I-4)',
+      pros:['Complete independence and flexibility', 'Free parking at Disney resort if staying on-site', 'Best for families with large luggage', 'Required for day trips to Clearwater, St. Augustine, etc.'],
+      cons:['Rental car center is a separate building requiring shuttle', 'I-4 construction ongoing — budget extra time', 'Gas, tolls, and parking add $20–40/day'],
+      tip:'Use Orlando\'s SunPass (E-PASS) for toll roads — the 429 expressway around the city and Osceola Parkway save significant time. Rental companies offer the SunPass transponder for $5–8/day. Worth it.',
+    },
+    {
+      method:'Uber/Lyft', emoji:'📱', price:'$35–65 to Disney, $30–55 to Universal',
+      time:'25–40 min',
+      pros:['No car worry', 'Door-to-door service', 'Can use hotel pickup queue'],
+      cons:['Surge pricing during peak hours adds 30–100%', 'Driver availability at MCO fluctuates', 'Tips add cost', 'Return trip surge from parks is common'],
+      tip:'MCO has a designated rideshare pickup area on Level 1 of the garages. Accept a wait — the designated area prevents confusion. Surge pricing is highest Friday evenings when flights concentrate.',
+    },
+    {
+      method:'Disney\'s Magical Express (Discontinued 2022)', emoji:'🚌', price:'N/A — service ended',
+      time:'N/A',
+      pros:['Historical: Used to be complimentary for Disney hotel guests'],
+      cons:['No longer available as of January 1, 2022'],
+      tip:'Disney discontinued Magical Express. Disney resort guests now use Mears Connect ($35/person each way) or Uber/Lyft as the primary airport transportation. Book Mears Connect in advance at peak travel times.',
+    },
+    {
+      method:'Mears Connect', emoji:'🚌', price:'$35/person each way (Express: $55)',
+      time:'45–75 min (shared van)',
+      pros:['Reliable, professional service', 'Luggage handling included', 'Air-conditioned', 'Express (private) option available for faster service'],
+      cons:['Shared van means multiple stops — extend trip time', 'Must book in advance', 'Not as flexible as rideshare'],
+      tip:'The Mears Connect Express (private, direct) at $55/person is worth it for a family of 4 — comparable to Uber pricing with guaranteed availability and no surge pricing.',
+    },
+    {
+      method:'SunRail (future expansion)', emoji:'🚆', price:'$2–4',
+      time:'Under development for direct theme park service',
+      pros:['MCO to downtown Orlando is operational (from Terminal A/D)', 'Inexpensive', 'Avoids I-4 traffic'],
+      cons:['Current service does NOT reach Disney or Universal', 'Planned expansion to Disney area is future project'],
+      tip:'SunRail connects MCO (Terminal A and Terminal D) to downtown Orlando and north/south corridors. For theme park access, it requires a transfer to bus. Not recommended for theme park visitors currently.',
+    },
+  ];
+
+  const MCO_TIPS = [
+    {icon:'⏰', tip:'MCO security lines can reach 45–75 minutes on Friday mornings and Sunday afternoons. TSA PreCheck is highly recommended for MCO regulars. CLEAR biometric screening is available and reduces security to 5 minutes.'},
+    {icon:'🍽️', tip:'Airside dining at MCO post-security is heavily concentrated in the Terminal B food court. Pizza Bruno, Zaza New Cuban Diner, and Kona Café (Disney-themed, Terminal B airside) are the standouts.'},
+    {icon:'🛍️', tip:'The Orlando International Airport has the best-curated airport shopping of any Florida airport. Books & Books, the Harry Potter store (Terminal B), and local Florida gift shops are worth browsing during layovers.'},
+    {icon:'🚗', tip:'Ground transportation from MCO uses the Rental Car Center (separate building, free shuttle 7 minutes from terminal). All major and most minor rental car companies are consolidated there.'},
+    {icon:'🏨', tip:'The Hyatt Regency Orlando International Airport is directly connected to the Main Terminal with a sky bridge — a rare in-terminal luxury hotel with direct baggage delivery.'},
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-airport';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#003087,#1565C0,#C62828);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">MCO Airport & Arrival Guide</div>
+          <div style="font-size:11px;opacity:.8;">Terminals · Ground transportation · Rental cars · Security tips</div>
+        </div>
+        <span style="font-size:28px;">✈️</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        Orlando International Airport (MCO) is the 10th busiest airport in the United States — 50+ million passengers annually. Navigating arrivals efficiently can mean the difference between a smooth trip start and a 90-minute ground transportation ordeal.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    const termHdr = document.createElement('div');
+    termHdr.style.cssText = 'font-family:"Playfair Display",serif;font-size:15px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:10px;';
+    termHdr.textContent = '🏛️ MCO Terminal Guide';
+    body.appendChild(termHdr);
+
+    MCO_TERMINALS.forEach(term => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:12px;margin-bottom:10px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:9px 14px;background:${term.color}18;border-left:4px solid ${term.color};">
+          <div style="display:flex;gap:8px;align-items:center;">
+            <span style="font-size:18px;">${term.emoji}</span>
+            <div>
+              <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);">${term.name}</div>
+              <div style="font-size:10px;color:${term.color};font-weight:600;">${term.airlines}</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:8px 14px;">
+          <div style="font-size:11px;color:var(--text-secondary,#555);margin-bottom:4px;">${term.features}</div>
+          <div style="font-size:10px;color:var(--text-secondary,#777);font-style:italic;">${term.tip}</div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const transHdr = document.createElement('div');
+    transHdr.style.cssText = 'font-family:"Playfair Display",serif;font-size:15px;font-weight:700;color:var(--text-primary,#212121);margin:6px 0 10px;';
+    transHdr.textContent = '🚗 Ground Transportation';
+    body.appendChild(transHdr);
+
+    TRANSPORT_FROM_MCO.forEach(trans => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:10px 14px;background:#003087'18;border-left:4px solid #003087;">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div style="display:flex;gap:8px;align-items:center;">
+              <span style="font-size:20px;">${trans.emoji}</span>
+              <div>
+                <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${trans.method}</div>
+                <div style="font-size:10px;color:var(--text-secondary,#888);">${trans.time}</div>
+              </div>
+            </div>
+            <div style="font-size:11px;font-weight:700;color:#003087;">${trans.price}</div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          <div style="display:flex;gap:12px;margin-bottom:6px;">
+            <div style="flex:1;">
+              <div style="font-size:10px;font-weight:700;color:#2E7D32;margin-bottom:3px;">PROS</div>
+              ${trans.pros.map(p=>`<div style="font-size:10px;color:var(--text-secondary,#555);margin-bottom:2px;">✓ ${p}</div>`).join('')}
+            </div>
+            <div style="flex:1;">
+              <div style="font-size:10px;font-weight:700;color:#C62828;margin-bottom:3px;">CONS</div>
+              ${trans.cons.map(c=>`<div style="font-size:10px;color:var(--text-secondary,#555);margin-bottom:2px;">✗ ${c}</div>`).join('')}
+            </div>
+          </div>
+          <div style="display:flex;gap:5px;background:#003087'0d;background:#e3f2fd;border-radius:8px;padding:6px;">
+            <span style="font-size:11px;flex-shrink:0;">💡</span>
+            <div style="font-size:11px;color:var(--text-secondary,#555);">${trans.tip}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const tipCard = document.createElement('div');
+    tipCard.style.cssText = 'background:linear-gradient(135deg,#003087,#1565C0);border-radius:14px;margin-bottom:20px;padding:14px;color:#fff;';
+    tipCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;margin-bottom:8px;">✈️ MCO Insider Tips</div>
+    ${MCO_TIPS.map(t=>`<div style="display:flex;gap:10px;margin-bottom:7px;align-items:flex-start;">
+      <span style="font-size:18px;flex-shrink:0;">${t.icon}</span>
+      <div style="font-size:11px;opacity:.9;line-height:1.5;">${t.tip}</div>
+    </div>`).join('')}`;
+    body.appendChild(tipCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-airport')) buildScreen();
+
+  const _prevSS_aaaaaaa = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_aaaaaaa) _prevSS_aaaaaaa(name, el);
+    if (name === 'airport') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-airport');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectAirportCard() {
+    if (document.getElementById('airport-home-card')) return true;
+    const ref = document.getElementById('winter-park-home-card') || document.getElementById('ride-intensity-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'airport-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#003087,#1565C0,#C62828 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('airport');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">✈️</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">MCO Airport & Arrival Guide</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Terminals · Rental cars · Rideshare · Security · Ground transport</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _airportCard = false;
+  setInterval(() => { if (!_airportCard) _airportCard = injectAirportCard(); }, 87000);
+  setTimeout(() => { _airportCard = injectAirportCard(); }, 83500);
+  const _prevRH_aaaaaaa = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_aaaaaaa) _prevRH_aaaaaaa.apply(this, arguments);
+    setTimeout(() => { _airportCard = false; _airportCard = injectAirportCard(); }, 29800);
+  };
+})();
+</script>
