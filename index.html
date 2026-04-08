@@ -54380,3 +54380,397 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK AAAAAA: EPCOT Future World Rides & Pavilions Deep Dive ===== */
+(function initEpcotFutureWorld() {
+
+  const FW_SECTIONS = [
+    {
+      name:'World Discovery', emoji:'🔬', color:'#1565C0',
+      desc:'Science, technology, and space exploration. Home to some of EPCOT\'s most thrilling attractions.',
+      rides:[
+        { name:'Guardians of the Galaxy: Cosmic Rewind', type:'Reverse-launch roller coaster', wait:'70–120 min', ll:'ILL Required',
+          tip:'The first reverse-launch coaster Disney has ever built. You face the 360-degree rotating vehicle. "Retro Future" aesthetic. The pre-show sets up the humor. Buy ILL at 7 AM — sells out fast.' },
+        { name:'Mission: SPACE (Green or Orange Mission)', type:'Centrifuge space simulator', wait:'20–45 min', ll:false,
+          tip:'Green Mission is the gentle option (no spinning). Orange Mission is intense centrifuge — actual G-forces, restricted for health conditions. Both are extraordinary. Try Orange if you have no contraindications.' },
+        { name:'Test Track', type:'Automotive design simulator', wait:'30–60 min', ll:false,
+          tip:'Design a virtual car then test it at 65 mph on a simulated track. Redesigned in 2025 with Chevy partnership. Final outdoor track segment has great views.' },
+      ]
+    },
+    {
+      name:'World Nature', emoji:'🌊', color:'#00838F',
+      desc:'The beauty of the natural world. The Seas Pavilion is one of EPCOT\'s most underrated experiences.',
+      rides:[
+        { name:'Soarin\' Around the World', type:'Hang glider film simulation', wait:'30–75 min', ll:false,
+          tip:'Brilliant world tour on a giant IMAX dome. You hang in a glider over Kilimanjaro, Sydney Opera House, the Maldives, and more. Request Row A (top row) — lower rows have feet from upper gondolas visible.' },
+        { name:'Living with the Land', type:'Greenhouse boat tour', wait:'15–35 min', ll:false,
+          tip:'Slow boat through EPCOT\'s working hydroponic and aquaculture greenhouses. Food grown here goes to EPCOT restaurants. Surprisingly educational and meditative.' },
+        { name:'The Seas with Nemo & Friends', type:'Dark ride + aquarium', wait:'10–20 min', ll:false,
+          tip:'Short Nemo-themed clam-shell ride. The attached aquarium (Seas Pavilion) has the world\'s largest inland saltwater tank — 5.7 million gallons. Manatees, sharks, dolphins. Free to explore.' },
+        { name:'Turtle Talk with Crush', type:'Interactive show', wait:'15–25 min', ll:false,
+          tip:'Real-time AI-like conversation between Crush (the turtle) and audience members. How they do it is genuinely mysterious — Crush responds to specific children in the audience in real time. Magic.' },
+      ]
+    },
+    {
+      name:'World Celebration', emoji:'🌺', color:'#7B1FA2',
+      desc:'Entertainment, imagination, and creativity at the heart of Future World.',
+      rides:[
+        { name:'Remy\'s Ratatouille Adventure', type:'Shrinking family ride', wait:'50–100 min', ll:true,
+          tip:'Based on the Paris version at Disneyland Paris. You shrink to rat-size and scurry through Gusteau\'s kitchen. LLMP Tier 1 — book immediately at 7 AM or rope drop.' },
+        { name:'Journey Into Imagination with Figment', type:'Dark ride', wait:'10–25 min', ll:false,
+          tip:'EPCOT\'s beloved purple dragon returns in this classic dark ride. Low wait times make it walkable anytime. Figment merchandise outside the exit is consistently popular.' },
+        { name:'Disney and Pixar Short Film Festival', type:'4D show', wait:'10–20 min', ll:false,
+          tip:'Air-conditioned 4D show featuring Pixar shorts. Great midday heat break. Includes Feast, Inner Workings, and Coco sequences in 4D.' },
+      ]
+    },
+    {
+      name:'Spaceship Earth Area', emoji:'⚽', color:'#37474F',
+      desc:'The iconic geosphere entrance structure houses one of Disney\'s most thoughtful attractions.',
+      rides:[
+        { name:'Spaceship Earth', type:'Omnimover dark ride', wait:'15–35 min', ll:false,
+          tip:'A 16-minute journey through the history of communication from cave paintings to the internet. Narrated by Judi Dench. Underrated gem that most visitors rush past. The view from the top inside the geosphere is remarkable.' },
+      ]
+    },
+  ];
+
+  const EPCOT_TIPS = [
+    { icon:'⏰', tip:'EPCOT needs two full days to experience properly — one day for Future World/World Discovery/Nature, one day dedicated entirely to World Showcase dining and browsing.' },
+    { icon:'🍺', tip:'EPCOT has the best alcohol variety in all of Walt Disney World. You can carry drinks throughout the park and between pavilions. Responsible adults have been enjoying this for 40 years.' },
+    { icon:'🌸', tip:'The Flower & Garden Festival (March–June) is EPCOT\'s most pleasant time to visit. Outdoor kitchens, topiary Disney characters, mild weather, and butterfly exhibits.' },
+    { icon:'🎵', tip:'Eat to the Beat concerts (Food & Wine Festival) at America Gardens Theatre are free with park admission and feature classic acts performing 3 shows per day.' },
+    { icon:'🔭', tip:'EPCOT\'s mission was originally "Experimental Prototype Community of Tomorrow" — Walt\'s actual city of the future. The spirit of optimism about technology and human ingenuity runs through every element.' },
+    { icon:'📸', tip:'The Japan Pavilion and Norway Pavilion offer the best photo opportunities in all of World Showcase. The Japan torii gate reflected in the lagoon is spectacular.' },
+    { icon:'🌙', tip:'Stay until Harmonious (the nighttime fireworks spectacular). The World Showcase Lagoon is the stage — walk around the far side opposite the park entrance for the best angle.' },
+    { icon:'🍭', tip:'Norway\'s school bread and France\'s Les Halles croissants are the two most universally beloved snacks at EPCOT. Both open early. Both are worth a dedicated trip.' },
+  ];
+
+  const EPCOT_HISTORY = [
+    'EPCOT opened on October 1, 1982 — exactly 11 years after Magic Kingdom.',
+    'Walt Disney\'s original EPCOT vision was a real city of 20,000 residents where technology and city planning would be tested. Disney died before it was built.',
+    'The Spaceship Earth geosphere is 165 feet tall and weighs 16 million pounds. It\'s so precisely engineered that rainwater doesn\'t drip down the outside — it\'s channeled inside and releases into underground cisterns.',
+    'Michael Jackson filmed "Captain EO" for EPCOT Center in 1986. The 3D film ran until 1994, returned 2010–2015 after his death, and was permanently retired.',
+    'World Showcase originally opened with 9 pavilions in 1982. Morocco (1984) and Norway (1988) were the last added. Plans for proposed Spain, Israel, Equatorial Africa, and Russia pavilions were cancelled.',
+    'IllumiNations: Reflections of Earth ran from 1999–2019. Epcot Forever briefly followed. Harmonious debuted in 2021 as EPCOT\'s 40th anniversary show.',
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-epcot-futureworld';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#1565C0,#00838F,#7B1FA2);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">EPCOT: Future World Guide</div>
+          <div style="font-size:11px;opacity:.8;">Guardians · Soarin' · Spaceship Earth · History</div>
+        </div>
+        <span style="font-size:28px;">⚽</span>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:15px;font-weight:800;">1982</div><div style="font-size:9px;opacity:.8;">OPENED</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:15px;font-weight:800;">2</div><div style="font-size:9px;opacity:.8;">DAYS NEEDED</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:15px;font-weight:800;">11</div><div style="font-size:9px;opacity:.8;">COUNTRIES</div>
+        </div>
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    FW_SECTIONS.forEach(section => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+      let ridesHTML = section.rides.map(r=>`<div style="background:var(--bg,#f8f8f8);border-radius:10px;padding:10px;margin-bottom:6px;">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:3px;">
+          <div style="font-size:12px;font-weight:800;color:var(--text-primary,#212121);flex:1;">${r.name}</div>
+          <span style="font-size:9px;padding:2px 6px;border-radius:20px;font-weight:800;background:${r.ll==='ILL Required'?'#C6282818':r.ll?'#E6500018':'var(--bg,#f0f0f0)'};color:${r.ll==='ILL Required'?'#C62828':r.ll?'#E65100':'var(--text-secondary,#888)'};flex-shrink:0;margin-left:4px;">${r.ll==='ILL Required'?'ILL':r.ll?'LLMP':''}</span>
+        </div>
+        <div style="font-size:10px;color:${section.color};margin-bottom:3px;">${r.type} · Wait: ${r.wait}</div>
+        <div style="font-size:11px;color:var(--text-secondary,#666);">${r.tip}</div>
+      </div>`).join('');
+      card.innerHTML = `
+        <div style="padding:12px 14px;background:${section.color}18;border-left:4px solid ${section.color};">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:22px;">${section.emoji}</span>
+            <div><div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--text-primary,#212121);">${section.name}</div>
+            <div style="font-size:11px;color:var(--text-secondary,#555);margin-top:2px;">${section.desc}</div></div>
+          </div>
+        </div>
+        <div style="padding:12px 14px;">${ridesHTML}</div>`;
+      body.appendChild(card);
+    });
+
+    const tipsCard = document.createElement('div');
+    tipsCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+    tipsCard.innerHTML = `<div style="padding:12px 14px;background:linear-gradient(135deg,#1565C0,#00838F);color:#fff;">
+      <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;">💡 EPCOT Expert Tips</div>
+    </div>
+    <div style="padding:12px 14px;">
+      ${EPCOT_TIPS.map(t=>`<div style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start;">
+        <span style="font-size:18px;flex-shrink:0;">${t.icon}</span>
+        <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;">${t.tip}</div>
+      </div>`).join('')}
+    </div>`;
+    body.appendChild(tipsCard);
+
+    const histCard = document.createElement('div');
+    histCard.style.cssText = 'background:linear-gradient(135deg,#1565C0,#7B1FA2);border-radius:16px;margin-bottom:20px;padding:14px;color:#fff;';
+    histCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">📚 EPCOT History & Trivia</div>
+    ${EPCOT_HISTORY.map(h=>`<div style="display:flex;gap:8px;margin-bottom:8px;align-items:flex-start;">
+      <span style="font-size:12px;flex-shrink:0;margin-top:2px;">●</span>
+      <div style="font-size:12px;opacity:.95;line-height:1.5;">${h}</div>
+    </div>`).join('')}`;
+    body.appendChild(histCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-epcot-futureworld')) buildScreen();
+
+  const _prevSS_aaaaaa = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_aaaaaa) _prevSS_aaaaaa(name, el);
+    if (name === 'epcot-futureworld') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-epcot-futureworld');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectEFWCard() {
+    if (document.getElementById('efw-home-card')) return true;
+    const ref = document.getElementById('dc-home-card') || document.getElementById('itinerary-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'efw-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#1565C0,#00838F,#7B1FA2);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('epcot-futureworld');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">⚽</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">EPCOT Future World Guide</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Guardians · Soarin' · Spaceship Earth · History</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _efwCard = false;
+  setInterval(() => { if (!_efwCard) _efwCard = injectEFWCard(); }, 61000);
+  setTimeout(() => { _efwCard = injectEFWCard(); }, 57500);
+  const _prevRH_aaaaaa = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_aaaaaa) _prevRH_aaaaaa.apply(this, arguments);
+    setTimeout(() => { _efwCard = false; _efwCard = injectEFWCard(); }, 19400);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK BBBBBB: Orlando Accessibility & Special Needs Guide ===== */
+(function initOrlandoAccessibility() {
+
+  const DISNEY_ACCESS = [
+    {
+      name:'Disability Access Service (DAS)', emoji:'♿', color:'#1565C0',
+      who:'Guests who cannot wait in conventional queue lines due to a non-obvious disability.',
+      how:'Register at Guest Services at park entry or pre-register online via My Disney Experience app up to 30 days before visit.',
+      benefit:'Receive a return time equal to current standby wait. Wait anywhere in the park, then return during your window for a shorter queue.',
+      tip:'DAS does not guarantee immediate access — it mirrors the standby wait. The benefit is waiting anywhere in the park rather than in the physical queue. Pre-register online to save 30–45 min at the park.',
+    },
+    {
+      name:'Mobility & Wheelchair Access', emoji:'🦽', color:'#2E7D32',
+      who:'Guests using wheelchairs, ECV scooters, or with mobility limitations.',
+      how:'Wheelchair rental available at park entry ($12–25/day). ECV (electric scooter) available ($50/day). Third-party ECV rental companies offer better rates and can deliver to your hotel.',
+      benefit:'Every Disney attraction has a wheelchair/ECV boarding area. Most accept wheelchairs directly into the ride vehicle. Some require transfer.',
+      tip:'Rent from an outside company (Buena Vista Scooter Rentals, Apple Scooter) and have it delivered to your resort. Disney\'s rentals cannot be taken between parks on the same day.',
+    },
+    {
+      name:'Sensory & Autism Support', emoji:'🌈', color:'#7B1FA2',
+      who:'Guests with autism, sensory sensitivities, anxiety disorders.',
+      how:'Kennel Club at every park entry has a sensory bag for loan — noise-canceling headphones, fidget tools, sunglasses. Also available: quiet rooms inside Magic Kingdom and EPCOT.',
+      benefit:'DAS is particularly valuable for guests with autism who cannot tolerate unpredictable queue waiting. Social Story guides available at Guest Services.',
+      tip:'Certified Autism Center status — Disney has trained staff in autism awareness. Avoid peak crowd times (11 AM – 3 PM). Early morning and evening hours are significantly lower stimulation.',
+    },
+    {
+      name:'Dietary Accommodations', emoji:'🥗', color:'#00695C',
+      who:'Guests with food allergies, dietary restrictions, or medical dietary needs.',
+      how:'When making ADRs, note allergies. At counter service, ask to speak with the chef — required at every Disney location. Allergen menus available at all restaurants.',
+      benefit:'Disney has exceptional allergen protocols. Top 9 allergens are marked on all menus. Chef consultations at counter service are standard practice, not an imposition.',
+      tip:'Celiac disease, severe nut allergies, dairy-free, vegan — Disney handles all of these. Call 407-WDW-DINE (407-939-3463) ahead of your trip to note complex dietary needs in your reservation.',
+    },
+    {
+      name:'Visual & Hearing Impairments', emoji:'👁️', color:'#F57F17',
+      who:'Guests with visual or hearing impairments.',
+      how:'Audio Description devices available at Guest Services for films and shows (free loan). Assistive listening devices for shows. Braille guide maps available.',
+      benefit:'Disney has been a leader in accessibility for 50+ years. Most major shows have reflective captioning units. Sign language interpretation available on specific days (check schedule).',
+      tip:'Braille and large print guides available at Guest Services. The Disney World website has a full accessibility section by park and attraction.',
+    },
+  ];
+
+  const UNIVERSAL_ACCESS = [
+    {
+      name:'Attraction Assistance Pass (AAP)', color:'#2E7D32',
+      desc:'Similar to Disney\'s DAS. Register at Guest Services. Provides virtual wait equal to standby time.',
+    },
+    {
+      name:'Universal Accessibility Guide', color:'#2E7D32',
+      desc:'Detailed PDF available on the Universal website listing every attraction\'s accessibility features, height requirements, and boarding assistance options.',
+    },
+    {
+      name:'ECV/Wheelchair Rentals', color:'#2E7D32',
+      desc:'Wheelchair $12/day, ECV $50/day at Universal. Third-party rentals (Gold Mobility, ENOVA) offer hotel delivery.',
+    },
+  ];
+
+  const PRACTICAL_TIPS = [
+    { icon:'📞', tip:'Call ahead to larger hotels to confirm accessibility features before booking. "ADA accessible room" requirements can vary — be specific about what you need (roll-in shower, grab bars, etc.).' },
+    { icon:'🌡️', tip:'Florida heat is a genuine health concern for mobility device users and those with certain conditions. Schedule indoor attraction time from 11 AM – 3 PM. Carry extra water and electrolytes.' },
+    { icon:'🚗', tip:'Rental car companies are required to provide hand controls and spinner knobs on request. Book directly with the rental company (not a third party) and request 5+ days in advance.' },
+    { icon:'🏨', tip:'Disney\'s resorts are the most accessible hotels in Orlando by a significant margin. The transportation network (monorail, boats, Skyliner) largely eliminates the need to navigate parking lots.' },
+    { icon:'📱', tip:'My Disney Experience app has accessibility filtering for each attraction — filter by "Must Transfer from Wheelchair/ECV" vs. "May Stay in Wheelchair/ECV." Plan your route before entering the park.' },
+    { icon:'🧊', tip:'Hidden disability/invisible illness: DAS eligibility is not limited to visible disabilities. If you have a condition that prevents conventional queue waiting, explain it to Guest Services.' },
+    { icon:'🎟️', tip:'Disney does NOT require medical documentation for DAS. Universal\'s AAP also does not require documentation. You explain your needs; cast members make a determination based on the information provided.' },
+    { icon:'👪', tip:'Disney allows one DAS holder plus their entire party to return together. If traveling with a DAS guest, the whole group benefits from the return time system.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-orlando-accessibility';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#1565C0,#2E7D32,#7B1FA2);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Accessibility Guide</div>
+          <div style="font-size:11px;opacity:.8;">DAS · Mobility · Sensory · Dietary · Hearing</div>
+        </div>
+        <span style="font-size:28px;">♿</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        Orlando theme parks are the most accessible in the world. Disney has been a leader in guest accessibility since 1971. This guide covers every major accommodation type across Disney, Universal, and beyond.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    /* Disney section header */
+    const disneyHdr = document.createElement('div');
+    disneyHdr.style.cssText = 'background:linear-gradient(135deg,#1565C0,#003087);border-radius:12px;padding:10px 14px;margin-bottom:10px;color:#fff;';
+    disneyHdr.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;">🏰 Walt Disney World Accessibility</div>`;
+    body.appendChild(disneyHdr);
+
+    DISNEY_ACCESS.forEach(item => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:10px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:10px 14px;background:${item.color}18;border-left:4px solid ${item.color};">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:20px;">${item.emoji}</span>
+            <div style="font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${item.name}</div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          <div style="margin-bottom:6px;">
+            <div style="font-size:10px;font-weight:700;color:${item.color};margin-bottom:2px;">WHO</div>
+            <div style="font-size:11px;color:var(--text-secondary,#555);">${item.who}</div>
+          </div>
+          <div style="margin-bottom:6px;">
+            <div style="font-size:10px;font-weight:700;color:${item.color};margin-bottom:2px;">HOW</div>
+            <div style="font-size:11px;color:var(--text-secondary,#555);">${item.how}</div>
+          </div>
+          <div style="display:flex;gap:6px;background:${item.color}0d;border-radius:8px;padding:7px;margin-top:4px;">
+            <span style="font-size:12px;flex-shrink:0;">💡</span>
+            <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${item.tip}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    /* Universal section */
+    const univHdr = document.createElement('div');
+    univHdr.style.cssText = 'background:linear-gradient(135deg,#2E7D32,#1B5E20);border-radius:12px;padding:10px 14px;margin:10px 0;color:#fff;';
+    univHdr.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;">🎢 Universal Orlando Accessibility</div>`;
+    body.appendChild(univHdr);
+
+    const univCard = document.createElement('div');
+    univCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:14px;padding:12px 14px;border:1px solid var(--border,#eee);';
+    univCard.innerHTML = UNIVERSAL_ACCESS.map(u=>`<div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border,#eee);">
+      <div style="font-size:12px;font-weight:700;color:#2E7D32;margin-bottom:3px;">${u.name}</div>
+      <div style="font-size:11px;color:var(--text-secondary,#666);">${u.desc}</div>
+    </div>`).join('');
+    body.appendChild(univCard);
+
+    const practCard = document.createElement('div');
+    practCard.style.cssText = 'background:linear-gradient(135deg,#1565C0,#7B1FA2);border-radius:16px;margin-bottom:20px;padding:14px;color:#fff;';
+    practCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">🎯 Practical Accessibility Tips</div>
+    ${PRACTICAL_TIPS.map(t=>`<div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
+      <span style="font-size:18px;flex-shrink:0;">${t.icon}</span>
+      <div style="font-size:12px;opacity:.95;line-height:1.5;">${t.tip}</div>
+    </div>`).join('')}`;
+    body.appendChild(practCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-orlando-accessibility')) buildScreen();
+
+  const _prevSS_bbbbbb = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_bbbbbb) _prevSS_bbbbbb(name, el);
+    if (name === 'orlando-accessibility') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-orlando-accessibility');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectAccessCard() {
+    if (document.getElementById('access-home-card')) return true;
+    const ref = document.getElementById('efw-home-card') || document.getElementById('dc-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'access-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#1565C0,#2E7D32,#7B1FA2);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('orlando-accessibility');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">♿</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Accessibility Guide</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">DAS pass · Mobility · Sensory · Dietary needs</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _accessCard = false;
+  setInterval(() => { if (!_accessCard) _accessCard = injectAccessCard(); }, 62000);
+  setTimeout(() => { _accessCard = injectAccessCard(); }, 58500);
+  const _prevRH_bbbbbb = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_bbbbbb) _prevRH_bbbbbb.apply(this, arguments);
+    setTimeout(() => { _accessCard = false; _accessCard = injectAccessCard(); }, 19800);
+  };
+})();
+</script>
