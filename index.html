@@ -46435,3 +46435,330 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK MMMM2: Kid-Free Adult Orlando Guide ===== */
+(function initAdultOrlando() {
+
+  const SECTIONS = [
+    {
+      title:'Parks Without Kids', icon:'🎢', color:'#6B0F1A',
+      items:[
+        { name:'Adult Parks Strategy', desc:'Rope drop alone means walk-on rides everywhere. Without stroller logistics and kid meal breaks, adults can cover an entire park\'s major rides in 4 hours. Use that efficiency.' },
+        { name:'Evening-Only Park Visits', desc:'Arrive at 4pm. Parks are most atmospheric after 6pm. Do the best rides with shorter evening queues, catch the fireworks/shows, and leave by close. Perfect for adults staying nearby.' },
+        { name:'EPCOT World Showcase Drinking Tour', desc:'Start at Canada and work counter-clockwise. 11 pavilions, each with 2–4 drinks. Properly done over 4 hours, you\'ll taste wine, beer, sake, Italian aperitivo, and margaritas without leaving one park.' },
+        { name:'Mickey\'s Not-So-Scary / After Hours Events', desc:'Adults-only evening events at Magic Kingdom — limited capacity, near walk-on rides, Halloween/Christmas theming. Absolutely worth the $160–200/ticket premium.' },
+      ]
+    },
+    {
+      title:'Adult Dining Experiences', icon:'🍷', color:'#c62828',
+      items:[
+        { name:'Victoria & Albert\'s at Grand Floridian', desc:'$295–$350/person chef\'s table tasting menu. AAA 5-Diamond. The finest restaurant in all of Orlando by nearly every measure. Book months in advance. Jacket required.' },
+        { name:'California Grill at Contemporary Resort', desc:'Rooftop restaurant with fireworks views over Magic Kingdom. New American cuisine, excellent cocktail program. One of the best "splurge" Disney experiences for adults.' },
+        { name:'Capa at Four Seasons', desc:'Spanish rooftop steakhouse with Disney fireworks views from a different angle. Top-tier wine list. More relaxed dress code than California Grill, equally spectacular.' },
+        { name:'The Boheme at Grand Bohemian', desc:'Downtown Orlando\'s most romantic restaurant. Jazz performances nightly, exceptional wine list, beautifully presented American cuisine in an art-hotel setting.' },
+        { name:'Knife & Spoon at Ritz-Carlton', desc:'James Beard Award-winning chef John Tesar\'s steakhouse in the Ritz-Carlton Grande Lakes. For serious food enthusiasts, this is Orlando\'s most chef-driven fine dining experience.' },
+      ]
+    },
+    {
+      title:'Adults-Only Experiences', icon:'🎭', color:'#4A148C',
+      items:[
+        { name:'Oga\'s Cantina (Galaxy\'s Edge)', desc:'Bar inside Hollywood Studios. Characters, exotic cocktails, DJ R-3X spinning tunes. Maximum 2 drinks, 45-minute limit. Must be 21+ to sit at the bar alone.' },
+        { name:'Jock Lindsey\'s Hangar Bar (Disney Springs)', desc:'Indiana Jones-themed bar. Themed cocktails, great atmosphere, no tickets required. One of the most creative themed bars outside a park.' },
+        { name:'Nomad Lounge (Animal Kingdom)', desc:'Adults-only bar adjacent to Tiffins restaurant at Animal Kingdom. Exceptional cocktails, beautiful expedition theming. Requires park ticket but no wait.' },
+        { name:'La Cava del Tequila (EPCOT Mexico)', desc:'Tucked inside the Mexico pyramid. 200+ tequilas, margarita flights, intimate setting. Gets crowded — go at 11am or 9pm.' },
+        { name:'Hanson\'s Shoe Repair (Downtown)', desc:'The speakeasy that requires a password (search online weekly). Hidden bar in a former shoe shop. Prohibition-era cocktails, dim lighting, no phones at the bar. One of Orlando\'s genuine gems.' },
+      ]
+    },
+    {
+      title:'Day Escapes for Adults', icon:'🌊', color:'#1565C0',
+      items:[
+        { name:'Clearwater Beach Day Trip', desc:'90 minutes from Orlando. Consistently ranked #1 US beach. Clear water, white sand, Pier 60 sunset market. Combine with a late lunch at Frenchy\'s on the beach.' },
+        { name:'St. Augustine Historic District', desc:'2 hours north. America\'s oldest city. Walking ghost tours, Colonial Quarter, Fort Castillo de San Marcos, and one of Florida\'s best craft beer scenes. Perfect adult day trip.' },
+        { name:'Wine Country at Lakeridge Winery', desc:'45 minutes from Orlando. Florida\'s largest winery. Free tours and tastings, vineyard views, live music on weekends. Surprisingly good for Florida wine.' },
+        { name:'Kayaking Silver Springs State Park', desc:'90 minutes away. Glass-bottom kayaks over crystal-clear spring. World\'s largest artesian spring. Sea turtles, manatees, monkeys (yes, really). A surreal Florida experience.' },
+        { name:'Kennedy Space Center', desc:'45 minutes east. Shuttle launches, Apollo artifacts, astronaut encounters. The Atlantis exhibit is one of the most moving human achievement displays on the planet.' },
+      ]
+    },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-adult-orlando';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const header = document.createElement('div');
+    header.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#1a1a2e,#6B0F1A,#C9A96E 130%);padding:16px 14px 14px;';
+    header.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:#fff;">Adult Orlando Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.7);">Kid-free experiences · Fine dining · Day escapes</div>
+        </div>
+        <span style="font-size:24px;">🍷</span>
+      </div>
+      <div style="background:rgba(255,255,255,.1);border-radius:8px;padding:7px 12px;font-size:11px;color:rgba(255,255,255,.85);line-height:1.5;">
+        Orlando is a genuinely excellent adult destination — beyond the rides and characters lies one of the country's most interesting dining, arts, and cocktail scenes.
+      </div>`;
+
+    const content = document.createElement('div');
+    content.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    SECTIONS.forEach(section => {
+      const secHeader = document.createElement('div');
+      secHeader.style.cssText = `display:flex;align-items:center;gap:8px;margin:14px 0 8px;`;
+      secHeader.innerHTML = `<span style="font-size:20px;">${section.icon}</span><div style="font-size:13px;font-weight:800;color:${section.color};">${section.title.toUpperCase()}</div>`;
+      content.appendChild(secHeader);
+
+      section.items.forEach(item => {
+        const card = document.createElement('div');
+        card.style.cssText = 'background:var(--card-bg,#fff);border-radius:12px;margin-bottom:8px;padding:11px 13px;border:1px solid var(--border,#eee);border-left:3px solid ' + section.color + ';';
+        card.innerHTML = `
+          <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:4px;">${item.name}</div>
+          <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${item.desc}</div>`;
+        content.appendChild(card);
+      });
+    });
+
+    const spacer = document.createElement('div');
+    spacer.style.height = '20px';
+    content.appendChild(spacer);
+
+    s.appendChild(header);
+    s.appendChild(content);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-adult-orlando')) buildScreen();
+
+  const _prevSS_mmmm2 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_mmmm2) _prevSS_mmmm2(name, el);
+    if (name === 'adult-orlando') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-adult-orlando');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectAdultCard() {
+    if (document.getElementById('adult-home-card')) return true;
+    const ref = document.getElementById('firsttimer-home-card') || document.getElementById('nbhd-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'adult-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#1a1a2e,#6B0F1A,#C9A96E);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('adult-orlando');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:3px;">🍷 Adult Orlando Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">Fine dining · Speakeasies · Day trips · Parks strategy</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.4);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _adultCard = false;
+  setInterval(() => { if (!_adultCard) _adultCard = injectAdultCard(); }, 30500);
+  setTimeout(() => { _adultCard = injectAdultCard(); }, 27000);
+
+  const _prevRH_mmmm2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_mmmm2) _prevRH_mmmm2.apply(this, arguments);
+    setTimeout(() => { _adultCard = false; _adultCard = injectAdultCard(); }, 7100);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK NNNN2: Theme Park Rain & Bad Weather Guide ===== */
+(function initRainGuide() {
+
+  const RAIN_RIDES = [
+    {
+      park:'Magic Kingdom', emoji:'🏰', color:'#003087',
+      indoor:['Haunted Mansion','Pirates of the Caribbean','Space Mountain','TRON (covered queue)','Seven Dwarfs Mine Train (partially covered queue)','Buzz Lightyear\'s Space Ranger Spin','Monsters Inc.','Carousel of Progress','Walt Disney\'s Enchanted Tiki Room','Hall of Presidents','The Many Adventures of Winnie the Pooh','Mad Tea Party (covered)'],
+      strategy:'Head to Tomorrowland when it rains — Space Mountain, Buzz Lightyear, and Carousel of Progress all indoors. Magic Kingdom is actually the best rain park because most attractions are covered.'
+    },
+    {
+      park:'EPCOT', emoji:'🌍', color:'#005B9A',
+      indoor:['Guardians of the Galaxy: Cosmic Rewind','Soarin\'','Test Track (mostly)','Mission: SPACE','Remy\'s Ratatouille','Living with the Land','The Seas with Nemo & Friends','Journey Into Imagination','Disney & Pixar Short Film Festival','Spaceship Earth'],
+      strategy:'EPCOT is the best rain day park. Nearly all Future World/World Discovery attractions are fully indoor. World Showcase has covered pavilion interiors to shelter in. Spend rain in Journey Into Imagination or The Seas.'
+    },
+    {
+      park:'Hollywood Studios', emoji:'🎬', color:'#37474F',
+      indoor:['Rise of the Resistance','Millennium Falcon (fully covered)','Mickey & Minnie\'s Runaway Railway','Tower of Terror','Rock \'n\' Roller Coaster','Star Tours','Muppet*Vision 3D','Indiana Jones Epic Stunt Spectacular (covered amphitheater)','Beauty and the Beast Live on Stage'],
+      strategy:'Galaxy\'s Edge is mostly covered by awnings and building overhangs. You can wait out light rain under the First Order structures. Tower of Terror and Rock \'n\' Roller Coaster both run in light rain.'
+    },
+    {
+      park:'Animal Kingdom', emoji:'🦁', color:'#33691E',
+      indoor:['Avatar Flight of Passage','Na\'vi River Journey','Festival of the Lion King','Dinosaur','It\'s Tough to Be a Bug!','Conservation Station'],
+      strategy:'Animal Kingdom is the worst rain day park — Kilimanjaro Safaris and many animal areas close in lightning. If rain is forecast, Pandora is your refuge (both rides fully indoor). Skip AK on days with extended storm forecasts.'
+    },
+    {
+      park:'Universal Orlando', emoji:'⚡', color:'#c62828',
+      indoor:['Harry Potter Escape from Gringotts','Forbidden Journey','Men in Black','Minions','Jurassic World ride (mostly)','Shrek','Simpsons Ride'],
+      strategy:'Diagon Alley is entirely indoor — a perfect rain refuge. You can spend 2 hours inside without riding anything (shopping, restaurants, ambient theming). Universal generally handles rain better than Disney parks.'
+    },
+  ];
+
+  const LIGHTNING_RULES = [
+    'Disney suspends ALL outdoor attractions (including roller coasters) at the first lightning strike within 10 miles. This is non-negotiable — CMs cannot override it.',
+    'Suspension typically lasts 30 min after the last strike. Florida storms often move through in 45–60 min total.',
+    'During suspension, use the time for: indoor attractions, sit-down restaurants, air-conditioned shops, restrooms.',
+    'Lightning delay + post-storm = some of the shortest waits of the day. Regular guests leave during rain; the wait drops by 40–60%.',
+    'Check "My Disney Experience" or Universal app for real-time attraction status updates during storms.',
+    'Universal rarely closes entire parks for weather — they\'ll run indoor attractions throughout. Disney is more conservative.',
+  ];
+
+  const RAIN_TIPS = [
+    { icon:'🌧️', tip:'Light rain: Just get wet and keep going. Most rides run. Lines drop significantly — this is actually a hidden benefit.' },
+    { icon:'⛈️', tip:'Thunderstorm: Head to the biggest indoor attraction you haven\'t done. Haunted Mansion, Soarin\', Guardians are all good bets.' },
+    { icon:'🌡️', tip:'Rain often breaks the Florida heat. A 10-minute shower can cool the park from 95°F to 82°F. Sometimes it\'s a relief.' },
+    { icon:'🛍️', tip:'Best shops to shelter in: Disney Character Warehouse (huge), EPCOT Mouse Gear, Universal\'s Diagon Alley shops (enormous).' },
+    { icon:'🍽️', tip:'Rain at meal time = walk-in table service. Restaurants have openings during storms that are impossible on sunny days. Try for California Grill, Brown Derby, or Le Cellier.' },
+    { icon:'🌈', tip:'Stay for the rainbow. Post-storm Magic Kingdom with a rainbow over Cinderella Castle is one of the most photographed moments in any theme park worldwide.' },
+    { icon:'📱', tip:'Florida summer rains are predictable: 2–4pm onset, 45–90 minute duration, then clear. Plan accordingly — indoor lunch at 1:30pm, outdoor rides by 5pm.' },
+    { icon:'🥾', tip:'Wet socks are a trip-ender. Bring a spare pair in your daypack. $3 of prevention avoids $30 of misery.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-rain-guide';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const header = document.createElement('div');
+    header.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#1565C0,#0277BD,#29B6F6);padding:16px 14px 14px;';
+    header.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:#fff;">Rainy Day Survival Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">Indoor rides · Lightning rules · Hidden benefits</div>
+        </div>
+        <span style="font-size:24px;">⛈️</span>
+      </div>
+      <div style="background:rgba(255,255,255,.12);border-radius:8px;padding:7px 12px;font-size:11px;color:rgba(255,255,255,.9);">
+        Florida rains almost every summer afternoon. This isn't a disaster — it's an opportunity. Lines drop, restaurants open up, and parks thin out.
+      </div>`;
+
+    const content = document.createElement('div');
+    content.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    // Rain tips
+    const tipsCard = document.createElement('div');
+    tipsCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;padding:12px 14px;margin-bottom:14px;border:1px solid var(--border,#eee);';
+    tipsCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:8px;">☂️ Rain Strategy</div>`;
+    RAIN_TIPS.forEach(t => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;gap:8px;margin-bottom:7px;align-items:flex-start;';
+      row.innerHTML = `<span style="font-size:16px;">${t.icon}</span><div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${t.tip}</div>`;
+      tipsCard.appendChild(row);
+    });
+    content.appendChild(tipsCard);
+
+    // Lightning rules
+    const lgCard = document.createElement('div');
+    lgCard.style.cssText = 'background:linear-gradient(135deg,#1565C0,#0277BD);border-radius:14px;padding:14px;margin-bottom:14px;color:#fff;';
+    lgCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;margin-bottom:10px;">⚡ Lightning Policy & Reality</div>`;
+    LIGHTNING_RULES.forEach(r => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;gap:8px;margin-bottom:7px;align-items:flex-start;';
+      row.innerHTML = `<span style="font-size:14px;flex-shrink:0;">⚡</span><div style="font-size:11px;color:rgba(255,255,255,.9);line-height:1.5;">${r}</div>`;
+      lgCard.appendChild(row);
+    });
+    content.appendChild(lgCard);
+
+    // Parks
+    RAIN_RIDES.forEach(park => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+
+      const ph = document.createElement('div');
+      ph.style.cssText = `background:${park.color};padding:10px 14px;display:flex;align-items:center;gap:8px;`;
+      ph.innerHTML = `<span style="font-size:20px;">${park.emoji}</span><div style="font-size:13px;font-weight:700;color:#fff;">${park.park}</div>`;
+      card.appendChild(ph);
+
+      const pb = document.createElement('div');
+      pb.style.cssText = 'padding:12px 14px;';
+
+      const indoorLabel = document.createElement('div');
+      indoorLabel.style.cssText = 'font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:6px;';
+      indoorLabel.textContent = 'INDOOR ATTRACTIONS';
+      pb.appendChild(indoorLabel);
+
+      const indoorGrid = document.createElement('div');
+      indoorGrid.style.cssText = 'display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;';
+      park.indoor.forEach(r => {
+        const chip = document.createElement('span');
+        chip.style.cssText = `padding:2px 8px;border-radius:20px;font-size:10px;background:${park.color}12;color:${park.color};font-weight:600;`;
+        chip.textContent = r;
+        indoorGrid.appendChild(chip);
+      });
+      pb.appendChild(indoorGrid);
+
+      const strategyDiv = document.createElement('div');
+      strategyDiv.style.cssText = `background:rgba(0,0,0,.04);border-radius:8px;padding:8px 10px;border-left:3px solid ${park.color};`;
+      strategyDiv.innerHTML = `<div style="font-size:10px;font-weight:700;color:${park.color};margin-bottom:2px;">RAIN STRATEGY</div><div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${park.strategy}</div>`;
+      pb.appendChild(strategyDiv);
+
+      card.appendChild(pb);
+      content.appendChild(card);
+    });
+
+    const spacer = document.createElement('div');
+    spacer.style.height = '20px';
+    content.appendChild(spacer);
+
+    s.appendChild(header);
+    s.appendChild(content);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-rain-guide')) buildScreen();
+
+  const _prevSS_nnnn2 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_nnnn2) _prevSS_nnnn2(name, el);
+    if (name === 'rain-guide') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-rain-guide');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectRainCard() {
+    if (document.getElementById('rain-home-card')) return true;
+    const ref = document.getElementById('adult-home-card') || document.getElementById('firsttimer-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'rain-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#1565C0,#0277BD,#29B6F6);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('rain-guide');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:3px;">⛈️ Rainy Day Survival Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.85);">Indoor rides · Lightning rules · Hidden advantages</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.5);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _rainCard = false;
+  setInterval(() => { if (!_rainCard) _rainCard = injectRainCard(); }, 31000);
+  setTimeout(() => { _rainCard = injectRainCard(); }, 27500);
+
+  const _prevRH_nnnn2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_nnnn2) _prevRH_nnnn2.apply(this, arguments);
+    setTimeout(() => { _rainCard = false; _rainCard = injectRainCard(); }, 7300);
+  };
+})();
+</script>
