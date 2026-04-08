@@ -58240,3 +58240,368 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK TTTTTT: EPCOT Deep Dive — Future World Complete ===== */
+(function initEPCOTDeep() {
+
+  const EPCOT_AREAS = [
+    {
+      name:'World Discovery', emoji:'🚀', color:'#003087',
+      desc:'Space, science, and the exploration of what lies beyond our world. The eastern quadrant of Future World housing the park\'s most thrilling attractions.',
+      rides:[
+        {name:'Guardians of the Galaxy: Cosmic Rewind', type:'Reverse-launch indoor coaster', wait:'45–90 min', note:'The first "reverse launch" roller coaster in the world. Launches backward, then forward. Guardians of the Galaxy soundtrack (you choose your song). 42" minimum. Stunning indoor environment.'},
+        {name:'Test Track', type:'Car design simulator', wait:'30–60 min', note:'Design a virtual vehicle then test it at 65 mph on a track. Not the most technically impressive ride but unique format. Single rider cuts the wait significantly.'},
+        {name:'Mission: SPACE', type:'Centrifuge simulator', wait:'15–35 min', note:'Green mission (mild) or Orange mission (intense centrifuge, 2.5G force). Orange is genuinely intense — motion sickness warning is real. Not recommended after dining.'},
+      ],
+      tip:'Cosmic Rewind requires a virtual queue or Individual Lightning Lane ($15–22). The virtual queue opens at 7 AM via My Disney Experience app. Set an alarm — it fills within seconds.',
+    },
+    {
+      name:'World Nature', emoji:'🌊', color:'#0277BD',
+      desc:'The living world — the ocean, the atmosphere, the natural systems that sustain life on Earth.',
+      rides:[
+        {name:'Soarin\' Around the World', type:'Hang glider simulator', wait:'30–60 min', note:'15-minute hang-glider flight over the world\'s most beautiful landscapes. Gentle scent effects, gentle motion. One of the most beloved Disney attractions. All ages accessible. Try to get a top-row seat for the best view without people\'s feet in frame.'},
+        {name:'Living with the Land', type:'Greenhouse boat tour', wait:'20–40 min', note:'A boat tour through EPCOT\'s actual working greenhouses and fish farms. Some of the food grown here is served in EPCOT restaurants. Educational but genuinely fascinating.'},
+        {name:'The Seas with Nemo & Friends', type:'Clamshell dark ride', wait:'10–25 min', note:'Gentle Finding Nemo dark ride into the world\'s largest saltwater fish tank (5.7 million gallons). The aquarium viewing area after the ride has genuine marine life worth spending 30+ minutes with.'},
+        {name:'Turtle Talk with Crush', type:'Interactive show', wait:'10 min', note:'Live animated turtle converses in real-time with the audience. Real-time motion capture and improvisational dialogue. A technical marvel. Worth 15 minutes.'},
+      ],
+      tip:'Living with the Land offers a Behind the Seeds tour ($25) — a guided walkthrough of the working greenhouse where EPCOT\'s food is actually grown. Book at the dock. Far better content than the standard boat ride.',
+    },
+    {
+      name:'World Celebration', emoji:'🎆', color:'#7B1FA2',
+      desc:'The reimagined central EPCOT hub celebrating human creativity and discovery.',
+      rides:[
+        {name:'Spaceship Earth (the golf ball)', type:'Slow dark ride through human history', wait:'15–40 min', note:'The iconic 180-foot geodesic sphere housing a 15-minute journey through human communication history. Narrated by Judi Dench. A beloved slow meditative experience.'},
+        {name:'Remy\'s Ratatouille Adventure', type:'Trackless dark ride', wait:'40–75 min', note:'Shrunk to the size of a rat for a chase through Gusteau\'s restaurant. The French theming is meticulously detailed. 34" minimum. Shorter wait in France Pavilion World Showcase.'},
+        {name:'Journey Into Imagination with Figment', type:'Dark ride (classic)', wait:'10–20 min', note:'Beloved purple dragon Figment through the Imagination Institute. The shortest wait in EPCOT. Air-conditioned. The original 1983 Figment song is an EPCOT classic.'},
+      ],
+      tip:'Remy\'s Ratatouille Adventure is technically in the France Pavilion expansion (World Showcase) but is the most in-demand mid-tier EPCOT ride. Ride at park opening or use Lightning Lane.',
+    },
+    {
+      name:'World Showcase', emoji:'🌍', color:'#C9A96E',
+      desc:'Eleven country pavilions around a 1.3-mile promenade encircling the World Showcase Lagoon. The cultural, dining, and entertainment heart of EPCOT.',
+      rides:[
+        {name:'Frozen Ever After (Norway)', type:'Water dark ride', wait:'40–80 min', note:'Frozen characters in Norwegian fjord setting. Replaced the original Maelstrom Norway adventure. Family favorite. Single rider available.'},
+        {name:'Remy\'s Ratatouille Adventure (France)', type:'See World Celebration above', wait:'See above', note:'France Pavilion expansion. Count this in your World Showcase plan.'},
+        {name:'Gran Fiesta Tour (Mexico)', type:'Boat ride through Mexico Pavilion', wait:'5–15 min', note:'Slow boat through the Mexico pavilion interior. Very low wait. The Three Caballeros theming is charming. Walk-on almost always.'},
+        {name:'Reflections of China / other films', type:'360° films', wait:'Walk-in', note:'Multiple countries have circle-vision films. Canada\'s O Canada is genuinely beautiful. China\'s Reflections is excellent. Stand for 14 minutes but zero wait time.'},
+      ],
+      tip:'The World Showcase promenade is 1.3 miles around the lagoon. Walking all 11 countries takes 2.5–3 hours with brief stops. The drinking tour (one representative drink per country) is an EPCOT tradition — budget $8–15 per country.',
+    },
+  ];
+
+  const EPCOT_FESTIVALS = [
+    {name:'International Festival of the Arts', when:'January–February', emoji:'🎨', note:'Art, culinary art, and performance art. Fringe-style entertainment, artist demonstrations, and food booths with art-inspired items. The most underrated EPCOT festival.'},
+    {name:'International Flower & Garden Festival', when:'March–May', emoji:'🌸', note:'Topiary sculptures of Disney characters throughout the park, outdoor kitchens with fresh seasonal dishes, garden-themed entertainment. EPCOT at its most beautiful.'},
+    {name:'International Food & Wine Festival', when:'August–November', emoji:'🍷', note:'The flagship festival. 30+ food/drink booths representing global cuisines. Celebrity chef appearances, Eat to the Beat concerts. The most popular EPCOT event of the year.'},
+    {name:'International Festival of the Holidays', when:'November–December', emoji:'🎄', note:'Holiday storytellers in each pavilion, Candlelight Processional (celebrity narrator + choir + orchestra), holiday overlay foods throughout World Showcase.'},
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-epcot-deep';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#003087,#0277BD,#C9A96E);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">EPCOT — Complete Deep Dive</div>
+          <div style="font-size:11px;opacity:.8;">Cosmic Rewind · Soarin · World Showcase · Festivals</div>
+        </div>
+        <span style="font-size:28px;">🌐</span>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:15px;font-weight:800;">11</div><div style="font-size:9px;opacity:.8;">COUNTRIES</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:15px;font-weight:800;">4</div><div style="font-size:9px;opacity:.8;">FESTIVALS</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:15px;font-weight:800;">2+</div><div style="font-size:9px;opacity:.8;">DAYS IDEAL</div>
+        </div>
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    EPCOT_AREAS.forEach(area => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+      let ridesHTML = area.rides.map(r=>`<div style="background:var(--bg,#f8f8f8);border-radius:10px;padding:9px;margin-bottom:5px;">
+        <div style="font-size:12px;font-weight:800;color:var(--text-primary,#212121);">${r.name}</div>
+        <div style="font-size:10px;font-weight:600;color:${area.color};margin:2px 0;">${r.type} · ${r.wait}</div>
+        <div style="font-size:11px;color:var(--text-secondary,#666);">${r.note}</div>
+      </div>`).join('');
+      card.innerHTML = `
+        <div style="padding:10px 14px;background:${area.color}18;border-left:4px solid ${area.color};">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:22px;">${area.emoji}</span>
+            <div>
+              <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--text-primary,#212121);">${area.name}</div>
+              <div style="font-size:11px;color:var(--text-secondary,#555);">${area.desc}</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          ${ridesHTML}
+          <div style="display:flex;gap:5px;background:${area.color}0d;border-radius:8px;padding:7px;margin-top:5px;">
+            <span style="font-size:11px;flex-shrink:0;">💡</span>
+            <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${area.tip}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const festCard = document.createElement('div');
+    festCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+    festCard.innerHTML = `<div style="padding:12px 14px;background:linear-gradient(135deg,#003087,#C9A96E);color:#fff;">
+      <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;">🎪 EPCOT Annual Festivals</div>
+    </div>
+    <div style="padding:12px 14px;">
+      ${EPCOT_FESTIVALS.map(f=>`<div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border,#eee);">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+          <span style="font-size:18px;">${f.emoji}</span>
+          <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${f.name}</div>
+        </div>
+        <div style="font-size:10px;font-weight:700;color:#003087;margin-bottom:2px;padding-left:24px;">${f.when}</div>
+        <div style="font-size:11px;color:var(--text-secondary,#666);padding-left:24px;">${f.note}</div>
+      </div>`).join('')}
+    </div>`;
+    body.appendChild(festCard);
+
+    const stratCard = document.createElement('div');
+    stratCard.style.cssText = 'background:linear-gradient(135deg,#003087,#0277BD);border-radius:16px;margin-bottom:20px;padding:14px;color:#fff;';
+    stratCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">🎯 EPCOT Strategy</div>
+    ${[
+      {icon:'⏰', tip:'EPCOT needs 2 days to experience properly: Day 1 for Future World attractions (Cosmic Rewind, Soarin\', Test Track, Guardians), Day 2 for World Showcase at a leisurely pace with dining.'},
+      {icon:'🍜', tip:'World Showcase opens at 11 AM but Future World opens at 9 AM. Use the early morning for Future World rides when crowds are light.'},
+      {icon:'🌅', tip:'EPCOT\'s evening atmosphere is the best of any Disney park — the lights on the lagoon, the pavilion illumination, the fireworks. Don\'t leave at sunset. The park transforms.'},
+      {icon:'🎵', tip:'The Eat to the Beat concert series during Food & Wine Festival is free with park admission. Major acts from the 80s–2000s perform multiple sets nightly.'},
+    ].map(t=>`<div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
+      <span style="font-size:18px;flex-shrink:0;">${t.icon}</span>
+      <div style="font-size:12px;opacity:.95;line-height:1.5;">${t.tip}</div>
+    </div>`).join('')}`;
+    body.appendChild(stratCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-epcot-deep')) buildScreen();
+
+  const _prevSS_tttttt = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_tttttt) _prevSS_tttttt(name, el);
+    if (name === 'epcot-deep') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-epcot-deep');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectEPCOTDeepCard() {
+    if (document.getElementById('epcot-deep-home-card')) return true;
+    const ref = document.getElementById('golf-rec-home-card') || document.getElementById('ioa-deep-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'epcot-deep-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#003087,#0277BD,#C9A96E 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('epcot-deep');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🌐</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">EPCOT — Complete Deep Dive</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Cosmic Rewind · Soarin · 11 Countries · 4 Festivals</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _epcotDeepCard = false;
+  setInterval(() => { if (!_epcotDeepCard) _epcotDeepCard = injectEPCOTDeepCard(); }, 80000);
+  setTimeout(() => { _epcotDeepCard = injectEPCOTDeepCard(); }, 76500);
+  const _prevRH_tttttt = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_tttttt) _prevRH_tttttt.apply(this, arguments);
+    setTimeout(() => { _epcotDeepCard = false; _epcotDeepCard = injectEPCOTDeepCard(); }, 27000);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK UUUUUU: Orlando Theme Park Food Guide ===== */
+(function initParkFood() {
+
+  const PARK_FOOD = [
+    {
+      park:'Magic Kingdom', emoji:'🏰', color:'#003087',
+      musteat:[
+        {name:'Dole Whip at Aloha Isle', price:'$7', note:'The original and best Dole Whip location. Pineapple soft serve with pineapple juice. A Disney institution since 1986. The float version adds cold pineapple juice underneath.'},
+        {name:'Mickey Premium Bar', price:'$6', note:'Chocolate-dipped ice cream bar in Mickey Mouse shape. Sold at virtually every cart. The most photographed Disney food item. Worth the sugar.'},
+        {name:'Churros at Multiple Carts', price:'$6', note:'Disney churros are longer and better-seasoned than park-standard. Cinnamon sugar coating with powdered sugar. The ones near Frontierland are fresh-from-the-fryer consistently.'},
+        {name:'Cosmic Ray\'s Starlight Cafe', price:'$15–18', note:'Best quick-service in Magic Kingdom. Counter-service rotisserie chicken, burger, and ribs. The alien animatronic show running behind the counter is part of the experience.'},
+        {name:'Be Our Guest at Dinner', price:'$60–80/person', note:'Table service inside Beast\'s Castle. Only place to get alcohol in Magic Kingdom (wine/beer at dinner). The West Wing dining room with the enchanted rose is worth requesting.'},
+      ],
+      skip:'Casey\'s Corner hot dogs are overpriced. The candy at the Confectionery is standard retail at theme park markup — buy elsewhere.',
+    },
+    {
+      park:'EPCOT', emoji:'🌐', color:'#1565C0',
+      musteat:[
+        {name:'School Bread (Norway)', price:'$6', note:'Cardamom bread filled with custard and covered in powdered sugar and coconut. A Norwegian bakery staple. Found at Kringla Bakeri Og Kafé in Norway Pavilion.'},
+        {name:'Croissant from Boulangerie Patisserie (France)', price:'$5–8', note:'Imported French pastry techniques, genuine French butter. The butter croissant at EPCOT\'s France Pavilion is legitimately comparable to a Paris boulangerie.'},
+        {name:'Karamell-Küche Caramel Products (Germany)', price:'$8–15', note:'Werther\'s Caramel brand store in the Germany Pavilion. Caramel-covered pretzels, caramel apples, caramel sundaes. Every item is exceptional.'},
+        {name:'Kierin Ramen (Japan)', price:'$12–15', note:'The ramen inside Japan Pavilion\'s Katsura Grill. Legitimately good ramen in a theme park — the broth is prepared properly.'},
+        {name:'Electric Umbrella Burger', price:'$16–18', note:'The upgraded counter service burgers at Electric Umbrella are among the best QS burgers at any Disney park. The impossible burger and the Angus burger are both solid.'},
+      ],
+      skip:'The Mexico pavilion sit-down restaurant (La Hacienda de San Angel) is overpriced for average Mexican food. Eat at the taco cart outside for half the price and equal quality.',
+    },
+    {
+      park:'Hollywood Studios', emoji:'🎬', color:'#C62828',
+      musteat:[
+        {name:'Ronto Wrap at Ronto Roasters (Galaxy\'s Edge)', price:'$14', note:'Spit-roasted pork and pork sausage with tangy slaw in a toasted pita. The best savory theme park food by most standards. The actual wood-burning spit is functional and visible.'},
+        {name:'Milk Stand Drinks (Galaxy\'s Edge)', price:'$8', note:'Blue Milk or Green Milk — both are plant-based, slightly sweet, and otherworldly in flavor. From Star Wars: The Force Awakens. Instagram mandatory.'},
+        {name:'Backlot Express', price:'$14–18', note:'Best general QS in Hollywood Studios. Chicken sandwich, burgers, and the surprisingly decent plant-based options. The theming (movie backlot) adds atmosphere.'},
+        {name:'Oga\'s Cantina (Galaxy\'s Edge)', price:'$12–20 per drink', note:'The Star Wars bar. Atmospheric, limited space. Reservations through My Disney Experience strongly recommended. Alcoholic and non-alcoholic themed drinks.'},
+      ],
+      skip:'Fairfax Fare turkey leg — the giant turkey leg is a Disney tradition but expensive for what you get ($16 for an oversalted meat product). Worth doing once for the Instagram but not as actual sustenance.',
+    },
+    {
+      park:'Animal Kingdom', emoji:'🌿', color:'#2E7D32',
+      musteat:[
+        {name:'Satu\'ali Canteen (Pandora)', price:'$14–16', note:'The best quick-service food in Animal Kingdom. The vegetable curry served in a bread bowl, the Pandoran Feast (slow-roasted chicken and sustainable fish), and the Blueberry Cream Cheese mousse dessert are all excellent.'},
+        {name:'Pongu Pongu Drinks (Pandora)', price:'$7–9', note:'Night Blossom (non-alcoholic, lychee-based layered drink) and Pandoran Sunrise. Visually striking, genuinely tasty. The drinks are as photogenic as the land itself.'},
+        {name:'Flame Tree Barbecue', price:'$14–18', note:'Best QS barbecue at Walt Disney World. Outdoor seating overlooking the water with Discovery Island in the background. The ribs and pulled pork with corn on the cob are legitimate.'},
+        {name:'Harambe Market', price:'$12–16', note:'Four counter service windows serving African-inspired cuisine. The Kuku Paka (chicken curry) and Nyama choma ribs are consistently well-reviewed. Outdoor market atmosphere.'},
+      ],
+      skip:'Restaurantosaurus (formerly) counter service — generic American food in a mismatched land. Use Satu\'ali Canteen instead.',
+    },
+    {
+      park:'Universal Studios Florida', emoji:'🎬', color:'#7B1FA2',
+      musteat:[
+        {name:'Butterbeer at Leaky Cauldron', price:'$9 (frozen)', note:'The most authentic version of Butterbeer in Florida — served in the actual pub dining room. The frozen version is the definitive format.'},
+        {name:'Flaming Moe at Moe\'s Tavern', price:'$8', note:'The non-alcoholic orange smoke drink from The Simpsons. The smoke effect is real, created by dry ice in the cup. Exactly like the TV version. Mandatory for Simpsons fans.'},
+        {name:'Lard Lad Giant Donut', price:'$6', note:'Giant pink-frosted donut from The Simpsons. Available in multiple flavors. The sprinkle version and the strawberry frosted are the best.'},
+        {name:'Lombard\'s Seafood Grille', price:'$25–35/person', note:'Best table service in Universal Studios Florida. San Francisco-themed seafood on the lagoon with actually good food. Clam chowder in a sourdough bowl is the signature.'},
+      ],
+      skip:'Fast food counter service on Hollywood Blvd. Walk five minutes to Springfield or Diagon Alley for dramatically better and more interesting food options.',
+    },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-park-food';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#C62828,#F57F17,#C9A96E);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Theme Park Food Guide</div>
+          <div style="font-size:11px;opacity:.8;">Dole Whip · Ronto Wrap · School Bread · Butterbeer · Must-eats by park</div>
+        </div>
+        <span style="font-size:28px;">🍽️</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        Theme park food has evolved dramatically. Knowing the must-eats vs. the skip-its at each park saves money and dining regret. This guide covers the genuine standouts — food that's actually worth the theme park markup.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    PARK_FOOD.forEach(park => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:10px 14px;background:${park.color}18;border-left:4px solid ${park.color};">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:22px;">${park.emoji}</span>
+            <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--text-primary,#212121);">${park.park}</div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          <div style="font-size:10px;font-weight:700;color:#2E7D32;margin-bottom:5px;">✅ MUST EAT</div>
+          ${park.musteat.map(m=>`<div style="margin-bottom:8px;padding:8px;background:var(--bg,#f8f8f8);border-radius:10px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;">
+              <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);">${m.name}</div>
+              <span style="font-size:11px;font-weight:700;color:${park.color};">${m.price}</span>
+            </div>
+            <div style="font-size:11px;color:var(--text-secondary,#666);line-height:1.5;">${m.note}</div>
+          </div>`).join('')}
+          <div style="font-size:10px;font-weight:700;color:#C62828;margin-top:6px;margin-bottom:3px;">⚠️ SKIP</div>
+          <div style="font-size:11px;color:var(--text-secondary,#666);font-style:italic;">${park.skip}</div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const tipCard = document.createElement('div');
+    tipCard.style.cssText = 'background:linear-gradient(135deg,#C62828,#F57F17);border-radius:16px;margin-bottom:20px;padding:14px;color:#fff;';
+    tipCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">💡 Park Dining Strategy</div>
+    ${[
+      {icon:'⏰', tip:'Eat at 11 AM or 2:30 PM — between standard meal rushes. Restaurants empty out significantly. Tables become available walk-in even at popular spots.'},
+      {icon:'💰', tip:'A family of 4 spending $80/meal × 3 meals = $240/day on food. Pack a water bottle and refill at fountains. Bring granola bars for snacks. The $8 churro is fine but the $8 twice a day adds up.'},
+      {icon:'📱', tip:'Mobile ordering is mandatory at every Disney and Universal counter service. Order at 10:30 AM for an 11:30 AM pickup while in line for rides. You arrive, tap "I\'m here," get food in 2 minutes.'},
+      {icon:'🥤', tip:'Free water cups are available at any Disney quick-service location. Universal charges — bring a reusable bottle. Staying hydrated in Florida heat is non-negotiable.'},
+    ].map(t=>`<div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
+      <span style="font-size:18px;flex-shrink:0;">${t.icon}</span>
+      <div style="font-size:12px;opacity:.95;line-height:1.5;">${t.tip}</div>
+    </div>`).join('')}`;
+    body.appendChild(tipCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-park-food')) buildScreen();
+
+  const _prevSS_uuuuuu = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_uuuuuu) _prevSS_uuuuuu(name, el);
+    if (name === 'park-food') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-park-food');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectPFCard() {
+    if (document.getElementById('park-food-home-card')) return true;
+    const ref = document.getElementById('epcot-deep-home-card') || document.getElementById('golf-rec-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'park-food-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#C62828,#F57F17,#C9A96E 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('park-food');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🍽️</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Theme Park Food Guide</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Dole Whip · Ronto Wrap · School Bread · Butterbeer · Must-eats by park</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _pfCard = false;
+  setInterval(() => { if (!_pfCard) _pfCard = injectPFCard(); }, 81000);
+  setTimeout(() => { _pfCard = injectPFCard(); }, 77500);
+  const _prevRH_uuuuuu = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_uuuuuu) _prevRH_uuuuuu.apply(this, arguments);
+    setTimeout(() => { _pfCard = false; _pfCard = injectPFCard(); }, 27400);
+  };
+})();
+</script>
