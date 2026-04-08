@@ -50450,3 +50450,448 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK HHHHH: Disney Dining Reservation Strategy ===== */
+(function initDiningReservations() {
+
+  const RESTAURANTS = [
+    {
+      name:"Be Our Guest Restaurant", park:"Magic Kingdom", emoji:"🕯️", color:"#1565C0",
+      type:"Table Service", price:"$$$$", booking:"60 days — books in under 10 minutes",
+      meals:["Dinner only (Lunch walk-up possible)"],
+      mustOrder:["Braised pork, Grey Stuff dessert, French onion soup"],
+      tip:"The most sought-after ADR at Walt Disney World. Book at exactly midnight (60 days before). The ballroom is breathtaking — request it.",
+      difficulty:5
+    },
+    {
+      name:"Cinderella's Royal Table", park:"Magic Kingdom", emoji:"👑", color:"#7B1FA2",
+      type:"Character Dining", price:"$$$$", booking:"60 days — extremely competitive",
+      meals:["Breakfast, Lunch, Dinner"],
+      mustOrder:["Breakfast: Cinderella's Fairy Tale package, Dinner: Filet of beef"],
+      tip:"Inside Cinderella Castle — one of the most iconic restaurant locations in the world. Princess characters visit each table. Worth every dollar for families.",
+      difficulty:5
+    },
+    {
+      name:"Topolino's Terrace – Flavors of the Riviera", park:"EPCOT/Disney's Riviera Resort", emoji:"🎨", color:"#e65100",
+      type:"Character Breakfast / Table Service Dinner", price:"$$$$", booking:"60 days",
+      meals:["Character Breakfast, Dinner"],
+      mustOrder:["Breakfast: crêpes, character meetings. Dinner: branzino, charcuterie board"],
+      tip:"Rooftop with EPCOT fireworks views at dinner (specific seats only — request fireworks table). Character breakfast is the best at Disney World currently.",
+      difficulty:4
+    },
+    {
+      name:"California Grill", park:"Contemporary Resort", emoji:"🌉", color:"#1a237e",
+      type:"Signature Dining", price:"$$$$", booking:"60 days",
+      meals:["Dinner"],
+      mustOrder:["Sushi, oak-fired flatbreads, sustainable seafood"],
+      tip:"Watch Magic Kingdom fireworks from the rooftop. They pipe in the audio. Request a window table. One of the best meal experiences at Walt Disney World.",
+      difficulty:4
+    },
+    {
+      name:"Space 220 Restaurant", park:"EPCOT", emoji:"🚀", color:"#311B92",
+      type:"Table Service (Immersive)", price:"$$$", booking:"60 days",
+      meals:["Lunch, Dinner"],
+      mustOrder:["Impossible meatballs, Galaxy slaw, Moonrise cocktail"],
+      tip:"'Elevator' lifts you 220 miles up to a space station with Earth views outside the windows. The spectacle is the meal. Food is solid, atmosphere is extraordinary.",
+      difficulty:4
+    },
+    {
+      name:"Oga's Cantina", park:"Hollywood Studios", emoji:"🍸", color:"#37474F",
+      type:"Bar / Lounge", price:"$$$", booking:"60 days (60 min max stay)",
+      meals:["Snacks and drinks only"],
+      mustOrder:["Fuzzy Tauntaun, Bespin Fizz, Blue Milk"],
+      tip:"Standing room only. 45-minute enforced visit limit. Drinks are creative and themed. DJ R-3X spins beats. Reserve online — walk-ups rare.",
+      difficulty:3
+    },
+    {
+      name:"Mythos Restaurant", park:"Islands of Adventure", emoji:"🏛️", color:"#00695C",
+      type:"Table Service (Award-winning)", price:"$$$", booking:"Open Table / Universal",
+      meals:["Lunch, Dinner"],
+      mustOrder:["Mythos risotto, grilled salmon, souvlaki"],
+      tip:"Multiple times voted #1 theme park restaurant in the world. The cave dining room is architecturally stunning. No character dining — just exceptional food and atmosphere.",
+      difficulty:2
+    },
+    {
+      name:"Hollywood Brown Derby", park:"Hollywood Studios", emoji:"🎩", color:"#b71c1c",
+      type:"Table Service (Signature)", price:"$$$", booking:"60 days",
+      meals:["Lunch, Dinner"],
+      mustOrder:["Original Cobb Salad, grapefruit cake, pan-roasted chicken"],
+      tip:"1930s Hollywood glamour. Fantasmic! dining package available — gets you priority seating for the show. One of the park's most reliable dinner options.",
+      difficulty:3
+    },
+    {
+      name:"Via Napoli Ristorante e Pizzeria", park:"EPCOT (Italy Pavilion)", emoji:"🍕", color:"#c62828",
+      type:"Table Service", price:"$$$", booking:"60 days",
+      meals:["Lunch, Dinner"],
+      mustOrder:["Neapolitan-style pizza from wood-burning ovens, tiramisu"],
+      tip:"The best pizza at Walt Disney World by a wide margin. The wood-burning ovens are named after Italian volcanoes. Loud, festive atmosphere. Share a large pizza.",
+      difficulty:3
+    },
+    {
+      name:"Biergarten Restaurant", park:"EPCOT (Germany Pavilion)", emoji:"🍺", color:"#F57F17",
+      type:"Buffet / Live Entertainment", price:"$$$", booking:"60 days",
+      meals:["Lunch, Dinner"],
+      mustOrder:["German buffet: sausages, schnitzel, spaetzle, pretzels, sauerkraut"],
+      tip:"Communal tables, live polka/oompah band. You share tables with strangers — it becomes part of the fun. Very family-friendly. Exceptional value for a Disney buffet.",
+      difficulty:2
+    },
+  ];
+
+  const BOOKING_TIPS = [
+    { icon:'⏰', title:'The 60-Day Rule', desc:'Disney ADRs open exactly 60 days before your visit date. For the hardest tables (Be Our Guest, Cinderella Royal Table), book at 6:00 AM Eastern — not midnight. The system opens at midnight but heaviest competition starts at 6 AM.' },
+    { icon:'📱', title:'My Disney Experience App', desc:'Book dining directly in the app or on disneyworld.com. Link your resort reservation to unlock your 60-day window for the entire trip (up to 10 days) from the first day of your stay.' },
+    { icon:'🔄', title:'Cancellation Hunting', desc:'Check My Disney Experience at 30 days, 14 days, 7 days, and 3 days for cancellations. Families cancel constantly. Also check at exactly 9 AM when same-day dining opens.' },
+    { icon:'💳', title:'Credit Card Guarantee', desc:'All Table Service ADRs require a credit card. $10/person fee for no-shows. Cancel by midnight the day before to avoid charges — Disney enforces this strictly.' },
+    { icon:'🎠', title:'Character Dining Strategy', desc:'Character dining is booked early and fills fast. Cinderella Royal Table, Chef Mickey\'s, and Topolino\'s character breakfast are the top three. Book these first, then fill in regular dining.' },
+    { icon:'🌮', title:'Counter Service Strategy', desc:"Not all great food requires a reservation. Satu\'li Canteen (Pandora), Woody\'s Lunch Box, and Docking Bay 7 rival or beat many table service options at a fraction of the price." },
+    { icon:'🥂', title:'Signature vs Regular', desc:'Signature dining (2 dining credits on the dining plan, or $60–100/person à la carte) includes California Grill, Victoria & Albert\'s, and Monsieur Paul. Reserve these for special occasions.' },
+    { icon:'🔥', title:"Victoria & Albert's", desc:"Disney's only AAA Five Diamond restaurant. $350+/person prix-fixe. Reservations open 60 days out and go in hours. Jacket required. The most refined dining experience in all of Florida. Special occasion only." },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-dining-reservations';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#b71c1c,#e65100,#F57F17);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Dining Reservations</div>
+          <div style="font-size:11px;opacity:.8;">ADR strategy · Best restaurants · Booking tips</div>
+        </div>
+        <span style="font-size:28px;">🍽️</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        <strong>Golden Rule:</strong> Book Advanced Dining Reservations (ADRs) exactly 60 days before your trip begins. The best tables at Disney World vanish within minutes.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    /* Difficulty legend */
+    const legend = document.createElement('div');
+    legend.style.cssText = 'background:var(--card-bg,#fff);border-radius:12px;padding:10px 14px;margin-bottom:14px;border:1px solid var(--border,#eee);';
+    legend.innerHTML = `<div style="font-size:11px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:6px;">BOOKING DIFFICULTY</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <span style="font-size:11px;padding:3px 10px;border-radius:20px;background:#c6282818;color:#c62828;font-weight:700;">●●●●● Extremely Hard</span>
+      <span style="font-size:11px;padding:3px 10px;border-radius:20px;background:#e6500018;color:#e65100;font-weight:700;">●●●● Very Hard</span>
+      <span style="font-size:11px;padding:3px 10px;border-radius:20px;background:#F57F1718;color:#F57F17;font-weight:700;">●●● Moderate</span>
+      <span style="font-size:11px;padding:3px 10px;border-radius:20px;background:#2E7D3218;color:#2E7D32;font-weight:700;">●● Easier</span>
+    </div>`;
+    body.appendChild(legend);
+
+    /* Restaurant cards */
+    RESTAURANTS.forEach(r => {
+      const dots = Array.from({length:5},(_,i)=>`<span style="color:${i<r.difficulty?r.color:'#ddd'};">●</span>`).join('');
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:10px 14px;background:${r.color}18;border-left:4px solid ${r.color};">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
+            <div style="flex:1;">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+                <span style="font-size:18px;">${r.emoji}</span>
+                <div style="font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${r.name}</div>
+              </div>
+              <div style="font-size:10px;color:var(--text-secondary,#888);">${r.park} · ${r.type} · ${r.price}</div>
+            </div>
+            <div style="font-size:14px;flex-shrink:0;">${dots}</div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          <div style="font-size:10px;font-weight:700;color:${r.color};margin-bottom:3px;">📅 ${r.booking}</div>
+          <div style="font-size:11px;color:var(--text-secondary,#555);margin-bottom:6px;font-weight:600;">Must Order: ${r.mustOrder.join(' · ')}</div>
+          <div style="font-size:11px;color:var(--text-secondary,#666);line-height:1.5;">${r.tip}</div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    /* Booking tips */
+    const tipsCard = document.createElement('div');
+    tipsCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+    tipsCard.innerHTML = `<div style="padding:12px 14px;background:linear-gradient(135deg,#b71c1c,#e65100);color:#fff;">
+      <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;">📋 Complete Booking Strategy</div>
+    </div>
+    <div style="padding:12px 14px;">
+      ${BOOKING_TIPS.map(t=>`<div style="margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border,#eee);">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+          <span style="font-size:20px;">${t.icon}</span>
+          <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${t.title}</div>
+        </div>
+        <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.6;padding-left:28px;">${t.desc}</div>
+      </div>`).join('')}
+    </div>`;
+    body.appendChild(tipsCard);
+
+    const valueCard = document.createElement('div');
+    valueCard.style.cssText = 'background:linear-gradient(135deg,#e65100,#F57F17);border-radius:16px;margin-bottom:20px;padding:14px;color:#fff;';
+    valueCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">💰 Best Value Dining (No Reservation Needed)</div>
+    ${[
+      { name:"Satu'li Canteen (Pandora)", desc:"Bowl-style customizable meals. The best counter service in all of Walt Disney World." },
+      { name:"Docking Bay 7 (Hollywood Studios)", desc:"Creative Galaxy-themed dishes. Ronto Wrap rivals most table service sandwiches." },
+      { name:"Pecos Bill's (Magic Kingdom)", desc:"Burgers and a free self-serve toppings bar. The hidden gem of MK counter service." },
+      { name:"Lotus Blossom Café (EPCOT)", desc:"Authentic-ish Chinese food. The egg rolls and noodle soup are legit." },
+      { name:"Sunshine Seasons (EPCOT)", desc:"The Land Pavilion food court. Fish from the attached aquaculture facility. Fresh and reasonably priced." },
+    ].map(v=>`<div style="display:flex;gap:8px;margin-bottom:8px;"><span style="flex-shrink:0;">★</span><div><div style="font-size:12px;font-weight:700;">${v.name}</div><div style="font-size:11px;opacity:.85;">${v.desc}</div></div></div>`).join('')}`;
+    body.appendChild(valueCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-dining-reservations')) buildScreen();
+
+  const _prevSS_hhhhh = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_hhhhh) _prevSS_hhhhh(name, el);
+    if (name === 'dining-reservations') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-dining-reservations');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectDiningCard() {
+    if (document.getElementById('dining-res-home-card')) return true;
+    const ref = document.getElementById('ioa-home-card') || document.getElementById('hs-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'dining-res-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#b71c1c,#e65100,#F57F17);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('dining-reservations');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🍽️</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Dining Reservations Guide</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">ADR strategy · Be Our Guest · Topolino's · More</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _diningCard = false;
+  setInterval(() => { if (!_diningCard) _diningCard = injectDiningCard(); }, 42000);
+  setTimeout(() => { _diningCard = injectDiningCard(); }, 38500);
+  const _prevRH_hhhhh = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_hhhhh) _prevRH_hhhhh.apply(this, arguments);
+    setTimeout(() => { _diningCard = false; _diningCard = injectDiningCard(); }, 11800);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK IIIII: Kennedy Space Center Complete Guide ===== */
+(function initKennedySpaceCenter() {
+
+  const ATTRACTIONS = [
+    {
+      name:'Atlantis — The Space Shuttle Experience', emoji:'🚀', type:'Exhibition Hall', duration:'45–90 min',
+      color:'#1565C0', mustSee:true,
+      desc:'The actual Space Shuttle Atlantis displayed at a 43.2-degree angle as if just returning from orbit. Surrounded by 60,000 sq ft of interactive exhibits.',
+      tip:'Start here first when the doors open. The introductory film with the reveal of Atlantis is genuinely moving. Take your time — this is the centerpiece of KSC.'
+    },
+    {
+      name:'Heroes and Legends / U.S. Astronaut Hall of Fame', emoji:'👨‍🚀', type:'Museum', duration:'45 min',
+      color:'#37474F', mustSee:true,
+      desc:'Meet the original Mercury, Gemini, and Apollo astronauts through immersive exhibits and personal artifacts.',
+      tip:'Often overlooked but deeply emotional. Alan Shepard\'s suit, John Glenn\'s capsule, and original mission artifacts. Start here for historical context before the launch complex tour.'
+    },
+    {
+      name:'Kennedy Space Center Bus Tour + Apollo/Saturn V Center', emoji:'🌕', type:'Tour + Exhibition', duration:'3–4 hours',
+      color:'#F57F17', mustSee:true,
+      desc:'Bus tour of the actual launch complex. The Saturn V center houses a complete 363-foot Saturn V rocket — the most powerful ever flown.',
+      tip:'The Saturn V rocket display is incomprehensible in scale. Budget 3–4 hours minimum for the full bus tour and Saturn V center. Included with admission. Go early — buses get crowded.'
+    },
+    {
+      name:'IMAX Theater (Two Shows)', emoji:'🎬', type:'IMAX Film', duration:'45 min each',
+      color:'#311B92', mustSee:false,
+      desc:'A Beautiful Planet and other space documentaries filmed from the International Space Station on a 5-story IMAX screen.',
+      tip:'Good midday break from heat. Films rotate seasonally. Included with admission. Great family-friendly experience especially for kids.'
+    },
+    {
+      name:'Rocket Garden', emoji:'🏗️', type:'Outdoor Exhibit', duration:'30 min',
+      color:'#2E7D32', mustSee:true,
+      desc:'Walk beneath actual rockets from America\'s space history — Mercury, Gemini, and early Apollo-era launch vehicles.',
+      tip:'The scale hits you immediately — these are actual rockets. Early morning or late afternoon for best photos. Free to wander at your own pace.'
+    },
+    {
+      name:'Journey to Mars: Explorers Wanted', emoji:'🔴', type:'Exhibition', duration:'30 min',
+      color:'#b71c1c', mustSee:false,
+      desc:'Current and future Mars exploration plans including Orion capsule, Space Launch System concepts, and Mars habitat mockups.',
+      tip:'Good for space enthusiasts wanting to understand where NASA is heading. Interactive stations for kids. Moderately interesting for general visitors.'
+    },
+    {
+      name:'Astronaut Encounter', emoji:'🌟', type:'Live Presentation', duration:'30 min',
+      color:'#C9A96E', mustSee:true,
+      desc:'Meet an actual NASA astronaut who has flown in space. Q&A session with authentic mission experiences shared.',
+      tip:'Check the daily schedule — one presentation per day typically. Lines form early. Meeting a real astronaut is genuinely remarkable regardless of age.'
+    },
+    {
+      name:'Space Mirror Memorial', emoji:'🕊️', type:'Memorial', duration:'10 min',
+      color:'#37474F', mustSee:false,
+      desc:'A 42-foot mirror monument honoring astronauts who died in service to the space program. Names lit from behind.',
+      tip:'A quiet, reflective moment that adds weight to the whole experience. Visit after the Atlantis exhibit for maximum emotional impact.'
+    },
+  ];
+
+  const LOGISTICS = [
+    { icon:'🚗', title:'Getting There from Orlando', desc:'50 miles east of Orlando via SR-528 (Beachline Expressway). About 1 hour from I-Drive, 55 min from Disney. Toll road — bring SunPass or cash. Parking is free at KSC.' },
+    { icon:'⏰', title:'Hours & Best Timing', desc:'Opens at 9 AM daily, closes at 6 PM most days. Arrive at 8:45 AM for parking. Full day (8+ hours) needed to see everything. Wednesday through Friday are least crowded.' },
+    { icon:'💰', title:'Admission Pricing', desc:'Adult: ~$75. Child (3–11): ~$65. Online booking saves $10+ per person. Add-ons: Astronaut Training Experience, NASA Up Close Tour (additional cost, exceptional for enthusiasts).' },
+    { icon:'☀️', title:'Weather Preparation', desc:'Outdoor elements are extensive — rocket garden, launch pads, etc. Sunscreen essential. Afternoon thunderstorms June–September. Bring water. The center is hot in summer — schedule outdoor sections early.' },
+    { icon:'📅', title:'Launch Scheduling', desc:'Check the KSC launch schedule before your visit. Witnessing a rocket launch adds a dimension words cannot capture. Free to view launches from public areas. Book nearby hotel if timing works.' },
+    { icon:'🍽️', title:'Dining On-Site', desc:'Orbit Café is the main counter service inside the visitor complex. It\'s serviceable theme park food — acceptable, not remarkable. Fuel Up American Café near the entrance has better coffee.' },
+    { icon:'👶', title:'With Kids', desc:'Outstanding for children 5+. Younger kids may lose interest during the Saturn V tour but love the rocket garden and IMAX. The simulator experiences have height requirements (42").' },
+    { icon:'🎓', title:'Serious Space Fans', desc:'Book the NASA Up Close Tour ($125+ add-on) — gets you behind security to active launch facilities, the Vehicle Assembly Building exterior, and crawler transporter roads. Remarkable access.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-kennedy-space-center';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:#0a0a1a;flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;color:#fff;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#0a0a1a,#1565C0,#311B92);padding:16px 14px 14px;border-bottom:1px solid rgba(255,255,255,.1);';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Kennedy Space Center</div>
+          <div style="font-size:11px;opacity:.7;">Cape Canaveral · 1 hour from Orlando</div>
+        </div>
+        <span style="font-size:28px;">🚀</span>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <div style="flex:1;background:rgba(255,255,255,.1);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:18px;font-weight:800;">1hr</div><div style="font-size:9px;opacity:.7;">FROM ORLANDO</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,.1);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:18px;font-weight:800;">8+h</div><div style="font-size:9px;opacity:.7;">FULL EXPERIENCE</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,.1);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:18px;font-weight:800;">~$75</div><div style="font-size:9px;opacity:.7;">ADMISSION</div>
+        </div>
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    /* Intro */
+    const intro = document.createElement('div');
+    intro.style.cssText = 'background:rgba(21,101,192,.2);border:1px solid rgba(21,101,192,.4);border-radius:14px;padding:14px;margin-bottom:14px;';
+    intro.innerHTML = `<div style="font-size:13px;line-height:1.7;color:rgba(255,255,255,.9);">
+      Kennedy Space Center is not a theme park. It is the actual working space launch facility where NASA and SpaceX launch missions to the International Space Station and beyond. The Space Shuttle Atlantis, the Saturn V moon rocket, and the astronauts you meet are completely real. This is one of the most meaningful places in Florida — and arguably the United States.
+    </div>`;
+    body.appendChild(intro);
+
+    ATTRACTIONS.forEach(a => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:14px;margin-bottom:12px;overflow:hidden;';
+      card.innerHTML = `
+        <div style="padding:10px 14px;background:${a.color}25;border-left:4px solid ${a.color};display:flex;align-items:flex-start;gap:10px;">
+          <span style="font-size:22px;flex-shrink:0;">${a.emoji}</span>
+          <div style="flex:1;">
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+              <div style="font-size:13px;font-weight:700;color:#fff;">${a.name}</div>
+              ${a.mustSee ? '<span style="background:#C9A96E;color:#000;font-size:9px;font-weight:800;padding:2px 7px;border-radius:20px;">MUST SEE</span>' : ''}
+            </div>
+            <div style="font-size:10px;color:rgba(255,255,255,.6);margin-top:2px;">${a.type} · ${a.duration}</div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          <div style="font-size:12px;color:rgba(255,255,255,.8);line-height:1.5;margin-bottom:8px;">${a.desc}</div>
+          <div style="display:flex;gap:8px;background:rgba(255,255,255,.05);border-radius:8px;padding:8px;">
+            <span style="font-size:14px;flex-shrink:0;">💡</span>
+            <div style="font-size:11px;color:rgba(255,255,255,.65);line-height:1.5;">${a.tip}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const logCard = document.createElement('div');
+    logCard.style.cssText = 'background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:16px;margin-bottom:14px;overflow:hidden;';
+    logCard.innerHTML = `<div style="padding:12px 14px;background:linear-gradient(135deg,#1565C0,#311B92);">
+      <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;">📋 Visit Planning Guide</div>
+    </div>
+    <div style="padding:12px 14px;">
+      ${LOGISTICS.map(l=>`<div style="margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.08);">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+          <span style="font-size:18px;">${l.icon}</span>
+          <div style="font-size:13px;font-weight:700;color:#fff;">${l.title}</div>
+        </div>
+        <div style="font-size:12px;color:rgba(255,255,255,.7);line-height:1.6;padding-left:26px;">${l.desc}</div>
+      </div>`).join('')}
+    </div>`;
+    body.appendChild(logCard);
+
+    const launchCard = document.createElement('div');
+    launchCard.style.cssText = 'background:linear-gradient(135deg,#311B92,#1565C0);border-radius:16px;margin-bottom:20px;padding:14px;';
+    launchCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">🚀 Witnessing a Launch</div>
+    <div style="font-size:12px;color:rgba(255,255,255,.9);line-height:1.7;margin-bottom:10px;">
+      If your visit dates align with a SpaceX Falcon 9 or NASA launch, reorganize your entire trip to be present. A rocket launch — the sound, the light, the vibration in your chest — is a once-in-a-lifetime experience. It changes how you see the world.
+    </div>
+    ${[
+      'Check: KSC website, SpaceX.com, and NASASpaceflight.com for confirmed launch windows.',
+      'Launches are visible from across Orlando (I-Drive, Disney) but nothing compares to being at the Cape.',
+      'Popular launch viewing spots: Playalinda Beach (closest public access), Titusville Riverfront Park, Jetty Park in Port Canaveral.',
+      'Launches scrub frequently — have a backup plan. If it launches, it\'s worth any inconvenience.',
+    ].map(t=>`<div style="display:flex;gap:8px;margin-bottom:6px;"><span style="font-size:12px;">⭐</span><div style="font-size:12px;color:rgba(255,255,255,.85);">${t}</div></div>`).join('')}`;
+    body.appendChild(launchCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-kennedy-space-center')) buildScreen();
+
+  const _prevSS_iiiii = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_iiiii) _prevSS_iiiii(name, el);
+    if (name === 'kennedy-space-center') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-kennedy-space-center');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectKSCCard() {
+    if (document.getElementById('ksc-home-card')) return true;
+    const ref = document.getElementById('dining-res-home-card') || document.getElementById('ioa-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'ksc-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#0a0a1a,#1565C0,#311B92);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('kennedy-space-center');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🚀</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Kennedy Space Center</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.75);">Real rockets · Shuttle Atlantis · 1 hour from Orlando</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.5);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _kscCard = false;
+  setInterval(() => { if (!_kscCard) _kscCard = injectKSCCard(); }, 43000);
+  setTimeout(() => { _kscCard = injectKSCCard(); }, 39500);
+  const _prevRH_iiiii = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_iiiii) _prevRH_iiiii.apply(this, arguments);
+    setTimeout(() => { _kscCard = false; _kscCard = injectKSCCard(); }, 12200);
+  };
+})();
+</script>
