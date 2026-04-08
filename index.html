@@ -54774,3 +54774,217 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK CCCCCC: Orlando Weather, Climate & Packing Guide ===== */
+(function initOrlandoWeather() {
+
+  const MONTHS = [
+    { month:'January', temp:'High 70°F / Low 49°F', humidity:'Low', rain:'Low', crowds:'Low', rating:5,
+      pro:'Perfect weather for all outdoor activities. Very low humidity. Cool evenings.',
+      con:'Some days can be cold (40s) — pack a jacket for evenings. Some park attractions may be under refurbishment.',
+      what:'Light layers. T-shirts and shorts by day, light jacket for evenings. 1 pair of jeans.' },
+    { month:'February', temp:'High 72°F / Low 52°F', humidity:'Low', rain:'Low', crowds:'Low–High',
+      rating:5,
+      pro:'Excellent weather. Presidents\' Week is the exception — huge crowds that week only.',
+      con:'Presidents\' Week (mid-Feb): extreme park crowds. Book hotels and parks early if your dates overlap.',
+      what:'Same as January. Sunscreen needed on clear days even in "cool" weather.' },
+    { month:'March', temp:'High 77°F / Low 57°F', humidity:'Moderate', rain:'Low', crowds:'High',
+      rating:3,
+      pro:'Beautiful weather. Spring flowers. Flower & Garden Festival begins at EPCOT.',
+      con:'Spring Break — one of the busiest park months of the year. Crowds from mid-March through April are intense.',
+      what:'T-shirts and shorts. Light rain layer (afternoon thunderstorms begin building). Sunscreen critical.' },
+    { month:'April', temp:'High 82°F / Low 62°F', humidity:'Moderate', rain:'Low–Moderate', crowds:'High',
+      rating:3,
+      pro:'Warm but not yet sweltering. Still in Flower & Garden Festival season.',
+      con:'Continued Spring Break crowds through mid-April. Humidity building.',
+      what:'Shorts and breathable tops. Sun hat starts being important. SPF 50+ sunscreen daily.' },
+    { month:'May', temp:'High 88°F / Low 68°F', humidity:'Moderate–High', rain:'Moderate', crowds:'Low–Moderate',
+      rating:4,
+      pro:'Excellent underrated window. Crowds drop after spring break. Weather not yet brutal.',
+      con:'Humidity noticeably builds. Afternoon thunderstorms become more common.',
+      what:'Lightweight breathable clothing only. Wide-brim hat essential. Ponchos for afternoon storms. Sunscreen.' },
+    { month:'June', temp:'High 91°F / Low 74°F', humidity:'High', rain:'High (daily)', crowds:'High',
+      rating:2,
+      pro:'Summer energy, longest days, school-age excitement.',
+      con:'Intense heat and humidity. Daily afternoon thunderstorms 2–5 PM almost guaranteed. Very crowded.',
+      what:'Moisture-wicking fabrics only. UV protection shirt for water activities. Two ponchos (one per park day). Change of clothes in bag.' },
+    { month:'July', temp:'High 92°F / Low 75°F', humidity:'Very High', rain:'Very High', crowds:'Very High',
+      rating:1,
+      pro:'Pool weather. Long park hours. 4th of July festivities at all parks.',
+      con:'Hottest, most humid month. Daily storms. Most crowded weeks of summer.',
+      what:'Identical to June. Cooling towels are game-changers. Fans. Cold water constantly.' },
+    { month:'August', temp:'High 92°F / Low 75°F', humidity:'Very High', rain:'Very High', crowds:'High',
+      rating:2,
+      pro:'European visitors bring different crowd energy. Schools start returning.',
+      con:'Indistinguishable from July weather-wise. Hurricanes enter peak season.',
+      what:'Same as July. Monitor weather app daily. Hurricane Florence strategy: parks stay open unless wind advisory.' },
+    { month:'September', temp:'High 88°F / Low 70°F', humidity:'High', rain:'High (less than summer)', crowds:'Lowest',
+      rating:5,
+      pro:'LOWEST CROWDS of the entire year. Comfortable walking temperatures. Food & Wine Festival begins at EPCOT.',
+      con:'Hurricane season peak. Hot and humid still. Occasional storm impacts.',
+      what:'Slightly lighter than summer — still moisture-wicking. Checking hurricane forecasts is normal practice.' },
+    { month:'October', temp:'High 84°F / Low 64°F', humidity:'Moderate', rain:'Moderate', crowds:'Low–Moderate',
+      rating:4,
+      pro:'Mickey\'s Not-So-Scary Halloween Party. Wonderful weather improving weekly. EPCOT Food & Wine.',
+      con:'Mid-October starts filling up. Halloween parties sell out.',
+      what:'Transitional — pack for both warm days and cooler evenings. Light layer for after 7 PM.' },
+    { month:'November', temp:'High 78°F / Low 58°F', humidity:'Low–Moderate', rain:'Low', crowds:'Low–Extreme',
+      rating:4,
+      pro:'Excellent first half of the month. Beautiful weather. Mickey\'s Very Merry Christmas begins.',
+      con:'Thanksgiving week is one of the 3 busiest weeks of the year. Parks hit capacity.',
+      what:'Light jacket for mornings and evenings. Shorts still appropriate by day. Perfect outdoor weather.' },
+    { month:'December', temp:'High 72°F / Low 52°F', humidity:'Low', rain:'Low', crowds:'Low–Extreme',
+      rating:3,
+      pro:'Christmas decorations across all parks. Mickey\'s Very Merry Christmas Party. Beautiful holiday atmosphere.',
+      con:'Christmas week (Dec 20–Jan 1) is the single most crowded week of the year. Parks hit absolute capacity.',
+      what:'Layers essential — 50s at night with 70s by day. Jacket for evenings. Very comfortable daytime.' },
+  ];
+
+  const HURRICANE_INFO = [
+    { icon:'🌀', tip:'Hurricane season: June 1 – November 30. Peak: August – October. Florida averages 1 hurricane landfall per year but most miss the Orlando area.' },
+    { icon:'📱', tip:'Download the official NOAA Weather app and National Hurricane Center app before your trip. Subscribe to park alerts — parks communicate storm plans 24 hours in advance.' },
+    { icon:'🏰', tip:'Disney World and Universal stay open during mild tropical storms. They close only when sustained winds reach 35–40 mph (tropical storm force) in the area. This is rarer than you think.' },
+    { icon:'✈️', tip:'Travel insurance with "cancel for any reason" is highly recommended for September–October visits. Hurricane-related flight cancellations are common without it.' },
+    { icon:'🏨', tip:'Disney resort hotel rooms are extraordinarily storm-safe. During Hurricane Ian (2022), Disney resorts provided refuge. On-site is actually safer during storms than off-site options.' },
+    { icon:'💧', tip:'Florida thunderstorms: Totally different from hurricanes. The daily 2–5 PM storms last 45–90 minutes, clear completely, and don\'t affect park operations. Don\'t let them worry you.' },
+  ];
+
+  const PACKING_LIST = [
+    { category:'Sun Protection', items:['SPF 50+ reef-safe sunscreen (large bottle — reapply every 90 min)', 'Wide-brim hat (not a baseball cap — you need neck protection)', 'UV protection shirt/rash guard for water activities', 'Sunglasses with UV protection'] },
+    { category:'Hydration', items:['Refillable water bottle (all Disney/Universal parks have free water fill stations)', 'Electrolyte packets (SaltStick or Liquid IV — essential in summer)', 'Small soft-sided cooler if bringing snacks to parks'] },
+    { category:'Rain Gear', items:['Packable ponchos × 2 per person (buy on Amazon — $2 each, vs $30 in park)', 'Waterproof phone case/bag', 'Quick-dry shoes (if visiting water parks or water rides)'] },
+    { category:'Comfort', items:['Cooling towel (wet and drape around neck in heat — transforms the experience)', 'Small battery-powered fan (portable neck fan or handheld)', 'Comfortable, broken-in walking shoes (20,000+ daily steps)', 'Extra socks — blisters are a theme park trip killer'] },
+    { category:'Health & Safety', items:['Personal medications + 2 extra days supply in carry-on', 'Band-aids and moleskin for blisters', 'Pain reliever (ibuprofen or acetaminophen)', 'Insect repellent (DEET-based for Wekiwa and outdoor nature areas)'] },
+    { category:'Tech & Documents', items:['Portable phone charger (power bank 20,000 mAh for all-day park use)', 'Phone charger cable × 2 (one always dies)', 'Park tickets downloaded to Apple Wallet offline', 'Travel insurance documents screenshot saved offline'] },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-orlando-weather';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#0277BD,#2E7D32,#F57F17);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Weather & Packing Guide</div>
+          <div style="font-size:11px;opacity:.8;">Month-by-month · Packing list · Hurricane info</div>
+        </div>
+        <span style="font-size:28px;">🌤️</span>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:15px;font-weight:800;">Sept</div><div style="font-size:9px;opacity:.8;">BEST WEATHER+CROWDS</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:15px;font-weight:800;">July</div><div style="font-size:9px;opacity:.8;">HOTTEST + BUSIEST</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:15px;font-weight:800;">Jan</div><div style="font-size:9px;opacity:.8;">BEST OVERALL</div>
+        </div>
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    /* Month cards in 2-column grid */
+    const grid = document.createElement('div');
+    grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;';
+    MONTHS.forEach(m => {
+      const stars = '★'.repeat(m.rating) + '☆'.repeat(5-m.rating);
+      const monthColor = m.rating >= 5 ? '#2E7D32' : m.rating >= 4 ? '#558B2F' : m.rating >= 3 ? '#F57F17' : m.rating >= 2 ? '#E65100' : '#C62828';
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:12px;padding:10px;border:1px solid var(--border,#eee);border-top:3px solid ' + monthColor + ';';
+      card.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
+          <div style="font-size:13px;font-weight:800;color:var(--text-primary,#212121);">${m.month}</div>
+          <div style="font-size:11px;color:${monthColor};">${stars}</div>
+        </div>
+        <div style="font-size:10px;color:${monthColor};font-weight:700;margin-bottom:3px;">${m.temp}</div>
+        <div style="display:flex;gap:3px;margin-bottom:5px;">
+          <span style="font-size:9px;padding:1px 5px;border-radius:10px;background:#0277BD18;color:#0277BD;">${m.humidity} humidity</span>
+          <span style="font-size:9px;padding:1px 5px;border-radius:10px;background:#2E7D3218;color:#2E7D32;">Crowds: ${m.crowds}</span>
+        </div>
+        <div style="font-size:10px;color:#2E7D32;margin-bottom:2px;">✓ ${m.pro.substring(0,45)}${m.pro.length>45?'...':''}</div>
+        <div style="font-size:10px;color:#C62828;">✗ ${m.con.substring(0,45)}${m.con.length>45?'...':''}</div>`;
+      grid.appendChild(card);
+    });
+    body.appendChild(grid);
+
+    /* Full packing list */
+    const packCard = document.createElement('div');
+    packCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+    packCard.innerHTML = `<div style="padding:12px 14px;background:linear-gradient(135deg,#0277BD,#2E7D32);color:#fff;">
+      <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;">🎒 Complete Orlando Packing List</div>
+    </div>
+    <div style="padding:12px 14px;">
+      ${PACKING_LIST.map(cat=>`<div style="margin-bottom:12px;">
+        <div style="font-size:11px;font-weight:800;color:#0277BD;margin-bottom:5px;">${cat.category.toUpperCase()}</div>
+        ${cat.items.map(item=>`<div style="display:flex;gap:6px;align-items:flex-start;margin-bottom:3px;">
+          <span style="color:#2E7D32;flex-shrink:0;font-size:12px;">✓</span>
+          <div style="font-size:11px;color:var(--text-secondary,#555);">${item}</div>
+        </div>`).join('')}
+      </div>`).join('')}
+    </div>`;
+    body.appendChild(packCard);
+
+    const hurrCard = document.createElement('div');
+    hurrCard.style.cssText = 'background:linear-gradient(135deg,#0277BD,#F57F17);border-radius:16px;margin-bottom:20px;padding:14px;color:#fff;';
+    hurrCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">🌀 Hurricane Season Reality Check</div>
+    ${HURRICANE_INFO.map(h=>`<div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
+      <span style="font-size:18px;flex-shrink:0;">${h.icon}</span>
+      <div style="font-size:12px;opacity:.95;line-height:1.5;">${h.tip}</div>
+    </div>`).join('')}`;
+    body.appendChild(hurrCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-orlando-weather')) buildScreen();
+
+  const _prevSS_cccccc = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_cccccc) _prevSS_cccccc(name, el);
+    if (name === 'orlando-weather') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-orlando-weather');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectWeatherCard() {
+    if (document.getElementById('weather-home-card')) return true;
+    const ref = document.getElementById('access-home-card') || document.getElementById('efw-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'weather-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#0277BD,#2E7D32,#F57F17);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('orlando-weather');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🌤️</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Weather & Packing Guide</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Month-by-month weather · Complete packing list</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _weatherCard = false;
+  setInterval(() => { if (!_weatherCard) _weatherCard = injectWeatherCard(); }, 63000);
+  setTimeout(() => { _weatherCard = injectWeatherCard(); }, 59500);
+  const _prevRH_cccccc = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_cccccc) _prevRH_cccccc.apply(this, arguments);
+    setTimeout(() => { _weatherCard = false; _weatherCard = injectWeatherCard(); }, 20200);
+  };
+})();
+</script>
