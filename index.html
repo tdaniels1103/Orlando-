@@ -47834,3 +47834,187 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK UUUU2: Orlando Concert & Music Venues Guide ===== */
+(function initMusicGuide() {
+
+  const VENUES = [
+    {
+      name:'Amway Center', type:'Arena', capacity:'18,000+', emoji:'🏟️', color:'#1565C0',
+      neighborhood:'Downtown Orlando',
+      desc:'The Orlando Magic\'s home and the main arena for major touring concerts in Central Florida.',
+      notable:['Major touring artists: Taylor Swift, Beyoncé, Bad Bunny when on FL dates','Hosting UCF sporting events, boxing, WWE','Parking is downtown — Uber is strongly recommended'],
+      tip:'GA floor shows sell out fast. Seats in 100-level are excellent. Upper deck has sightline issues for center-stage shows.',
+    },
+    {
+      name:'Dr. Phillips Center for the Performing Arts', type:'Concert Hall', capacity:'2,700 (Walt Disney Theater) / 300 (Steinmetz Hall)', emoji:'🎼', color:'#7B1FA2',
+      neighborhood:'Downtown Orlando',
+      desc:'One of the finest performing arts centers in the Southeast US. Broadway touring shows, Orlando Philharmonic, chamber music.',
+      notable:['Steinmetz Hall is acoustically perfect — a miracle of modern engineering','Orlando Philharmonic seasons September–May','Broadway touring shows (Hamilton, Lion King, etc.) typically 1 week runs','Frontyard Festival (outdoor free events) runs seasonally'],
+      tip:'Steinmetz Hall\'s acoustics mean even "cheap" seats sound extraordinary. Book early — best Broadway shows sell out in hours.',
+    },
+    {
+      name:'Hard Rock Live at Universal CityWalk', type:'Music Venue', capacity:'3,000', emoji:'🎸', color:'#37474F',
+      neighborhood:'Universal CityWalk',
+      desc:'Mid-size concert venue with excellent sightlines and sound.',
+      notable:['Mid-level touring artists and popular reunion tours','All-ages and 21+ shows — check each event','Part of Hard Rock Hotel complex — no separate parking needed if staying there'],
+      tip:'Floor level is GA standing. Balcony seating is reserved and comfortable. Best value seats for most shows.',
+    },
+    {
+      name:'House of Blues (Disney Springs)', type:'Music Venue', capacity:'1,000 (concert hall)', emoji:'🎵', color:'#4A148C',
+      neighborhood:'Disney Springs',
+      desc:'Intimate venue with the famous HoB voodoo décor. Great sound, great sight lines.',
+      notable:['Sunday Gospel Brunch ($44 — all-you-can-eat + live gospel show) is a must-do','Local and national touring artists','No Disney ticket required — free parking for 3 hrs at Disney Springs'],
+      tip:'Gospel Brunch is worth doing even if you\'re not religious — the performances are extraordinary and the food is excellent.',
+    },
+    {
+      name:'Will\'s Pub', type:'Dive Bar/Music Venue', capacity:'250', emoji:'🎤', color:'#5D4037',
+      neighborhood:'Audubon Park',
+      desc:'Orlando\'s most beloved independent music venue. Serving local and touring indie/rock acts for decades.',
+      notable:['Best indie/alternative music in Orlando','Late shows — expect 10pm+ set times','Cash bar, cash preferred (ATM inside)','No reservations — just show up'],
+      tip:'This is where Orlando musicians go after their own shows. The vibe is unmatched — truly a locals-only feel even when packed.',
+    },
+    {
+      name:'The Social', type:'Club/Music Venue', capacity:'300', emoji:'🎶', color:'#c62828',
+      neighborhood:'Downtown Orlando',
+      desc:'Downtown small venue with strong indie, alternative, and hip-hop bookings.',
+      notable:['Booking reflects national touring at the early-career level','Great for discovering artists before they get big','21+ most nights','Parking on Church Street area'],
+      tip:'Check the booking calendar — the Social has launched several national careers. If a name sounds vaguely familiar, it\'s probably here.',
+    },
+    {
+      name:'Mead Botanical Garden (Summer Concert Series)', type:'Outdoor Venue', capacity:'Varies', emoji:'🌺', color:'#2E7D32',
+      neighborhood:'Winter Park',
+      desc:'Free outdoor summer concert series in a beautiful botanical garden. Friday evenings.',
+      notable:['Usually free admission','Local and regional bands, some national acts','BYO picnic and drinks','Family-friendly and dog-friendly'],
+      tip:'One of the best free events in Orlando. Bring a blanket, a bottle of wine, and arrive by 6:30pm for a good spot.',
+    },
+    {
+      name:'Camping World Stadium', type:'Stadium', capacity:'65,000', emoji:'🏟️', color:'#E65100',
+      neighborhood:'Downtown Orlando',
+      desc:'Outdoor stadium hosting major festivals, stadium-level concerts, and college football bowl games.',
+      notable:['Stadium-level concerts (when they happen)','College football Gasparilla Bowl in December','Music festivals throughout the year','Large outdoor venue with Florida weather challenges'],
+      tip:'For outdoor stadium shows in summer, check weather and arrive with ponchos. The venue can be hot and exposed.',
+    },
+  ];
+
+  const MUSIC_EVENTS = [
+    { name:'Immersion Music Festival', month:'Spring', desc:'Electronic music at Lakeland, FL (90 min) — popular with Orlando attendees.' },
+    { name:'Universal Mardi Gras Concerts', month:'Feb–April', desc:'Free with park admission. A-list artists perform — check lineup before visiting.' },
+    { name:'EPCOT International Festivals', month:'Year-round', desc:'World Showcase stages have live entertainment throughout all major festivals.' },
+    { name:'SunFest', month:'May (West Palm, 3 hrs)', desc:'Major Florida music festival — worth the drive for a strong lineup year.' },
+    { name:'Mead Garden Concert Series', month:'Summer Fridays', desc:'Free Friday evening concerts in Winter Park. One of Orlando\'s best free events.' },
+    { name:'Dr. Phillips Center Frontyard', month:'Seasonal', desc:'Outdoor programming at the arts center — free events and ticketed shows.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-music-guide';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const header = document.createElement('div');
+    header.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#1a1a1a,#4A148C,#7B1FA2);padding:16px 14px 14px;';
+    header.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:#fff;">Concert & Music Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.7);">8 venues · Events · Gospel Brunch · Local scene</div>
+        </div>
+        <span style="font-size:24px;">🎸</span>
+      </div>`;
+
+    const content = document.createElement('div');
+    content.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    VENUES.forEach(venue => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:10px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="background:${venue.color};padding:10px 14px;display:flex;align-items:center;gap:10px;">
+          <span style="font-size:22px;">${venue.emoji}</span>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:700;color:#fff;">${venue.name}</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.8);">${venue.type} · Cap: ${venue.capacity} · ${venue.neighborhood}</div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          <div style="font-size:12px;color:var(--text-secondary,#555);margin-bottom:7px;line-height:1.5;">${venue.desc}</div>
+          ${venue.notable.slice(0,2).map(n=>`<div style="font-size:11px;color:var(--text-secondary,#666);padding:2px 0;">• ${n}</div>`).join('')}
+          <div style="margin-top:7px;background:${venue.color}08;border-radius:8px;padding:7px 10px;border-left:3px solid ${venue.color};">
+            <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.4;font-style:italic;">"${venue.tip}"</div>
+          </div>
+        </div>`;
+      content.appendChild(card);
+    });
+
+    // Events
+    const evHeader = document.createElement('div');
+    evHeader.style.cssText = 'font-size:13px;font-weight:800;color:#4A148C;margin:14px 0 8px;';
+    evHeader.textContent = '📅 MUSIC EVENTS CALENDAR';
+    content.appendChild(evHeader);
+
+    MUSIC_EVENTS.forEach(ev => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:12px;margin-bottom:7px;padding:10px 13px;border:1px solid var(--border,#eee);border-left:3px solid #4A148C;';
+      card.innerHTML = `
+        <div style="display:flex;justify-content:space-between;margin-bottom:2px;">
+          <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);">${ev.name}</div>
+          <span style="font-size:10px;font-weight:700;color:#4A148C;">${ev.month}</span>
+        </div>
+        <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.4;">${ev.desc}</div>`;
+      content.appendChild(card);
+    });
+
+    const spacer = document.createElement('div');
+    spacer.style.height = '20px';
+    content.appendChild(spacer);
+
+    s.appendChild(header);
+    s.appendChild(content);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-music-guide')) buildScreen();
+
+  const _prevSS_uuuu2 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_uuuu2) _prevSS_uuuu2(name, el);
+    if (name === 'music-guide') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-music-guide');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectMusicCard() {
+    if (document.getElementById('music-home-card')) return true;
+    const ref = document.getElementById('genie-home-card') || document.getElementById('bkfst-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'music-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#1a1a1a,#4A148C,#7B1FA2);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('music-guide');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:3px;">🎸 Concert & Music Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.75);">Dr. Phillips · Hard Rock Live · Gospel Brunch</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.4);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _musicCard = false;
+  setInterval(() => { if (!_musicCard) _musicCard = injectMusicCard(); }, 34500);
+  setTimeout(() => { _musicCard = injectMusicCard(); }, 31000);
+
+  const _prevRH_uuuu2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_uuuu2) _prevRH_uuuu2.apply(this, arguments);
+    setTimeout(() => { _musicCard = false; _musicCard = injectMusicCard(); }, 8700);
+  };
+})();
+</script>
