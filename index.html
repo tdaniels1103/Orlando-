@@ -48791,3 +48791,224 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK ZZZZ2: Harry Potter Wizarding World Complete Guide ===== */
+(function initHPGuide() {
+
+  const LANDS = [
+    {
+      name:'Hogsmeade', park:'Islands of Adventure', emoji:'🏰', color:'#4A148C',
+      desc:'The original Wizarding World land (2010). Modeled on the village from the films. Snow-capped rooftops, the Hogwarts Express, and Hogwarts Castle itself.',
+      mustDo:[
+        { name:'Harry Potter and the Forbidden Journey', type:'Dark ride hybrid', height:'48"', tip:'Still exceptional 15 years later. The Hogwarts Castle queue is half the experience — explore every room.' },
+        { name:'Hagrid\'s Magical Creatures Motorbike Adventure', type:'Coaster / Dark Ride', height:'48"', tip:'The best theme park ride in the world. Period. Virtual queue or very early standby only.' },
+        { name:'Flight of the Hippogriff', type:'Family coaster', height:'36"', tip:'Short but fun family coaster. Good starter coaster for younger kids.' },
+      ],
+      food:[
+        { name:'Three Broomsticks', type:'Counter service', specialty:'Butterbeer, Great Feast (chicken/ribs), Pumpkin Juice', tip:'Best value meal in Hogsmeade. The family feast platter feeds 4 for $60.' },
+        { name:'Hog\'s Head Pub', type:'Bar', specialty:'Hogshead Brew, Butterbeer, Pumpkin Ale', tip:'Walk through Three Broomsticks — the pub is attached at the back. The animatronic Hog\'s Head behind the bar occasionally moves.' },
+        { name:'Honeydukes', type:'Sweet shop', specialty:'Chocolate Frogs, Bertie Bott\'s Beans, Chocolate wands', tip:'The chocolate frogs contain a collectible wizard card. The beans have the same disgusting flavors as the books.' },
+      ],
+      secrets:['The Marauder\'s Map is embedded in the Three Broomsticks floor','Look for the Monster Book of Monsters in a shop window','Interactive wand spots throughout — buy a wand at Ollivanders (performance show) or any shop'],
+    },
+    {
+      name:'Diagon Alley', park:'Universal Studios Florida', emoji:'⚗️', color:'#1a237e',
+      desc:'The 2014 expansion. Larger, more immersive, and more detailed than Hogsmeade. Includes Knockturn Alley (dark magic district) and King\'s Cross station connection.',
+      mustDo:[
+        { name:'Harry Potter and the Escape from Gringotts', type:'Multi-dimensional ride', height:'42"', tip:'Combines fire effects, 3D projections, and actual coaster elements. The Gringotts queue through the bank is extraordinary even without the ride.' },
+        { name:'The Hogwarts Express (London → Hogsmeade)', type:'Train / Show', height:'None', tip:'Different experience going each direction. Requires tickets for both parks. Going from King\'s Cross to Hogsmeade feels like crossing into the wizarding world.' },
+        { name:'Leaky Cauldron breakfast', type:'Dining', height:'N/A', tip:'The most atmospheric meal in any theme park. Toad in the Hole, English breakfast, Butterbeer. The interior design is extraordinary.' },
+      ],
+      food:[
+        { name:'Leaky Cauldron', type:'Counter service (themed pub)', specialty:'English breakfast, Toad in the Hole, Fish & Chips, Butterbeer', tip:'Open for breakfast, lunch, and dinner. Breakfast service (full English) is particularly excellent and often overlooked.' },
+        { name:'The Hopping Pot', type:'Outdoor counter', specialty:'Butterbeer, Wizarding cocktails, street food', tip:'Outdoor food stalls with rotating items. The Butterbeer ice cream here is worth seeking out.' },
+        { name:'Florean Fortescue\'s Ice-Cream Parlour', type:'Ice cream shop', specialty:'Butterbeer ice cream, unique wizarding flavors', tip:'Unique flavor combinations you won\'t find anywhere else. The Earl Grey and lavender flavor is extraordinary.' },
+      ],
+      secrets:['Knockturn Alley is entered through a narrow passage off the main Diagon Alley street — most guests miss it','The dragon on the Gringotts roof breathes real fire approximately every 15 minutes','Look for the Whispering Widget in the windows — it broadcasts Potterwatch if you know how to tune in'],
+    },
+  ];
+
+  const BUTTERBEER_GUIDE = [
+    { type:'Cold', temp:'Cold', desc:'Traditional cold pour with foam top. The original.' },
+    { type:'Frozen', temp:'Frozen', desc:'Blended frozen version. Most popular. Sweeter and creamier.' },
+    { type:'Hot', temp:'Hot', desc:'Warm butterscotch drink. Only seasonally at some locations. Perfect on a rare cool Florida day.' },
+    { type:'Ice Cream', temp:'Soft serve', desc:'Butterbeer soft-serve at Florean Fortescue\'s. Unique flavor — more complex than the drink.' },
+    { type:'Fudge', temp:'Candy', desc:'Available at Honeydukes. Take a piece of Butterbeer home.' },
+    { type:'Potted Cream', temp:'Dessert', desc:'Butterscotch custard at Leaky Cauldron. Underrated — excellent dessert.' },
+  ];
+
+  const WAND_GUIDE = [
+    { type:'Interactive Wand', price:'$55', where:'Ollivanders, any wand shop', note:'Works at interactive spots throughout both lands. Comes with a map of all spell locations.' },
+    { type:'Non-Interactive Character Wand', price:'$38–45', where:'Wand shops', note:'Replica wands from the film. Gorgeous but don\'t trigger spell spots.' },
+    { type:'Ollivanders Experience', price:'Free (park ticket)', where:'Ollivanders (both locations)', note:'Live show where a wand "chooses" a guest. Usually a child from the audience. Do not miss this.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-hp-guide';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:#1a0d2e;flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;color:#fff;';
+
+    const header = document.createElement('div');
+    header.style.cssText = 'flex-shrink:0;background:linear-gradient(160deg,#1a0d2e,#4A148C,#7B1FA2);padding:16px 14px 14px;border-bottom:1px solid rgba(255,255,255,.1);';
+    header.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.1);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:#fff;">Wizarding World Complete Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.6);">Hogsmeade · Diagon Alley · Butterbeer · Wands</div>
+        </div>
+        <span style="font-size:24px;">⚡</span>
+      </div>
+      <div style="background:rgba(255,255,255,.08);border-radius:10px;padding:8px 12px;font-size:12px;color:rgba(255,255,255,.85);">
+        To experience both lands fully, you need park-to-park tickets (both Universal Studios Florida and Islands of Adventure). The Hogwarts Express connecting them is worth it alone.
+      </div>`;
+
+    const content = document.createElement('div');
+    content.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    // Lands
+    LANDS.forEach(land => {
+      const landHeader2 = document.createElement('div');
+      landHeader2.style.cssText = `background:${land.color};border-radius:14px 14px 0 0;padding:12px 14px;margin-top:16px;`;
+      landHeader2.innerHTML = `
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:22px;">${land.emoji}</span>
+          <div>
+            <div style="font-size:14px;font-weight:700;color:#fff;">${land.name}</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.75);">${land.park}</div>
+          </div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.8);margin-top:5px;line-height:1.5;">${land.desc}</div>`;
+      content.appendChild(landHeader2);
+
+      const landBody = document.createElement('div');
+      landBody.style.cssText = 'background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-top:none;border-radius:0 0 14px 14px;padding:12px 14px;margin-bottom:4px;';
+
+      // Must dos
+      const mdLabel = document.createElement('div');
+      mdLabel.style.cssText = `font-size:10px;font-weight:700;color:${land.color === '#4A148C' ? '#AB47BC' : '#7986CB'};margin-bottom:7px;`;
+      mdLabel.textContent = 'MUST-DO EXPERIENCES';
+      landBody.appendChild(mdLabel);
+
+      land.mustDo.forEach(item => {
+        const row = document.createElement('div');
+        row.style.cssText = 'background:rgba(255,255,255,.06);border-radius:8px;padding:8px 10px;margin-bottom:6px;';
+        row.innerHTML = `
+          <div style="display:flex;justify-content:space-between;margin-bottom:2px;">
+            <div style="font-size:12px;font-weight:700;color:#fff;">${item.name}</div>
+            <span style="font-size:9px;padding:1px 6px;border-radius:20px;background:rgba(255,255,255,.15);color:rgba(255,255,255,.8);">${item.height}</span>
+          </div>
+          <div style="font-size:10px;color:rgba(255,255,255,.5);margin-bottom:3px;">${item.type}</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.7);line-height:1.4;">${item.tip}</div>`;
+        landBody.appendChild(row);
+      });
+
+      // Food
+      const foodLabel = document.createElement('div');
+      foodLabel.style.cssText = 'font-size:10px;font-weight:700;color:rgba(255,255,255,.5);margin:10px 0 7px;';
+      foodLabel.textContent = 'DINING';
+      landBody.appendChild(foodLabel);
+
+      land.food.forEach(food => {
+        const row = document.createElement('div');
+        row.style.cssText = 'margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.07);';
+        row.innerHTML = `
+          <div style="font-size:12px;font-weight:700;color:rgba(255,255,255,.9);">🍽️ ${food.name}</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.5);">${food.type} · ${food.specialty.substring(0,50)}...</div>`;
+        landBody.appendChild(row);
+      });
+
+      content.appendChild(landBody);
+    });
+
+    // Butterbeer guide
+    const bbHeader = document.createElement('div');
+    bbHeader.style.cssText = 'font-size:13px;font-weight:800;color:#AB47BC;margin:16px 0 8px;';
+    bbHeader.textContent = '🍺 BUTTERBEER COMPLETE GUIDE';
+    content.appendChild(bbHeader);
+
+    const bbGrid = document.createElement('div');
+    bbGrid.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;';
+    BUTTERBEER_GUIDE.forEach(bb => {
+      const chip = document.createElement('div');
+      chip.style.cssText = 'background:rgba(255,255,255,.07);border-radius:10px;padding:8px 10px;border:1px solid rgba(255,255,255,.1);min-width:calc(50% - 3px);';
+      chip.innerHTML = `
+        <div style="font-size:11px;font-weight:700;color:#CE93D8;">${bb.type}</div>
+        <div style="font-size:9px;color:rgba(255,255,255,.5);margin-bottom:3px;">${bb.temp}</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.7);">${bb.desc}</div>`;
+      bbGrid.appendChild(chip);
+    });
+    content.appendChild(bbGrid);
+
+    // Wand guide
+    const wandHeader = document.createElement('div');
+    wandHeader.style.cssText = 'font-size:13px;font-weight:800;color:#AB47BC;margin:0 0 8px;';
+    wandHeader.textContent = '🪄 WAND GUIDE';
+    content.appendChild(wandHeader);
+
+    WAND_GUIDE.forEach(w => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:rgba(255,255,255,.06);border-radius:10px;margin-bottom:6px;padding:10px 12px;border:1px solid rgba(255,255,255,.1);';
+      card.innerHTML = `
+        <div style="display:flex;justify-content:space-between;margin-bottom:3px;">
+          <div style="font-size:12px;font-weight:700;color:#fff;">${w.type}</div>
+          <span style="font-size:12px;font-weight:800;color:#CE93D8;">${w.price}</span>
+        </div>
+        <div style="font-size:10px;color:rgba(255,255,255,.5);margin-bottom:3px;">${w.where}</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.7);">${w.note}</div>`;
+      content.appendChild(card);
+    });
+
+    const spacer = document.createElement('div');
+    spacer.style.height = '20px';
+    content.appendChild(spacer);
+
+    s.appendChild(header);
+    s.appendChild(content);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-hp-guide')) buildScreen();
+
+  const _prevSS_zzzz2 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_zzzz2) _prevSS_zzzz2(name, el);
+    if (name === 'hp-guide') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-hp-guide');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectHPCard() {
+    if (document.getElementById('hp-home-card')) return true;
+    const ref = document.getElementById('checklist-home-card') || document.getElementById('scavenger-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'hp-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(160deg,#1a0d2e,#4A148C,#7B1FA2);border-radius:16px;padding:14px;cursor:pointer;border:1px solid rgba(255,255,255,.1);';
+    card.onclick = () => window.showScreen('hp-guide');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:3px;">⚡ Wizarding World Complete Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.75);">Hogsmeade · Diagon Alley · Butterbeer · Wands</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.4);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _hpCard = false;
+  setInterval(() => { if (!_hpCard) _hpCard = injectHPCard(); }, 37000);
+  setTimeout(() => { _hpCard = injectHPCard(); }, 33500);
+
+  const _prevRH_zzzz2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_zzzz2) _prevRH_zzzz2.apply(this, arguments);
+    setTimeout(() => { _hpCard = false; _hpCard = injectHPCard(); }, 9700);
+  };
+})();
+</script>
