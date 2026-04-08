@@ -46762,3 +46762,184 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK OOOO2: Disney Springs & CityWalk Complete Guide ===== */
+(function initShoppingDistricts() {
+
+  const DISNEY_SPRINGS = {
+    areas:[
+      {
+        name:'The Landing', color:'#1565C0',
+        desc:'Waterfront dining and entertainment. The most scenic part of Disney Springs.',
+        highlights:['Paddlefish (floating restaurant shaped like a steamboat)','The BOATHOUSE (nautical fine dining with amphicar tours)','Jock Lindsey\'s Hangar Bar (Indiana Jones themed)','Chef Art Smith\'s Homecomin\' (Southern comfort food)'],
+      },
+      {
+        name:'Town Center', color:'#2E7D32',
+        desc:'Premium shopping and flagship stores. Most upscale area of Disney Springs.',
+        highlights:['L\'Occitane','UNIQLO','Columbia Sportswear','Anthropologie','The Disney Store (largest in the world)','Something Silver (custom jewelry)'],
+      },
+      {
+        name:'The Marketplace', color:'#E65100',
+        desc:'Classic Disney shopping and iconic dining. The original Disney Springs area.',
+        highlights:['World of Disney (the mothership)','LEGO Store (giant outdoor sculptures)','Disney\'s Days of Christmas (year-round ornaments)','T-REX Cafe (animatronic dinosaurs)','Rainforest Café'],
+      },
+      {
+        name:'West Side', color:'#7B1FA2',
+        desc:'Entertainment-focused. Movie theater, bowling, live music.',
+        highlights:['AMC Movie Theater (with dine-in option)','Splitsville Luxury Lanes (bowling + sushi)','House of Blues (live music venue)','Cirque du Soleil "Drawn to Life" (must-book experience)'],
+      },
+    ],
+    tips:[
+      'Disney Springs is free to enter — no park ticket required. Excellent for a free evening or arrival day.',
+      'Parking is free for the first 3 hours. After 3 hours, charges apply unless you dine at a participating restaurant.',
+      'Cirque du Soleil "Drawn to Life" is one of the most creative shows in Disney Springs history — book in advance ($75–145/person).',
+      'BOATHOUSE Amphicar Tours: 20-minute tours in a car that drives into the water. A bucket-list Orlando experience ($130 for 3 people).',
+      'House of Blues has free live music on Sunday Gospel Brunch ($44/person including all-you-can-eat food). One of Orlando\'s best brunch experiences.',
+    ]
+  };
+
+  const CITYWALK = {
+    venues:[
+      { name:'The Toothsome Chocolate Emporium', type:'Restaurant/Bar', desc:'Steampunk themed restaurant with massive milkshakes and creative cocktails. One of the most visually stunning casual restaurants in Orlando.' },
+      { name:'Antojitos Authentic Mexican Food', type:'Restaurant', desc:'One of the better Mexican restaurants in the tourist corridor. Waterfall inside, strong margaritas, solid tacos.' },
+      { name:'Margaritaville', type:'Restaurant/Bar', desc:'Jimmy Buffett-themed restaurant. Excellent for a festive group lunch. The margarita-making "volcano" is entertaining.' },
+      { name:'Hard Rock Café', type:'Restaurant', desc:'World\'s original Hard Rock Café. Rock memorabilia, solid burgers. Best for the novelty and memorabilia rather than the food.' },
+      { name:'Bob Marley - A Tribute to Freedom', type:'Bar/Live Music', desc:'Reggae music venue with live bands nightly. Outdoor courtyard, Red Stripe beer, Caribbean food. Great for unwinding after parks.' },
+      { name:'The Groove', type:'Nightclub', desc:'Universal\'s main nightclub. Multi-room dance venue, opens 9pm. Cover charge varies.' },
+      { name:'Pat O\'Brien\'s', type:'Bar', desc:'New Orleans hurricane drinks, dueling pianos nightly. One of CityWalk\'s best pure entertainment experiences.' },
+      { name:'Tin Roof', type:'Live Music Bar', desc:'Live music every night. Genre varies — check schedule. Good food, energetic atmosphere.' },
+    ],
+    tips:[
+      'CityWalk is free to walk through — the cover charge only applies to the nightclub (The Groove) and some special events.',
+      'Universal hotel guests get free Universal Cinemark tickets — great for a rest day movie.',
+      'The 5-minute walk from Hard Rock Hotel makes this perfect for a pre-park breakfast or post-park dinner without needing a car.',
+      'Halloween Horror Nights in fall transforms CityWalk and parts of Universal — special ticketed event, different pricing.',
+      'Voodoo Doughnut is a Portland-based doughnut shop inside CityWalk. The bacon maple doughnut is legendary.',
+    ]
+  };
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-shopping-districts';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const header = document.createElement('div');
+    header.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#1a1a1a,#003087,#00538F);padding:16px 14px 14px;';
+    header.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:#fff;">Disney Springs & CityWalk</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.7);">Free entry · Dining · Shopping · Nightlife</div>
+        </div>
+        <span style="font-size:24px;">🏪</span>
+      </div>`;
+
+    const content = document.createElement('div');
+    content.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    // Disney Springs
+    const dsHeader = document.createElement('div');
+    dsHeader.style.cssText = 'display:flex;align-items:center;gap:8px;margin:0 0 10px;';
+    dsHeader.innerHTML = `<span style="font-size:20px;">🏰</span><div style="font-size:14px;font-weight:800;color:#003087;">DISNEY SPRINGS</div><span style="font-size:10px;background:#003087;color:#fff;border-radius:20px;padding:2px 8px;font-weight:700;">FREE ENTRY</span>`;
+    content.appendChild(dsHeader);
+
+    DISNEY_SPRINGS.areas.forEach(area => {
+      const card = document.createElement('div');
+      card.style.cssText = `background:var(--card-bg,#fff);border-radius:12px;margin-bottom:8px;padding:11px 13px;border:1px solid var(--border,#eee);border-left:3px solid ${area.color};`;
+      card.innerHTML = `
+        <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:3px;">${area.name}</div>
+        <div style="font-size:11px;color:var(--text-secondary,#666);margin-bottom:5px;">${area.desc}</div>
+        ${area.highlights.map(h=>`<div style="font-size:10px;color:var(--text-secondary,#555);padding:1px 0;">→ ${h}</div>`).join('')}`;
+      content.appendChild(card);
+    });
+
+    const dsTipsCard = document.createElement('div');
+    dsTipsCard.style.cssText = 'background:rgba(0,48,135,.06);border-radius:12px;padding:12px 14px;margin-bottom:16px;border:1px solid rgba(0,48,135,.15);';
+    dsTipsCard.innerHTML = `<div style="font-size:11px;font-weight:700;color:#003087;margin-bottom:6px;">💡 Disney Springs Tips</div>`;
+    DISNEY_SPRINGS.tips.forEach(t => {
+      const row = document.createElement('div');
+      row.style.cssText = 'font-size:11px;color:var(--text-secondary,#555);padding:3px 0;line-height:1.4;';
+      row.textContent = '• ' + t;
+      dsTipsCard.appendChild(row);
+    });
+    content.appendChild(dsTipsCard);
+
+    // CityWalk
+    const cwHeader = document.createElement('div');
+    cwHeader.style.cssText = 'display:flex;align-items:center;gap:8px;margin:0 0 10px;';
+    cwHeader.innerHTML = `<span style="font-size:20px;">🎢</span><div style="font-size:14px;font-weight:800;color:#c62828;">UNIVERSAL CITYWALK</div><span style="font-size:10px;background:#c62828;color:#fff;border-radius:20px;padding:2px 8px;font-weight:700;">FREE ENTRY</span>`;
+    content.appendChild(cwHeader);
+
+    CITYWALK.venues.forEach(v => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:12px;margin-bottom:8px;padding:11px 13px;border:1px solid var(--border,#eee);border-left:3px solid #c62828;';
+      card.innerHTML = `
+        <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:3px;">
+          <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);">${v.name}</div>
+          <span style="font-size:9px;font-weight:700;color:#c62828;">${v.type}</span>
+        </div>
+        <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.4;">${v.desc}</div>`;
+      content.appendChild(card);
+    });
+
+    const cwTipsCard = document.createElement('div');
+    cwTipsCard.style.cssText = 'background:rgba(198,40,40,.05);border-radius:12px;padding:12px 14px;margin-bottom:20px;border:1px solid rgba(198,40,40,.15);';
+    cwTipsCard.innerHTML = `<div style="font-size:11px;font-weight:700;color:#c62828;margin-bottom:6px;">💡 CityWalk Tips</div>`;
+    CITYWALK.tips.forEach(t => {
+      const row = document.createElement('div');
+      row.style.cssText = 'font-size:11px;color:var(--text-secondary,#555);padding:3px 0;line-height:1.4;';
+      row.textContent = '• ' + t;
+      cwTipsCard.appendChild(row);
+    });
+    content.appendChild(cwTipsCard);
+
+    s.appendChild(header);
+    s.appendChild(content);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-shopping-districts')) buildScreen();
+
+  const _prevSS_oooo2 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_oooo2) _prevSS_oooo2(name, el);
+    if (name === 'shopping-districts') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-shopping-districts');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectSDCard() {
+    if (document.getElementById('sd-home-card')) return true;
+    const ref = document.getElementById('rain-home-card') || document.getElementById('adult-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'sd-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#1a1a1a,#003087,#00538F);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('shopping-districts');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:3px;">🏪 Disney Springs & CityWalk</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">Both free to enter · Dining · Nightlife · Tips</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.4);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _sdCard = false;
+  setInterval(() => { if (!_sdCard) _sdCard = injectSDCard(); }, 31500);
+  setTimeout(() => { _sdCard = injectSDCard(); }, 28000);
+
+  const _prevRH_oooo2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_oooo2) _prevRH_oooo2.apply(this, arguments);
+    setTimeout(() => { _sdCard = false; _sdCard = injectSDCard(); }, 7500);
+  };
+})();
+</script>
