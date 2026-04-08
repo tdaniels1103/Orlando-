@@ -35659,3 +35659,933 @@ body.date-night-mode nav {
   console.log('[Orlando Date Night] System fully wired. Toggle with window.toggleDateNightMode()');
 })();
 </script>
+<script>
+/* ===== BLOCK HHH: Live Wait Times Board ===== */
+(function initWaitTimes() {
+
+  const RIDES = {
+    'Magic Kingdom': [
+      { id:'tron',     name:'Tron Lightcycle / Run',         emoji:'🏍️', base:65, thrill:5 },
+      { id:'sdmt',     name:'Seven Dwarfs Mine Train',        emoji:'⛏️', base:55, thrill:3 },
+      { id:'space',    name:'Space Mountain',                 emoji:'🚀', base:40, thrill:3 },
+      { id:'peter',    name:"Peter Pan's Flight",             emoji:'🧚', base:45, thrill:2 },
+      { id:'bigthunder',name:'Big Thunder Mountain',          emoji:'🌵', base:30, thrill:3 },
+      { id:'haunted',  name:'Haunted Mansion',                emoji:'👻', base:25, thrill:2 },
+      { id:'splash',   name:"Tiana's Bayou Adventure",        emoji:'🐸', base:50, thrill:3 },
+    ],
+    'EPCOT': [
+      { id:'guardians',name:'Guardians: Cosmic Rewind',       emoji:'🚀', base:70, thrill:5 },
+      { id:'frozen',   name:'Frozen Ever After',              emoji:'❄️', base:55, thrill:2 },
+      { id:'remy',     name:"Remy's Ratatouille Adventure",   emoji:'🐭', base:40, thrill:2 },
+      { id:'soarin',   name:"Soarin'",                        emoji:'🌏', base:35, thrill:2 },
+      { id:'test',     name:'Test Track',                     emoji:'🏎️', base:30, thrill:3 },
+      { id:'space_e',  name:'Mission: SPACE (Orange)',         emoji:'🌕', base:20, thrill:4 },
+    ],
+    'Hollywood Studios': [
+      { id:'rise',     name:'Rise of the Resistance',         emoji:'⚡', base:60, thrill:4 },
+      { id:'slinky',   name:'Slinky Dog Dash',                emoji:'🐕', base:65, thrill:3 },
+      { id:'mmrr',     name:"Mickey & Minnie's Runaway Railway",emoji:'🎠', base:40, thrill:2 },
+      { id:'smugglers',name:'Millennium Falcon: Smugglers Run',emoji:'🚀', base:35, thrill:3 },
+      { id:'rocknroll',name:"Rock 'n' Roller Coaster",        emoji:'🎸', base:30, thrill:5 },
+      { id:'tot',      name:'Tower of Terror',                emoji:'🏨', base:28, thrill:4 },
+    ],
+    'Animal Kingdom': [
+      { id:'fop',      name:'Avatar: Flight of Passage',      emoji:'🦋', base:75, thrill:5 },
+      { id:'everest',  name:'Expedition Everest',             emoji:'🏔️', base:35, thrill:4 },
+      { id:'safari',   name:'Kilimanjaro Safaris',            emoji:'🦒', base:20, thrill:1 },
+      { id:'navir',    name:"Na'vi River Journey",            emoji:'🌿', base:40, thrill:1 },
+      { id:'dino',     name:'DINOSAUR',                       emoji:'🦖', base:20, thrill:3 },
+    ],
+    'Universal Studios FL': [
+      { id:'hagrid',   name:"Hagrid's Magical Creatures",     emoji:'🐲', base:90, thrill:4 },
+      { id:'veloci',   name:'VelociCoaster',                  emoji:'🦕', base:70, thrill:5 },
+      { id:'mummy',    name:'Revenge of the Mummy',           emoji:'🧟', base:30, thrill:4 },
+      { id:'rip',      name:'Hollywood Rip Ride Rockit',      emoji:'🎢', base:25, thrill:5 },
+      { id:'forbidden',name:'Harry Potter & the Forbidden Journey',emoji:'⚡',base:45, thrill:3 },
+    ],
+  };
+
+  /* Simulated wait time generation with time-of-day realism */
+  function getWait(baseWait) {
+    const tz = 'America/New_York';
+    const now = new Date();
+    const h = parseInt(new Intl.DateTimeFormat('en-US', { timeZone:tz, hour:'numeric', hour12:false }).format(now));
+    const weekday = new Intl.DateTimeFormat('en-US', { timeZone:tz, weekday:'long' }).format(now);
+    const isWeekend = weekday === 'Saturday' || weekday === 'Sunday';
+
+    // Time-of-day multipliers: low at open, peak midday, lower evening
+    const mult = h < 9 ? 0.3 : h < 11 ? 0.6 : h < 15 ? 1.2 : h < 17 ? 1.0 : h < 20 ? 0.7 : 0.4;
+    const weekendBonus = isWeekend ? 1.3 : 1.0;
+    const jitter = 0.85 + Math.random() * 0.3;
+    return Math.max(5, Math.round(baseWait * mult * weekendBonus * jitter / 5) * 5);
+  }
+
+  const WAIT_COLORS = {
+    low:    { max:20,  color:'#2E7D32', bg:'#E8F5E9', label:'Short' },
+    medium: { max:45,  color:'#F57F17', bg:'#FFF8E1', label:'Moderate' },
+    high:   { max:80,  color:'#E65100', bg:'#FBE9E7', label:'Long' },
+    extreme:{ max:999, color:'#c62828', bg:'#FFEBEE', label:'Very Long' },
+  };
+
+  function getWaitTier(wait) {
+    if (wait <= 20) return WAIT_COLORS.low;
+    if (wait <= 45) return WAIT_COLORS.medium;
+    if (wait <= 80) return WAIT_COLORS.high;
+    return WAIT_COLORS.extreme;
+  }
+
+  /* Live wait state */
+  let waitData = {};
+  let lastRefresh = null;
+
+  function refreshAllWaits() {
+    Object.keys(RIDES).forEach(park => {
+      waitData[park] = RIDES[park].map(r => ({ ...r, wait: getWait(r.base) }));
+    });
+    lastRefresh = Date.now();
+    renderWaitBoard();
+  }
+
+  /* Auto-refresh every 60 seconds */
+  window.waitTimesInterval = setInterval(refreshAllWaits, 60000);
+
+  function buildWaitRow(ride) {
+    const tier = getWaitTier(ride.wait);
+    const barW = Math.min(100, Math.round(ride.wait / 120 * 100));
+    return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border,#eee);">
+      <span style="font-size:20px;flex-shrink:0;">${ride.emoji}</span>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${ride.name}</div>
+        <div style="height:4px;background:var(--border,#eee);border-radius:2px;margin-top:4px;">
+          <div style="height:4px;background:${tier.color};border-radius:2px;width:${barW}%;transition:width .6s ease;"></div>
+        </div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;">
+        <div style="font-size:18px;font-weight:800;color:${tier.color};">${ride.wait}</div>
+        <div style="font-size:9px;font-weight:700;color:${tier.color};">${tier.label.toUpperCase()}</div>
+      </div>
+    </div>`;
+  }
+
+  function renderWaitBoard() {
+    const s = document.getElementById('screen-wait-times');
+    if (!s || s.style.display === 'none') return;
+
+    const list = s.querySelector('#wt-list');
+    if (!list) return;
+
+    const secAgo = lastRefresh ? Math.round((Date.now() - lastRefresh) / 1000) : 0;
+    const ts = s.querySelector('#wt-timestamp');
+    if (ts) ts.textContent = `Updated ${secAgo}s ago`;
+
+    list.innerHTML = '';
+    Object.entries(waitData).forEach(([park, rides]) => {
+      const parkBlock = document.createElement('div');
+      parkBlock.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+
+      const PARK_COLORS = {
+        'Magic Kingdom':'#1565C0','EPCOT':'#00695C','Hollywood Studios':'#B71C1C',
+        'Animal Kingdom':'#2E7D32','Universal Studios FL':'#7B1FA2',
+      };
+      const PARK_EMOJI = {
+        'Magic Kingdom':'🏰','EPCOT':'🌐','Hollywood Studios':'🎬',
+        'Animal Kingdom':'🦁','Universal Studios FL':'🎡',
+      };
+      const pc = PARK_COLORS[park] || '#FF6B35';
+
+      const avgWait = Math.round(rides.reduce((s,r)=>s+r.wait,0)/rides.length);
+      const avgTier = getWaitTier(avgWait);
+
+      parkBlock.innerHTML = `
+        <div style="padding:10px 14px;background:${pc}15;border-bottom:1px solid ${pc}22;
+          display:flex;align-items:center;justify-content:space-between;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:20px;">${PARK_EMOJI[park]||'🎢'}</span>
+            <span style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:${pc};">${park}</span>
+          </div>
+          <span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;
+            background:${avgTier.bg};color:${avgTier.color};">Avg ${avgWait} min</span>
+        </div>
+        <div style="padding:0 14px;">
+          ${rides.sort((a,b)=>b.wait-a.wait).map(buildWaitRow).join('')}
+        </div>`;
+      list.appendChild(parkBlock);
+    });
+  }
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-wait-times';
+    s.className = 'screen';
+    s.style.display = 'none';
+    s.innerHTML = `
+      <div style="padding:16px;display:flex;align-items:center;gap:12px;
+        background:linear-gradient(135deg,#1a1a3e,#FF6B35);color:#fff;flex-shrink:0;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;
+          border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;">Wait Times</div>
+          <div style="font-size:11px;opacity:.8;" id="wt-timestamp">Loading…</div>
+        </div>
+        <button onclick="window.refreshAllWaits()" style="background:rgba(255,255,255,.2);border:none;border-radius:20px;
+          padding:6px 12px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;">🔄 Refresh</button>
+      </div>
+      <!-- Legend -->
+      <div style="display:flex;gap:6px;padding:10px 14px;background:var(--card-bg,#fff);border-bottom:1px solid var(--border,#eee);flex-wrap:wrap;">
+        ${Object.values(WAIT_COLORS).map(t=>`<span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;
+          background:${t.bg};color:${t.color};">${t.label}</span>`).join('')}
+        <span style="font-size:10px;color:var(--text-secondary,#aaa);margin-left:auto;line-height:2;">Simulated · refreshes every 60s</span>
+      </div>
+      <div id="wt-list" style="padding:14px;overflow-y:auto;height:calc(100vh - 130px);-webkit-overflow-scrolling:touch;"></div>`;
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-wait-times')) buildScreen();
+  refreshAllWaits();
+  window.refreshAllWaits = refreshAllWaits;
+
+  const _prevSS_wt = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_wt) _prevSS_wt(name, el);
+    if (name === 'wait-times') {
+      document.querySelectorAll('.screen').forEach(s=>s.style.display='none');
+      const s = document.getElementById('screen-wait-times');
+      if (s) { s.style.display='block'; refreshAllWaits(); }
+    }
+  };
+
+  /* Home card */
+  function injectWTCard() {
+    if (document.getElementById('wt-home-card')) return true;
+    const euCard = document.getElementById('eu-home-card') || document.getElementById('ft-home-card');
+    if (!euCard) return false;
+    const card = document.createElement('div');
+    card.id = 'wt-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:var(--card-bg,#fff);border-radius:16px;padding:14px;border:1px solid var(--border,#eee);cursor:pointer;';
+    card.onclick = () => window.showScreen('wait-times');
+
+    const top5 = Object.values(waitData).flat().sort((a,b)=>a.wait-b.wait).slice(0,3);
+    const preview = top5.map(r => {
+      const t = getWaitTier(r.wait);
+      return `<div style="display:flex;align-items:center;gap:6px;padding:3px 0;">
+        <span style="font-size:14px;">${r.emoji}</span>
+        <span style="font-size:12px;flex:1;color:var(--text-primary,#212121);">${r.name}</span>
+        <span style="font-size:12px;font-weight:800;color:${t.color};">${r.wait} min</span>
+      </div>`;
+    }).join('');
+
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--text-primary,#212121);">⏱️ Wait Times</div>
+        <span style="font-size:11px;color:var(--primary,#FF6B35);font-weight:700;">See all ›</span>
+      </div>
+      <div style="font-size:10px;color:var(--text-secondary,#aaa);margin-bottom:6px;">SHORTEST WAITS RIGHT NOW</div>
+      ${preview}`;
+    euCard.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _wtCard = false;
+  setInterval(()=>{ if(!_wtCard) _wtCard=injectWTCard(); }, 4000);
+  setTimeout(()=>{ _wtCard=injectWTCard(); }, 1200);
+
+  const _prevRH_wt = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_wt) _prevRH_wt.apply(this, arguments);
+    setTimeout(()=>{ _wtCard=false; _wtCard=injectWTCard(); }, 600);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK III: Park Hopper Day Optimizer ===== */
+(function initParkHopper() {
+
+  const PARK_TIPS = {
+    'Magic Kingdom + EPCOT': {
+      emoji:'🏰+🌐', color:'#1565C0',
+      morning:'Spend 9am–2pm at Magic Kingdom. Hit Tron, Seven Dwarfs, and Space Mountain at rope drop.',
+      transfer:'Take the monorail or ferry to EPCOT — it\'s a relaxing 12-minute ride.',
+      afternoon:'Arrive EPCOT by 3pm. Test Track and Soarin\' have shorter afternoon waits.',
+      evening:'World Showcase opens at 11am but is magical at night. Dinner in France or Italy pavilion.',
+      tip:'Park Hopper tickets allow entry to EPCOT after 2pm. Guardians virtual queue fills at 7am.',
+    },
+    'Hollywood Studios + EPCOT': {
+      emoji:'🎬+🌐', color:'#B71C1C',
+      morning:'HS rope drop for Slinky Dog + MMRR (7:30am early entry if staying on-site).',
+      transfer:'Walk or take the Skyliner gondola — 8 minutes direct.',
+      afternoon:'Switch to EPCOT after 2pm. Remy\'s and Frozen are great afternoon picks.',
+      evening:'EPCOT\'s International Gateway entrance is closest to France and World Showcase.',
+      tip:'This is the most popular combo. The Skyliner makes hopping seamless.',
+    },
+    'Animal Kingdom + Magic Kingdom': {
+      emoji:'🦁+🏰', color:'#2E7D32',
+      morning:'AK opens at 8am. Flight of Passage + Kilimanjaro Safaris before 10am.',
+      transfer:'Bus transfer — approximately 30–45 minutes. Plan for this time.',
+      afternoon:'Arrive MK by 1pm. Use Genie+ selections for afternoon.',
+      evening:'Magic Kingdom evenings are spectacular. Stay for fireworks at 9pm.',
+      tip:'AK closes earlier than other parks. Switching to MK for an evening is a great strategy.',
+    },
+    'Magic Kingdom + Hollywood Studios': {
+      emoji:'🏰+🎬', color:'#7B1FA2',
+      morning:'MK rope drop: Tron + Seven Dwarfs. Both early entry targets.',
+      transfer:'Bus from MK — approximately 25 minutes.',
+      afternoon:'HS after 2pm: Rise of Resistance LL, Tower of Terror evening hours.',
+      evening:'Galaxy\'s Edge lights up beautifully at night. Great evening atmosphere.',
+      tip:'Less common combo but works well for thrill-seekers wanting MK coasters + HS headliners.',
+    },
+  };
+
+  const SINGLE_PARK_TIPS = [
+    { park:'Magic Kingdom', emoji:'🏰', tip:'Needs a full day. Rope drop Tron → Seven Dwarfs → Space Mountain. Midday resort break highly recommended.' },
+    { park:'EPCOT', emoji:'🌐', tip:'Best park for a leisurely day. World Showcase in the afternoon + evening. Great for foodies and couples.' },
+    { park:'Hollywood Studios', emoji:'🎬', tip:'Can be done in 6–8 hours efficiently with Lightning Lane. Most compact Disney park.' },
+    { park:'Animal Kingdom', emoji:'🦁', tip:'Opens early, closes early. Half-day possible. Flight of Passage is the must-do. Add afternoon elsewhere.' },
+    { park:'Universal (Both)', emoji:'🎡', tip:'Studios + Islands of Adventure is the classic combo. Express Pass makes it doable in one day.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-park-hopper';
+    s.className = 'screen';
+    s.style.display = 'none';
+
+    const combosHTML = Object.entries(PARK_TIPS).map(([combo, data]) => `
+      <div style="background:var(--card-bg,#fff);border-radius:14px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);">
+        <div style="padding:12px 14px;background:${data.color}15;border-bottom:1px solid ${data.color}22;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:${data.color};">${data.emoji} ${combo}</div>
+        </div>
+        <div style="padding:12px 14px;">
+          ${[
+            {icon:'🌅',label:'Morning Plan',text:data.morning},
+            {icon:'🚌',label:'Transfer',text:data.transfer},
+            {icon:'☀️',label:'Afternoon',text:data.afternoon},
+            {icon:'🌙',label:'Evening',text:data.evening},
+          ].map(row=>`<div style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start;">
+            <div style="width:32px;height:32px;border-radius:50%;background:${data.color}15;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">${row.icon}</div>
+            <div><div style="font-size:10px;font-weight:700;color:${data.color};margin-bottom:2px;">${row.label.toUpperCase()}</div>
+            <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;">${row.text}</div></div>
+          </div>`).join('')}
+          <div style="background:${data.color}10;border-radius:10px;padding:8px 10px;display:flex;gap:8px;align-items:flex-start;">
+            <span style="font-size:14px;">💡</span>
+            <span style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;">${data.tip}</span>
+          </div>
+        </div>
+      </div>`).join('');
+
+    const singleHTML = SINGLE_PARK_TIPS.map(p=>`
+      <div style="display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border,#eee);">
+        <span style="font-size:22px;flex-shrink:0;">${p.emoji}</span>
+        <div><div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${p.park}</div>
+        <div style="font-size:12px;color:var(--text-secondary,#666);line-height:1.5;margin-top:2px;">${p.tip}</div></div>
+      </div>`).join('');
+
+    s.innerHTML = `
+      <div style="padding:16px;display:flex;align-items:center;gap:12px;
+        background:linear-gradient(135deg,#4A148C,#1565C0);color:#fff;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;
+          border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div>
+          <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;">Park Hopper Optimizer</div>
+          <div style="font-size:11px;opacity:.8;">Best combos, transfer tips & daily strategy</div>
+        </div>
+      </div>
+      <div style="padding:14px;overflow-y:auto;height:calc(100vh - 68px);-webkit-overflow-scrolling:touch;">
+        <div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:14px;border:1px solid var(--border,#eee);">
+          <div style="font-size:11px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:8px;">🎟️ PARK HOPPER BASICS</div>
+          ${[
+            'Park Hopper tickets cost ~$65 extra per person above the base ticket.',
+            'You can hop to any park after 2:00 PM on your ticket date.',
+            'Resort guests: monorail (MK→EPCOT→resorts) and Skyliner (EPCOT↔HS) are free.',
+            'Bus transfers between Disney parks average 25–45 minutes. Plan for this.',
+            'Park Hopper Plus adds water parks and other venues.',
+          ].map(t=>`<div style="display:flex;gap:8px;margin-bottom:6px;"><span style="color:var(--primary,#FF6B35);">✓</span><span style="font-size:12px;color:var(--text-secondary,#555);">${t}</span></div>`).join('')}
+        </div>
+        <div style="font-size:11px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:10px;">BEST 2-PARK COMBINATIONS</div>
+        ${combosHTML}
+        <div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:20px;border:1px solid var(--border,#eee);">
+          <div style="font-size:11px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:8px;">SINGLE-PARK STRATEGY</div>
+          ${singleHTML}
+        </div>
+      </div>`;
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-park-hopper')) buildScreen();
+
+  const _prevSS_ph = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_ph) _prevSS_ph(name, el);
+    if (name === 'park-hopper') {
+      document.querySelectorAll('.screen').forEach(s=>s.style.display='none');
+      const s = document.getElementById('screen-park-hopper');
+      if (s) s.style.display='block';
+    }
+  };
+
+  function injectPHCard() {
+    if (document.getElementById('ph-home-card')) return true;
+    const wtCard = document.getElementById('wt-home-card');
+    if (!wtCard) return false;
+    const card = document.createElement('div');
+    card.id = 'ph-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#4A148C,#1565C0);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('park-hopper');
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">🎟️ Park Hopper Optimizer</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);margin-top:3px;">Best 2-park combos · transfer times · daily strategy</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.6);">›</span>
+      </div>`;
+    wtCard.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _phCard = false;
+  setInterval(()=>{ if(!_phCard) _phCard=injectPHCard(); }, 4500);
+  setTimeout(()=>{ _phCard=injectPHCard(); }, 1400);
+
+  const _prevRH_ph = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_ph) _prevRH_ph.apply(this, arguments);
+    setTimeout(()=>{ _phCard=false; _phCard=injectPHCard(); }, 650);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK JJJ: Family & Baby Services Guide ===== */
+(function initFamilyGuide() {
+
+  const SERVICES = [
+    {
+      park:'All Disney Parks', emoji:'🏰',
+      sections:[
+        { icon:'🍼', title:'Baby Care Centers', body:'Every Disney park has a fully equipped Baby Care Center with changing tables, nursing rooms, microwave, high chairs, and basic supplies for purchase. Clean, private, and air-conditioned. Located near First Aid.' },
+        { icon:'🧸', title:'Rider Switch (Child Swap)', body:'Free perk for families with children who cannot ride. One adult waits with the child while others ride, then swap without re-queuing. Ask any Cast Member — works at all height-restricted attractions.' },
+        { icon:'🦽', title:'Accessibility', body:'DAS (Disability Access Service) available at Guest Relations. Pre-register online 2–30 days before your visit at DisneyWorld.com. Virtual wait for guests who cannot wait in a standard queue.' },
+        { icon:'🛒', title:'Stroller Rental', body:'Strollers: $15/day single, $31/day double. Available near park entrances. Tip: bring your own umbrella stroller — much cheaper and you keep it all day without returning to the parking area.' },
+        { icon:'🍱', title:'Kids Dining', body:"Disney's best family dining: Cinderella's Royal Table (princess meals), Crystal Palace (Winnie the Pooh), Chef Mickey's (Mickey & friends buffet). Book 60 days in advance — they fill immediately." },
+        { icon:'🎭', title:'Character Meets', body:'Free character meets included with park admission at all four parks. Check the My Disney Experience app each morning for current times — they change daily. Arrive 20–30 min early for popular characters.' },
+      ],
+    },
+    {
+      park:'Universal Orlando', emoji:'🎡',
+      sections:[
+        { icon:'🍼', title:'Family Services', body:'Family Services centers at both Studios and IoA near park entrances. Nursing stations, changing tables, and family restrooms throughout. Staff are extremely helpful for families with infants.' },
+        { icon:'🛒', title:'Stroller Rental', body:'Strollers available for rental near park entrances. Bring your own if possible. Universal is more compact than Disney — many families manage without a stroller for kids 4+.' },
+        { icon:'🎢', title:'Kids Rides', body:"Universal has dedicated kids' areas: Seuss Landing (IoA) and Minion Land (Studios) are perfect for young families. Springfield: Home of the Simpsons has family-friendly options too." },
+        { icon:'🦽', title:'Accessibility', body:"Universal's Attraction Assistance Pass available at Guest Services. Guests with qualifying disabilities receive return times instead of waiting in standard queue." },
+      ],
+    },
+  ];
+
+  const HEIGHT_TIPS = [
+    { emoji:'👶', age:'Under 36" (Toddler)', parks:['Fantasyland at MK (Peter Pan, Dumbo, Winnie the Pooh)','Toon Lagoon at IoA','Seuss Landing at IoA','Minion Land at Universal'], avoid:['All height-restricted attractions'] },
+    { emoji:'🧒', age:'36"–40" (Young Child)', parks:['Barnstormer at MK (35")','Flight of the Hippogriff at IoA (36")','Splash Mountain (40")','Test Track (40")','Soarin (40")'], avoid:['Tron, Rock \'n\' Roller Coaster, Mission:SPACE Orange, VelociCoaster'] },
+    { emoji:'👦', age:'40"–44" (Older Child)', parks:['Most Disney rides open','Rise of the Resistance (40")','Slinky Dog Dash (38")','Forbidden Journey (48")'], avoid:['Tron (40" but intense), Hollywood Rip Ride Rockit (51")'] },
+    { emoji:'🧑', age:'44"+ (Teen / Adult)', parks:['All parks fully accessible','VelociCoaster (51")','Incredible Hulk (54")'], avoid:[] },
+  ];
+
+  const PACKING_BABY = [
+    '🍼 Formula / breast milk (allowed through security in reasonable quantities)',
+    '🧴 Sunscreen SPF 50+ — reapply every 2 hours on children',
+    '🌡️ Digital thermometer and infant pain reliever',
+    '🩹 Blister bandages and baby first-aid kit',
+    '👒 Wide-brim sun hat — Florida sun is intense even at 10am',
+    '🧊 Insulated bag for snacks and milk (parks allow outside food)',
+    '💧 Refillable water bottles — free water available at any quick-service',
+    '👙 Extra change of clothes × 2 per child (water rides, accidents)',
+    '🎧 Noise-cancelling headphones or earplugs for sensory-sensitive kids',
+    '🌂 Compact umbrella stroller + rain cover',
+    '📱 Download park app for character meet times and ride waits',
+    '🔦 Small nightlight for hotel room',
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-family-guide';
+    s.className = 'screen';
+    s.style.display = 'none';
+    s.innerHTML = `
+      <div style="padding:16px;display:flex;align-items:center;gap:12px;
+        background:linear-gradient(135deg,#E65100,#FF6B35);color:#fff;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;
+          border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div>
+          <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;">Family & Baby Guide</div>
+          <div style="font-size:11px;opacity:.8;">Services, strollers, rider switch & more</div>
+        </div>
+      </div>
+      <div style="padding:14px;overflow-y:auto;height:calc(100vh - 68px);-webkit-overflow-scrolling:touch;">
+
+        <!-- Park services -->
+        ${SERVICES.map(p=>`
+          <div style="margin-bottom:14px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+              <span style="font-size:24px;">${p.emoji}</span>
+              <span style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--text-primary,#212121);">${p.park}</span>
+            </div>
+            ${p.sections.map(sec=>`
+              <div style="background:var(--card-bg,#fff);border-radius:12px;padding:12px;margin-bottom:8px;border:1px solid var(--border,#eee);">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                  <span style="font-size:18px;">${sec.icon}</span>
+                  <span style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${sec.title}</span>
+                </div>
+                <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.6;">${sec.body}</div>
+              </div>`).join('')}
+          </div>`).join('')}
+
+        <!-- Height guide -->
+        <div style="margin-bottom:14px;">
+          <div style="font-size:11px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:10px;">📏 WHAT CAN MY CHILD RIDE?</div>
+          ${HEIGHT_TIPS.map(h=>`
+            <div style="background:var(--card-bg,#fff);border-radius:12px;padding:12px;margin-bottom:8px;border:1px solid var(--border,#eee);">
+              <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:8px;">${h.emoji} ${h.age}</div>
+              <div style="font-size:10px;font-weight:700;color:#2E7D32;margin-bottom:4px;">✓ GREAT RIDES</div>
+              ${h.parks.map(r=>`<div style="font-size:12px;color:var(--text-secondary,#555);padding:2px 0;">• ${r}</div>`).join('')}
+              ${h.avoid.length ? `<div style="font-size:10px;font-weight:700;color:#c62828;margin:8px 0 4px;">✗ TOO INTENSE</div>
+                ${h.avoid.map(r=>`<div style="font-size:12px;color:var(--text-secondary,#666);padding:2px 0;">• ${r}</div>`).join('')}` : ''}
+            </div>`).join('')}
+        </div>
+
+        <!-- Baby packing list -->
+        <div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:20px;border:1px solid var(--border,#eee);">
+          <div style="font-size:11px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:10px;">🎒 BABY & TODDLER PACKING LIST</div>
+          ${PACKING_BABY.map(item=>`<div style="font-size:12px;color:var(--text-secondary,#555);padding:5px 0;border-bottom:1px solid var(--border,#f0f0f0);">${item}</div>`).join('')}
+        </div>
+      </div>`;
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-family-guide')) buildScreen();
+
+  const _prevSS_fg = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_fg) _prevSS_fg(name, el);
+    if (name === 'family-guide') {
+      document.querySelectorAll('.screen').forEach(s=>s.style.display='none');
+      const s = document.getElementById('screen-family-guide');
+      if (s) s.style.display='block';
+    }
+  };
+
+  function injectFGCard() {
+    if (document.getElementById('fg-home-card')) return true;
+    const phCard = document.getElementById('ph-home-card');
+    if (!phCard) return false;
+    const card = document.createElement('div');
+    card.id = 'fg-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:var(--card-bg,#fff);border-radius:16px;padding:14px;border:1px solid var(--border,#eee);cursor:pointer;';
+    card.onclick = () => window.showScreen('family-guide');
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--text-primary,#212121);">👶 Family & Baby Guide</div>
+          <div style="font-size:11px;color:var(--text-secondary,#888);margin-top:3px;">Rider switch · Baby Care Centers · strollers · height guide</div>
+        </div>
+        <span style="font-size:24px;color:var(--primary,#FF6B35);">›</span>
+      </div>`;
+    phCard.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _fgCard = false;
+  setInterval(()=>{ if(!_fgCard) _fgCard=injectFGCard(); }, 5000);
+  setTimeout(()=>{ _fgCard=injectFGCard(); }, 1600);
+
+  const _prevRH_fg = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_fg) _prevRH_fg.apply(this, arguments);
+    setTimeout(()=>{ _fgCard=false; _fgCard=injectFGCard(); }, 700);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK KKK: Orlando Dining Deals & Happy Hours ===== */
+(function initDiningDeals() {
+
+  const TZ = 'America/New_York';
+  function orlandoNow() {
+    const now = new Date();
+    const h = parseInt(new Intl.DateTimeFormat('en-US',{timeZone:TZ,hour:'numeric',hour12:false}).format(now));
+    const m = parseInt(new Intl.DateTimeFormat('en-US',{timeZone:TZ,minute:'numeric'}).format(now));
+    const weekday = new Intl.DateTimeFormat('en-US',{timeZone:TZ,weekday:'long'}).format(now);
+    return { h, m, weekday, totalMins: h*60+m };
+  }
+
+  const DEALS = [
+    { id:'hhrose',   name:'Midnight Rose Rooftop — Happy Hour', emoji:'🍸', area:'Downtown',
+      days:['Monday','Tuesday','Wednesday','Thursday','Friday'],
+      startH:16, endH:19, type:'happy-hour',
+      deal:'$6 house cocktails, $4 drafts, half-price flatbreads', saving:'Save 40%',
+      tip:'Best rooftop views in Downtown Orlando at the lowest prices of the day.' },
+    { id:'hhprato',  name:"Prato Park Avenue — Aperitivo Hour",  emoji:'🍷', area:'Winter Park',
+      days:['Monday','Tuesday','Wednesday','Thursday'],
+      startH:17, endH:19, type:'happy-hour',
+      deal:'$8 wine by glass, $10 Aperol Spritz, half-price small plates', saving:'Save 35%',
+      tip:'Sit on the outdoor terrace facing Park Ave. One of Orlando\'s most beautiful evening spots.' },
+    { id:'hhboheme', name:"The Boheme — Pre-Theatre Dinner",  emoji:'🎷', area:'Downtown',
+      days:['Tuesday','Wednesday','Thursday'],
+      startH:17, endH:18, type:'early-bird',
+      deal:'3-course prix fixe $45 per person (normally $75+)', saving:'Save $30+/person',
+      tip:'Live jazz begins at 7pm — arrive at 5pm for dinner then stay for the show.' },
+    { id:'hhlakeeola', name:'Lake Eola Farmers Market', emoji:'🌽', area:'Downtown',
+      days:['Sunday'],
+      startH:10, endH:15, type:'market',
+      deal:'Fresh Florida produce, local food vendors, artisan goods — cash preferred', saving:'Local prices',
+      tip:'One of the best Sunday traditions in Orlando. Combine with a Lake Eola paddle boat ride.' },
+    { id:'hhhs',    name:'Hillstone — Bar Menu', emoji:'🍺', area:'Sand Lake Road',
+      days:['Monday','Tuesday','Wednesday','Thursday','Friday'],
+      startH:17, endH:18, type:'happy-hour',
+      deal:'$8 house wine, $5 drafts, bar food at reduced prices', saving:'Save 30%',
+      tip:'Hillstone\'s bar area doesn\'t take reservations — walk in for great value.' },
+    { id:'hhdisney', name:"Disney Springs — Dining Week",  emoji:'🏰', area:'Disney Springs',
+      days:['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'],
+      startH:11, endH:22, type:'promotion',
+      deal:'Select restaurants offer prix-fixe menus at Disney Springs during dining events', saving:'Varies',
+      tip:'Check Disney\'s website for current Disney Springs dining promotions and restaurant weeks.' },
+    { id:'hhsushipop', name:'Sushi Pop — Omakase Tuesdays', emoji:'🍣', area:'Oviedo',
+      days:['Tuesday'],
+      startH:17, endH:21, type:'special',
+      deal:'Chef\'s choice omakase tasting menu — call for current pricing', saving:'Unique experience',
+      tip:'Tuesday is the best day to visit — freshest fish delivery and special menu options.' },
+    { id:'hhpb', name:'Punch Bowl Social — Games + Eats', emoji:'🎳', area:'I-Drive',
+      days:['Monday','Tuesday','Wednesday'],
+      startH:15, endH:18, type:'happy-hour',
+      deal:'$3 craft beers, $6 cocktails, discounted bowling and ping pong Mon–Wed 3–6pm', saving:'Save 50% on activities',
+      tip:'Best weekday deal in the entertainment district. Perfect date or group activity.' },
+  ];
+
+  function isActivenow(deal) {
+    const { h, m, weekday, totalMins } = orlandoNow();
+    if (!deal.days.includes(weekday)) return false;
+    return totalMins >= deal.startH*60 && totalMins < deal.endH*60;
+  }
+  function isUpcoming(deal) {
+    const { totalMins, weekday } = orlandoNow();
+    if (!deal.days.includes(weekday)) return false;
+    return totalMins < deal.startH*60 && totalMins >= (deal.startH*60 - 120);
+  }
+
+  const TYPE_COLORS = {
+    'happy-hour':  { bg:'#E8F5E9', color:'#2E7D32', label:'Happy Hour' },
+    'early-bird':  { bg:'#FFF8E1', color:'#F57F17', label:'Early Bird' },
+    'market':      { bg:'#E3F2FD', color:'#1565C0', label:'Market' },
+    'promotion':   { bg:'#F3E5F5', color:'#7B1FA2', label:'Promotion' },
+    'special':     { bg:'#FFE0B2', color:'#E65100', label:'Special Event' },
+  };
+
+  function formatTime(h) {
+    if (h === 12) return '12pm';
+    if (h === 0) return 'midnight';
+    return h < 12 ? h+'am' : (h-12)+'pm';
+  }
+
+  function buildDealCard(d) {
+    const active = isActivenow(d);
+    const upcoming = isUpcoming(d);
+    const tc = TYPE_COLORS[d.type] || TYPE_COLORS['special'];
+    const card = document.createElement('div');
+    card.style.cssText = `background:var(--card-bg,#fff);border-radius:14px;margin-bottom:10px;
+      border:1px solid var(--border,#eee);overflow:hidden;
+      ${active ? 'border-color:#2E7D32;box-shadow:0 2px 12px rgba(46,125,50,.15);' : ''}`;
+    card.innerHTML = `
+      <div style="padding:12px 14px;">
+        <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;">
+          <span style="font-size:24px;flex-shrink:0;">${d.emoji}</span>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${d.name}</div>
+            <div style="font-size:11px;color:var(--text-secondary,#aaa);">${d.area} · ${formatTime(d.startH)}–${formatTime(d.endH)}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+            ${active ? '<span style="font-size:10px;font-weight:800;padding:3px 8px;border-radius:20px;background:#2E7D32;color:#fff;">● ACTIVE NOW</span>' :
+              upcoming ? '<span style="font-size:10px;font-weight:800;padding:3px 8px;border-radius:20px;background:#F57F17;color:#fff;">STARTS SOON</span>' :
+              `<span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;background:${tc.bg};color:${tc.color};">${tc.label}</span>`}
+            <span style="font-size:11px;font-weight:800;color:var(--primary,#FF6B35);">${d.saving}</span>
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--text-primary,#212121);font-weight:600;margin-bottom:6px;">${d.deal}</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">
+          ${d.days.map(day=>day.slice(0,3)).map(d=>`<span style="padding:2px 7px;background:var(--border,#f0f0f0);border-radius:10px;font-size:10px;font-weight:700;color:var(--text-secondary,#666);">${d}</span>`).join('')}
+        </div>
+        <div style="display:flex;gap:6px;align-items:flex-start;">
+          <span style="font-size:13px;flex-shrink:0;">💡</span>
+          <div style="font-size:11px;color:var(--text-secondary,#666);line-height:1.5;">${d.tip}</div>
+        </div>
+      </div>`;
+    return card;
+  }
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-dining-deals';
+    s.className = 'screen';
+    s.style.display = 'none';
+    s.innerHTML = `
+      <div style="padding:16px;display:flex;align-items:center;gap:12px;
+        background:linear-gradient(135deg,#2E7D32,#4CAF50);color:#fff;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;
+          border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;">Dining Deals & Happy Hours</div>
+          <div style="font-size:11px;opacity:.8;" id="dd-time-label">Loading…</div>
+        </div>
+      </div>
+      <div style="padding:14px;overflow-y:auto;height:calc(100vh - 68px);-webkit-overflow-scrolling:touch;">
+        <div id="dd-active-section"></div>
+        <div id="dd-all-section"></div>
+      </div>`;
+    document.body.appendChild(s);
+  }
+
+  function renderDeals() {
+    const s = document.getElementById('screen-dining-deals');
+    if (!s || s.style.display === 'none') return;
+    const { weekday } = orlandoNow();
+    const ts = s.querySelector('#dd-time-label');
+    if (ts) ts.textContent = `${weekday} — Orlando time`;
+
+    const active = DEALS.filter(isActivenow);
+    const upcoming = DEALS.filter(d => isUpcoming(d) && !isActivenow(d));
+    const rest = DEALS.filter(d => !isActivenow(d) && !isUpcoming(d));
+
+    const actSec = s.querySelector('#dd-active-section');
+    const allSec = s.querySelector('#dd-all-section');
+    actSec.innerHTML = '';
+    allSec.innerHTML = '';
+
+    if (active.length) {
+      const hdr = document.createElement('div');
+      hdr.style.cssText = 'font-size:11px;font-weight:700;color:#2E7D32;margin-bottom:8px;';
+      hdr.innerHTML = `● HAPPENING RIGHT NOW (${active.length})`;
+      actSec.appendChild(hdr);
+      active.forEach(d => actSec.appendChild(buildDealCard(d)));
+    }
+    if (upcoming.length) {
+      const hdr = document.createElement('div');
+      hdr.style.cssText = 'font-size:11px;font-weight:700;color:#F57F17;margin:12px 0 8px;';
+      hdr.innerHTML = `⏰ STARTING WITHIN 2 HOURS (${upcoming.length})`;
+      actSec.appendChild(hdr);
+      upcoming.forEach(d => actSec.appendChild(buildDealCard(d)));
+    }
+
+    const allHdr = document.createElement('div');
+    allHdr.style.cssText = 'font-size:11px;font-weight:700;color:var(--text-secondary,#888);margin:12px 0 8px;';
+    allHdr.textContent = 'ALL DEALS & PROMOTIONS';
+    allSec.appendChild(allHdr);
+    rest.forEach(d => allSec.appendChild(buildDealCard(d)));
+    if (!rest.length && !active.length) {
+      allSec.innerHTML += '<div style="text-align:center;padding:30px;color:var(--text-secondary,#aaa);">Check back later for active deals!</div>';
+    }
+  }
+
+  if (!document.getElementById('screen-dining-deals')) buildScreen();
+
+  const _prevSS_dd = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_dd) _prevSS_dd(name, el);
+    if (name === 'dining-deals') {
+      document.querySelectorAll('.screen').forEach(s=>s.style.display='none');
+      const s = document.getElementById('screen-dining-deals');
+      if (s) { s.style.display='block'; renderDeals(); }
+    }
+  };
+
+  function injectDDCard() {
+    if (document.getElementById('dd-home-card')) return true;
+    const fgCard = document.getElementById('fg-home-card');
+    if (!fgCard) return false;
+    const { h } = orlandoNow();
+    const activeNow = DEALS.filter(isActivenow);
+    const card = document.createElement('div');
+    card.id = 'dd-home-card';
+    card.style.cssText = `margin:10px 14px 0;border-radius:16px;padding:14px;cursor:pointer;
+      background:${activeNow.length ? 'linear-gradient(135deg,#2E7D32,#4CAF50)' : 'var(--card-bg,#fff);border:1px solid var(--border,#eee)'};`;
+    card.onclick = () => window.showScreen('dining-deals');
+    if (activeNow.length) {
+      card.innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">🍹 Deals Active Now!</div>
+          <span style="background:rgba(255,255,255,.25);padding:3px 10px;border-radius:20px;font-size:10px;font-weight:800;color:#fff;">${activeNow.length} deals</span>
+        </div>
+        ${activeNow.slice(0,2).map(d=>`<div style="font-size:12px;color:rgba(255,255,255,.9);padding:2px 0;">• ${d.name}</div>`).join('')}`;
+    } else {
+      card.innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div>
+            <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--text-primary,#212121);">🍹 Dining Deals</div>
+            <div style="font-size:11px;color:var(--text-secondary,#888);margin-top:3px;">Happy hours, early bird, markets & specials</div>
+          </div>
+          <span style="font-size:24px;color:var(--primary,#FF6B35);">›</span>
+        </div>`;
+    }
+    fgCard.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _ddCard = false;
+  setInterval(()=>{ if(!_ddCard) _ddCard=injectDDCard(); }, 5500);
+  setTimeout(()=>{ _ddCard=injectDDCard(); }, 1800);
+
+  const _prevRH_dd = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_dd) _prevRH_dd.apply(this, arguments);
+    setTimeout(()=>{ _ddCard=false; _ddCard=injectDDCard(); }, 750);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK LLL: International Visitor Guide ===== */
+(function initIntlGuide() {
+
+  const COUNTRIES = [
+    {
+      flag:'🇬🇧', name:'United Kingdom', currency:'GBP', rate:0.79,
+      tips:['Driving is on the RIGHT in the US — take extra care at roundabouts and junctions.','Tipping is expected and important: 18–22% at restaurants, $1–2/bag for luggage, $3–5/day for housekeeping.','American portion sizes are large. Sharing entrees is common and acceptable.','Power outlets are 110V/60Hz — UK devices need a voltage adapter, not just a plug adapter.'],
+    },
+    {
+      flag:'🇨🇦', name:'Canada', currency:'CAD', rate:1.36,
+      tips:['Canadians feel very at home — English spoken everywhere. Similar culture with key differences.','Tax is added at the register, not included in menu prices. Florida sales tax is 6%.','Healthcare works differently — ensure you have travel insurance. Emergency room visits can be $5,000+.','Check if your provincial health insurance covers US treatment (most don\'t adequately).'],
+    },
+    {
+      flag:'🇦🇺', name:'Australia', currency:'AUD', rate:1.53,
+      tips:['Australia is summer when Florida is summer — both are hot. Florida humidity will surprise even Australians.','Tipping culture is strong here — budget an extra 20% on all restaurant bills.','Driving on the right takes adjustment. Start in uncrowded areas to build confidence.','Orlando to Sydney is 22+ hours. Allow 2–3 days to adjust to the time difference before park visits.'],
+    },
+    {
+      flag:'🇧🇷', name:'Brazil', currency:'BRL', rate:4.98,
+      tips:['Portuguese and Spanish are widely spoken in Orlando — especially in tourist areas and Disney.','Brazilians are prolific Disney visitors — you will hear Portuguese throughout Walt Disney World.','The Brazilian school holiday (July) makes Orlando very crowded. Best to avoid or plan accordingly.','US visa (B-2) required. Process well in advance. ESTA not available for Brazilian passport holders.'],
+    },
+    {
+      flag:'🇩🇪', name:'Germany', currency:'EUR', rate:0.92,
+      tips:['ESTA visa waiver allows 90-day visa-free entry. Apply online before departure.','EPCOT\'s Germany pavilion is a popular photo stop — visit World Showcase in the evening.','European electrical devices need a voltage converter for 110V US outlets.','Customer service culture is different — American servers are friendly and attentive by design, not intrusive.'],
+    },
+    {
+      flag:'🇯🇵', name:'Japan', currency:'JPY', rate:149,
+      tips:['ESTA visa waiver applies. Apply online before departure at esta.cbp.dhs.gov.','EPCOT\'s Japan pavilion has authentic merchandise and the Teppan Edo restaurant — popular with Japanese visitors.','Japan has Universal Studios — you will notice differences in ride design and crowd management philosophy.','Restroom quality will vary — Disney maintains high standards, but public facilities can be inconsistent.'],
+    },
+    {
+      flag:'🇲🇽', name:'Mexico', currency:'MXN', rate:17.2,
+      tips:['Valid US visa or ESTA required depending on nationality. Check requirements carefully.','EPCOT\'s Mexico pavilion has a stunning pyramid entrance and La Hacienda de San Angel restaurant on the lagoon.','Spanish is very widely spoken throughout Orlando — especially in tourist areas and theme parks.','Florida\'s Cuban and Latin food scene is excellent — venture beyond theme parks for authentic cuisine.'],
+    },
+    {
+      flag:'🇮🇳', name:'India', currency:'INR', rate:83,
+      tips:['US visa (B-2 tourist) required — not eligible for ESTA. Apply well in advance.','Orlando has excellent Indian restaurants. Curry Lane on Sand Lake Road is a good starting point.','Vegetarian options are available but require specific planning at theme parks — ask staff.','Theme park ride intensity may surprise first-time riders — review height requirements and thrill levels carefully.'],
+    },
+  ];
+
+  const QUICK_TIPS = [
+    { icon:'💱', tip:'Always pay in USD. Decline "Dynamic Currency Conversion" at payment terminals — it has terrible exchange rates.' },
+    { icon:'📱', tip:'Get an eSIM or international plan before arriving. Google Fi, T-Mobile, and AT&T have good international options.' },
+    { icon:'🏥', tip:'US healthcare is very expensive. Comprehensive travel insurance with medical coverage is essential. Emergency visits start at $3,000.' },
+    { icon:'🚗', tip:'Florida requires an International Driving Permit plus your home license if your license is not in English. Driving is on the right.' },
+    { icon:'💳', tip:'Credit cards are accepted almost everywhere. Notify your bank before travel to avoid fraud blocks. Visa and Mastercard work best.' },
+    { icon:'🌡️', tip:'Orlando summers (June–September) are extreme heat and humidity. Even visitors from tropical countries are surprised by the intensity.' },
+    { icon:'☎️', tip:'US emergency number is 911 for police, fire, and ambulance. Disney has its own emergency response — locate First Aid on arrival.' },
+    { icon:'✈️', tip:'MCO (Orlando International Airport) is the main airport. Sanford Airport (SFB) is cheaper but farther from Disney and Universal.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-intl-guide';
+    s.className = 'screen';
+    s.style.display = 'none';
+
+    const today = new Date();
+    const dateStr = new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',month:'long',day:'numeric',year:'numeric'}).format(today);
+
+    s.innerHTML = `
+      <div style="padding:16px;display:flex;align-items:center;gap:12px;
+        background:linear-gradient(135deg,#1565C0,#42A5F5);color:#fff;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;
+          border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div>
+          <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;">International Visitor Guide</div>
+          <div style="font-size:11px;opacity:.8;">Tips for visitors from around the world</div>
+        </div>
+      </div>
+      <div style="padding:14px;overflow-y:auto;height:calc(100vh - 68px);-webkit-overflow-scrolling:touch;">
+
+        <!-- Quick tips -->
+        <div style="background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:14px;border:1px solid var(--border,#eee);">
+          <div style="font-size:11px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:10px;">🌍 UNIVERSAL TIPS FOR ALL VISITORS</div>
+          ${QUICK_TIPS.map(t=>`<div style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start;">
+            <span style="font-size:18px;flex-shrink:0;">${t.icon}</span>
+            <span style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;">${t.tip}</span>
+          </div>`).join('')}
+        </div>
+
+        <!-- Currency converter note -->
+        <div style="background:linear-gradient(135deg,#1565C0,#42A5F5);border-radius:14px;padding:14px;margin-bottom:14px;color:#fff;">
+          <div style="font-size:13px;font-weight:700;margin-bottom:6px;">💱 Current Exchange Rates (Approximate)</div>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;">
+            ${COUNTRIES.map(c=>`<div style="background:rgba(255,255,255,.15);border-radius:8px;padding:8px;">
+              <div style="font-size:16px;font-weight:800;">${c.flag} $1 USD</div>
+              <div style="font-size:12px;opacity:.9;">≈ ${c.rate} ${c.currency}</div>
+            </div>`).join('')}
+          </div>
+          <div style="font-size:10px;color:rgba(255,255,255,.6);margin-top:8px;">Rates are approximate. Check xe.com for live rates before your trip.</div>
+        </div>
+
+        <!-- Country-specific tips -->
+        <div style="font-size:11px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:10px;">🗺️ COUNTRY-SPECIFIC TIPS</div>
+        ${COUNTRIES.map(c=>`
+          <div style="background:var(--card-bg,#fff);border-radius:14px;margin-bottom:10px;overflow:hidden;border:1px solid var(--border,#eee);">
+            <div style="padding:10px 14px;background:var(--border,#f5f5f5);border-bottom:1px solid var(--border,#eee);">
+              <span style="font-size:22px;">${c.flag}</span>
+              <span style="font-size:14px;font-weight:700;color:var(--text-primary,#212121);margin-left:8px;">${c.name}</span>
+            </div>
+            <div style="padding:10px 14px;">
+              ${c.tips.map(t=>`<div style="display:flex;gap:8px;margin-bottom:8px;align-items:flex-start;">
+                <span style="color:var(--primary,#FF6B35);font-size:12px;flex-shrink:0;margin-top:1px;">●</span>
+                <span style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;">${t}</span>
+              </div>`).join('')}
+            </div>
+          </div>`).join('')}
+      </div>`;
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-intl-guide')) buildScreen();
+
+  const _prevSS_ig = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_ig) _prevSS_ig(name, el);
+    if (name === 'intl-guide') {
+      document.querySelectorAll('.screen').forEach(s=>s.style.display='none');
+      const s = document.getElementById('screen-intl-guide');
+      if (s) s.style.display='block';
+    }
+  };
+
+  function injectIGCard() {
+    if (document.getElementById('ig-home-card')) return true;
+    const ddCard = document.getElementById('dd-home-card');
+    if (!ddCard) return false;
+    const card = document.createElement('div');
+    card.id = 'ig-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:var(--card-bg,#fff);border-radius:16px;padding:14px;border:1px solid var(--border,#eee);cursor:pointer;';
+    card.onclick = () => window.showScreen('intl-guide');
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--text-primary,#212121);">🌍 International Visitor Guide</div>
+          <div style="font-size:11px;color:var(--text-secondary,#888);margin-top:3px;">8 countries · currency · visa · driving · tipping</div>
+        </div>
+        <span style="font-size:24px;color:var(--primary,#FF6B35);">›</span>
+      </div>`;
+    ddCard.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _igCard = false;
+  setInterval(()=>{ if(!_igCard) _igCard=injectIGCard(); }, 6000);
+  setTimeout(()=>{ _igCard=injectIGCard(); }, 2000);
+
+  const _prevRH_ig = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_ig) _prevRH_ig.apply(this, arguments);
+    setTimeout(()=>{ _igCard=false; _igCard=injectIGCard(); }, 800);
+  };
+})();
+</script>
