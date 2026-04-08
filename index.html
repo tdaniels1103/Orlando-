@@ -64075,3 +64075,304 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK ZZZZZZZ: Orlando Accessibility & Disability Guide ===== */
+(function initOrlandoAccessibility() {
+
+  const ACCESS_PARKS = [
+    {
+      park:'Walt Disney World', emoji:'🏰', color:'#003087',
+      programs:[
+        {name:'Disability Access Service (DAS)', note:'Disney\'s accommodation for guests who cannot tolerate extended queue environments due to disability. DAS provides a return time equal to the current standby wait — you wait anywhere in the park, then return when your time is ready. Register in person at Guest Relations or via Live Chat at 30 days before arrival for advance registration.'},
+        {name:'Companion Restrooms', note:'All Disney parks have companion restrooms throughout. Baby Care Centers double as private accessible facilities. All park entrance and exit points have companion restrooms.'},
+        {name:'Wheelchair & ECV Rentals', note:'Manual wheelchairs: $12/day. Electric Conveyance Vehicles (ECVs): $50/day + $20 refundable deposit. Single-day rentals at each park — not transferable between parks. Reservations can be made in advance but are first-come-first-served day-of.'},
+        {name:'Accessible Attraction Entrances', note:'Every Disney attraction has an accessible entrance that accommodates wheelchairs and mobility devices. The accessible entrance may be through the main queue or a separate entrance. CMs at each attraction are trained to assist.'},
+      ],
+      tip:'For DAS registration via Live Chat (30 days before), expect a 30–60 minute wait for the chat. The advance registration saves significant time vs. in-park Guest Relations lines. DAS can be registered for groups of up to 6 people.',
+    },
+    {
+      park:'Universal Orlando', emoji:'🎬', color:'#C62828',
+      programs:[
+        {name:'Universal Attraction Assistance Pass (AAP)', note:'Similar to Disney\'s DAS. Provides alternate entrance access for guests who cannot wait in standard queues. Register at Guest Services in the park. Each attraction is reviewed individually — some have accessible standard queues, others require the AAP entrance.'},
+        {name:'Accessibility Information Guide', note:'Universal provides a comprehensive PDF guide on their website listing every attraction\'s accessibility requirements, restrictions, and accommodations. Download before arrival at universal-orlando.com/accessibility.'},
+        {name:'Wheelchair Rentals', note:'Manual wheelchairs $15/day. Electric convenience vehicles (ECVs) $55/day + $50 deposit. Available at both park entrances and at CityWalk.'},
+      ],
+      tip:'Universal\'s AAP is issued per-day rather than per-visit. For multi-day visits, register each morning at Guest Services. The process typically takes 10–15 minutes.',
+    },
+    {
+      park:'SeaWorld / Busch Gardens', emoji:'🐋', color:'#0277BD',
+      programs:[
+        {name:'Ride Access Program (RAP)', note:'SeaWorld\'s queue accommodation for disability needs. RAP cards are issued at Guest Services and provide return times at designated attractions. SeaWorld also provides more specific sensory information for each attraction than Disney or Universal.'},
+        {name:'Sensory Guide', note:'SeaWorld publishes a sensory guide with ratings for each attraction: lighting, sound, movement intensity, and tactile elements. The most comprehensive sensory information of any Orlando park — valuable for guests with autism or sensory processing differences.'},
+        {name:'Dietary Accommodations', note:'SeaWorld\'s food services staff are trained for common dietary needs (gluten-free, allergen-free). Inform dining teams at time of order. More responsive than Disney Quick Service for complex dietary needs.'},
+      ],
+      tip:'SeaWorld\'s sensory guide is the most detailed published by any Orlando park. Print it before arrival and carry it with you to preview each attraction\'s sensory environment before entering.',
+    },
+  ];
+
+  const ACCESS_TIPS = [
+    {icon:'📋', tip:'All Disney parks offer Accessibility Guides at Guest Relations — single-page summaries of all accessibility accommodations, accessible pathways, and service locations. Pick one up at the first Guest Relations you pass.'},
+    {icon:'🐕', tip:'Service animals are permitted in virtually all areas of Disney, Universal, and SeaWorld, including most indoor attractions. Relief areas are marked on accessibility maps. Service animals must be under control at all times. "Service Animal Rest Areas" are marked on park maps.'},
+    {icon:'🎧', tip:'Assistive listening devices (ALDs) are available for free at Guest Relations at all Disney parks. Used with hearing aids (T-coil) or standalone earpieces. Available at over 100 attraction pre-shows and theater experiences.'},
+    {icon:'🌞', tip:'Sensory accommodations: Disney\'s Quiet Rooms are available at each park — designated low-stimulation spaces with dim lighting. Baby Care Centers double as calm sensory spaces. EPCOT\'s International Gateway has the largest quiet room.'},
+    {icon:'🗺️', tip:'The Autism Travel website and the Hidden Disabilities Sunflower program (accepted at Universal) provide additional resources. The Sunflower lanyard signals staff at participating venues to offer additional assistance without guests needing to ask.'},
+    {icon:'💊', tip:'All parks permit medications (including refrigerated insulin and EpiPens) into the parks. Disney Baby Care Centers have refrigerators for medications. Universal Guest Services also stores medications during the day.'},
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-accessibility';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#003087,#0277BD,#2E7D32);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Accessibility & Disability Guide</div>
+          <div style="font-size:11px;opacity:.8;">DAS · AAP · Wheelchair rentals · Service animals · Sensory guides</div>
+        </div>
+        <span style="font-size:28px;">♿</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        All major Orlando parks have dedicated accessibility programs. Disney's DAS, Universal's AAP, and SeaWorld's sensory guides make the parks more accessible than most visitors realize — but the programs require advance knowledge to use effectively.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    ACCESS_PARKS.forEach(park => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:9px 14px;background:${park.color}18;border-left:4px solid ${park.color};">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:20px;">${park.emoji}</span>
+            <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${park.park}</div>
+          </div>
+        </div>
+        <div style="padding:8px 14px;">
+          ${park.programs.map(p=>`<div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--border,#f5f5f5);">
+            <div style="font-size:12px;font-weight:700;color:${park.color};margin-bottom:2px;">${p.name}</div>
+            <div style="font-size:10px;color:var(--text-secondary,#555);line-height:1.5;">${p.note}</div>
+          </div>`).join('')}
+          <div style="display:flex;gap:5px;background:${park.color}0d;border-radius:8px;padding:6px;margin-top:4px;">
+            <span style="font-size:11px;flex-shrink:0;">💡</span>
+            <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${park.tip}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const tipsCard = document.createElement('div');
+    tipsCard.style.cssText = 'background:linear-gradient(135deg,#003087,#2E7D32);border-radius:14px;margin-bottom:20px;padding:14px;color:#fff;';
+    tipsCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;margin-bottom:8px;">♿ Accessibility Tips & Resources</div>
+    ${ACCESS_TIPS.map(t=>`<div style="display:flex;gap:10px;margin-bottom:7px;align-items:flex-start;">
+      <span style="font-size:18px;flex-shrink:0;">${t.icon}</span>
+      <div style="font-size:11px;opacity:.95;line-height:1.5;">${t.tip}</div>
+    </div>`).join('')}`;
+    body.appendChild(tipsCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-accessibility')) buildScreen();
+
+  const _prevSS_zzzzzzz = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_zzzzzzz) _prevSS_zzzzzzz(name, el);
+    if (name === 'accessibility') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-accessibility');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectACCard() {
+    if (document.getElementById('accessibility-home-card')) return true;
+    const ref = document.getElementById('packing-home-card') || document.getElementById('transport-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'accessibility-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#003087,#0277BD,#2E7D32 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('accessibility');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">♿</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Accessibility & Disability Guide</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">DAS · AAP · Wheelchair rentals · Sensory guides · Service animals</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _acCard = false;
+  setInterval(() => { if (!_acCard) _acCard = injectACCard(); }, 112000);
+  setTimeout(() => { _acCard = injectACCard(); }, 108500);
+  const _prevRH_zzzzzzz = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_zzzzzzz) _prevRH_zzzzzzz.apply(this, arguments);
+    setTimeout(() => { _acCard = false; _acCard = injectACCard(); }, 39800);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK AAAAAAAA: Orlando for Solo Travelers ===== */
+(function initOrlandoSolo() {
+
+  const SOLO_EXPERIENCES = [
+    {
+      category:'Theme Parks Solo', emoji:'🎢', color:'#003087',
+      why:'Visiting theme parks solo is underrated. Single rider lines cut wait times dramatically. You control your own pace — linger at attractions you love, skip ones you don\'t. No consensus-building required.',
+      tips:[
+        {title:'Single Rider Lines', note:'Expedition Everest, Manta at SeaWorld, Revenge of the Mummy, Harry Potter rides — all have single rider lines that reduce waits 50–80%. As a solo visitor, you fill the odd seat in every car. On busy days, single rider is the closest thing to front-of-line access.'},
+        {title:'Rope Drop Strategy', note:'Solo visitors move faster through crowds than groups. Arrive at park open, go immediately to the most popular attraction, and complete it before 9 AM. Then reverse the usual flow — go to the back of the park while crowds cluster at the front.'},
+        {title:'After-Dark Advantage', note:'Parks after 7 PM are dramatically less crowded as families with young children depart. Solo travelers who arrive at 4 PM and stay until closing experience a different, quieter park that daytime visitors never see.'},
+      ],
+    },
+    {
+      category:'Solo Dining', emoji:'🍽️', color:'#C62828',
+      why:'Orlando is an excellent solo dining city. Counter service is ideal for solo, and most restaurants are accommodating of single diners at the bar.',
+      tips:[
+        {title:'Bar Seating', note:'Almost every upscale restaurant in Orlando seats solo diners at the bar without a reservation. Capa (Four Seasons), The Courtesy Bar, Hanson\'s Shoe Repair, The Osprey Tavern — all excellent solo bar experiences. Better conversation, faster service.'},
+        {title:'Character Dining Solo', note:'Solo visitors at character dining (Chef Mickey\'s, Tusker House) receive the same character interactions as tables of 8. Characters spend proportionally more time with solo diners — you\'re a more novel encounter than a family table.'},
+        {title:'Quick Service Advantage', note:'Solo quick-service meals have no wait for mobile ordering. Park food is fastest for solos — no coordination on what to order, no waiting for everyone to finish.'},
+      ],
+    },
+    {
+      category:'Social & Meeting People', emoji:'🤝', color:'#2E7D32',
+      why:'Theme parks and solo travel in Orlando connect well with the online Disney and Universal fan communities who organize meet-ups and group visits.',
+      tips:[
+        {title:'DisFriends & Community Groups', note:'Multiple Facebook groups and Reddit communities (r/WaltDisneyWorld, r/UniversalOrlando) organize solo meetup days. Finding a partner to tackle the parks with for a day combines solo flexibility with social connection.'},
+        {title:'Bar/Live Music Venues', note:'Will\'s Pub in Mills 50 and Raglan Road in Disney Springs are social bars where solo visitors are welcomed and conversations with strangers are the norm. The live music focus at both venues creates natural social momentum.'},
+        {title:'Tour Groups', note:'Wild Africa Trek, Sunrise Safari, and other small-group experiences inherently create a social environment. The shared experience of a 12-person morning safari naturally creates conversation among strangers.'},
+      ],
+    },
+    {
+      category:'Solo Safety & Logistics', emoji:'🔒', color:'#7B1FA2',
+      why:'Orlando is one of the safest major tourist destinations in the US. Standard urban awareness applies.',
+      tips:[
+        {title:'I-Drive & Tourist Areas', note:'International Drive is heavily policed and generally safe. The resort corridor (Disney, Universal area) is among the safest tourist environments in the country. Exercise standard urban awareness after midnight in downtown Orlando.'},
+        {title:'Solo Hotel Safety', note:'Disney resort hotels are among the most secure hotel environments in Florida — extensive security presence and guest-only access to accommodations. Universal\'s on-site hotels are similarly secure.'},
+        {title:'Transportation at Night', note:'Use Uber/Lyft app with share your trip feature for late-night returns from downtown Orlando or I-Drive. Disney buses run until 1–2 AM on busy nights. Never leave a bar and drive — Lyft is $10–20 from any bar district.'},
+      ],
+    },
+  ];
+
+  const SOLO_ITINERARY = [
+    {day:'Day 1', plan:'Magic Kingdom full day. Solo rope drop = 4–5 rides before 9 AM. Use single rider at Peter Pan. Stay for fireworks. Dinner at the park (solo bar at Be Our Guest if reservations allow, or Columbia Harbour House quick service).'},
+    {day:'Day 2', plan:'EPCOT morning + World Showcase evening. Start at World Discovery (Guardians, Cosmic Rewind). Solo lunch in Japan or Morocco Pavilion. World Showcase drinking-around-the-world (11 countries, one drink each) is a celebrated solo activity.'},
+    {day:'Day 3', plan:'Hollywood Studios. Rise of Resistance at rope drop (secure virtual queue at 7 AM). Galaxy\'s Edge full exploration. Solo dinner at Oga\'s Cantina (solo bar seating often available walk-in).'},
+    {day:'Day 4', plan:'Universal Studios Florida + Islands of Adventure with park-to-park. Solo single rider at Gringotts, Velocicoaster, and Forbidden Journey cuts all waits in half. Day drinking at Three Broomsticks and The Hopping Pot.'},
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-solo-travel';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#003087,#C62828,#7B1FA2);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Orlando for Solo Travelers</div>
+          <div style="font-size:11px;opacity:.8;">Single rider lines · Solo dining · Social opportunities · Safety</div>
+        </div>
+        <span style="font-size:28px;">🧳</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        Solo travel at Orlando theme parks offers genuine advantages: single rider lines, your own pace, and the ability to linger or skip freely. The parks are designed for easy solo navigation, and the solo community is larger than most visitors realize.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    SOLO_EXPERIENCES.forEach(exp => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:9px 14px;background:${exp.color}18;border-left:4px solid ${exp.color};">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:20px;">${exp.emoji}</span>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${exp.category}</div>
+              <div style="font-size:10px;color:var(--text-secondary,#666);">${exp.why}</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:8px 14px;">
+          ${exp.tips.map(t=>`<div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--border,#f5f5f5);">
+            <div style="font-size:12px;font-weight:700;color:${exp.color};margin-bottom:2px;">${t.title}</div>
+            <div style="font-size:10px;color:var(--text-secondary,#555);line-height:1.5;">${t.note}</div>
+          </div>`).join('')}
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const itinCard = document.createElement('div');
+    itinCard.style.cssText = 'background:linear-gradient(135deg,#003087,#C62828);border-radius:14px;margin-bottom:20px;padding:14px;color:#fff;';
+    itinCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;margin-bottom:8px;">🗓️ 4-Day Solo Itinerary</div>
+    ${SOLO_ITINERARY.map(d=>`<div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.15);">
+      <div style="font-size:11px;font-weight:700;margin-bottom:2px;">${d.day}</div>
+      <div style="font-size:11px;opacity:.9;line-height:1.5;">${d.plan}</div>
+    </div>`).join('')}`;
+    body.appendChild(itinCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-solo-travel')) buildScreen();
+
+  const _prevSS_aaaaaaaa = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_aaaaaaaa) _prevSS_aaaaaaaa(name, el);
+    if (name === 'solo-travel') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-solo-travel');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectSOLOCard() {
+    if (document.getElementById('solo-travel-home-card')) return true;
+    const ref = document.getElementById('accessibility-home-card') || document.getElementById('packing-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'solo-travel-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#003087,#C62828,#7B1FA2 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('solo-travel');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🧳</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Orlando for Solo Travelers</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Single rider lines · Solo dining · Safety · 4-day itinerary</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _soloCard = false;
+  setInterval(() => { if (!_soloCard) _soloCard = injectSOLOCard(); }, 113000);
+  setTimeout(() => { _soloCard = injectSOLOCard(); }, 109500);
+  const _prevRH_aaaaaaaa = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_aaaaaaaa) _prevRH_aaaaaaaa.apply(this, arguments);
+    setTimeout(() => { _soloCard = false; _soloCard = injectSOLOCard(); }, 40200);
+  };
+})();
+</script>
