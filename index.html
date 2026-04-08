@@ -41723,3 +41723,206 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK NNN2: Fireworks & Nighttime Spectacular Guide ===== */
+(function initFireworksGuide() {
+
+  const SHOWS = [
+    {
+      name:'Happily Ever After (MAGIC KINGDOM)',
+      park:'Magic Kingdom',
+      emoji:'🏰',
+      duration:'18 min',
+      time:'Typically 9 PM (check schedule — varies seasonally)',
+      type:'Fireworks + Projection on Cinderella Castle',
+      rating:5,
+      desc:"Disney's signature nighttime spectacular. Cinderella Castle becomes a canvas for stunning projection mapping while fireworks arc across the sky. One of the greatest pieces of entertainment Disney has ever created. The finale 'Go the Distance / When You Wish Upon a Star' will make you cry — prepare for it.",
+      bestSpots:[
+        { spot:'Main Street USA Hub (center)', why:'Iconic centered castle shot. Most crowded but best view.' },
+        { spot:'Frontierland dock', why:'Angled side view, less crowded, beautiful foreground with the waterway.' },
+        { spot:'California Grill restaurant rooftop', why:'The restaurant pipes in the audio and lets dining guests view from the deck. Reserve dinner for 9:00–9:30 PM slot.' },
+        { spot:'Seven Seas Lagoon beach (Polynesian)', why:'Fireworks float over the lagoon. Gorgeous reflection shot. $0 cost — just take the monorail.' },
+      ],
+      tips:["Claim your spot 30–45 minutes early in the hub. Crowds form fast.", "The show is identical in viewing quality from anywhere with an open sky view — you don't need to be directly in the hub.", "Download Shazam or Soundhound — the music is beautiful and you'll want to identify every track."],
+      bestMonth:'Year-round, but Christmas overlay (holiday version) is extraordinary Nov–early Jan',
+    },
+    {
+      name:'Luminous (formerly Harmonious) — EPCOT',
+      park:'EPCOT',
+      emoji:'🌐',
+      duration:'20 min',
+      time:'Typically 9 PM (check app)',
+      type:'Water / Fireworks / Projection / Laser',
+      rating:4,
+      desc:"EPCOT's lagoon spectacular uses floating platforms on World Showcase Lagoon for projection screens, combined with fireworks, water jets, and lasers. A massive scale production centered on the theme of global connection through music. The fireworks at the finale are among the largest in any Disney show.",
+      bestSpots:[
+        { spot:'International Gateway area (France/UK pavilions)', why:'Great angle looking across the lagoon. Easy exit after show.' },
+        { spot:'Italy pavilion terrace', why:'Elevated viewing above the crowd. Beautiful angle.' },
+        { spot:'Japan Pavilion waterfront', why:'Quieter area on the east side with clear views of the main platform.' },
+      ],
+      tips:["Arrive 25 minutes early at the World Showcase Lagoon waterfront.", "International Gateway (back entrance near France) provides excellent viewing AND easier post-show exit.", "The show has been redesigned multiple times — check current version reviews before your visit."],
+      bestMonth:'Food & Wine Festival period (Aug–Nov) — festival lights add magic to the atmosphere',
+    },
+    {
+      name:"Star Wars: A Galactic Spectacular — Hollywood Studios",
+      park:"Hollywood Studios",
+      emoji:'⭐',
+      duration:'14 min',
+      time:'Typically 9:30 PM',
+      type:'Fireworks + Projection on Chinese Theatre',
+      rating:5,
+      desc:"The Star Wars score booms while the Chinese Theatre becomes a projection screen for iconic scenes from all eras of Star Wars. Fireworks burst in sync with John Williams' music. For Star Wars fans, this is an emotional, extraordinary experience.",
+      bestSpots:[
+        { spot:'Hollywood Boulevard main corridor', why:'Centered view of the Theatre. Arrive 30+ min early.' },
+        { spot:'Commissary Lane entrance', why:'Side view, usually less crowded, nearly as good.' },
+      ],
+      tips:["This show is genuinely emotional for Star Wars fans — you WILL tear up to the Imperial March and Duel of Fates.", "The park has limited exit routes after the show — move quickly right after it ends or wait 15 minutes.", "The Resistance Marchin finale with Rise of the Skywalker score is breathtaking."],
+      bestMonth:'Year-round. May 4th (Star Wars Day) has special programming and is extraordinary — extremely crowded',
+    },
+    {
+      name:"Tree of Life Awakening — Animal Kingdom",
+      park:'Animal Kingdom',
+      emoji:'🌳',
+      duration:'Continuous from dusk',
+      time:'Dusk–close (approximately every 10 min)',
+      type:'Projection on Tree of Life',
+      rating:4,
+      desc:"Not a fireworks show — a series of 5-minute projection sequences on the 14-story Tree of Life. As dusk falls, animals and spirits appear to 'come alive' on the tree bark. Gentle, beautiful, and completely unlike any other Disney nighttime experience.",
+      bestSpots:[
+        { spot:'Discovery Island / Tree of Life base area', why:'Any clear angle on the tree is excellent.' },
+        { spot:'Flame Tree BBQ seating area', why:'Elevated views with food in hand is the perfect combination.' },
+      ],
+      tips:["Animal Kingdom closes earlier than other parks — plan evening dining here instead of other shows.", "The ambient sound design during the projections is genuinely sublime.", "River of Light water show has ended — Tree of Life Awakenings is now the primary nighttime offering."],
+      bestMonth:'October (Animal Kingdom during Halloween season has special evening atmosphere)',
+    },
+    {
+      name:"Universal's Holiday Parade Featuring Macy's",
+      park:'Universal Studios Florida',
+      emoji:'🎄',
+      duration:'30 min',
+      time:'Multiple times nightly (seasonal: Nov–Jan)',
+      type:'Parade (seasonal)',
+      rating:4,
+      desc:"A proper Macy's Thanksgiving-style parade through Universal Studios with giant balloons, floats, performers, and holiday characters. The free entertainment value is high and the production quality is excellent.",
+      bestSpots:[
+        { spot:'Hollywood Blvd main route (midpoint)', why:'Clear float visibility and character viewing.' },
+        { spot:'Near Fear Factor Live theater entrance', why:'Parade turns here — balloons are closest.' },
+      ],
+      tips:["This runs only during Universal's Holiday season overlay — check dates (typically Nov–Jan).", "Combine with Grinchmas at Dr. Seuss Landing for a full holiday evening.", "The parade has real New York-sized balloons — legitimately impressive."],
+      bestMonth:'December (Christmas overlay is most complete and beautiful)',
+    },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-fireworks-guide';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#0a0a1a);flex-direction:column;overflow:hidden;';
+    s.innerHTML = `
+      <div style="background:linear-gradient(135deg,#1A0050,#3D0070,#B388FF);padding:18px 14px 20px;
+        display:flex;align-items:center;gap:12px;flex-shrink:0;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;
+          border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#fff;">Fireworks & Night Shows</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">Best views · Timing · Photography spots</div>
+        </div>
+        <span style="font-size:28px;">🎆</span>
+      </div>
+      <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;background:linear-gradient(180deg,#0a0a1a,#1a0a2e);">
+
+        <div style="background:linear-gradient(135deg,#1A0050,#3D0070);border-radius:16px;padding:14px;margin-bottom:14px;color:#fff;">
+          <div style="font-size:13px;line-height:1.6;opacity:.9;">
+            Orlando's nighttime shows are world-class entertainment — not just fireworks, but full multi-sensory productions. Plan your evenings around them. They justify staying in the park until close.
+          </div>
+        </div>
+
+        ${SHOWS.map(show => `
+          <div style="background:rgba(255,255,255,.05);border-radius:14px;margin-bottom:12px;
+            border:1px solid rgba(255,255,255,.1);overflow:hidden;">
+            <div style="background:linear-gradient(135deg,#1A0050,#3D0070);padding:12px 14px;">
+              <div style="display:flex;align-items:flex-start;gap:8px;">
+                <span style="font-size:26px;">${show.emoji}</span>
+                <div style="flex:1;">
+                  <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:#fff;">${show.name}</div>
+                  <div style="font-size:10px;color:rgba(255,255,255,.7);">${show.park} · ${show.type} · ${show.duration}</div>
+                  <div style="font-size:10px;color:#B388FF;font-weight:700;margin-top:2px;">⏰ ${show.time}</div>
+                </div>
+                <div style="font-size:13px;">${'⭐'.repeat(show.rating)}</div>
+              </div>
+            </div>
+            <div style="padding:12px 14px;">
+              <div style="font-size:12px;color:rgba(255,255,255,.75);line-height:1.5;margin-bottom:8px;">${show.desc}</div>
+
+              <div style="font-size:10px;font-weight:700;color:#B388FF;margin-bottom:5px;">📍 BEST VIEWING SPOTS</div>
+              ${show.bestSpots.map(spot => `
+                <div style="background:rgba(255,255,255,.04);border-radius:8px;padding:7px 10px;margin-bottom:5px;">
+                  <div style="font-size:12px;font-weight:700;color:rgba(255,255,255,.9);">${spot.spot}</div>
+                  <div style="font-size:11px;color:rgba(255,255,255,.6);">${spot.why}</div>
+                </div>`).join('')}
+
+              <div style="font-size:10px;font-weight:700;color:#FFD700;margin:8px 0 4px;">💡 TIPS</div>
+              ${show.tips.map(t => `<div style="font-size:11px;color:rgba(255,255,255,.7);padding:2px 0;">${t}</div>`).join('')}
+              <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:6px;">Best month: ${show.bestMonth}</div>
+            </div>
+          </div>`).join('')}
+
+        <div style="background:linear-gradient(135deg,#1A0050,#3D0070);border-radius:14px;padding:14px;margin-bottom:20px;color:#fff;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">📸 Fireworks Photography Tips</div>
+          ${[
+            'Use a tripod or brace against a wall/railing — handheld at 1–3 seconds will blur.',
+            'Camera settings: ISO 100–200, f/8–f/11, 2–5 second shutter for standard fireworks.',
+            'Phone: use the "Pro" or "Manual" mode if available. Or use Nightography mode on Samsung.',
+            "Include Cinderella Castle in the foreground for the definitive Magic Kingdom fireworks shot.",
+            "Shoot 20+ exposures per show — only 2–3 will be perfect. Volume wins in fireworks photography.",
+            "EPCOT lagoon reflection shots: shoot from the waterfront, keep the horizon line at the bottom third.",
+          ].map(tip => `<div style="font-size:12px;color:rgba(255,255,255,.9);padding:4px 0;border-bottom:1px solid rgba(255,255,255,.15);line-height:1.5;">→ ${tip}</div>`).join('')}
+        </div>
+      </div>`;
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-fireworks-guide')) buildScreen();
+
+  const _prevSS_nnn2 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_nnn2) _prevSS_nnn2(name, el);
+    if (name === 'fireworks-guide') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-fireworks-guide');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectFireworksCard() {
+    if (document.getElementById('fireworks-home-card')) return true;
+    const ref = document.getElementById('thrill-home-card') || document.getElementById('dietary-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'fireworks-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#1A0050,#3D0070,#B388FF);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('fireworks-guide');
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:28px;">🎆</span>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Fireworks & Night Shows</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.85);">5 shows · Best spots · Photography tips</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _fwCard = false;
+  setInterval(() => { if (!_fwCard) _fwCard = injectFireworksCard(); }, 18000);
+  setTimeout(() => { _fwCard = injectFireworksCard(); }, 14500);
+
+  const _prevRH_nnn2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_nnn2) _prevRH_nnn2.apply(this, arguments);
+    setTimeout(() => { _fwCard = false; _fwCard = injectFireworksCard(); }, 3400);
+  };
+})();
+</script>
