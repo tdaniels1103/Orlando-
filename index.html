@@ -48236,3 +48236,167 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK WWWW2: Complete Souvenir & Gift Guide ===== */
+(function initSouvenirGuide() {
+
+  const CATEGORIES = [
+    {
+      name:'Best Value Souvenirs', icon:'💰', color:'#2E7D32',
+      items:[
+        { name:'MagicBand+ (Disney)', price:'$34.99', where:'Any Disney park or resort shop', note:'Wearable tech that lights up, interacts with Galaxy\'s Edge, and links to your tickets. More useful than it looks — and the tech makes it a better keepsake than a generic toy.' },
+        { name:'Mickey Ear Hat (classic)', price:'$29–39', where:'Any Disney park', note:'The timeless souvenir. Can be personalized with embroidery at no extra charge. The official "you were at Disney" artifact.' },
+        { name:'Butterbeer Tankard (Universal)', price:'$14 with Butterbeer', where:'Universal Wizarding World', note:'The Butterbeer Tankard can be refilled at reduced prices throughout the day. You keep the mug — a practical souvenir.' },
+        { name:'Annual Passholder Magnets (Disney)', price:'Free with AP', where:'Guest Relations', note:'Each month has a unique magnet design exclusive to Annual Passholders. Non-AP guests can sometimes purchase them — ask at Guest Relations.' },
+        { name:'Pressed Pennies', price:'51 cents', where:'Machines throughout all parks', note:'Collect them all. Each machine has 3 designs — $1.53 per stop for a unique handmade keepsake. The most affordable souvenir at any theme park.' },
+        { name:'EPCOT Country Pins (Disney)', price:'$10–15', where:'Each World Showcase Pavilion', note:'Each country has exclusive pin designs. Pin trading is a Disney obsession — CMs wear lanyards and will trade any pin for any pin.' },
+      ]
+    },
+    {
+      name:'Splurge Souvenirs', icon:'✨', color:'#C9A96E',
+      items:[
+        { name:'Custom Lightsaber (Savi\'s Workshop)', price:'$249.99', where:'Hollywood Studios - Savi\'s', note:'A 45-minute guided experience. Comes in a branded carrying case. The most meaningful and expensive souvenir at Disney. Worth it for serious Star Wars fans.' },
+        { name:'Proprietary Droid (Droid Depot)', price:'$119.99+', where:'Hollywood Studios - Galaxy\'s Edge', note:'BB-series or R-series droid that interacts with Galaxy\'s Edge sensors. The droid does things as you walk through the land — an experience, not just a toy.' },
+        { name:'Ollivanders Wand (Universal)', price:'$55', where:'Ollivanders in Hogsmeade/Diagon Alley', note:'Interactive wand that triggers special effects at spell locations throughout the Wizarding World. Not just a prop — functional in the park.' },
+        { name:'Disney Fine Art at Art of Disney', price:'$200–2,000+', where:'Disney Springs and parks', note:'Signed limited edition prints from Disney animators. Genuine art — not a toy. For the collector who wants something that lasts.' },
+        { name:'Pandora Jewelry (EPCOT)', price:'$50–500', where:'EPCOT - various pavilions', note:'Pandora has Disney and country-specific charms exclusive to EPCOT. Collector\'s items that hold value.' },
+        { name:'Custom Portrait at Animation Academy', price:'$25–50', where:'Hollywood Studios', note:'Disney artists draw your likeness in the Disney animation style. Takes 20 minutes. A genuinely unique piece of art with your face.' },
+      ]
+    },
+    {
+      name:'Best Edible Souvenirs', icon:'🍫', color:'#6D4C41',
+      items:[
+        { name:'Dole Whip Mix (To Go)', price:'$12–18', where:'Various parks and shopDisney.com', note:'Make Dole Whip at home. Pineapple, strawberry, and mango flavors. A taste of Disney in your kitchen.' },
+        { name:'Le Cellier Cheddar Cheese Soup Mix', price:'$15', where:'EPCOT Canada Pavilion shop', note:'The recipe for Le Cellier\'s famous soup to make at home. One of the most requested EPCOT food items.' },
+        { name:'Grey Goose Kringla (School Bread recipe)', price:'Approx $25', where:'Norway Pavilion shop', note:'Get the packaged version of Kringla Bakeri\'s products to take home. Available at the Norway pavilion shops.' },
+        { name:'Florida Orange Blossom Honey', price:'$12–20', where:'Florida-themed shops throughout parks', note:'Genuine Florida artisan honey. Better than the generic Disney-branded candy — a real regional product.' },
+        { name:'Walt Disney World 50th Commemorative Chocolate', price:'$15–30', where:'World of Disney (Disney Springs)', note:'Molded chocolates with Walt Disney World landmarks. Seasonal availability — buy when you see them.' },
+      ]
+    },
+    {
+      name:'Practical Souvenirs Worth Buying', icon:'🛍️', color:'#1565C0',
+      items:[
+        { name:'Disney Reusable Souvenir Popcorn Bucket', price:'$22 with popcorn ($2 refills)', where:'Any Disney park', note:'Seasonal and specialty buckets (R2-D2, Mickey, holiday themes) are collector items. The refill system makes it practical during the visit.' },
+        { name:'Disney Souvenir Sipper / Drink Cup', price:'$18–22 with drink', where:'Any Disney park', note:'Refillable souvenir cups that save money on subsequent drinks during your park day.' },
+        { name:'Universal Souvenir Cup', price:'$17 with drink', where:'Universal parks', note:'All-day refillable at any Universal drink station. Actually saves money if you drink 3+ fountain drinks in a day.' },
+        { name:'Disney Autograph Book + Pen', price:'$12–18', where:'Disney park entrance shops', note:'Better than a generic notebook — Disney-bound design, holds up to character autograph sessions.' },
+        { name:'MagicBand Accessories (holders, straps)', price:'$8–15', where:'Disney parks and resorts', note:'If you\'re keeping and using a MagicBand, stylish holders and bands personalize it.' },
+      ]
+    },
+  ];
+
+  const BUYING_TIPS = [
+    { icon:'📱', tip:'shopDisney.com stocks most park items for delivery. If you forget to buy something, you can often order it online at the same price after you\'re home.' },
+    { icon:'📦', tip:'Ship packages to your Disney resort hotel directly — everything gets delivered to your room. Order from shopDisney before your trip to save carrying space.' },
+    { icon:'💳', tip:'Disney Visa cardholders get 10% off merchandise at select locations. Disney Resort guests: charge everything to your room keycard and pay at checkout (avoids carrying cash).' },
+    { icon:'⚖️', tip:'Weigh your luggage before leaving for the airport. Souvenir shopping often pushes bags over 50 lbs ($100 overweight fee). Ship heavy items home via FedEx/UPS from Disney Springs.' },
+    { icon:'🏷️', tip:'Price compare pins at Pin Traders (Disney Springs) vs in-park shops — sometimes 10–20% cheaper. Also, eBay has authentic Disney pins at steep discounts if you\'re not picky about getting them in-park.' },
+    { icon:'🎁', tip:'Best gifts for people who didn\'t come: edible items (Dole Whip mix, candy, honey) > logo apparel > pins > plush toys. Practical or consumable > branded merchandise.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-souvenir-guide';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const header = document.createElement('div');
+    header.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#E65100,#FF6F00,#C9A96E);padding:16px 14px 14px;';
+    header.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:#fff;">Souvenir & Gift Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.85);">Best buys · Worth the splurge · Buying tips</div>
+        </div>
+        <span style="font-size:24px;">🛍️</span>
+      </div>`;
+
+    const content = document.createElement('div');
+    content.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    // Tips first
+    const tipsCard = document.createElement('div');
+    tipsCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;padding:12px 14px;margin-bottom:14px;border:1px solid var(--border,#eee);';
+    tipsCard.innerHTML = `<div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:8px;">🧠 Smart Shopping Tips</div>`;
+    BUYING_TIPS.forEach(t => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;gap:8px;margin-bottom:6px;align-items:flex-start;';
+      row.innerHTML = `<span style="font-size:15px;">${t.icon}</span><div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${t.tip}</div>`;
+      tipsCard.appendChild(row);
+    });
+    content.appendChild(tipsCard);
+
+    // Categories
+    CATEGORIES.forEach(cat => {
+      const catHeader = document.createElement('div');
+      catHeader.style.cssText = `display:flex;align-items:center;gap:8px;margin:14px 0 8px;`;
+      catHeader.innerHTML = `<span style="font-size:20px;">${cat.icon}</span><div style="font-size:13px;font-weight:800;color:${cat.color};">${cat.name.toUpperCase()}</div>`;
+      content.appendChild(catHeader);
+
+      cat.items.forEach(item => {
+        const card = document.createElement('div');
+        card.style.cssText = 'background:var(--card-bg,#fff);border-radius:12px;margin-bottom:7px;padding:10px 13px;border:1px solid var(--border,#eee);';
+        card.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2px;">
+            <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);flex:1;line-height:1.3;">${item.name}</div>
+            <span style="font-size:11px;font-weight:800;color:${cat.color};flex-shrink:0;margin-left:8px;">${item.price}</span>
+          </div>
+          <div style="font-size:10px;color:var(--text-secondary,#aaa);margin-bottom:3px;">📍 ${item.where}</div>
+          <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.4;">${item.note}</div>`;
+        content.appendChild(card);
+      });
+    });
+
+    const spacer = document.createElement('div');
+    spacer.style.height = '20px';
+    content.appendChild(spacer);
+
+    s.appendChild(header);
+    s.appendChild(content);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-souvenir-guide')) buildScreen();
+
+  const _prevSS_wwww2 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_wwww2) _prevSS_wwww2(name, el);
+    if (name === 'souvenir-guide') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-souvenir-guide');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectSouvenirCard() {
+    if (document.getElementById('souvenir-home-card')) return true;
+    const ref = document.getElementById('airport-home-card') || document.getElementById('music-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'souvenir-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#E65100,#FF6F00,#C9A96E);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('souvenir-guide');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:3px;">🛍️ Souvenir & Gift Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.85);">Best buys · Lightsabers · Edibles · Smart tips</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.5);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _souvenirCard = false;
+  setInterval(() => { if (!_souvenirCard) _souvenirCard = injectSouvenirCard(); }, 35500);
+  setTimeout(() => { _souvenirCard = injectSouvenirCard(); }, 32000);
+
+  const _prevRH_wwww2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_wwww2) _prevRH_wwww2.apply(this, arguments);
+    setTimeout(() => { _souvenirCard = false; _souvenirCard = injectSouvenirCard(); }, 9100);
+  };
+})();
+</script>
