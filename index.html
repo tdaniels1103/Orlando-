@@ -39835,3 +39835,593 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK EEE2: Disney Annual Pass & Membership Guide ===== */
+(function initAnnualPassGuide() {
+
+  const PASSES = [
+    {
+      name:'Disney Incredi-Pass',
+      emoji:'🏆',
+      tier:'Top Tier',
+      price:'$1,399/year',
+      color:'#F57F17',
+      includes:['All 4 parks','No blockout dates','Disney Springs discounts (20% dining, 20% merchandise)','PhotoPass downloads included','Free parking at all 4 parks','Water parks included (Blizzard Beach, Typhoon Lagoon)','15% off select hotels'],
+      bestFor:'Florida residents who visit 5+ times per year or any fan visiting 3+ weeks per year',
+      breakEven:'3 visits (with parking, PhotoPass, dining discounts)',
+      insider:"The Incredi-Pass dining discount alone saves $30–60 per table-service meal. For 3+ visits with table-service dining, it pays for itself quickly.",
+    },
+    {
+      name:'Disney Sorcerer Pass',
+      emoji:'🧙',
+      tier:'Mid-High',
+      price:'$899/year',
+      color:'#7B1FA2',
+      includes:['All 4 parks (moderate blockout dates — major holidays)', 'Partial PhotoPass discount', 'Free parking', 'Disney Springs discounts', 'Water parks included'],
+      bestFor:'Florida residents visiting 4–6 times per year; excellent value for locals',
+      breakEven:'2–3 visits (1-day tickets = $109–189 each)',
+      insider:"Florida residents can pay monthly ($80–90/month) — making this feel like a streaming service that happens to include access to 4 theme parks.",
+    },
+    {
+      name:'Disney Pirate Pass',
+      emoji:'🏴‍☠️',
+      tier:'Mid',
+      price:'$599/year',
+      color:'#1565C0',
+      includes:['All 4 parks (significant blockout dates — weekends, holidays)', 'Basic discounts', 'Free parking (limited times)', 'Water parks access'],
+      bestFor:'Local Orlando residents who can visit on weekdays only',
+      breakEven:'3–4 visits for a local adult',
+      insider:"Weekday park visits are genuinely different — 40–60% fewer guests on most days. For a local, this unlocks a totally different (better) park experience.",
+    },
+    {
+      name:'Disney Pixie Dust Pass',
+      emoji:'✨',
+      tier:'Entry',
+      price:'$399/year',
+      color:'#2E7D32',
+      includes:['Florida residents ONLY', 'All 4 parks (heavy blockout dates)', 'Basic discounts', 'Best for local families on tight budgets'],
+      bestFor:'Florida residents only, flexible weekday visitors',
+      breakEven:'2 visits for a family of 4',
+      insider:"The most underrated Disney product for Central Florida residents. At $399/year, one great weekday visit per month justifies the entire cost.",
+    },
+  ];
+
+  const UNIVERSAL_PASSES = [
+    { name:'Power Annual Pass', price:'$429+/year', includes:'Both parks, no blackout dates, 15% dining, 15% merch, free parking', color:'#1B5E20' },
+    { name:'Preferred Annual Pass', price:'$299+/year', includes:'Both parks, moderate blackouts, 10% dining discount, parking on select days', color:'#2E7D32' },
+    { name:'Seasonal Annual Pass', price:'$179+/year', includes:'Both parks with significant blackouts, basic discounts — best for locals', color:'#4CAF50' },
+  ];
+
+  const PASS_TIPS = [
+    { icon:'📅', tip:"Buy annual passes on the first day of your trip — the year starts immediately. You'll recoup the upgrade cost on that first visit through discounts." },
+    { icon:'💰', tip:"Upgrade from a day ticket to an annual pass at any Guest Relations window. The price of your day ticket is fully credited toward the annual pass." },
+    { icon:'👨‍👩‍👧', tip:"Family annual pass math: 4 people × $899 = $3,596/year. 4 visits × $180/person/day = $2,880 in tickets alone — the pass pays off in 4 visits without counting discounts." },
+    { icon:'🍽️', tip:"The 20% dining discount at Disney applies at most sit-down restaurants in all parks and Disney Springs. On a 7-night trip with table service, this alone can save $200–400." },
+    { icon:'📸', tip:"Incredi-Pass and Sorcerer Pass include Disney's PhotoPass — every ride photo, character photo, and professional shot included. Separately, PhotoPass is $200+/year." },
+    { icon:'🅿️', tip:"Free parking saves $30/day at Disney. If you visit 12 times per year, that's $360 in parking savings alone from the annual pass." },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-annual-pass';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;';
+    s.innerHTML = `
+      <div style="background:linear-gradient(135deg,#F57F17,#F9A825,#FFF9C4);padding:18px 14px 20px;
+        display:flex;align-items:center;gap:12px;flex-shrink:0;">
+        <button onclick="window.showScreen('home')" style="background:rgba(0,0,0,.2);border:none;
+          border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#fff;">Annual Pass Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.9);">Disney · Universal · When to buy · Is it worth it?</div>
+        </div>
+        <span style="font-size:28px;">🎫</span>
+      </div>
+      <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;">
+
+        <div style="background:linear-gradient(135deg,#F57F17,#EF6C00);border-radius:16px;padding:14px;margin-bottom:14px;color:#fff;">
+          <div style="font-size:13px;line-height:1.6;opacity:.9;">
+            Annual passes are the single most powerful tool for frequent Orlando visitors. Even for first-time visitors, upgrading to an annual pass on Day 1 of a 5+ day trip often pays for itself through discounts alone.
+          </div>
+        </div>
+
+        <!-- Disney Passes -->
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:10px;">🏰 Disney Annual Passes</div>
+        ${PASSES.map(pass => `
+          <div style="background:var(--card-bg,#fff);border-radius:14px;margin-bottom:10px;
+            border:1px solid var(--border,#eee);overflow:hidden;">
+            <div style="background:${pass.color};padding:10px 14px;display:flex;align-items:center;justify-content:space-between;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-size:22px;">${pass.emoji}</span>
+                <div>
+                  <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:#fff;">${pass.name}</div>
+                  <div style="font-size:10px;color:rgba(255,255,255,.8);">${pass.tier}</div>
+                </div>
+              </div>
+              <div style="font-size:16px;font-weight:800;color:#fff;">${pass.price}</div>
+            </div>
+            <div style="padding:10px 14px;">
+              ${pass.includes.map(inc => `<div style="font-size:12px;color:var(--text-secondary,#555);padding:2px 0;">✓ ${inc}</div>`).join('')}
+              <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
+                <span style="font-size:10px;background:${pass.color}18;color:${pass.color};padding:3px 9px;border-radius:20px;font-weight:700;">Best for: ${pass.bestFor}</span>
+              </div>
+              <div style="background:${pass.color}08;border-left:3px solid ${pass.color};padding:8px 10px;border-radius:0 8px 8px 0;margin-top:8px;">
+                <div style="font-size:11px;font-weight:700;color:${pass.color};">🤫 INSIDER</div>
+                <div style="font-size:12px;color:var(--text-primary,#333);margin-top:2px;">${pass.insider}</div>
+              </div>
+              <div style="font-size:11px;color:var(--text-secondary,#888);margin-top:6px;">Break-even: ${pass.breakEven}</div>
+            </div>
+          </div>`).join('')}
+
+        <!-- Universal Passes -->
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--text-primary,#212121);margin:16px 0 10px;">🎬 Universal Annual Passes</div>
+        ${UNIVERSAL_PASSES.map(p => `
+          <div style="background:var(--card-bg,#fff);border-radius:12px;margin-bottom:8px;
+            border:1px solid var(--border,#eee);overflow:hidden;">
+            <div style="background:${p.color};padding:8px 12px;display:flex;align-items:center;justify-content:space-between;">
+              <div style="font-size:13px;font-weight:700;color:#fff;">${p.name}</div>
+              <div style="font-size:14px;font-weight:800;color:#A5D6A7;">${p.price}</div>
+            </div>
+            <div style="padding:8px 12px;font-size:12px;color:var(--text-secondary,#555);">${p.includes}</div>
+          </div>`).join('')}
+
+        <!-- Tips section -->
+        <div style="background:linear-gradient(135deg,#F57F17,#EF6C00);border-radius:14px;padding:14px;margin-top:14px;margin-bottom:20px;color:#fff;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">💡 Annual Pass Strategies</div>
+          ${PASS_TIPS.map(pt => `
+            <div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
+              <span style="font-size:18px;flex-shrink:0;">${pt.icon}</span>
+              <div style="font-size:12px;color:rgba(255,255,255,.9);line-height:1.5;">${pt.tip}</div>
+            </div>`).join('')}
+        </div>
+      </div>`;
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-annual-pass')) buildScreen();
+
+  const _prevSS_eee2 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_eee2) _prevSS_eee2(name, el);
+    if (name === 'annual-pass') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-annual-pass');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectAPCard() {
+    if (document.getElementById('ap-home-card')) return true;
+    const ref = document.getElementById('photo-home-card') || document.getElementById('daytrip-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'ap-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#F57F17,#F9A825,#FFF9C4);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('annual-pass');
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:28px;">🎫</span>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#333;">Annual Pass Guide</div>
+          <div style="font-size:11px;color:rgba(0,0,0,.7);">Disney · Universal · When it pays off · Insider tips</div>
+        </div>
+        <span style="font-size:22px;color:rgba(0,0,0,.5);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _apCard = false;
+  setInterval(() => { if (!_apCard) _apCard = injectAPCard(); }, 13500);
+  setTimeout(() => { _apCard = injectAPCard(); }, 10000);
+
+  const _prevRH_eee2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_eee2) _prevRH_eee2.apply(this, arguments);
+    setTimeout(() => { _apCard = false; _apCard = injectAPCard(); }, 2500);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK FFF2: Kids by Age Guide ===== */
+(function initKidsByAge() {
+
+  const AGE_GUIDES = [
+    {
+      ageRange:'Babies & Toddlers (0–2)',
+      emoji:'👶',
+      color:'#EC407A',
+      verdict:'Can work, but adjust expectations',
+      verdictColor:'#EC407A',
+      parks:['EPCOT is most stroller-friendly and least overstimulating for infants','Magic Kingdom\'s Fantasy land is most infant-appropriate','Animal Kingdom: the animals and nature are calming for very young children'],
+      rides:['Magic Carpets of Aladdin (MK)','The Many Adventures of Winnie the Pooh (MK)','It\'s a Small World (MK — perfect for infants)','Living with the Land (EPCOT — calm boat ride)','Na\'vi River Journey (AK — serene and beautiful)'],
+      practicalTips:['Baby Care Centers in every Disney park — free diapers, changing tables, nursing rooms, formula warming','Rider Switch available for all height-restricted rides — parents take turns with no extra wait','Best strollers: Zoe XL1 or UPPAbaby Cruz — compact and park-friendly','All Disney and Universal buses accommodate strollers folded','Schedule around naps — 2 PM return to hotel for nap + pool is the ideal toddler day structure'],
+      packingList:['Baby carrier (Ergobaby or similar) for crowd navigation','Portable sound machine for naps in the hotel','Baby sunscreen SPF 50+ (Florida sun is serious)','Enough diapers for 1.5× your expected need'],
+    },
+    {
+      ageRange:'Little Ones (3–5)',
+      emoji:'🧒',
+      color:'#7B1FA2',
+      verdict:'Magic Kingdom was built for this age',
+      verdictColor:'#7B1FA2',
+      parks:['Magic Kingdom: This is THE park for this age group. Every inch is designed for them.','EPCOT: Remy\'s Ratatouille and Finding Nemo pavilion are perfect','Animal Kingdom: Conservation Station and animal encounters are incredible for this age'],
+      rides:['Remy\'s Ratatouille Adventure (EPCOT) — perfect size and excitement level','The Barnstormer — first coaster for many kids at this age (if 35" tall)','Seven Dwarfs Mine Train — achievable first coaster (38" tall)','Pete\'s Silly Sideshow character meet-and-greet (MK)','Dumbo the Flying Elephant — this age loves it unironically','Friendship Boats at EPCOT — boat ride with beautiful views'],
+      practicalTips:['Character dining is worth every penny at this age — characters come to YOU','Magic Kingdom in the morning, pool in the afternoon, Disney Springs in the evening is the perfect day','Kids at this age need 1 park per day max — resist the urge to park hop','Schedule shows and parades into the itinerary — they will remember these forever'],
+      packingList:['Disney character ears or outfits — they will wear them','Autograph book and thick markers for character signatures','Light-up toys for evening events (available in parks but cheaper at Dollar Tree before trip)','Small backpack for the child to carry — gives them ownership'],
+    },
+    {
+      ageRange:'Elementary Age (6–9)',
+      emoji:'🧑',
+      color:'#1565C0',
+      verdict:'The golden age for Disney visits',
+      verdictColor:'#1565C0',
+      parks:['All 4 Disney parks are ideal now — they can handle the full day','Hollywood Studios becomes exciting: Star Wars, Toy Story','Universal Islands of Adventure: Hogsmeade is extraordinary for book fans'],
+      rides:['Star Wars: Rise of the Resistance — most impressive ride ever built for this age group','Slinky Dog Dash — perfect family coaster (age-appropriate thrills)','Guardians of the Galaxy: Cosmic Rewind (54" or Express Pass)','Velocicoaster single rider if 51"+ — life-changing first big coaster','Flight of the Hippogriff at Hogsmeade — great first Universal coaster'],
+      practicalTips:['Start measuring heights at home — many rides require 48–54". Know what they can ride before arriving.','Bibbidi Bobbidi Boutique (Disney) or Olivanders (Universal) are worth the splurge at this age','Let them navigate with the park app — they feel empowered and love the responsibility','Evening is when energy comes back — use it for rides (lower waits) rather than forcing early bedtimes'],
+      packingList:["Glow-in-the-dark accessories for evening (they'll make friends)", 'Comfortable waterproof shoes — avoid flip flops for parks','Small handheld fan — Disney/Universal sell them but $6 at Walmart is better','Portable phone charger — they will want to use the apps'],
+    },
+    {
+      ageRange:'Tweens (10–12)',
+      emoji:'🧑‍🦱',
+      color:'#2E7D32',
+      verdict:'Universal becomes equally exciting as Disney',
+      verdictColor:'#2E7D32',
+      parks:['Universal IoA + USF: Velocicoaster, Hagrid\'s, and the Wizarding World are peak tween experiences','Hollywood Studios: Star Wars land is built for this age group\'s imagination','EPCOT: World Showcase dining adventure + Guardians coaster'],
+      rides:["Velocicoaster (Universal) — the best roller coaster in Florida, hands down, at any age", "Hagrid's Magical Creatures Motorbike Adventure — the most themed ride ever built",'Star Wars: Galactic Starcruiser immersive experience (if budget allows — $800+ per person)', 'Tron Lightcycle Run — Disney\'s fastest, best coaster','Mission: SPACE (orange side) — proper space simulation thrill'],
+      practicalTips:['They can now do single rider lines solo — a genuine game-changer for wait times','Let them plan one full day of the trip: their itinerary, their restaurants, their choices — they will feel heard and engaged','Budget $50–100 personal spending money — they will find things to buy that matter to them','Evening park time becomes genuinely fun — they stay up, enjoy the atmosphere, feel grown-up'],
+      packingList:['AirPods or earbuds for long travel days and hotel downtime','Their own phone with the park app downloaded','Spending money in small bills for more control','A book or tablet for resort travel days'],
+    },
+    {
+      ageRange:'Teenagers (13–17)',
+      emoji:'👦',
+      color:'#E65100',
+      verdict:'Universal + thrill rides + freedom = success',
+      verdictColor:'#E65100',
+      parks:['Universal is often preferred by teenagers over Disney by this age','Epic Universe (opening 2025): new Wizarding World + Monsters = perfect teen park','Hollywood Studios: the most adult-skewing Disney park works well for teens'],
+      rides:["Velocicoaster (Universal) — they will want to ride it 3 times", 'Hagrid\'s Magical Creatures: even cynical teens are converted','TRON Lightcycle Run: Disney\'s best thrill experience','Guardians of the Galaxy: Cosmic Rewind — one of Disney\'s best experiences','Mako at SeaWorld — Florida\'s fastest coaster'],
+      practicalTips:["Give them genuine independence — a 2-hour window to explore the park solo while the family does something else. They will love this.", "Hagrid's single rider line is usually faster — they may want to go alone or with a friend from your group", "Universal Express Pass transforms the teen day — they can ride everything multiple times", "Let teens opt out of some things without drama — forcing a teenager into something = misery for everyone"],
+      packingList:["Their own phone and data plan — non-negotiable for independence", 'Portable charger (they will kill the battery quickly)', 'Sunscreen they will actually apply (spray form wins the compliance battle)', "Cash or Venmo access for food independence"],
+    },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-kids-by-age';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;';
+    s.innerHTML = `
+      <div style="background:linear-gradient(135deg,#EC407A,#F48FB1,#F8BBD0);padding:18px 14px 20px;
+        display:flex;align-items:center;gap:12px;flex-shrink:0;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.3);border:none;
+          border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#fff;">Kids by Age Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.9);">Tailored plans · Best rides · Practical tips by age</div>
+        </div>
+        <span style="font-size:28px;">🎡</span>
+      </div>
+      <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;">
+
+        <div style="background:linear-gradient(135deg,#C2185B,#E91E63);border-radius:16px;padding:14px;margin-bottom:14px;color:#fff;">
+          <div style="font-size:13px;line-height:1.6;opacity:.9;">
+            The perfect Orlando experience depends enormously on your children's ages. Here's a complete, honest guide to what works — and what to skip — at every stage.
+          </div>
+        </div>
+
+        ${AGE_GUIDES.map(guide => `
+          <div style="background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;
+            border:1px solid var(--border,#eee);overflow:hidden;">
+            <div style="background:${guide.color};padding:12px 14px;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-size:26px;">${guide.emoji}</span>
+                <div>
+                  <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:#fff;">${guide.ageRange}</div>
+                  <div style="font-size:11px;color:rgba(255,255,255,.85);font-weight:600;">${guide.verdict}</div>
+                </div>
+              </div>
+            </div>
+            <div style="padding:12px 14px;">
+
+              <div style="font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:5px;">BEST PARKS</div>
+              ${guide.parks.map(p => `<div style="font-size:12px;color:var(--text-secondary,#555);padding:2px 0;">🏰 ${p}</div>`).join('')}
+
+              <div style="font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin:8px 0 5px;">BEST RIDES FOR THIS AGE</div>
+              ${guide.rides.map(r => `<div style="font-size:12px;color:${guide.color};font-weight:600;padding:2px 0;">⭐ ${r}</div>`).join('')}
+
+              <div style="font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin:8px 0 5px;">PRACTICAL TIPS</div>
+              ${guide.practicalTips.map(t => `<div style="font-size:12px;color:var(--text-secondary,#555);padding:2px 0;">💡 ${t}</div>`).join('')}
+
+              <div style="margin-top:8px;background:${guide.color}08;border-radius:8px;padding:8px 10px;">
+                <div style="font-size:10px;font-weight:700;color:${guide.color};margin-bottom:4px;">🎒 PACK FOR THIS AGE</div>
+                ${guide.packingList.map(item => `<div style="font-size:12px;color:var(--text-secondary,#555);padding:2px 0;">• ${item}</div>`).join('')}
+              </div>
+            </div>
+          </div>`).join('')}
+
+        <div style="background:linear-gradient(135deg,#C2185B,#E91E63);border-radius:14px;padding:14px;margin-bottom:20px;color:#fff;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">🌟 Universal Truth About Kids & Parks</div>
+          <div style="font-size:12px;color:rgba(255,255,255,.9);line-height:1.7;">
+            Every family is different and every child is different. These are patterns, not rules. The single most important factor in a successful kids' park trip isn't the rides, the hotel, or the itinerary — it's sleep. A rested child at a mediocre park beats an exhausted child at the greatest park on earth every single time.
+          </div>
+        </div>
+      </div>`;
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-kids-by-age')) buildScreen();
+
+  const _prevSS_fff2 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_fff2) _prevSS_fff2(name, el);
+    if (name === 'kids-by-age') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-kids-by-age');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectKidsCard() {
+    if (document.getElementById('kids-age-home-card')) return true;
+    const ref = document.getElementById('ap-home-card') || document.getElementById('photo-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'kids-age-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#EC407A,#F48FB1,#F8BBD0);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('kids-by-age');
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:28px;">🎡</span>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Kids by Age Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.9);">5 age groups · Best rides · Practical packing tips</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _kidsCard = false;
+  setInterval(() => { if (!_kidsCard) _kidsCard = injectKidsCard(); }, 14000);
+  setTimeout(() => { _kidsCard = injectKidsCard(); }, 10500);
+
+  const _prevRH_fff2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_fff2) _prevRH_fff2.apply(this, arguments);
+    setTimeout(() => { _kidsCard = false; _kidsCard = injectKidsCard(); }, 2600);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK GGG2: Dining Reservation Masterclass ===== */
+(function initDiningReservations() {
+
+  const TOP_RESTAURANTS = [
+    {
+      name:"Victoria & Albert's",
+      park:'Disney\'s Grand Floridian',
+      emoji:'👑',
+      rating:5,
+      pricePerPerson:'$295–$385+',
+      bookingWindow:'60 days via Disney Dining',
+      cuisine:'Modern American Haute Cuisine',
+      type:'Table Service / Chef\'s Table',
+      desc:"Disney's only AAA Five Diamond restaurant. An intimate prix fixe experience where each of 10–12 courses is a work of art. The wine pairing ($175–200) is extraordinary.",
+      tipsForBooking:['Book exactly at 60 days — this sells out in seconds','Chef\'s Table requires a phone call to book (407-939-3862)','Special dietary needs handled exquisitely — communicate in advance','Dress code: formal. This is Disney\'s most upscale experience.'],
+      bestFor:'Special occasions · Anniversaries · Proposals',
+    },
+    {
+      name:"California Grill",
+      park:"Disney's Contemporary Resort",
+      emoji:'🌙',
+      rating:5,
+      pricePerPerson:'$50–$120',
+      bookingWindow:'60 days via Disney Dining',
+      cuisine:'Modern American with Sushi',
+      type:'Table Service',
+      desc:"Top of the Contemporary Resort with floor-to-ceiling views of Magic Kingdom. Watch the fireworks from the restaurant — and your ticket is validated to go to the observation deck too. Sublime.",
+      tipsForBooking:['Book at 60 days for fireworks-time seating (9 PM window)','Request a window table when booking — not guaranteed but often honored','They will reserve a deck spot for fireworks viewing with your reservation'],
+      bestFor:'Romantic evenings · Anniversary dinners · Disney fireworks viewing',
+    },
+    {
+      name:'Capa Rooftop',
+      park:'Four Seasons Orlando',
+      emoji:'⭐',
+      rating:5,
+      pricePerPerson:'$90–$180',
+      bookingWindow:'90 days via Four Seasons app',
+      cuisine:'Spanish Steakhouse',
+      type:'Table Service',
+      desc:"Rooftop Spanish steakhouse at the Four Seasons with extraordinary views of the Disney World fireworks. The Spanish octopus and wagyu steaks are legendary. Wine list is exceptional.",
+      tipsForBooking:['Non-hotel guests can book — call the restaurant directly','Request a window table facing the Magic Kingdom fireworks direction','The sangria flight is a perfect starter'],
+      bestFor:'Luxury dining · Non-Disney guests who want Disney fireworks views',
+    },
+    {
+      name:'Satu\'li Canteen',
+      park:'Animal Kingdom — Pandora',
+      emoji:'🌿',
+      rating:4,
+      pricePerPerson:'$15–$25',
+      bookingWindow:'No reservation needed (Mobile Order)',
+      cuisine:'Pandoran / Grain Bowl',
+      type:'Quick Service',
+      desc:"Don't let 'Quick Service' fool you — Satu'li is genuinely excellent food. The Cheeseburger Pods and Grain Bowls are creative, fresh, and surprisingly satisfying. Plus Pandora is jaw-droppingly beautiful.",
+      tipsForBooking:['Use Mobile Order on the My Disney Experience app','Order 30 minutes before your planned lunch to minimize wait','The Blueberry Cream Cheese Mousse dessert is an underrated gem'],
+      bestFor:'Budget-friendly lunch · Pandora experience · Quick meal between rides',
+    },
+    {
+      name:'Be Our Guest',
+      park:'Magic Kingdom',
+      emoji:'🕯️',
+      rating:4,
+      pricePerPerson:'$15–$22 (QS lunch) / $55–$90 (TS dinner)',
+      bookingWindow:'60 days for dinner',
+      cuisine:'French-inspired / American',
+      type:'Quick Service (lunch) / Table Service (dinner)',
+      desc:"Dinner in the Beast's Castle is a genuinely magical experience. The rose petal centerpiece, the enchanted windows, the live music — it works. The prix fixe dinner is worth the price for the experience alone.",
+      tipsForBooking:['Lunch is QS with no reservation — arrive before 11 AM or after 2 PM for minimal wait','Dinner reservation needed at 60 days','Request the West Wing for the most dramatic dining room'],
+      bestFor:'Families · Beauty and the Beast fans · Magical dining experience',
+    },
+    {
+      name:"The Ravenous Pig",
+      park:'Winter Park (off-property)',
+      emoji:'🐷',
+      rating:5,
+      pricePerPerson:'$30–$60',
+      bookingWindow:'Via Resy — book 2–3 weeks in advance',
+      cuisine:'American Gastropub',
+      type:'Table Service',
+      desc:"James Beard-nominated gastropub widely considered the best restaurant in all of Orlando. The Short Rib and Crispy Pig Ear salad are revelatory. Craft beer and wine list are exceptional. This is where Orlando chefs eat.",
+      tipsForBooking:['Book via Resy — cancellation rate means occasional same-day spots appear','Bar seating is walk-up only — great option if reservation is unavailable','Tuesday and Wednesday have best availability'],
+      bestFor:'Serious food lovers · Date nights · Best meal of the trip',
+    },
+    {
+      name:"Sushi Pop",
+      park:'Casselberry (near Orlando)',
+      emoji:'🍣',
+      rating:5,
+      pricePerPerson:'$30–$65',
+      bookingWindow:'OpenTable — book 1 week ahead',
+      cuisine:'Creative Japanese / Omakase',
+      type:'Table Service',
+      desc:"Tiny, extraordinary sushi restaurant hidden in a strip mall north of Orlando. Chef Henry Moso's omakase tasting menus rival anything in Miami or NYC. One of the genuinely best-kept secrets in Florida dining.",
+      tipsForBooking:['Omakase is 48-hour advance notice only — book immediately','Counter seating is the best experience', 'BYOB for the full omakase (corkage fee is minimal)'],
+      bestFor:'Serious sushi fans · Adventurous diners · Best hidden gem meal',
+    },
+    {
+      name:'The Boheme at Grand Bohemian',
+      park:'Downtown Orlando',
+      emoji:'🎨',
+      rating:4,
+      pricePerPerson:'$40–$80',
+      bookingWindow:'OpenTable — 1 week advance',
+      cuisine:'American / Continental',
+      type:'Table Service',
+      desc:"Sophisticated dining in Downtown Orlando's premier boutique hotel. Sunday brunch is exceptional. The bar has over 100 wines by the glass and 40+ bourbons. Jazz Thursday through Saturday evening.",
+      tipsForBooking:['Sunday jazz brunch is the signature experience — book it','Bar seating is walk-up for smaller parties','Ask for a table near the art collection'],
+      bestFor:'Date nights · Locals\' favorite · Wine lovers · Sunday brunch',
+    },
+  ];
+
+  const BOOKING_TIMELINE = [
+    { days: '180+ days', action: "Walt Disney World hotel guests can book dining 60 days from CHECK-IN (covers entire stay). Book your resort first, then immediately set dining reservations." },
+    { days: '60 days', action: "Disney Dining opens. Victoria & Albert's and California Grill fireworks seating sell out in minutes. Be ready at 5:59 AM Eastern." },
+    { days: '60 days', action: "Disney's top character dining (Cinderella's Royal Table, Be Our Guest dinner) also opens at 60 days — act immediately." },
+    { days: '30–60 days', action: "Universal park reservations and on-site hotel dining. Universal has no 60-day equivalent — book when you think of it." },
+    { days: '14–30 days', action: "Off-property restaurants (Ravenous Pig, Sushi Pop, Park Avenue restaurants) — 1–3 weeks is usually sufficient." },
+    { days: '1–7 days', action: "Check for cancellations at fully-booked Disney spots. Cancellation day (day-of) drops often happen 10–15 minutes after park open when people cancel." },
+    { days: 'Day of trip', action: "Mobile Order for all Quick Service restaurants. Order 30 minutes before hunger strikes. Never wait in a QS line." },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-dining-reservations';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;';
+    s.innerHTML = `
+      <div style="background:linear-gradient(135deg,#3E2723,#5D4037,#A1887F);padding:18px 14px 20px;
+        display:flex;align-items:center;gap:12px;flex-shrink:0;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;
+          border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#fff;">Dining Reservation Masterclass</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">Top restaurants · Booking strategy · Insider tips</div>
+        </div>
+        <span style="font-size:28px;">🍽️</span>
+      </div>
+      <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;">
+
+        <!-- Top restaurants -->
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:10px;">🌟 Orlando's Best Dining Experiences</div>
+        ${TOP_RESTAURANTS.map(r => `
+          <div style="background:var(--card-bg,#fff);border-radius:14px;margin-bottom:10px;
+            border:1px solid var(--border,#eee);overflow:hidden;">
+            <div style="background:linear-gradient(135deg,#3E2723,#5D4037);padding:10px 14px;">
+              <div style="display:flex;align-items:flex-start;gap:8px;">
+                <span style="font-size:22px;">${r.emoji}</span>
+                <div style="flex:1;">
+                  <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:#fff;">${r.name}</div>
+                  <div style="font-size:10px;color:rgba(255,255,255,.7);">${r.cuisine} · ${r.park}</div>
+                </div>
+                <div style="text-align:right;flex-shrink:0;">
+                  <div style="font-size:12px;">${'⭐'.repeat(r.rating)}</div>
+                  <div style="font-size:11px;font-weight:800;color:#FFCC80;">${r.pricePerPerson}</div>
+                </div>
+              </div>
+            </div>
+            <div style="padding:10px 14px;">
+              <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;margin-bottom:6px;">${r.desc}</div>
+              <div style="font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:4px;">📅 BOOKING: ${r.bookingWindow}</div>
+              ${r.tipsForBooking.map(t => `<div style="font-size:11px;color:var(--text-secondary,#666);padding:2px 0;">💡 ${t}</div>`).join('')}
+              <div style="font-size:10px;color:var(--text-secondary,#888);margin-top:6px;">Best for: ${r.bestFor}</div>
+            </div>
+          </div>`).join('')}
+
+        <!-- Booking timeline -->
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;
+          color:var(--text-primary,#212121);margin:16px 0 10px;">📅 Booking Timeline</div>
+        ${BOOKING_TIMELINE.map(bt => `
+          <div style="background:var(--card-bg,#fff);border-radius:12px;margin-bottom:6px;
+            border:1px solid var(--border,#eee);padding:10px 12px;display:flex;gap:12px;align-items:flex-start;">
+            <div style="font-size:12px;font-weight:800;color:#5D4037;min-width:75px;flex-shrink:0;">${bt.days}</div>
+            <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;">${bt.action}</div>
+          </div>`).join('')}
+
+        <div style="background:linear-gradient(135deg,#3E2723,#5D4037);border-radius:14px;padding:14px;margin-top:14px;margin-bottom:20px;color:#fff;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">🔑 The Golden Rules of Disney Dining</div>
+          ${[
+            'The Disney Dining reservation system opens at exactly 6 AM Eastern. Have the app open and party pre-selected at 5:59:50 AM.',
+            "Mobile Order is the single biggest time-saver in the parks. Never stand in a QS line — ever.",
+            'Cancellation monitoring: apps like MouseDining or Dining Buddy auto-notify when reservations open up.',
+            'Always book: even if you might cancel. Cancellation deadline is usually midnight the night before.',
+            'The dining plan math rarely works out — it works best for families who would order the highest-tier items anyway.',
+          ].map(tip => `<div style="font-size:12px;color:rgba(255,255,255,.9);padding:4px 0;border-bottom:1px solid rgba(255,255,255,.15);line-height:1.5;">→ ${tip}</div>`).join('')}
+        </div>
+      </div>`;
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-dining-reservations')) buildScreen();
+
+  const _prevSS_ggg2 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_ggg2) _prevSS_ggg2(name, el);
+    if (name === 'dining-reservations') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-dining-reservations');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectDRCard() {
+    if (document.getElementById('dr-home-card')) return true;
+    const ref = document.getElementById('kids-age-home-card') || document.getElementById('ap-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'dr-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#3E2723,#5D4037,#A1887F);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('dining-reservations');
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:28px;">🍽️</span>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Dining Reservation Masterclass</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">8 top restaurants · 60-day strategy · Insider tips</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _drCard = false;
+  setInterval(() => { if (!_drCard) _drCard = injectDRCard(); }, 14500);
+  setTimeout(() => { _drCard = injectDRCard(); }, 11000);
+
+  const _prevRH_ggg2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_ggg2) _prevRH_ggg2.apply(this, arguments);
+    setTimeout(() => { _drCard = false; _drCard = injectDRCard(); }, 2700);
+  };
+})();
+</script>
