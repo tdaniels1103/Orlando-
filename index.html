@@ -43268,3 +43268,166 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK VVV2: International Visitor Masterclass ===== */
+(function initIntlVisitor() {
+
+  const SECTIONS = [
+    {
+      title:'Before You Arrive — Entry & Visas',
+      emoji:'✈️',
+      color:'#1565C0',
+      tips:[
+        { point:'ESTA vs. Visa', detail:"Citizens of 42 VWP countries (UK, EU, Australia, Japan, etc.) need ESTA ($21) not a visa. Apply at esta.cbp.dhs.gov at least 72 hours before departure. Non-VWP countries require a B-2 tourist visa from a US embassy." },
+        { point:'CBP Global Entry + Mobile Passport', detail:"If you have Global Entry or a trusted traveler program, use the Mobile Passport app at MCO for faster customs clearance. Lines are often 10× shorter than standard immigration." },
+        { point:'Travel Insurance — Non-Negotiable', detail:"US healthcare costs are extraordinary — a brief ER visit can cost $3,000–10,000 without insurance. Buy comprehensive travel insurance that includes emergency medical coverage. World Nomads and Allianz are reliable options." },
+        { point:'COVID/Health Requirements', detail:"Check CBP.gov for current entry requirements. Requirements change — always verify within 2 weeks of departure." },
+      ],
+    },
+    {
+      title:'Money & Payments in Orlando',
+      emoji:'💵',
+      color:'#2E7D32',
+      tips:[
+        { point:'Cash vs. Card', detail:"Orlando is nearly cashless. Disney, Universal, and SeaWorld accept all major credit cards including Apple Pay and Google Pay everywhere. Keep $100–200 cash for tips, street vendors, and small transactions." },
+        { point:'ATMs and Currency Exchange', detail:"International visitors: use your bank\'s ATM partner network for best rates. Avoid airport currency exchange (worst rates). Charles Schwab debit card has zero foreign transaction fees — excellent option if available in your country." },
+        { point:'Sales Tax in Florida', detail:"Florida state sales tax is 6% + county surtax (varies — approximately 6–8% in Orange/Osceola counties). This is NOT included in displayed prices. Add 7–8% to all price tags when budgeting." },
+        { point:'Tipping Culture', detail:"Tips are expected and essential to service workers' income in the US. Standard: 20% at restaurants, $5/day housekeeping, $2–5/bag for porters. Disney dining: Disney's Magical Express bellhops expect $5/bag. Failure to tip is noticed and culturally significant." },
+        { point:'International Outlet Shopping', detail:"Premium Outlets and Florida Mall: bring your passport. Many outlets offer tourist tax refund programs (varies by store). VAT refund: the US does not have a VAT — but many brands will match international pricing or offer exclusives." },
+      ],
+    },
+    {
+      title:'Language & Communication',
+      emoji:'🗣️',
+      color:'#7B1FA2',
+      tips:[
+        { point:'EPCOT World Showcase Languages', detail:"EPCOT hires cast members from each country represented in World Showcase. The Japan cast members speak Japanese, France pavilion staff often French, etc. Seek them out for authentic conversation." },
+        { point:'Captioning & Audio Description', detail:"Disney provides free handheld captioning and audio description devices at Guest Relations in every park. Free and available in English. For other languages, translation apps work well on the phone." },
+        { point:'Universal Language Support', detail:"Universal's International Guest Services can assist with basic language support. Some staff in the Wizarding World areas are multi-lingual." },
+        { point:'Local SIM or International Data', detail:"T-Mobile and AT&T both offer international plans that are competitive with purchasing a local US SIM. Google Fi is specifically designed for international travelers. Unlimited data is essential for maps and park apps." },
+      ],
+    },
+    {
+      title:'Cultural Notes for International Visitors',
+      emoji:'🌍',
+      color:'#E65100',
+      tips:[
+        { point:'Queue (Line) Culture', detail:"Americans queue (wait in line) for everything. Do not cut. Overtaking in a queue — even accidentally — is taken very seriously. When in doubt, ask 'Is this the end of the line?'" },
+        { point:'Portion Sizes', detail:"American portions are enormous by international standards. Quick Service meals typically serve 1.5× European portions. Sharing a meal is completely normal and often done." },
+        { point:'Dietary Communication', detail:"US allergen disclosure is less common than EU. For serious allergies, be explicit and assertive: 'I have a life-threatening allergy to [ingredient].' Disney responds extremely well to this." },
+        { point:'Personal Space', detail:"Americans maintain larger personal space bubbles than many cultures — stand at arm\'s length in lines. Eye contact and brief acknowledgment ('Hey, how are you?' = greeting, not an invitation to conversation) are cultural norms." },
+        { point:'Tap Water Safety', detail:"Orlando tap water is safe to drink. The taste may be different due to minerals — bottled water is available everywhere but not necessary for safety." },
+      ],
+    },
+    {
+      title:'Best Parks by Country of Origin',
+      emoji:'🗺️',
+      color:'#006064',
+      tips:[
+        { point:'United Kingdom Visitors', detail:"EPCOT\'s UK pavilion has Yorkshire Chips, Rose and Crown pub, and staff from the UK. Magic Kingdom\'s Peter Pan theming resonates deeply. The Haunted Mansion has strong UK Gothic atmosphere." },
+        { point:'Japan Visitors', detail:"EPCOT Japan Pavilion is authentic and staffed with Japanese cast members. Tomorrowland at Magic Kingdom references Japanese anime influences. Tokyo Disney inspiration is visible throughout." },
+        { point:'Australian / NZ Visitors', detail:"September–October visits: excellent weather and very low crowds. Many Australian travelers report Magic Kingdom and Animal Kingdom as matching their expectations. Typhoon Lagoon has an outdoor feel familiar to Australians." },
+        { point:'European Visitors Generally', detail:"EPCOT World Showcase has pavilions for France, Germany, Italy, UK, Norway, and more. Authentic food, merchandise, and cast from each country. The most internationally-oriented Disney experience available." },
+        { point:'Latin American Visitors', detail:"Mexico Pavilion at EPCOT is staffed by Mexican cast members. The Three Caballeros and Gran Fiesta Tour dark ride feature familiar characters. Orlando\'s large Hispanic community means excellent authentic Latin restaurants throughout the city." },
+      ],
+    },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-intl-visitor';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;';
+    s.innerHTML = `
+      <div style="background:linear-gradient(135deg,#1565C0,#1976D2,#64B5F6);padding:18px 14px 20px;
+        display:flex;align-items:center;gap:12px;flex-shrink:0;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;
+          border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#fff;">International Visitor Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">Visas · Money · Culture · Language · Parks by country</div>
+        </div>
+        <span style="font-size:28px;">🌍</span>
+      </div>
+      <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;">
+
+        <div style="background:linear-gradient(135deg,#1565C0,#1976D2);border-radius:16px;padding:14px;margin-bottom:14px;color:#fff;">
+          <div style="font-size:13px;line-height:1.6;opacity:.9;">
+            Orlando is one of the world's most visited destinations for international travelers. These guides bridge the practical and cultural gaps that make the difference between a good trip and an extraordinary one.
+          </div>
+        </div>
+
+        ${SECTIONS.map(section => `
+          <div style="background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;
+            border:1px solid var(--border,#eee);overflow:hidden;">
+            <div style="background:${section.color};padding:10px 14px;display:flex;align-items:center;gap:8px;">
+              <span style="font-size:22px;">${section.emoji}</span>
+              <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:#fff;">${section.title}</div>
+            </div>
+            <div style="padding:10px 14px;">
+              ${section.tips.map(tip => `
+                <div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border,#f0f0f0);">
+                  <div style="font-size:13px;font-weight:700;color:${section.color};margin-bottom:3px;">${tip.point}</div>
+                  <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;">${tip.detail}</div>
+                </div>`).join('')}
+            </div>
+          </div>`).join('')}
+
+        <div style="background:linear-gradient(135deg,#1565C0,#1976D2);border-radius:14px;padding:14px;margin-bottom:20px;color:#fff;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">🌟 Top International Visitor Tips</div>
+          ${[
+            'Book Disney and Universal well in advance — last-minute availability is very limited and much more expensive.',
+            "Convert your measurements: Florida weather in Fahrenheit (90°F = 32°C is very hot). Distances in miles (1 mile = 1.6km).",
+            'Outlets: The US uses 110V/60Hz. European (220V/50Hz) electronics need a transformer, not just an adapter.',
+            "Download Google Translate with English offline pack for emergency communication backup.",
+            "Emergency number in the US: 911 (police, fire, ambulance). Operators speak multiple languages.",
+          ].map(tip => `<div style="font-size:12px;color:rgba(255,255,255,.9);padding:4px 0;border-bottom:1px solid rgba(255,255,255,.15);line-height:1.5;">→ ${tip}</div>`).join('')}
+        </div>
+      </div>`;
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-intl-visitor')) buildScreen();
+
+  const _prevSS_vvv2 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_vvv2) _prevSS_vvv2(name, el);
+    if (name === 'intl-visitor') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-intl-visitor');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectIntlCard() {
+    if (document.getElementById('intl-home-card')) return true;
+    const ref = document.getElementById('health-home-card') || document.getElementById('itin-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'intl-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#1565C0,#1976D2,#64B5F6);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('intl-visitor');
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:28px;">🌍</span>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">International Visitor Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.85);">Visas · Money · Culture · Tips by country</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _intlCard = false;
+  setInterval(() => { if (!_intlCard) _intlCard = injectIntlCard(); }, 22000);
+  setTimeout(() => { _intlCard = injectIntlCard(); }, 18500);
+
+  const _prevRH_vvv2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_vvv2) _prevRH_vvv2.apply(this, arguments);
+    setTimeout(() => { _intlCard = false; _intlCard = injectIntlCard(); }, 4200);
+  };
+})();
+</script>
