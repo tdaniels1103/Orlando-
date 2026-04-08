@@ -40821,3 +40821,474 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK JJJ2: Trip Budget Calculator (Interactive) ===== */
+(function initBudgetCalculator() {
+
+  const COST_DATA = {
+    tickets: {
+      disney: { base: 109, average: 145, premium: 189, label: 'Disney 1-Day Ticket' },
+      universal: { base: 89, average: 115, premium: 149, label: 'Universal 1-Day Ticket' },
+      seaworld: { base: 49, average: 75, premium: 109, label: 'SeaWorld 1-Day Ticket' },
+      multiDay: { disney4: 399, universal3: 269, both5: 599 },
+    },
+    hotels: {
+      budget: { min: 60, max: 120, examples: ['Motel 6 near I-Drive', 'Days Inn Maingate', 'Ramada near Convention Center'] },
+      moderate: { min: 120, max: 220, examples: ['Disney\'s All-Star Resorts ($170)', 'Universal Cabana Bay ($160)', 'Rosen Inn ($120)'] },
+      deluxe: { min: 220, max: 450, examples: ['Disney\'s Port Orleans ($280)', 'Loews Sapphire Falls ($260)', 'Hyatt Regency ($320)'] },
+      luxury: { min: 450, max: 1200, examples: ['Disney\'s Grand Floridian ($750)', 'Four Seasons ($900)', 'Waldorf Astoria ($600)'] },
+    },
+    food: {
+      budget: { perPerson: 35, desc: 'Quick Service, Publix meals, snacks' },
+      moderate: { perPerson: 65, desc: 'Mix of QS and one Table Service per day' },
+      splurge: { perPerson: 120, desc: 'Multiple Table Service meals, alcohol, snacks' },
+      luxury: { perPerson: 200, desc: 'Character dining, V&A, fine dining every night' },
+    },
+    extras: {
+      lightning: { cost: 25, label: 'Lightning Lane Multi Pass (per person/day)' },
+      lightningPremier: { cost: 18, label: 'Lightning Lane Premier (1 ride, per person)' },
+      express: { cost: 100, label: 'Universal Express Pass (per person/day)' },
+      photopass: { cost: 200, label: 'Disney PhotoPass (full trip)' },
+      parking: { cost: 30, label: 'Park parking (per day)' },
+      airport: { cost: 50, label: 'Mears Connect round-trip (per person)' },
+      souvenirs: {
+        low: 30, moderate: 75, high: 200,
+        label: 'Souvenirs (per person, full trip)',
+      },
+    },
+  };
+
+  const PRESETS = [
+    { label:'Budget Family (4 people, 5 days)', emoji:'💰', people:4, days:5, hotelLevel:'budget', foodLevel:'budget', extras:['parking'], parks:['seaworld','universal'] },
+    { label:'Value Family (4 people, 7 days)', emoji:'😊', people:4, days:7, hotelLevel:'moderate', foodLevel:'moderate', extras:['lightning','parking'], parks:['disney','disney','disney','disney','universal','universal','seaworld'] },
+    { label:'Moderate Couple (2 people, 5 days)', emoji:'💑', people:2, days:5, hotelLevel:'deluxe', foodLevel:'moderate', extras:['lightning','lightningPremier','photopass'], parks:['disney','disney','disney','universal','universal'] },
+    { label:'Luxury Couple (2 people, 7 days)', emoji:'✨', people:2, days:7, hotelLevel:'luxury', foodLevel:'luxury', extras:['lightningPremier','express','photopass','airport'], parks:['disney','disney','disney','disney','disney','universal','seaworld'] },
+    { label:'Solo Adventurer (1 person, 4 days)', emoji:'🧳', people:1, days:4, hotelLevel:'budget', foodLevel:'moderate', extras:['lightning'], parks:['disney','disney','universal','universal'] },
+  ];
+
+  function calcBudget(preset) {
+    const p = preset.people;
+    const d = preset.days;
+    const hotel = COST_DATA.hotels[preset.hotelLevel];
+    const food = COST_DATA.food[preset.foodLevel];
+
+    const hotelCost = ((hotel.min + hotel.max) / 2) * d;
+    const foodCost = food.perPerson * p * d;
+
+    let ticketCost = 0;
+    preset.parks.forEach(park => {
+      const t = COST_DATA.tickets[park] || COST_DATA.tickets.disney;
+      ticketCost += t.average * p;
+    });
+
+    let extrasCost = 0;
+    preset.extras.forEach(e => {
+      const ex = COST_DATA.extras[e];
+      if (!ex) return;
+      if (e === 'lightning' || e === 'lightningPremier') extrasCost += ex.cost * p * d;
+      else if (e === 'express') extrasCost += ex.cost * p * d;
+      else if (e === 'photopass') extrasCost += ex.cost;
+      else if (e === 'parking') extrasCost += ex.cost * d;
+      else if (e === 'airport') extrasCost += ex.cost * p * 2;
+      else extrasCost += ex.cost;
+    });
+
+    const souvenirCost = COST_DATA.extras.souvenirs.moderate * p;
+    const total = hotelCost + foodCost + ticketCost + extrasCost + souvenirCost;
+    const daily = total / d;
+
+    return { hotelCost, foodCost, ticketCost, extrasCost, souvenirCost, total, daily };
+  }
+
+  function renderBudget(container, preset) {
+    const b = calcBudget(preset);
+    const fmt = n => '$' + Math.round(n).toLocaleString();
+
+    container.innerHTML = `
+      <div style="background:linear-gradient(135deg,#1B5E20,#2E7D32);border-radius:12px;padding:14px;margin-bottom:12px;color:#fff;">
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:4px;">${preset.emoji} ${preset.label}</div>
+        <div style="font-size:12px;opacity:.8;">${preset.people} ${preset.people===1?'person':'people'} · ${preset.days} days · ${preset.hotelLevel} hotel · ${preset.foodLevel} dining</div>
+        <div style="font-size:28px;font-weight:800;margin-top:8px;">${fmt(b.total)}</div>
+        <div style="font-size:13px;opacity:.8;">Total trip cost · ${fmt(b.daily)}/day/family · ${fmt(b.daily/preset.people)}/day/person</div>
+      </div>
+
+      <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:8px;">Cost Breakdown:</div>
+      ${[
+        { label:'🏨 Hotel', amount: b.hotelCost, note: COST_DATA.hotels[preset.hotelLevel].examples[0] },
+        { label:'🍽️ Food & Dining', amount: b.foodCost, note: COST_DATA.food[preset.foodLevel].desc },
+        { label:'🎢 Park Tickets', amount: b.ticketCost, note: `${preset.parks.length} park days` },
+        { label:'⚡ Add-ons & Extras', amount: b.extrasCost, note: preset.extras.join(', ') || 'none' },
+        { label:'🛍️ Souvenirs', amount: b.souvenirCost, note: 'Moderate souvenir budget' },
+      ].map(item => `
+        <div style="background:var(--card-bg,#fff);border-radius:10px;padding:10px 12px;margin-bottom:6px;
+          border:1px solid var(--border,#eee);display:flex;align-items:flex-start;gap:10px;">
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${item.label}</div>
+            <div style="font-size:11px;color:var(--text-secondary,#888);">${item.note}</div>
+          </div>
+          <div style="font-size:15px;font-weight:800;color:#2E7D32;flex-shrink:0;">${fmt(item.amount)}</div>
+        </div>`).join('')}
+
+      <!-- Savings tips -->
+      <div style="background:#E8F5E9;border-radius:10px;padding:12px;margin-top:10px;border:1px solid #C8E6C9;">
+        <div style="font-size:12px;font-weight:700;color:#1B5E20;margin-bottom:6px;">💡 Save on This Budget</div>
+        ${[
+          'Buy tickets at Costco or AAA to save $10–25 per ticket',
+          'Pack a soft-sided cooler with snacks and drinks for the parks',
+          'Skip 1 Lightning Lane day and use that morning for rope drop instead',
+          'Book hotel 60+ days in advance for 15–25% lower rates',
+        ].map(tip => `<div style="font-size:11px;color:#2E7D32;padding:2px 0;">✓ ${tip}</div>`).join('')}
+      </div>`;
+  }
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-budget-calculator';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;';
+
+    const header = document.createElement('div');
+    header.style.cssText = 'background:linear-gradient(135deg,#1B5E20,#2E7D32,#66BB6A);padding:18px 14px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0;';
+    header.innerHTML = `
+      <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;
+        border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+      <div style="flex:1;">
+        <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#fff;">Trip Budget Calculator</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.8);">5 preset scenarios · Real cost breakdowns · Savings tips</div>
+      </div>
+      <span style="font-size:28px;">💰</span>`;
+
+    const content = document.createElement('div');
+    content.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    // Preset tabs
+    const presetBar = document.createElement('div');
+    presetBar.style.cssText = 'display:flex;gap:6px;overflow-x:auto;padding-bottom:10px;margin-bottom:10px;scrollbar-width:none;';
+    const resultArea = document.createElement('div');
+
+    PRESETS.forEach((preset, i) => {
+      const btn = document.createElement('button');
+      btn.style.cssText = `flex-shrink:0;padding:7px 12px;border-radius:20px;border:1.5px solid;
+        font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;
+        background:${i===0?'#1B5E20':'rgba(27,94,32,.1)'};
+        color:${i===0?'#fff':'#1B5E20'};
+        border-color:${i===0?'#1B5E20':'rgba(27,94,32,.3)'};`;
+      btn.textContent = `${preset.emoji} ${preset.label.split('(')[0].trim()}`;
+      btn.onclick = () => {
+        presetBar.querySelectorAll('button').forEach(b => {
+          b.style.background = 'rgba(27,94,32,.1)';
+          b.style.color = '#1B5E20';
+          b.style.borderColor = 'rgba(27,94,32,.3)';
+        });
+        btn.style.background = '#1B5E20';
+        btn.style.color = '#fff';
+        btn.style.borderColor = '#1B5E20';
+        renderBudget(resultArea, preset);
+      };
+      presetBar.appendChild(btn);
+    });
+
+    content.appendChild(presetBar);
+    content.appendChild(resultArea);
+    renderBudget(resultArea, PRESETS[0]);
+
+    s.appendChild(header);
+    s.appendChild(content);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-budget-calculator')) buildScreen();
+
+  const _prevSS_jjj2 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_jjj2) _prevSS_jjj2(name, el);
+    if (name === 'budget-calculator') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-budget-calculator');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectBudgetCard() {
+    if (document.getElementById('budget-home-card')) return true;
+    const ref = document.getElementById('crowd-home-card') || document.getElementById('transport-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'budget-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#1B5E20,#2E7D32,#66BB6A);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('budget-calculator');
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:28px;">💰</span>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Trip Budget Calculator</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.85);">5 scenarios · Real breakdowns · Savings tips</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _budCard = false;
+  setInterval(() => { if (!_budCard) _budCard = injectBudgetCard(); }, 16000);
+  setTimeout(() => { _budCard = injectBudgetCard(); }, 12500);
+
+  const _prevRH_jjj2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_jjj2) _prevRH_jjj2.apply(this, arguments);
+    setTimeout(() => { _budCard = false; _budCard = injectBudgetCard(); }, 3000);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK KKK2: Park App & Technology Guide ===== */
+(function initTechGuide() {
+
+  const APPS = [
+    {
+      name:'My Disney Experience',
+      emoji:'🏰',
+      platform:'iOS & Android · Free',
+      color:'#1565C0',
+      rating:5,
+      essentialFor:'Everything Disney',
+      features:[
+        'Mobile Order for all Quick Service restaurants',
+        'Lightning Lane purchase and management',
+        'Virtual queue for TRON and Guardians',
+        'Wait times for all Disney attractions (updated every few minutes)',
+        'Park maps and wayfinding',
+        'PhotoPass photos (auto-linked to your account)',
+        'Dining reservations: make, modify, or cancel',
+        'Disney hotel room controls (some resorts)',
+        'My Disney Experience MagicBand+ management',
+      ],
+      proTips:[
+        'Enable push notifications — Disney uses them for Virtual Queue alerts',
+        'Set up your park reservations and dining before arriving — easier at home on WiFi',
+        'The live wait times are reasonably accurate (±5–15 min). Check them constantly.',
+        'Mobile Order: open the app, place the order BEFORE you\'re hungry. Pick up window is typically 15–20 min',
+      ],
+      issues:'Can be slow during park open rush and virtual queue drops. Force-close and reopen if freezing.',
+    },
+    {
+      name:'Universal Orlando App',
+      emoji:'🎬',
+      platform:'iOS & Android · Free',
+      color:'#1B5E20',
+      rating:4,
+      essentialFor:'Universal virtual queues and waits',
+      features:[
+        'Virtual Queue for Hagrid\'s Magical Creatures Motorbike Adventure',
+        'Wait times for all Universal and IoA rides',
+        'Show schedules and parade times',
+        'Hotel and dining reservations',
+        'Park maps and wayfinding',
+        'Express Pass management',
+        'Locker reservations (useful for water park day)',
+      ],
+      proTips:[
+        "Hagrid's virtual queue: have the app open and logged in BEFORE you walk through the park gates",
+        "Wait times are updated every few minutes and are generally accurate",
+        "Download the app and create an account BEFORE your trip — faster on arrival day",
+      ],
+      issues:"Less feature-rich than Disney's app. Some sections are slow to load on park WiFi.",
+    },
+    {
+      name:'SeaWorld App (SEAS Mobile)',
+      emoji:'🐬',
+      platform:'iOS & Android · Free',
+      color:'#006064',
+      rating:3,
+      essentialFor:'Quick service ordering and wait times',
+      features:[
+        'Mobile dining order at select restaurants',
+        'Wait times and attraction status',
+        'Show schedules',
+        'Park map and wayfinding',
+        'Annual pass management',
+      ],
+      proTips:[
+        "SeaWorld's app is functional but minimal — use it primarily for wait times and show schedules",
+        "Check the ride status feature before walking to an attraction (some have frequent closures)",
+      ],
+      issues:"More limited than Disney/Universal equivalents. Some features require account creation.",
+    },
+    {
+      name:'Touring Plans',
+      emoji:'📊',
+      platform:'Web + iOS + Android · $15/year for full features',
+      color:'#7B1FA2',
+      rating:5,
+      essentialFor:'Crowd prediction and itinerary optimization',
+      features:[
+        'Daily crowd level predictions for all parks (1-10 scale)',
+        'Optimized itinerary generator (tells you what order to ride for minimum total wait)',
+        'Line app: real-time wait times from actual users at the parks',
+        'Restaurant reservation monitoring (auto-notifies when tables open)',
+        'Historical wait time data for any ride',
+        'Hotel booking via their discounted rates',
+      ],
+      proTips:[
+        'The optimized touring plan feature alone is worth the $15/year subscription',
+        'MouseDining (part of Touring Plans) will notify you when dining reservations open up',
+        'Line app crowd sourced waits are often more accurate than official Disney waits',
+      ],
+      issues:"Requires subscription for full optimization features. Free version has useful crowd calendars.",
+    },
+    {
+      name:'AllEars.net / App',
+      emoji:'📱',
+      platform:'Web + newsletters · Free',
+      color:'#E65100',
+      rating:4,
+      essentialFor:'Disney deep-dive information and news',
+      features:[
+        'Comprehensive Disney guides (dining, rides, resorts)',
+        'Regular deal and discount alerts',
+        'Photo guides and tips for every park',
+        'Disney news and updates (new ride openings, changes)',
+        'Community forums with experienced Disney fans',
+      ],
+      proTips:[
+        'Subscribe to their email newsletter for Disney deals — discount codes appear regularly',
+        'The AllEars dining database is the most thorough Disney restaurant guide available',
+      ],
+      issues:"Website is ad-heavy. The mobile app is simpler and cleaner than the full site.",
+    },
+  ];
+
+  const TECH_TIPS = [
+    { icon:'🔋', title:'Battery Strategy', tip:"Parks drain batteries faster than anywhere. Bring a 10,000+ mAh power bank. Disney rents them ($30/day) but you'll pay more than buying one at Amazon beforehand." },
+    { icon:'📡', title:'Park WiFi vs. Data', tip:"Disney and Universal both offer free WiFi. Disney's is surprisingly good. Universal's can be overwhelmed. Keep 4G/5G data active as backup, especially for virtual queue drops." },
+    { icon:'📸', title:'Memory SD Backup', tip:"If using a camera, back up photos to Google Photos or iCloud each evening. Card failures happen. Don't lose 7 days of memories to a corrupted SD card." },
+    { icon:'🎧', title:'Earbuds for Queues', tip:"Long queue waits are bearable with headphones. Download a podcast or playlist before entering a park (limited data in some queue areas)." },
+    { icon:'📲', title:'Screenshots = Lifesaver', tip:"Screenshot your dining reservations, park reservations, and hotel confirmations before leaving home. Internet in parks can be spotty and you may need offline access to this info." },
+    { icon:'🔒', title:'Park Locker Apps', tip:"Universal offers smartphone locker rentals for free (first 2 hours) on all major rides. Reserve via the app before the line — the locker system is seamless." },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-tech-guide';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;';
+    s.innerHTML = `
+      <div style="background:linear-gradient(135deg,#263238,#37474F,#607D8B);padding:18px 14px 20px;
+        display:flex;align-items:center;gap:12px;flex-shrink:0;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;
+          border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#fff;">App & Technology Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">Essential apps · Pro tips · Tech strategy</div>
+        </div>
+        <span style="font-size:28px;">📱</span>
+      </div>
+      <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;">
+
+        <div style="background:linear-gradient(135deg,#263238,#37474F);border-radius:16px;padding:14px;margin-bottom:14px;color:#fff;">
+          <div style="font-size:13px;line-height:1.6;opacity:.9;">
+            The right apps transform a good Orlando trip into a great one. Virtual queues, mobile ordering, and crowd prediction tools can save hours of waiting. Here's everything worth downloading.
+          </div>
+        </div>
+
+        ${APPS.map(app => `
+          <div style="background:var(--card-bg,#fff);border-radius:14px;margin-bottom:10px;
+            border:1px solid var(--border,#eee);overflow:hidden;">
+            <div style="background:${app.color};padding:10px 14px;display:flex;align-items:center;gap:8px;">
+              <span style="font-size:22px;">${app.emoji}</span>
+              <div style="flex:1;">
+                <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:#fff;">${app.name}</div>
+                <div style="font-size:10px;color:rgba(255,255,255,.8);">${app.platform}</div>
+              </div>
+              <div style="text-align:right;flex-shrink:0;">
+                <div style="font-size:12px;">${'⭐'.repeat(app.rating)}</div>
+                <div style="font-size:10px;color:rgba(255,255,255,.75);">Essential for: ${app.essentialFor}</div>
+              </div>
+            </div>
+            <div style="padding:10px 14px;">
+              <div style="font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:5px;">FEATURES</div>
+              ${app.features.map(f => `<div style="font-size:12px;color:var(--text-secondary,#555);padding:2px 0;">• ${f}</div>`).join('')}
+              <div style="margin-top:8px;border-top:1px solid var(--border,#f0f0f0);padding-top:8px;">
+                <div style="font-size:10px;font-weight:700;color:${app.color};margin-bottom:4px;">PRO TIPS</div>
+                ${app.proTips.map(t => `<div style="font-size:11px;color:var(--text-secondary,#666);padding:2px 0;">💡 ${t}</div>`).join('')}
+              </div>
+              <div style="margin-top:6px;font-size:11px;color:#B71C1C;font-style:italic;">⚠️ ${app.issues}</div>
+            </div>
+          </div>`).join('')}
+
+        <!-- Tech tips -->
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;
+          color:var(--text-primary,#212121);margin:12px 0 8px;">⚙️ Tech Strategies</div>
+        ${TECH_TIPS.map(t => `
+          <div style="background:var(--card-bg,#fff);border-radius:12px;margin-bottom:8px;
+            border:1px solid var(--border,#eee);padding:10px 12px;display:flex;gap:10px;align-items:flex-start;">
+            <span style="font-size:22px;flex-shrink:0;">${t.icon}</span>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:2px;">${t.title}</div>
+              <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;">${t.tip}</div>
+            </div>
+          </div>`).join('')}
+
+        <!-- Pre-trip tech checklist -->
+        <div style="background:linear-gradient(135deg,#263238,#37474F);border-radius:14px;padding:14px;margin-top:12px;margin-bottom:20px;color:#fff;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">✅ Pre-Trip Tech Checklist</div>
+          ${[
+            'Download My Disney Experience and create a Disney account (free)',
+            'Download Universal app and create a Universal account',
+            'Link park tickets to both apps 2–3 days before travel',
+            'Make dining reservations through the apps (60 days for Disney)',
+            'Set up Apple Pay or Google Pay — fastest payment at all parks',
+            'Download offline Google Maps of the Orlando area (works without data)',
+            'Charge power bank completely the night before park days',
+            'Screenshot all confirmation numbers, hotel info, dining reservations',
+          ].map(item => `<div style="font-size:12px;color:rgba(255,255,255,.9);padding:4px 0;border-bottom:1px solid rgba(255,255,255,.15);line-height:1.5;">☐ ${item}</div>`).join('')}
+        </div>
+      </div>`;
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-tech-guide')) buildScreen();
+
+  const _prevSS_kkk2 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_kkk2) _prevSS_kkk2(name, el);
+    if (name === 'tech-guide') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-tech-guide');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectTechCard() {
+    if (document.getElementById('tech-home-card')) return true;
+    const ref = document.getElementById('budget-home-card') || document.getElementById('crowd-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'tech-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#263238,#37474F,#607D8B);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('tech-guide');
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:28px;">📱</span>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">App & Technology Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">5 essential apps · Virtual queue mastery · Tech tips</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _techCard = false;
+  setInterval(() => { if (!_techCard) _techCard = injectTechCard(); }, 16500);
+  setTimeout(() => { _techCard = injectTechCard(); }, 13000);
+
+  const _prevRH_kkk2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_kkk2) _prevRH_kkk2.apply(this, arguments);
+    setTimeout(() => { _techCard = false; _techCard = injectTechCard(); }, 3100);
+  };
+})();
+</script>
