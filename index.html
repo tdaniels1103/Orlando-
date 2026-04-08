@@ -51313,3 +51313,396 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK LLLLL: Orlando Nightlife & Bar Guide ===== */
+(function initOrlandoNightlife() {
+
+  const AREAS = [
+    {
+      id:'downtown', name:'Downtown Orlando', emoji:'🌃', color:'#1a237e',
+      vibe:'Urban, Diverse, Local',
+      desc:'The authentic Orlando nightlife scene away from tourist corridors. Wall Street Plaza, Orange Avenue, and Church Street offer everything from dive bars to rooftop lounges.',
+      spots:[
+        { name:'Wall Street Plaza', type:'Bar complex', price:'$$', tip:'Six bars around a courtyard — you can bar hop without leaving the complex. Packed Thursday–Saturday. Outdoor courtyard has great energy.' },
+        { name:'The Hammered Lamb', type:'Craft cocktail bar', price:'$$$', tip:'Intimate speakeasy-style. Serious cocktails made by actual bartenders. Best craft cocktail bar in downtown Orlando.' },
+        { name:'Tier Nightclub', type:'Megaclub', price:'$$$', tip:'Orlando\'s largest dance club. Multi-level with rooftop. EDM, hip hop, top 40. Thursday is industry night.' },
+        { name:'Harry Buffalo', type:'Casual bar', price:'$', tip:'Budget-friendly shots and beers. Popular with local college crowd. No pretension — just a good time.' },
+        { name:'The Rusty Spoon', type:'Bar + exceptional food', price:'$$$', tip:'Chef Kathleen Blake\'s gastropub. Come for craft cocktails but stay for the food — genuinely one of the best kitchens in Downtown.' },
+      ]
+    },
+    {
+      id:'idrive', name:'International Drive', emoji:'🎆', color:'#C62828',
+      vibe:'Tourist-Friendly, High Energy',
+      desc:'The entertainment hub of tourist Orlando. Rooftop bars, themed venues, and everything in between within walking distance.',
+      spots:[
+        { name:'Kasa at ICON Park', type:'Rooftop lounge', price:'$$$', tip:'Best rooftop view on I-Drive with the ICON Wheel backdrop. Reserve a table — it fills up fast on weekends.' },
+        { name:'Howl at the Moon', type:'Dueling piano bar', price:'$$', tip:'Two pianists take requests and battle each other. Wildly fun, audience participation heavy. Great for groups.' },
+        { name:'Tin Roof', type:'Live music bar', price:'$$', tip:'Live bands every night, no cover. Southern comfort food, cold beer. Very crowd-friendly and accessible.' },
+        { name:'The Sports Bar at Hyatt Regency', type:'Sports bar', price:'$$', tip:'Multiple giant screens, full cocktail service. Best spot on I-Drive for watching major games.' },
+        { name:'Cuba Libre', type:'Restaurant & bar', price:'$$$', tip:'Authentic Cuban cocktails (mojitos, daiquiris) and live salsa music on weekends. Adjacent to the dance floor.' },
+      ]
+    },
+    {
+      id:'winterpark', name:'Park Avenue, Winter Park', emoji:'🌳', color:'#2E7D32',
+      vibe:'Sophisticated, Local, Low-Key',
+      desc:'The upscale alternative to tourist-row nightlife. Wine bars, craft cocktail spots, and rooftop terraces along the most beautiful street in Central Florida.',
+      spots:[
+        { name:'The Wine Room', type:'Self-serve wine bar', price:'$$$', tip:'200+ wines by the taste, glass, or bottle via self-serve machines. Cheese and charcuterie. Best concept wine bar in Florida.' },
+        { name:'Luma on Park', type:'Rooftop bar + fine dining', price:'$$$$', tip:'Park Avenue rooftop with stunning views. Bar menu available without dinner reservation. Excellent cocktails and small plates.' },
+        { name:'Prato', type:'Restaurant bar', price:'$$$', tip:'Northern Italian bar scene. Negronis, Aperol spritzes, Italian wine list. Gorgeous interior and bar seating available walk-in.' },
+        { name:'The Briarpatch', type:'Wine + cocktails', price:'$$$', tip:'Charming neighborhood spot with excellent natural wine selection. More relaxed and local than Luma.' },
+        { name:'Hamilton\'s Kitchen (Alfond Inn)', type:'Hotel bar', price:'$$$', tip:'Sophisticated hotel bar at the Alfond Inn boutique hotel. Beautiful interior, curated cocktail menu.' },
+      ]
+    },
+    {
+      id:'milk', name:'MILK District (South Orange)', emoji:'🎨', color:'#7B1FA2',
+      vibe:'Hip, Local, Creative',
+      desc:'Orlando\'s arts and music district. Converted warehouses, vinyl bars, and live music venues that locals actually go to.',
+      spots:[
+        { name:'The Milk Bar', type:'Neighborhood bar', price:'$', tip:'The anchor of the district. Dive bar energy, excellent jukebox, local crowd. No tourists. Perfect first stop.' },
+        { name:'Stardust Video and Coffee', type:'Bar/café hybrid', price:'$', tip:'Quirky independent space with vintage films projected, board games, cheap drinks. Beloved Orlando institution.' },
+        { name:'Lil Indies', type:'Vinyl bar + music', price:'$$', tip:'Live local music, vinyl record shop attached. Small and intimate. The creative heart of Orlando\'s music scene.' },
+        { name:'Will\'s Pub', type:'Live music venue', price:'$$', tip:'The most important independent music venue in Orlando. National and local acts. No bad spot in the house.' },
+        { name:'Hanson\'s Shoe Repair', type:'Speakeasy', price:'$$$', tip:'Hidden door in a fake shoe repair shop. Password required (find it on Instagram). Best speakeasy concept in Orlando.' },
+      ]
+    },
+  ];
+
+  const PRACTICAL = [
+    { icon:'🚗', tip:'Designate a driver or use Uber/Lyft — Orlando is a driving city. Rideshare from I-Drive or Downtown is easy and affordable. Parking downtown is challenging on weekends.' },
+    { icon:'⏰', tip:'Downtown Orlando picks up around 10 PM and peaks 12–2 AM. I-Drive venues are busy from 7 PM onwards. Park Avenue is a 6–10 PM scene.' },
+    { icon:'🪪', tip:'Valid government ID required everywhere. International visitors: your home country passport is accepted. Bring the physical ID — screenshots are not accepted.' },
+    { icon:'💳', tip:'Most Orlando bars are cashless or prefer card. Keep a tab open rather than paying drink-by-drink — it\'s faster and tips are processed better.' },
+    { icon:'🎉', tip:'Thursday is actually better than Saturday in Downtown Orlando. Local bartenders are working, crowds are more interesting, wait times at popular bars shorter.' },
+    { icon:'📱', tip:'Check Instagram/website for special events. Many venues have themed nights (Latin night, 90s night, industry night) that completely transform the crowd and vibe.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-orlando-nightlife';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:#0d0d1a;flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;color:#fff;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#0d0d1a,#1a237e,#C62828);padding:16px 14px 14px;border-bottom:1px solid rgba(255,255,255,.1);';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Orlando Nightlife</div>
+          <div style="font-size:11px;opacity:.7;">Downtown · I-Drive · Winter Park · MILK District</div>
+        </div>
+        <span style="font-size:28px;">🌃</span>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <div style="flex:1;background:rgba(255,255,255,.1);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:15px;font-weight:800;">4</div><div style="font-size:9px;opacity:.7;">DISTRICTS</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,.1);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:15px;font-weight:800;">20+</div><div style="font-size:9px;opacity:.7;">CURATED SPOTS</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,.1);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:15px;font-weight:800;">Thu</div><div style="font-size:9px;opacity:.7;">BEST NIGHT</div>
+        </div>
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    AREAS.forEach(area => {
+      const section = document.createElement('div');
+      section.style.cssText = 'margin-bottom:16px;';
+      section.innerHTML = `
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;padding-bottom:8px;border-bottom:2px solid ${area.color};">
+          <span style="font-size:22px;">${area.emoji}</span>
+          <div><div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">${area.name}</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.6);">${area.vibe} · ${area.desc.substring(0,60)}...</div></div>
+        </div>`;
+      area.spots.forEach(spot => {
+        const spotEl = document.createElement('div');
+        spotEl.style.cssText = 'background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 12px;margin-bottom:8px;';
+        spotEl.innerHTML = `
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+            <div style="font-size:13px;font-weight:700;color:#fff;">${spot.name}</div>
+            <div style="display:flex;gap:4px;align-items:center;">
+              <span style="font-size:10px;background:${area.color}40;color:rgba(255,255,255,.8);padding:2px 7px;border-radius:20px;">${spot.type}</span>
+              <span style="font-size:11px;color:rgba(255,255,255,.5);">${spot.price}</span>
+            </div>
+          </div>
+          <div style="font-size:11px;color:rgba(255,255,255,.65);line-height:1.5;">${spot.tip}</div>`;
+        section.appendChild(spotEl);
+      });
+      body.appendChild(section);
+    });
+
+    const practCard = document.createElement('div');
+    practCard.style.cssText = 'background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:16px;margin-bottom:20px;overflow:hidden;';
+    practCard.innerHTML = `<div style="padding:12px 14px;background:linear-gradient(135deg,#1a237e,#C62828);">
+      <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;">🎯 Practical Nightlife Tips</div>
+    </div>
+    <div style="padding:12px 14px;">
+      ${PRACTICAL.map(p=>`<div style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start;">
+        <span style="font-size:20px;flex-shrink:0;">${p.icon}</span>
+        <div style="font-size:12px;color:rgba(255,255,255,.75);line-height:1.5;">${p.tip}</div>
+      </div>`).join('')}
+    </div>`;
+    body.appendChild(practCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-orlando-nightlife')) buildScreen();
+
+  const _prevSS_lllll = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_lllll) _prevSS_lllll(name, el);
+    if (name === 'orlando-nightlife') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-orlando-nightlife');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectNightlifeCard() {
+    if (document.getElementById('nightlife-home-card')) return true;
+    const ref = document.getElementById('shopping-home-card') || document.getElementById('beaches-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'nightlife-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#0d0d1a,#1a237e,#C62828);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('orlando-nightlife');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🌃</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Nightlife Guide</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.75);">Downtown · I-Drive · Winter Park · MILK District</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.5);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _nightCard = false;
+  setInterval(() => { if (!_nightCard) _nightCard = injectNightlifeCard(); }, 46000);
+  setTimeout(() => { _nightCard = injectNightlifeCard(); }, 42500);
+  const _prevRH_lllll = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_lllll) _prevRH_lllll.apply(this, arguments);
+    setTimeout(() => { _nightCard = false; _nightCard = injectNightlifeCard(); }, 13400);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK MMMMM: Orlando With Kids — Age-by-Age Guide ===== */
+(function initOrlandoWithKids() {
+
+  const AGE_GROUPS = [
+    {
+      age:'Infants & Toddlers (0–2)', emoji:'👶', color:'#E91E63',
+      parks:['EPCOT (stroller-friendly, aquariums, music)', 'Disney Springs (no admission needed)', 'Animal Kingdom (low-intensity shows and animals)'],
+      rides:['None — focus on experiences, characters, shows'],
+      tips:[
+        'Stroller rental available at all Disney parks ($15–35/day) — bringing your own is smarter.',
+        'Rider swap (Baby Swap) allows one parent to ride while other stays with infant, then swap without re-queueing.',
+        'Character meets are the highlight at this age — face-to-face with Mickey causes genuine wonder.',
+        'Plan around nap schedule — morning park visit, afternoon hotel rest, optional evening return.',
+        'Baby Care Centers at every Disney park have changing tables, nursing rooms, microwaves, and formula.',
+      ]
+    },
+    {
+      age:'Little Kids (3–5)', emoji:'🧒', color:'#FF6D00',
+      parks:['Magic Kingdom (designed for this age)', 'EPCOT (festivals, aquarium, gentle rides)', 'SeaWorld (animal shows, gentler rides)'],
+      rides:['Dumbo the Flying Elephant', 'Carousel of Progress', 'It\'s a Small World', 'Under the Sea Journey of the Little Mermaid', 'Buzz Lightyear\'s Space Ranger Spin', 'The Many Adventures of Winnie the Pooh'],
+      tips:[
+        'Magic Kingdom is genuinely designed for ages 3–7. The castle, characters, and rides are pitch-perfect for this demographic.',
+        'Character dining at this age is magical — Cinderella Royal Table or Chef Mickey\'s creates memories that last a lifetime.',
+        'Avoid Avatar Flight of Passage, roller coasters, and anything with intense effects. Monsters Inc. Laugh Floor can scare sensitive kids.',
+        'Use the My Disney Experience app to show kids the characters\' locations — it helps them understand the plan.',
+        'Bring favorite comfort items from home for naps in stroller. Overstimulation is real.',
+      ]
+    },
+    {
+      age:'Elementary (6–9)', emoji:'🧑', color:'#1565C0',
+      parks:['All four Disney parks work', 'Universal Studios Florida (Minion Land, Simpsons)', 'Legoland Florida (Winterhaven, 45 min south)'],
+      rides:['Slinky Dog Dash', 'Seven Dwarfs Mine Train', 'Space Mountain', 'Expedition Everest', 'Hagrid\'s Motorbike', 'Revenge of the Mummy'],
+      tips:[
+        'This is peak Disney age — kids understand the story, meet favorites, but aren\'t too cool for it. Maximize this window.',
+        'Let kids lead some decisions — pick one ride they want to ride multiple times, one meal they choose.',
+        'Legoland Florida (Winterhaven) is purpose-built for 6–12 and often overlooked. Genuinely excellent for this age.',
+        'Interactive experiences (build a lightsaber, wand selection at Ollivanders) create more lasting memories than any ride.',
+        'Start teaching Lightning Lane strategy — kids can help "work the app" and feel ownership over the day.',
+      ]
+    },
+    {
+      age:'Tweens (10–12)', emoji:'👦', color:'#2E7D32',
+      parks:['Universal (VelociCoaster age!)', 'Hollywood Studios (Star Wars, Galaxy\'s Edge)', 'Epic Universe (opening May 2025)', 'SeaWorld (roller coasters)'],
+      rides:['VelociCoaster', 'Hollywood Rip Ride Rockit', 'Revenge of the Mummy', 'Guardians of the Galaxy: Cosmic Rewind', 'Tron Lightcycle / Run'],
+      tips:[
+        'Tweens are entering peak "too cool for Disney" territory. Hollywood Studios and Universal are now more compelling than Magic Kingdom.',
+        'Galaxy\'s Edge is perfect for this age — let them explore Batuu\'s markets and shops with some independence.',
+        'Coaster focus: Islands of Adventure and Hollywood Studios are the premium coaster destinations in Florida.',
+        'Build-a-lightsaber at Savi\'s ($250) or Droid Depot ($120) are highly motivating for this group — worth it as a trip centerpiece.',
+        'Give them some planned alone time to explore — a 90-minute window in Galaxy\'s Edge builds confidence and creates their own story.',
+      ]
+    },
+    {
+      age:'Teens (13–17)', emoji:'🧑‍🤝‍🧑', color:'#5D4037',
+      parks:['Universal Resort (all parks)', 'Epic Universe', 'Discovery Cove', 'Kennedy Space Center'],
+      rides:['VelociCoaster (top priority)', 'Hagrid\'s Motorbike', 'Tron Lightcycle / Run', 'Guardians Cosmic Rewind', 'Mako at SeaWorld (tallest coaster in Florida)'],
+      tips:[
+        'Teens typically prefer Universal over Disney. VelociCoaster and Hagrid\'s generate genuine excitement.',
+        'Discovery Cove (swim with dolphins, snorkel coral reef) is the surprise teen winner — unequivocally cool.',
+        'Epic Universe opening May 2025: teens will love Jurassic World area and Mario Kart expansion.',
+        'Give structured freedom — agree on a meeting point and time, let teens explore in small groups within park boundaries.',
+        'Kennedy Space Center resonates with curious teens — Astronaut Encounter and Rise of the Resistance are equally mind-expanding in different ways.',
+      ]
+    },
+  ];
+
+  const PRACTICAL = [
+    { icon:'🎯', title:'Pick One Park Per Day', desc:'The biggest family mistake is trying to do two parks in a day. One park, done well, creates better memories than two parks rushed.' },
+    { icon:'😴', title:'Build in Rest', desc:'Afternoon hotel return (1–3 PM) is not wasting time — it\'s the key to a great evening return. Overstimulated kids melt down; rested kids enjoy every moment.' },
+    { icon:'🍔', title:'Feed Before Meltdowns', desc:'Bring snacks (granola bars, fruit pouches, crackers) and preemptively eat before hunger strikes. Hungry children in theme parks = guaranteed meltdown.' },
+    { icon:'📱', title:'My Disney Experience App', desc:'Load it on every parent\'s phone. Mobile order lunch at 10 AM before the restaurant crowds. Check wait times from anywhere. Reserve Lightning Lanes proactively.' },
+    { icon:'👟', title:'Shoe Strategy', desc:'New shoes cause blisters. Bring shoes broken in at home — 20,000+ daily steps. Good socks matter. Bring a second pair of shoes in the park bag.' },
+    { icon:'🌧️', title:'Pack for Florida Weather', desc:'Ponchos (buy on Amazon, not in-park at $25 each). Sunscreen reapplication schedule. Cooling towels. Summer afternoons: thunderstorm between 2–5 PM almost daily.' },
+    { icon:'📸', title:'Memory Maker / Photos', desc:'Disney\'s Memory Maker ($200) includes all park photographer photos and ride photos for your whole party. Worth it for parties of 4+. Buy online for discount.' },
+    { icon:'🎂', title:'Celebrating Birthdays', desc:'Get a free birthday button at park Guest Services — cast members throughout the day will wish your child happy birthday. Genuinely magical effect.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-orlando-kids';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#E91E63,#FF6D00,#1565C0);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Orlando With Kids</div>
+          <div style="font-size:11px;opacity:.8;">Age-by-age guide · Parks · Tips</div>
+        </div>
+        <span style="font-size:28px;">🎠</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        Different ages need completely different Orlando strategies. A perfect trip for a 4-year-old is different from a perfect trip for a 12-year-old. Use this guide to optimize for your kids' ages.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    AGE_GROUPS.forEach(group => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:12px 14px;background:${group.color}18;border-left:4px solid ${group.color};">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:28px;">${group.emoji}</span>
+            <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--text-primary,#212121);">${group.age}</div>
+          </div>
+        </div>
+        <div style="padding:12px 14px;">
+          <div style="font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:5px;">BEST PARKS</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;">
+            ${group.parks.map(p=>`<span style="font-size:10px;padding:3px 8px;background:${group.color}18;color:${group.color};border-radius:20px;font-weight:600;">${p}</span>`).join('')}
+          </div>
+          <div style="font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:5px;">TOP RIDES</div>
+          <div style="font-size:11px;color:var(--text-secondary,#555);margin-bottom:10px;">${group.rides.join(' · ')}</div>
+          <div style="font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:6px;">AGE-SPECIFIC TIPS</div>
+          ${group.tips.map(t=>`<div style="display:flex;gap:6px;margin-bottom:5px;align-items:flex-start;">
+            <span style="color:${group.color};font-size:12px;flex-shrink:0;">●</span>
+            <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${t}</div>
+          </div>`).join('')}
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const practCard = document.createElement('div');
+    practCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+    practCard.innerHTML = `<div style="padding:12px 14px;background:linear-gradient(135deg,#E91E63,#FF6D00);color:#fff;">
+      <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;">🎯 Universal Family Tips</div>
+    </div>
+    <div style="padding:12px 14px;">
+      ${PRACTICAL.map(p=>`<div style="margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border,#eee);">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+          <span style="font-size:20px;">${p.icon}</span>
+          <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${p.title}</div>
+        </div>
+        <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;padding-left:28px;">${p.desc}</div>
+      </div>`).join('')}
+    </div>`;
+    body.appendChild(practCard);
+
+    const heightCard = document.createElement('div');
+    heightCard.style.cssText = 'background:linear-gradient(135deg,#1565C0,#2E7D32);border-radius:16px;margin-bottom:20px;padding:14px;color:#fff;';
+    heightCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">📏 Key Height Requirements</div>
+    ${[
+      { ride:'Seven Dwarfs Mine Train (MK)', height:'38"' },
+      { ride:'Space Mountain (MK)', height:'44"' },
+      { ride:'Tron Lightcycle / Run (MK)', height:'46"' },
+      { ride:'Guardians Cosmic Rewind (EPCOT)', height:'34"' },
+      { ride:'Slinky Dog Dash (HS)', height:'38"' },
+      { ride:'VelociCoaster (Universal)', height:'51"' },
+      { ride:'Hagrid\'s Motorbike (Universal)', height:'48"' },
+      { ride:'Incredible Hulk Coaster (IoA)', height:'54"' },
+    ].map(h=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.1);">
+      <div style="font-size:12px;opacity:.9;">${h.ride}</div>
+      <div style="font-size:13px;font-weight:800;background:rgba(255,255,255,.2);padding:2px 10px;border-radius:20px;">${h.height}</div>
+    </div>`).join('')}`;
+    body.appendChild(heightCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-orlando-kids')) buildScreen();
+
+  const _prevSS_mmmmm = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_mmmmm) _prevSS_mmmmm(name, el);
+    if (name === 'orlando-kids') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-orlando-kids');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectKidsCard() {
+    if (document.getElementById('kids-home-card')) return true;
+    const ref = document.getElementById('nightlife-home-card') || document.getElementById('shopping-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'kids-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#E91E63,#FF6D00,#1565C0);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('orlando-kids');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🎠</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Orlando With Kids</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Age-by-age guide · Height charts · Family tips</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _kidsCard = false;
+  setInterval(() => { if (!_kidsCard) _kidsCard = injectKidsCard(); }, 47000);
+  setTimeout(() => { _kidsCard = injectKidsCard(); }, 43500);
+  const _prevRH_mmmmm = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_mmmmm) _prevRH_mmmmm.apply(this, arguments);
+    setTimeout(() => { _kidsCard = false; _kidsCard = injectKidsCard(); }, 13800);
+  };
+})();
+</script>
