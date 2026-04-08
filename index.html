@@ -55605,3 +55605,209 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK GGGGGG: Disney Annual Pass & Membership Guide ===== */
+(function initDisneyAnnualPass() {
+
+  const AP_TIERS = [
+    {
+      name:'Disney Incredi-Pass', emoji:'🌟', color:'#C9A96E',
+      price:'$1,399/year ($116/month with monthly payment)',
+      access:'All four parks, all 365 days, including all blockout dates',
+      perks:['No blockout dates', '20% off most Disney restaurants', '20% off merchandise $50+', '10% off select hotel stays', 'PhotoPass download included', 'Free MagicBand+ upon activation', 'Free parking at all theme parks'],
+      bestFor:'Visitors planning 2+ trips per year OR a single trip of 7+ park days',
+      breakeven:'Breaks even vs individual tickets at approximately 7 park days',
+      tip:'The premium tier. Makes financial sense for two or more park visits per year, or for Florida residents who visit regularly. PhotoPass alone justifies part of the cost for photography-focused visitors.',
+    },
+    {
+      name:'Disney Sorcerer Pass', emoji:'🔮', color:'#7B1FA2',
+      price:'$969/year ($80/month — Florida residents only)',
+      access:'All four parks with limited blockout dates (major holidays)',
+      perks:['Most park days available', '15% off most restaurants', '15% off merchandise', 'Free MagicBand+ upon activation', 'Free parking'],
+      bestFor:'Florida residents visiting 5+ times per year',
+      breakeven:'Breaks even vs individual tickets at approximately 5 park days',
+      tip:'The best value tier for Florida residents. The blockout dates (Christmas week, Thanksgiving, spring break peaks) are exactly when you wouldn\'t want to visit anyway.',
+    },
+    {
+      name:'Disney Pirate Pass', emoji:'☠️', color:'#37474F',
+      price:'$749/year ($62/month — Florida residents only)',
+      access:'Moderate blockout dates (weekends, holidays, busy periods)',
+      perks:['10% off restaurants and merchandise', 'Free MagicBand+ upon activation', 'Free parking'],
+      bestFor:'Florida residents visiting primarily on weekdays',
+      breakeven:'Excellent value for regular weekday visitors',
+      tip:'The weekend restrictions are significant. If you can only visit Saturdays or holidays, you\'ll constantly be blacked out. Best for those with flexible schedules.',
+    },
+    {
+      name:'Disney Pixie Dust Pass', emoji:'✨', color:'#2E7D32',
+      price:'$399/year — Florida residents and Disney Vacation Club members',
+      access:'Heavily restricted blockout dates (essentially only slower weekdays)',
+      perks:['Basic discounts, no parking (extra $30/day)', 'Most affordable entry'],
+      bestFor:'Local Florida residents who visit on slow weekdays only',
+      breakeven:'4–5 uses pays for itself vs individual tickets',
+      tip:'The restrictions are very real. This pass works well for retirees and those with total schedule flexibility who can visit Tuesday–Thursday in January, February, or September.',
+    },
+  ];
+
+  const PERKS_DEEP = [
+    {
+      perk:'Disney Dining Discount (15–20%)', color:'#C62828',
+      detail:'Valid at most table service and counter service restaurants across all parks and resorts. Includes quick-service items. Does NOT apply during peak holiday dining packages or some special events. Stacks with the dining plan occasionally but not always.',
+      value:'A family of 4 spending $200/day on food saves $30–40/day — potentially $200+ over a 7-day trip.',
+    },
+    {
+      perk:'PhotoPass Download ($199 value included)', color:'#1565C0',
+      detail:'Incredi-Pass includes the Memory Maker equivalent — unlimited digital photo downloads from Disney photographers stationed throughout the parks, plus on-ride photos.',
+      value:'PhotoPass alone costs $199 purchased separately. Reduces Incredi-Pass effective cost by $199 for families who would have bought it anyway.',
+    },
+    {
+      perk:'Free Parking ($30–45/day value)', color:'#2E7D32',
+      detail:'All AP tiers (except Pixie Dust) include free theme park parking. At $30–45/day, a 5-day trip saves $150–225 in parking costs alone.',
+      value:'A week-long trip saves $210+ in parking. That\'s 15% of the Pirate Pass cost recovered immediately.',
+    },
+    {
+      perk:'Merchandise Discount', color:'#7B1FA2',
+      detail:'10–20% off most merchandise purchases of $50 or more at Disney-owned shops. Does not apply to most outlet items, already-discounted goods, or third-party vendors in Disney Springs.',
+      value:'A $150 splurge purchase at a Disney gift shop becomes $120–135. Adds up over multiple visits.',
+    },
+    {
+      perk:'Hotel Discounts', color:'#F57F17',
+      detail:'Passholders receive periodic room-only discount offers (typically 25–40% off rack rate) for Disney resort hotels. These offers are not guaranteed and vary by season.',
+      value:'A Moderate resort at $250/night rack rate can drop to $150–175 with AP discounts during promotional periods.',
+    },
+  ];
+
+  const BUYING_TIPS = [
+    { icon:'📱', tip:'Buy your Annual Pass at a Disney ticket window on the first day of your trip using the same-day admission credit. Your theme park ticket cost is credited toward the AP upgrade. Do this on Day 1, not Day 3.' },
+    { icon:'💳', tip:'Monthly payment plans are interest-free for most AP tiers if enrolled through Disney\'s official AP program. Pay one month upfront, then monthly. Cancel before renewal to avoid auto-charge.' },
+    { icon:'🗓️', tip:'AP renewal discount is typically $100–200 off for renewal within 30 days of expiration. If your pass expires, you lose the discount. Renewal reminder is in the My Disney Experience app.' },
+    { icon:'👪', tip:'Household members don\'t all need the same AP tier. Common strategy: one adult gets Incredi-Pass (for PhotoPass), other family members get Sorcerer Pass. Mix tiers based on individual visit frequency.' },
+    { icon:'🏠', tip:'Florida residents have access to tiers not available to out-of-state visitors. If you have family in Florida who can sponsor your address (some gray area — check current rules), the resident rates are exceptional.' },
+    { icon:'⏰', tip:'Annual passes ARE valid for the same day they\'re activated. Buy in the morning of a park day, use it that same day. The value of that first day counts toward the annual cost.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-disney-ap';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#003087,#C9A96E,#7B1FA2);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Disney Annual Pass Guide</div>
+          <div style="font-size:11px;opacity:.8;">Incredi-Pass · Sorcerer · Discounts · Strategy</div>
+        </div>
+        <span style="font-size:28px;">🏰</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        Disney Annual Passes unlock a completely different relationship with Walt Disney World — discounts, free parking, PhotoPass, and the freedom to visit without the anxiety of maximizing a $200 day ticket.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    AP_TIERS.forEach(tier => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:12px 14px;background:${tier.color}18;border-left:4px solid ${tier.color};">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+            <div style="display:flex;gap:8px;align-items:center;">
+              <span style="font-size:22px;">${tier.emoji}</span>
+              <div>
+                <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--text-primary,#212121);">${tier.name}</div>
+                <div style="font-size:11px;font-weight:800;color:${tier.color};">${tier.price}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          <div style="font-size:11px;color:var(--text-secondary,#666);margin-bottom:6px;"><strong>Access:</strong> ${tier.access}</div>
+          <div style="font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:4px;">PERKS</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;">
+            ${tier.perks.map(p=>`<span style="font-size:10px;padding:2px 8px;background:${tier.color}18;color:${tier.color};border-radius:20px;">${p}</span>`).join('')}
+          </div>
+          <div style="font-size:11px;color:${tier.color};font-weight:700;margin-bottom:4px;">⚡ Breaks even at: ${tier.breakeven}</div>
+          <div style="font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:2px;">BEST FOR: ${tier.bestFor}</div>
+          <div style="display:flex;gap:6px;background:${tier.color}0d;border-radius:8px;padding:7px;margin-top:6px;">
+            <span style="font-size:11px;flex-shrink:0;">💡</span>
+            <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${tier.tip}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const perksCard = document.createElement('div');
+    perksCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+    perksCard.innerHTML = `<div style="padding:12px 14px;background:linear-gradient(135deg,#003087,#C9A96E);color:#fff;">
+      <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;">💎 Deep Dive: AP Perk Value</div>
+    </div>
+    <div style="padding:12px 14px;">
+      ${PERKS_DEEP.map(p=>`<div style="margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border,#eee);">
+        <div style="font-size:13px;font-weight:700;color:${p.color};margin-bottom:4px;">${p.perk}</div>
+        <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;margin-bottom:4px;">${p.detail}</div>
+        <div style="font-size:11px;font-weight:700;color:#2E7D32;">💰 ${p.value}</div>
+      </div>`).join('')}
+    </div>`;
+    body.appendChild(perksCard);
+
+    const stratCard = document.createElement('div');
+    stratCard.style.cssText = 'background:linear-gradient(135deg,#003087,#7B1FA2);border-radius:16px;margin-bottom:20px;padding:14px;color:#fff;';
+    stratCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">🎯 Annual Pass Buying Strategy</div>
+    ${BUYING_TIPS.map(t=>`<div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
+      <span style="font-size:18px;flex-shrink:0;">${t.icon}</span>
+      <div style="font-size:12px;opacity:.95;line-height:1.5;">${t.tip}</div>
+    </div>`).join('')}`;
+    body.appendChild(stratCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-disney-ap')) buildScreen();
+
+  const _prevSS_gggggg = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_gggggg) _prevSS_gggggg(name, el);
+    if (name === 'disney-ap') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-disney-ap');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectAPCard() {
+    if (document.getElementById('ap-home-card')) return true;
+    const ref = document.getElementById('honeymoon-home-card') || document.getElementById('idrive-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'ap-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#003087,#C9A96E,#7B1FA2);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('disney-ap');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🏰</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Disney Annual Pass Guide</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Incredi-Pass · Sorcerer · Discounts · Buying strategy</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _apCard = false;
+  setInterval(() => { if (!_apCard) _apCard = injectAPCard(); }, 67000);
+  setTimeout(() => { _apCard = injectAPCard(); }, 63500);
+  const _prevRH_gggggg = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_gggggg) _prevRH_gggggg.apply(this, arguments);
+    setTimeout(() => { _apCard = false; _apCard = injectAPCard(); }, 21800);
+  };
+})();
+</script>
