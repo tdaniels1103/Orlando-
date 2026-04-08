@@ -49549,3 +49549,180 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK DDDDD: EPCOT Deep Dive Guide ===== */
+(function initEPCOT() {
+
+  const WORLDS = [
+    {
+      area:'World Discovery', emoji:'🚀', color:'#005B9A',
+      desc:'The science and technology area (formerly Future World East). Home to the newest and most thrilling attractions.',
+      spots:[
+        { name:'Guardians of the Galaxy: Cosmic Rewind', type:'Launched coaster (reverse launch)', height:'42"', tip:'Get Lightning Lane or Virtual Queue the moment the park opens at 7am via the app. This is EPCOT\'s version of Rise of the Resistance in terms of demand.' },
+        { name:'Test Track', type:'Simulator + high-speed track', height:'40"', tip:'Design your own concept car, then test it. The outdoor 65mph section at the end is exhilarating. Get Lightning Lane or go at rope drop.' },
+        { name:'Mission: SPACE (Orange)', type:'Intense centrifuge simulator', height:'44"', tip:'The Orange Mission simulates actual G-forces of launch. Some guests feel sick. Green Mission (tame alternative) is at the same location.' },
+        { name:'Mission: SPACE (Green)', type:'Gentle simulator', height:'40"', tip:'Same story as Orange but no centrifuge spinning. Good for those prone to motion sickness or with claustrophobia concerns.' },
+      ]
+    },
+    {
+      area:'World Nature', emoji:'🌊', color:'#0277BD',
+      desc:'Ocean, land, and environmental discovery. Home to The Seas and Soarin\'.',
+      spots:[
+        { name:'Soarin\' Around the World', type:'Hang gliding film simulator', height:'40"', tip:'One of the best rides in EPCOT. Beautifully filmed flight over world landmarks. Get Lightning Lane or go within first 30 min of opening.' },
+        { name:'The Seas with Nemo & Friends', type:'Gentle dark ride', height:'None', tip:'Calm ride through an animated ocean connecting to a real 5.7-million-gallon aquarium. Post-ride, explore the aquarium for manatees, dolphins, and sea turtles — all real.' },
+        { name:'Living with the Land', type:'Boat tour of working greenhouses', height:'None', tip:'Educational boat tour through actual NASA-derived greenhouse growing techniques. Slow and educational — best for those interested in agriculture. The fish raised here are served at The Garden Grill restaurant.' },
+        { name:'Turtle Talk with Crush', type:'Interactive animated show', height:'None', tip:'Dude! Crush the sea turtle has a live conversation with the audience through animation technology. Kids are often called on to talk to Crush — genuinely impressive.' },
+      ]
+    },
+    {
+      area:'World Celebration', emoji:'✨', color:'#7B1FA2',
+      desc:'The updated creative and imagination area around Spaceship Earth.',
+      spots:[
+        { name:'Spaceship Earth', type:'Slow dark ride through history of communication', height:'None', tip:'The iconic geodesic sphere ride. Slow, air-conditioned, historical. Great for hot afternoons or as a gentle introduction to EPCOT for young children.' },
+        { name:'Remy\'s Ratatouille Adventure', type:'Shrinking dark ride', height:'None', tip:'A gentle but beautifully designed ride through a French kitchen from a rat\'s perspective. No height requirement — perfect for all ages. Get Lightning Lane.' },
+        { name:'Journey Into Imagination with Figment', type:'Sensory dark ride', height:'None', tip:'The beloved purple dragon Figment leads you through a journey of the imagination. Cult classic at EPCOT — older guests have deep nostalgia for this. The smell sequences are memorable (and jarring).' },
+        { name:'ImageWorks', type:'Interactive play area', height:'None', tip:'Located at the end of the Figment ride, this free interactive area has photo ops, sound experiences, and play areas for kids.' },
+      ]
+    },
+    {
+      area:'World Showcase (11 Pavilions)', emoji:'🌍', color:'#E65100',
+      desc:'A 1.3-mile circular walkway around World Showcase Lagoon, connecting 11 country pavilions with authentic food, entertainment, and culture.',
+      spots:[
+        { name:'Mexico Pavilion', type:'Pavilion', note:'Enter the pyramid — a full indoor river ride (Gran Fiesta Tour), restaurant (San Angel Inn), and shops are inside. Don\'t just walk past.' },
+        { name:'Norway Pavilion', type:'Pavilion', note:'Anna and Elsa character meet (long waits), Kringla Bakeri (school bread — best EPCOT snack), and Frozen Ever After ride.' },
+        { name:'China Pavilion', type:'Pavilion', note:'Reflections of China 360-degree film. The acrobat and martial arts performances are scheduled throughout the day — check Times Guide.' },
+        { name:'Japan Pavilion', type:'Pavilion', note:'Matsuriza taiko drumming performances. Mitsukoshi department store (largest Japanese merchandise selection outside Japan). Kabuki Café kakigori (shaved ice).' },
+        { name:'Morocco Pavilion', type:'Pavilion', note:'Walk through to the back for a hidden courtyard most guests miss. Restaurant Marrakesh and Spice Road Table are overlooked dining gems.' },
+        { name:'France Pavilion', type:'Pavilion', note:'Croissant donuts at Les Halles. Remy\'s Ratatouille is here. The Impressions de France film has been replaced by a new show.' },
+        { name:'UK Pavilion', type:'Pavilion', note:'Rose & Crown pub for afternoon pints. The fish and chips are genuinely solid. Yorkshire County Fish Shop (outdoor) has good walk-and-eat fish and chips.' },
+        { name:'Canada Pavilion', type:'Pavilion', note:'O Canada! film (360-degree). Le Cellier Steakhouse (book 60 days out — excellent cheddar soup and Canadian beef).' },
+      ]
+    },
+  ];
+
+  const EPCOT_SECRETS = [
+    'Walk the World Showcase counter-clockwise (starting at Canada) to beat the crowds who go clockwise.',
+    'Most World Showcase pavilions have authentic cultural entertainment scheduled throughout the day — check the EPCOT Times Guide for each country\'s live performances.',
+    'La Cava del Tequila (inside Mexico Pyramid) has 200+ tequilas and excellent margaritas. Go early (11am) or late (9pm) to avoid the longest waits.',
+    'The backwards fountain near Spaceship Earth shoots water upward in synchronized jets. Watch for 5 minutes to understand the effect.',
+    'At night, EPCOT transforms — the World Showcase Lagoon reflects the illuminated pavilions, and the nightly Harmonious (or current show) is genuinely breathtaking from the lakeside promenade.',
+    'Annual Passholders get a discount at many World Showcase restaurants and shops. Always ask.',
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-epcot-guide';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const header = document.createElement('div');
+    header.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#00355E,#005B9A,#0288D1);padding:16px 14px 14px;';
+    header.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:#fff;">EPCOT Complete Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">4 areas · 11 World Showcase countries · Secrets</div>
+        </div>
+        <span style="font-size:24px;">🌍</span>
+      </div>
+      <div style="background:rgba(255,255,255,.12);border-radius:8px;padding:7px 12px;font-size:11px;color:rgba(255,255,255,.9);">
+        EPCOT is Orlando's most adult-friendly theme park and also deeply underrated. The combination of thrilling new rides, authentic world cuisine, and beautiful nighttime atmosphere makes it irreplaceable.
+      </div>`;
+
+    const content = document.createElement('div');
+    content.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    // Secrets first
+    const secretCard = document.createElement('div');
+    secretCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;padding:12px 14px;margin-bottom:14px;border:1px solid var(--border,#eee);border-left:3px solid #005B9A;';
+    secretCard.innerHTML = `<div style="font-size:12px;font-weight:700;color:#005B9A;margin-bottom:7px;">🔍 EPCOT INSIDER SECRETS</div>`;
+    EPCOT_SECRETS.forEach(s2 => {
+      const row = document.createElement('div');
+      row.style.cssText = 'font-size:11px;color:var(--text-secondary,#555);padding:3px 0;line-height:1.5;';
+      row.textContent = '→ ' + s2;
+      secretCard.appendChild(row);
+    });
+    content.appendChild(secretCard);
+
+    // Worlds
+    WORLDS.forEach(world => {
+      const worldHeader2 = document.createElement('div');
+      worldHeader2.style.cssText = `background:${world.color};border-radius:10px 10px 0 0;padding:10px 14px;margin-top:12px;display:flex;align-items:center;gap:8px;`;
+      worldHeader2.innerHTML = `
+        <span style="font-size:22px;">${world.emoji}</span>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:#fff;">${world.area}</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.8);">${world.desc.substring(0,70)}...</div>
+        </div>`;
+      content.appendChild(worldHeader2);
+
+      world.spots.forEach((spot, idx) => {
+        const row = document.createElement('div');
+        const isLast = idx === world.spots.length - 1;
+        row.style.cssText = `background:var(--card-bg,#fff);padding:10px 14px;${isLast ? 'border-radius:0 0 10px 10px;margin-bottom:4px;' : 'border-bottom:1px solid var(--border,#f0f0f0);'}`;
+
+        const hasHeight = spot.height !== undefined;
+        row.innerHTML = `
+          <div style="display:flex;justify-content:space-between;margin-bottom:2px;">
+            <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);">${spot.name}</div>
+            ${hasHeight ? `<span style="font-size:10px;font-weight:700;color:${world.color};">${spot.height}</span>` : ''}
+          </div>
+          <div style="font-size:10px;color:var(--text-secondary,#aaa);margin-bottom:3px;">${spot.type || ''}</div>
+          <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.4;">${spot.tip || spot.note || ''}</div>`;
+        content.appendChild(row);
+      });
+    });
+
+    const spacer = document.createElement('div');
+    spacer.style.height = '20px';
+    content.appendChild(spacer);
+
+    s.appendChild(header);
+    s.appendChild(content);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-epcot-guide')) buildScreen();
+
+  const _prevSS_ddddd = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_ddddd) _prevSS_ddddd(name, el);
+    if (name === 'epcot-guide') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-epcot-guide');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectEPCOTCard() {
+    if (document.getElementById('epcot-home-card')) return true;
+    const ref = document.getElementById('ak-home-card') || document.getElementById('kids-act-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'epcot-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#00355E,#005B9A,#0288D1);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('epcot-guide');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:3px;">🌍 EPCOT Complete Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.85);">Guardians · World Showcase · 11 countries · Tips</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.5);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _epcotCard = false;
+  setInterval(() => { if (!_epcotCard) _epcotCard = injectEPCOTCard(); }, 39000);
+  setTimeout(() => { _epcotCard = injectEPCOTCard(); }, 35500);
+
+  const _prevRH_ddddd = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_ddddd) _prevRH_ddddd.apply(this, arguments);
+    setTimeout(() => { _epcotCard = false; _epcotCard = injectEPCOTCard(); }, 10500);
+  };
+})();
+</script>
