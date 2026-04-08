@@ -48018,3 +48018,221 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK VVVV2: Orlando Airport & Travel Logistics ===== */
+(function initAirportGuide() {
+
+  const TERMINALS = [
+    {
+      terminal:'Terminal A (Gates 1–29)', airlines:['Delta','United','British Airways','Air Canada','Frontier'],
+      tip:'Terminal A has the best food options pre-security. If arriving on Delta or United, baggage claim is Level 2 — follow the orange signs.',
+    },
+    {
+      terminal:'Terminal B (Gates 70–129)', airlines:['American Airlines','Southwest','Spirit','JetBlue','Allegiant'],
+      tip:'Southwest uses B gates (100-129). Spirit uses 70-99. Both have separate security lines that are often shorter than Terminal A.',
+    },
+    {
+      terminal:'Terminal C (New — 2026+)', airlines:['New international expansion'],
+      tip:'Opening in phases from 2026. Check MCO website if traveling after 2025 for updated gate assignments.',
+    },
+  ];
+
+  const GROUND_TRANSPORT = [
+    {
+      option:'Rental Car', cost:'$40–120/day', time:'30–45 min to I-Drive', bestFor:'Staying outside Disney, visiting multiple areas, day trips',
+      tip:'Book in advance — MCO rental inventory sells out during peak periods. National Car Rental (Terminal C eventually) has the best loyalty program.',
+      warning:'Don\'t rent a car if you\'re staying at a Disney resort. Free Disney transport eliminates the need entirely.',
+    },
+    {
+      option:'Mears Connect (Disney Shuttle)', cost:'$39/adult round trip', time:'45–75 min to Disney', bestFor:'Disney resort guests',
+      tip:'Direct replacement for Magical Express. Books up — reserve before traveling. Drop-off at all Disney resort hotels.',
+      warning:'Not available to non-Disney resort guests. Cannot stop at Universal or I-Drive.',
+    },
+    {
+      option:'Rideshare (Uber/Lyft)', cost:'$30–60 one-way (varies)', time:'25–40 min', bestFor:'I-Drive, Universal, and non-Disney hotels',
+      tip:'Wait times at MCO rideshare pickup can be 15–30 min during peak hours. Wait on Level 1 (ground floor) at the designated rideshare zones.',
+      warning:'Surge pricing during morning and evening peak hours. Airport-specific surge can add 30–50% to normal rates.',
+    },
+    {
+      option:'SunRail + Bus Connection', cost:'$3–5', time:'90–120 min', bestFor:'Budget travelers, avoiding traffic',
+      tip:'MCO has a SunRail station. Take the train toward downtown Orlando, then connect by bus or rideshare to your destination.',
+      warning:'Very slow and complex. Only worth it if cost is the absolute priority.',
+    },
+    {
+      option:'Taxi (Cab)', cost:'$50–80 one-way', time:'30–45 min', bestFor:'Travelers without smartphones',
+      tip:'Taxis are metered and wait in the ground transportation area. More predictable pricing than rideshare on busy days (no surge).',
+      warning:'More expensive than rideshare on most days. No advance booking.',
+    },
+    {
+      option:'Private Car Service (Limo/Town Car)', cost:'$80–150+', time:'30–40 min', bestFor:'Groups, special occasions, VIP transfers',
+      tip:'Quote the total cost upfront including tip. For groups of 4+, this can be comparable to rideshare and more comfortable.',
+      warning:'Book 24+ hours in advance for guaranteed availability during peak season.',
+    },
+  ];
+
+  const MCO_TIPS = [
+    { icon:'⏰', tip:'MCO security lines can be 45–90 min during peak times (7–9am, 5–7pm). TSA PreCheck is worth having here — saves significant time.' },
+    { icon:'🔌', tip:'Power outlets are plentiful in MCO — at gates and food courts. Phone charging is easy throughout the airport.' },
+    { icon:'🍔', tip:'Best pre-flight food: Mariposa Café (landside, Terminal A) and Emeril\'s Tchoup Chop (airside, near B gates). Both are legitimate restaurants, not typical airport food.' },
+    { icon:'📱', tip:'MCO has free WiFi throughout. Connect to "MCO-Free-WiFi" — it\'s fast and no password required.' },
+    { icon:'🧳', tip:'Checked bag weight limit: 50 lbs for most domestic carriers. Theme park souvenir shopping can push you over — weigh bags at your hotel before heading to airport.' },
+    { icon:'🚗', tip:'Parking at MCO: Economy Lot (short walk + tram) is cheapest ($17/day). Garage parking ($22–28/day) is fastest for departures. Book in advance online to save.' },
+    { icon:'🛬', tip:'International arrivals go to Customs in Terminal B. Wait times can be 30–90 min. Schedule ground transport 90 min after scheduled landing for international flights.' },
+    { icon:'🎢', tip:'Want one last Disney memory before flying home? MCO has a "Last stop: Fantasmic" dining area near the A gates. Worth grabbing coffee and remembering the trip.' },
+  ];
+
+  const NEARBY_HOTELS = [
+    { name:'Hyatt Regency Orlando Airport', star:'4★', price:'$140–220', note:'Connected to the airport — no transport needed. Good for late arrivals or early departures.' },
+    { name:'Marriott Orlando Airport Lakeside', star:'3★', price:'$120–180', note:'5 min from airport with free shuttle. Better pool and amenities than the connected hotel.' },
+    { name:'Aloft Orlando Airport', star:'3★', price:'$100–150', note:'Modern rooms, free shuttle, bar/restaurant. Best value airport hotel option.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-airport-guide';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const header = document.createElement('div');
+    header.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#1a1a1a,#37474F,#607D8B);padding:16px 14px 14px;';
+    header.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:#fff;">Orlando Airport (MCO) Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.7);">Transport · Terminals · Insider tips</div>
+        </div>
+        <span style="font-size:24px;">✈️</span>
+      </div>
+      <div style="background:rgba(255,255,255,.1);border-radius:8px;padding:7px 12px;font-size:11px;color:rgba(255,255,255,.85);">
+        Orlando International Airport (MCO) handles 40+ million passengers annually. This guide helps you move through efficiently — or wait comfortably if you need to.
+      </div>`;
+
+    const content = document.createElement('div');
+    content.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    // Terminals
+    const termHeader = document.createElement('div');
+    termHeader.style.cssText = 'font-size:13px;font-weight:800;color:#37474F;margin:0 0 8px;';
+    termHeader.textContent = '🛫 TERMINAL GUIDE';
+    content.appendChild(termHeader);
+
+    TERMINALS.forEach(t => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:12px;margin-bottom:8px;padding:11px 13px;border:1px solid var(--border,#eee);border-left:3px solid #37474F;';
+      card.innerHTML = `
+        <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:3px;">${t.terminal}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:5px;">
+          ${t.airlines.map(a=>`<span style="padding:1px 7px;border-radius:20px;font-size:10px;background:#37474F15;color:#37474F;font-weight:600;">${a}</span>`).join('')}
+        </div>
+        <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.4;">${t.tip}</div>`;
+      content.appendChild(card);
+    });
+
+    // Ground transport
+    const gtHeader = document.createElement('div');
+    gtHeader.style.cssText = 'font-size:13px;font-weight:800;color:#37474F;margin:14px 0 8px;';
+    gtHeader.textContent = '🚗 GROUND TRANSPORTATION';
+    content.appendChild(gtHeader);
+
+    GROUND_TRANSPORT.forEach(gt => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:12px;margin-bottom:8px;padding:11px 13px;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="display:flex;justify-content:space-between;margin-bottom:3px;">
+          <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);">${gt.option}</div>
+          <span style="font-size:11px;font-weight:700;color:#37474F;">${gt.cost}</span>
+        </div>
+        <div style="font-size:10px;color:var(--text-secondary,#aaa);margin-bottom:4px;">⏱ ${gt.time} · Best for: ${gt.bestFor}</div>
+        <div style="font-size:11px;color:var(--text-secondary,#555);margin-bottom:3px;">${gt.tip}</div>
+        <div style="font-size:10px;color:#c62828;">⚠️ ${gt.warning}</div>`;
+      content.appendChild(card);
+    });
+
+    // MCO tips
+    const tipsHeader = document.createElement('div');
+    tipsHeader.style.cssText = 'font-size:13px;font-weight:800;color:#37474F;margin:14px 0 8px;';
+    tipsHeader.textContent = '💡 MCO INSIDER TIPS';
+    content.appendChild(tipsHeader);
+
+    const tipsCard = document.createElement('div');
+    tipsCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;padding:12px 14px;margin-bottom:12px;border:1px solid var(--border,#eee);';
+    MCO_TIPS.forEach(t => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;gap:8px;margin-bottom:7px;align-items:flex-start;';
+      row.innerHTML = `<span style="font-size:16px;">${t.icon}</span><div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${t.tip}</div>`;
+      tipsCard.appendChild(row);
+    });
+    content.appendChild(tipsCard);
+
+    // Hotels
+    const htHeader = document.createElement('div');
+    htHeader.style.cssText = 'font-size:13px;font-weight:800;color:#37474F;margin:14px 0 8px;';
+    htHeader.textContent = '🏨 AIRPORT HOTELS';
+    content.appendChild(htHeader);
+
+    NEARBY_HOTELS.forEach(h => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:12px;margin-bottom:8px;padding:10px 13px;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="display:flex;justify-content:space-between;margin-bottom:2px;">
+          <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);">${h.name}</div>
+          <span style="font-size:11px;font-weight:700;color:#37474F;">${h.price}</span>
+        </div>
+        <div style="font-size:10px;color:var(--text-secondary,#aaa);margin-bottom:2px;">${h.star}</div>
+        <div style="font-size:11px;color:var(--text-secondary,#555);">${h.note}</div>`;
+      content.appendChild(card);
+    });
+
+    const spacer = document.createElement('div');
+    spacer.style.height = '20px';
+    content.appendChild(spacer);
+
+    s.appendChild(header);
+    s.appendChild(content);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-airport-guide')) buildScreen();
+
+  const _prevSS_vvvv2 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_vvvv2) _prevSS_vvvv2(name, el);
+    if (name === 'airport-guide') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-airport-guide');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectAirportCard() {
+    if (document.getElementById('airport-home-card')) return true;
+    const ref = document.getElementById('music-home-card') || document.getElementById('genie-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'airport-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#1a1a1a,#37474F,#607D8B);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('airport-guide');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:3px;">✈️ MCO Airport Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.75);">Transport options · Terminals · Insider tips</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.4);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _airportCard = false;
+  setInterval(() => { if (!_airportCard) _airportCard = injectAirportCard(); }, 35000);
+  setTimeout(() => { _airportCard = injectAirportCard(); }, 31500);
+
+  const _prevRH_vvvv2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_vvvv2) _prevRH_vvvv2.apply(this, arguments);
+    setTimeout(() => { _airportCard = false; _airportCard = injectAirportCard(); }, 8900);
+  };
+})();
+</script>
