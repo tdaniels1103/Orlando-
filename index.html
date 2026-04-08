@@ -58605,3 +58605,378 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK VVVVVV: Orlando Photography Guide ===== */
+(function initOrlandoPhotography() {
+
+  const PHOTO_SPOTS = [
+    {
+      name:'Cinderella Castle at Dawn', park:'Magic Kingdom', emoji:'🏰', color:'#003087',
+      time:'6:45–7:15 AM (arrive before park open)',
+      shot:'Walk up Main Street USA before crowds arrive. The castle at first light with empty Main Street is one of the most iconic theme park photographs in the world.',
+      technique:'Use the central pathway on Main Street for forced perspective shots making the castle appear massive. Try a low angle (kneel or lie down) to exaggerate the scale.',
+      secret:'The Partners Statue (Walt and Mickey in the hub) at dawn is essentially never photographed without crowds. At early park access hour, you can get it alone with the castle behind.',
+      gear:'Phone cameras work perfectly. For DSLR/mirrorless: 24–70mm, f/5.6 to f/8 for depth. Tripods not allowed inside the park.',
+    },
+    {
+      name:'Pandora Bioluminescence (Night)', park:'Animal Kingdom', emoji:'🌿', color:'#1B5E20',
+      time:'After dark — approximately 8:30 PM (seasonal)',
+      shot:'The bioluminescent ground patterns, floating mountains reflected in water, and glowing plants create a photograph that looks completely unlike Earth.',
+      technique:'Longer exposure helps in low light (use night mode or manual settings). The waterfall reflection spot near the main bridge is the most striking composition.',
+      secret:'The tuk-tuk vehicles (parked) in Pandora are lit with bioluminescent effects and make excellent foreground elements. Most guests walk past them.',
+      gear:'Phone night mode is surprisingly capable. For serious photography: wide lens, ISO 800–3200, 1/30s or longer. Monopod recommended (no tripods).',
+    },
+    {
+      name:'Hogsmeade Snow-Capped Rooftops', park:'Islands of Adventure', emoji:'🏰', color:'#1565C0',
+      time:'Opening hour or mid-morning (low sun angle)',
+      shot:'The Three Broomsticks rooftop and Hogsmeade clock tower create a scene that looks identical to the film. The narrow alley between Zonko\'s and Honeydukes is the most cinematic composition.',
+      technique:'Position with Hogwarts Castle as background. Use a telephoto (85mm equivalent) to compress the distance between the village and the castle.',
+      secret:'The entrance to Hogsmeade (the archway from Jurassic World) at opening with no guests is a pristine landscape shot. The transition from Jurassic World to the snow-covered rooftops is striking.',
+      gear:'Versatile kit: 24–85mm. The narrow alleys benefit from f/4–f/5.6 for a slight background blur while keeping the architecture sharp.',
+    },
+    {
+      name:'EPCOT Spaceship Earth Reflections', park:'EPCOT', emoji:'🌐', color:'#0277BD',
+      time:'After rain, or fountains on in the reflecting pool',
+      shot:'The 180-foot geodesic sphere reflecting in the fountain pools at Innoventions Plaza creates a perfect geometric symmetry.',
+      technique:'Low to the ground for maximum reflection in the pool. Dawn light gives the ball a golden glow. Overcast skies create even, soft light on the sphere.',
+      secret:'At night with the sphere illuminated and EPCOT Forever fireworks in the background, the reflection shot becomes extraordinary. Arrive at the fountain edge 10 minutes before the fireworks show.',
+      gear:'Wide angle (16–24mm) for the full sphere with reflection. Standard (35–50mm) for tighter architectural shots.',
+    },
+    {
+      name:'Japan Pavilion Torii Gate — EPCOT', park:'EPCOT', emoji:'⛩️', color:'#C62828',
+      time:'Dusk or during EPCOT Forever fireworks',
+      shot:'The red Torii gate reflects in the World Showcase Lagoon. The most iconic Japan Pavilion shot. During fireworks, the explosion colors reflect in the water behind the gate.',
+      technique:'Wide angle captures gate + lagoon + fireworks. Telephoto compresses the gate against the fireworks burst.',
+      secret:'A puddle on the brick walkway near the Japan garden creates an additional foreground reflection on rainy days. The Japanese stone lanterns light up at dusk before the main fireworks show.',
+      gear:'Versatile range required for both wide establishing shots and telephoto fireworks compression.',
+    },
+    {
+      name:'Diagon Alley Dragon Fire', park:'Universal Studios Florida', emoji:'🔥', color:'#7B1FA2',
+      time:'Every 20 minutes from 10 AM onwards',
+      shot:'The Gringotts Dragon perches atop the bank building and breathes actual fire. The fire column is 10–15 feet tall and lasts 5–7 seconds.',
+      technique:'Position directly below the dragon before the fire event. Portrait orientation captures the full fire column scale. The dragon with fire against a blue sky is the ideal composition.',
+      secret:'The dragon breathes fire MORE frequently in cool/cloudy weather. The fire effect is also triggered by a recorded audio cue — listen for the low rumble sound effect to know you have 3–5 seconds before ignition.',
+      gear:'Burst mode is essential — the fire is brief and unpredictable in exact timing. High shutter speed (1/500s+) freezes the flame detail.',
+    },
+    {
+      name:'Walt Disney World Swan and Dolphin', park:'Disney area (off-park)', emoji:'🦢', color:'#C9A96E',
+      time:'Sunset',
+      shot:'The swan sculptures atop the Swan Hotel are 47-foot concrete swans. Photographed from Crescent Lake with EPCOT\'s International Gateway in the background.',
+      technique:'The boat dock at the BoardWalk gives the perfect angle — Swan + Dolphin framed by the BoardWalk Victorian architecture.',
+      secret:'The EPCOT International Gateway entrance (back entrance) behind World Showcase is accessible by walking from the Swan/Dolphin. No park ticket for the entrance area photography.',
+      gear:'50–135mm range for architectural detail. Golden hour light hits the white buildings dramatically.',
+    },
+    {
+      name:'Galaxy\'s Edge Millennium Falcon', park:'Hollywood Studios', emoji:'⭐', color:'#1a1a2e',
+      time:'Any time — interior lit 24/7 during park hours',
+      shot:'The actual-size Millennium Falcon (they built an entire spaceship) photographed from the alley approach. The ship fills the entire frame at close range.',
+      technique:'Walk the alley toward the Falcon without looking up — then the reveal from below is striking. Look up from directly underneath the hull for the most dramatic shot.',
+      secret:'The Falcon is partially real and partially forced perspective (the back third is a forced-perspective graphic). Stand at the correct distance for the illusion to be complete — follow the pathway.',
+      gear:'Wide angle (16–24mm) for the full hull. Ultra-wide (12–16mm) if you want the entire ship in frame from close proximity.',
+    },
+  ];
+
+  const PHOTO_TIPS = [
+    {icon:'⏰', tip:'Golden hour at Orlando parks (the hour after sunrise) is the most underutilized photography opportunity in Florida. Empty parks, beautiful light, and no strangers in your frame. Worth the early alarm.'},
+    {icon:'🌧️', tip:'Post-rain photography at theme parks creates reflections in every puddle and cleaned surfaces. Florida afternoon storms clear quickly — be positioned right after the storm ends for extraordinary conditions.'},
+    {icon:'📸', tip:'The PhotoPass photographers stationed throughout Disney parks are professionals — use them. They know the best angles and lighting at every location. The shot from in front of the castle with the photographer\'s angle is better than a self-timer.'},
+    {icon:'👥', tip:'Wait for the crowd gap. At any popular photo spot, a 2-3 minute wait creates a 10-second window of no pedestrians in frame. Watch the foot traffic pattern before choosing your moment.'},
+    {icon:'🔦', tip:'Disney\'s LED lighting at night is designed for photography — every building, every path is lit at the correct temperature for golden-hour-equivalent warmth. Night at a Disney park photographs far better than midday.'},
+    {icon:'📱', tip:'Pixel phones (and newer iPhones) have dramatically improved night mode capabilities. Don\'t assume you need a mirrorless camera. The best camera is the one you have — at a theme park, your phone is almost always sufficient.'},
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-photography';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:#0a0a15;flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;color:#fff;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#0a0a15,#1a1a4a,#C9A96E);padding:16px 14px 14px;border-bottom:1px solid rgba(201,169,110,.2);';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Orlando Photography Guide</div>
+          <div style="font-size:11px;opacity:.7;">Castle at dawn · Pandora night · Torii gate fireworks · Dragon fire</div>
+        </div>
+        <span style="font-size:28px;">📸</span>
+      </div>
+      <div style="background:rgba(201,169,110,.15);border:1px solid rgba(201,169,110,.3);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;color:rgba(255,255,255,.9);">
+        Orlando's theme parks are among the most photographed places on Earth — but the iconic shots require knowing exactly when and where to stand. This guide covers the compositions that separate memorable photography from tourist snapshots.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    PHOTO_SPOTS.forEach(spot => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:rgba(255,255,255,.06);border:1px solid rgba(201,169,110,.15);border-radius:16px;margin-bottom:12px;overflow:hidden;';
+      card.innerHTML = `
+        <div style="padding:10px 14px;background:${spot.color}50;border-left:4px solid ${spot.color};">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div style="display:flex;gap:8px;align-items:center;">
+              <span style="font-size:20px;">${spot.emoji}</span>
+              <div>
+                <div style="font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:#fff;">${spot.name}</div>
+                <div style="font-size:10px;color:rgba(255,255,255,.6);">${spot.park} · ${spot.time}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          <div style="font-size:12px;color:rgba(255,255,255,.8);line-height:1.5;margin-bottom:6px;">${spot.shot}</div>
+          <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.4);margin-bottom:2px;">TECHNIQUE</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.7);margin-bottom:6px;">${spot.technique}</div>
+          <div style="display:flex;gap:5px;background:rgba(255,215,0,.1);border-radius:8px;padding:6px;margin-bottom:5px;">
+            <span style="font-size:11px;flex-shrink:0;">🌟</span>
+            <div style="font-size:11px;color:rgba(255,215,0,.9);">${spot.secret}</div>
+          </div>
+          <div style="font-size:10px;color:rgba(255,255,255,.5);">📷 ${spot.gear}</div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const tipsCard = document.createElement('div');
+    tipsCard.style.cssText = 'background:linear-gradient(135deg,#0a0a15,#1a1a4a);border:1px solid rgba(201,169,110,.2);border-radius:16px;margin-bottom:20px;padding:14px;';
+    tipsCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;color:#C9A96E;">📷 Photography Strategy</div>
+    ${PHOTO_TIPS.map(t=>`<div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
+      <span style="font-size:18px;flex-shrink:0;">${t.icon}</span>
+      <div style="font-size:12px;opacity:.9;line-height:1.5;">${t.tip}</div>
+    </div>`).join('')}`;
+    body.appendChild(tipsCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-photography')) buildScreen();
+
+  const _prevSS_vvvvvv = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_vvvvvv) _prevSS_vvvvvv(name, el);
+    if (name === 'photography') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-photography');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectPhotoCard() {
+    if (document.getElementById('photography-home-card')) return true;
+    const ref = document.getElementById('park-food-home-card') || document.getElementById('epcot-deep-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'photography-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#0a0a15,#1a1a4a,#C9A96E);border-radius:16px;padding:14px;cursor:pointer;border:1px solid rgba(201,169,110,.3);';
+    card.onclick = () => window.showScreen('photography');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">📸</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Orlando Photography Guide</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.75);">Castle at dawn · Pandora night · Torii fireworks · Dragon fire</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.5);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _photoCard = false;
+  setInterval(() => { if (!_photoCard) _photoCard = injectPhotoCard(); }, 82000);
+  setTimeout(() => { _photoCard = injectPhotoCard(); }, 78500);
+  const _prevRH_vvvvvv = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_vvvvvv) _prevRH_vvvvvv.apply(this, arguments);
+    setTimeout(() => { _photoCard = false; _photoCard = injectPhotoCard(); }, 27800);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK WWWWWW: Orlando Seasonal Events & Holidays Guide ===== */
+(function initOrlandoSeasonalEvents() {
+
+  const SEASONAL_EVENTS = [
+    {
+      name:'Mickey\'s Very Merry Christmas Party', emoji:'🎄', color:'#C62828',
+      when:'Select nights, November–December (ticket required)',
+      park:'Magic Kingdom',
+      price:'$109–185/person (separate from park admission)',
+      why:'Mickey\'s Christmas Party transforms Magic Kingdom into a winter wonderland. Exclusive parade (Mickey\'s Once Upon a Christmastime), enhanced fireworks with Christmas overlay, free cookies and hot cocoa, character meets you can\'t get during regular hours (all characters in Christmas costumes), stage shows exclusive to the event.',
+      tip:'Worth the separate ticket for families with kids. The fireworks enhancement alone is substantial — the Christmas version of Enchantment is widely considered the best version of any Magic Kingdom fireworks show. Book early — specific nights sell out months ahead.',
+    },
+    {
+      name:'EPCOT International Festival of the Arts', emoji:'🎨', color:'#7B1FA2',
+      when:'January–February',
+      park:'EPCOT',
+      price:'Included with park admission',
+      why:'The most intellectual EPCOT festival. Fine art, culinary art, and performing arts. Artists demonstrate live techniques throughout the park. The Dreamers Everywhere concerts feature Disney music in orchestral/choral arrangements. Food booths feature "food as art" — edible painting palettes, artistic presentations.',
+      tip:'The Figment funko pop and art-inspired merchandise sell out fastest at this festival. The Disney on Broadway performers series brings Broadway cast members from Disney shows for free concerts. This is the least crowded major EPCOT event — attend now before it gets popular.',
+    },
+    {
+      name:'EPCOT Flower & Garden Festival', emoji:'🌸', color:'#2E7D32',
+      when:'March–May',
+      park:'EPCOT',
+      price:'Included with park admission',
+      why:'Hundreds of Disney character topiaries in elaborate garden scenes throughout the park. The Butterfly House in the England Pavilion contains live butterflies. Fresh produce and spring-forward cuisine at outdoor kitchens. The park looks most beautiful during this festival.',
+      tip:'The Spike the Bee topiary and all the Disney classics in topiary form are most concentrated near Spaceship Earth. The Outdoor Kitchens feature Florida spring produce — lighter, fresher food than the park\'s usual offerings. March is the sweet spot: spring flowers are peak, crowds are below summer levels.',
+    },
+    {
+      name:'Star Wars: Galactic Starcruiser (Now Closed)', emoji:'⭐', color:'#1a1a2e',
+      when:'CLOSED — 2023. Disney\'s most ambitious (and most expensive) experience',
+      park:'Hollywood Studios area',
+      price:'Was $5,000+ for 2 nights for 2 people',
+      why:'Historical: Galactic Starcruiser was a 2-night immersive Star Wars hotel where guests played as characters in an ongoing storyline. Every crew member, every meal, every activity was in-character. Sold out immediately for 2 years, then closed in 2023 citing insufficient demand at the price point.',
+      tip:'The Starcruiser closure was a major Disney story. It\'s included here because guests often ask — and because its storyline set pieces and props appear periodically in Disney\'s History of Themed Entertainment exhibitions.',
+    },
+    {
+      name:'Universal\'s Halloween Horror Nights', emoji:'🎃', color:'#6A1B9A',
+      when:'Select nights, September–October',
+      park:'Universal Studios Florida',
+      price:'$79–129/ticket, varies by night',
+      why:'The premier Halloween event in the United States. The entire Universal Studios park becomes a horror experience — 10+ professionally produced haunted houses (using Hollywood horror film IPs), scare zones throughout all pathways, live DJ entertainment, open-bar events. This is NOT for children.',
+      tip:'RIP Tour ($225+) gives front-of-line access to all houses. Essential on peak October weekends when house queues reach 90 minutes. Annual Pass discounts apply. Tuesday–Thursday nights in October have 30–40% shorter queues than Friday–Saturday.',
+    },
+    {
+      name:'Nights of Lights — St. Augustine', emoji:'🕯️', color:'#C9A96E',
+      when:'Mid-November through January',
+      park:'St. Augustine (day trip from Orlando)',
+      price:'Free to view',
+      why:'St. Augustine\'s Nights of Lights has been recognized by National Geographic as one of the Top 10 Light Displays in the World. The entire historic district — 6 square miles of 18th-century Spanish colonial architecture — is illuminated with millions of white lights. Breathtaking.',
+      tip:'The Nights of Lights tour via horse-drawn carriage is the premium experience ($25–35). The St. George Street pedestrian zone at 8 PM on a cold December night is one of the most beautiful places in Florida. Plan as a 2-hour evening trip from Orlando.',
+    },
+    {
+      name:'Mickey\'s Not-So-Scary Halloween Party', emoji:'👻', color:'#F57F17',
+      when:'Select nights, August–October (ticket required)',
+      park:'Magic Kingdom',
+      price:'$99–169/person',
+      why:'Magic Kingdom\'s Halloween event. Trick-or-treat stations throughout the park with actual full-sized candy, the Boo-to-You Halloween parade with the Headless Horseman, Hocus Pocus Villain Spectacular on the castle stage, and villains meet-and-greets.',
+      tip:'The Hocus Pocus Villain Spectacular is the highlight — it runs multiple times on event nights. The character meets at MNSSHP include villains and characters who don\'t appear during regular park hours. Trick-or-treating is surprisingly generous: a child can collect an entire bag of full-sized candy bars.',
+    },
+    {
+      name:'Epcot International Food & Wine Festival', emoji:'🍷', color:'#8B0000',
+      when:'Late August through November',
+      park:'EPCOT',
+      price:'Included with park admission (food booth items cost separately)',
+      why:'The largest annual food event in the United States by some measures. Over 30 international marketplaces, celebrity chef events, Eat to the Beat concert series with major recording artists, culinary demonstrations. The World Showcase becomes a global food festival that adults plan their Orlando trips around.',
+      tip:'Budget $80–120 per adult for the full food/drink booth experience. The specialty tastings and premium events ($40–120/person) require separate booking and fill quickly. The Japan sake flights and France wine selection are consistently exceptional.',
+    },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-seasonal';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#C62828,#F57F17,#C9A96E);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Seasonal Events Guide</div>
+          <div style="font-size:11px;opacity:.8;">Christmas Party · Horror Nights · Food & Wine · Flower & Garden</div>
+        </div>
+        <span style="font-size:28px;">🎪</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        Timing your Orlando trip around a seasonal event can transform the experience. Mickey's Christmas Party, Halloween Horror Nights, and EPCOT's Food & Wine Festival are world-class events that reward visitors who plan around them.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    SEASONAL_EVENTS.forEach(event => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:10px 14px;background:${event.color}18;border-left:4px solid ${event.color};">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
+            <div style="display:flex;gap:8px;align-items:center;">
+              <span style="font-size:22px;">${event.emoji}</span>
+              <div>
+                <div style="font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${event.name}</div>
+                <div style="font-size:10px;color:var(--text-secondary,#888);">${event.park} · ${event.when}</div>
+              </div>
+            </div>
+            <span style="font-size:10px;font-weight:700;color:${event.color};flex-shrink:0;">${event.price}</span>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;margin-bottom:7px;">${event.why}</div>
+          <div style="display:flex;gap:5px;background:${event.color}0d;border-radius:8px;padding:7px;">
+            <span style="font-size:11px;flex-shrink:0;">💡</span>
+            <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${event.tip}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const calCard = document.createElement('div');
+    calCard.style.cssText = 'background:linear-gradient(135deg,#C62828,#F57F17);border-radius:16px;margin-bottom:20px;padding:14px;color:#fff;';
+    calCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">📅 Best Time to Visit (Event Calendar)</div>
+    ${[
+      {months:'Jan–Feb', event:'EPCOT Festival of the Arts — least crowded festival', crowd:'Low'},
+      {months:'Mar–May', event:'Flower & Garden Festival — beautiful park, moderate crowds', crowd:'Moderate'},
+      {months:'Jun–Aug', event:'Peak summer crowds + Food & Wine begins late August', crowd:'High'},
+      {months:'Sep–Oct', event:'Halloween Horror Nights + Food & Wine Festival peak', crowd:'Moderate–High'},
+      {months:'Nov', event:'Food & Wine ends, Christmas events begin, best value month', crowd:'Low–Moderate'},
+      {months:'Dec', event:'Christmas Party, Holidays Festival — most magical, most crowded', crowd:'High'},
+    ].map(r=>`<div style="display:flex;gap:10px;margin-bottom:6px;align-items:flex-start;">
+      <div style="font-size:10px;font-weight:800;color:rgba(255,255,255,.7);flex-shrink:0;width:60px;">${r.months}</div>
+      <div style="flex:1;font-size:11px;opacity:.9;">${r.event}</div>
+      <div style="font-size:10px;font-weight:700;color:rgba(255,255,200,.9);flex-shrink:0;">${r.crowd}</div>
+    </div>`).join('')}`;
+    body.appendChild(calCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-seasonal')) buildScreen();
+
+  const _prevSS_wwwwww = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_wwwwww) _prevSS_wwwwww(name, el);
+    if (name === 'seasonal') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-seasonal');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectSeasonalCard() {
+    if (document.getElementById('seasonal-home-card')) return true;
+    const ref = document.getElementById('photography-home-card') || document.getElementById('park-food-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'seasonal-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#C62828,#F57F17,#C9A96E 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('seasonal');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🎪</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Seasonal Events Guide</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Christmas Party · Horror Nights · Food & Wine · Flower & Garden</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _seasonalCard = false;
+  setInterval(() => { if (!_seasonalCard) _seasonalCard = injectSeasonalCard(); }, 83000);
+  setTimeout(() => { _seasonalCard = injectSeasonalCard(); }, 79500);
+  const _prevRH_wwwwww = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_wwwwww) _prevRH_wwwwww.apply(this, arguments);
+    setTimeout(() => { _seasonalCard = false; _seasonalCard = injectSeasonalCard(); }, 28200);
+  };
+})();
+</script>
