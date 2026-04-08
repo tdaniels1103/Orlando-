@@ -60544,3 +60544,378 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK FFFFFFF: Disney Springs & CityWalk Complete Guide ===== */
+(function initDisneySpringsCityWalk() {
+
+  const DISNEY_SPRINGS = [
+    {
+      zone:'The Landing', emoji:'⚓', color:'#0277BD',
+      desc:'Waterfront dining and entertainment district with a nautical theme. The best restaurant concentration in Disney Springs.',
+      highlights:[
+        {name:'Jock Lindsey\'s Hangar Bar', type:'Bar', note:'Aviation-themed hidden gem consistently ranked one of the best themed bars in the US. Craft cocktails with Indiana Jones references throughout every detail. Arrive by 4 PM weekdays to skip the queue.'},
+        {name:'Raglan Road Irish Pub', type:'Restaurant/Bar', note:'Authentic Irish pub transported from Dublin. Live Irish music every night, Irish dancers on weekends. Guinness, shepherd\'s pie, fish and chips. The best evening experience in Disney Springs.'},
+        {name:'The Boathouse', type:'Fine dining', note:'Upscale American seafood with a fleet of vintage boats. The most aspirational dining in Disney Springs — lobster, oysters, and steak. The amphicar tours (vintage car/boat hybrids that drive into the water) are a Disney Springs tradition.'},
+        {name:'STK Orlando', type:'Contemporary steakhouse', note:'Upscale modern steakhouse with DJ entertainment and a vibrant atmosphere unlike typical Disney dining.'},
+      ],
+    },
+    {
+      zone:'Marketplace', emoji:'🛍️', color:'#C9A96E',
+      desc:'The classic Disney Springs shopping zone. The original Walt Disney World shopping area with the most comprehensive Disney merchandise collection outside of the parks.',
+      highlights:[
+        {name:'World of Disney', type:'Mega store', note:'The largest Disney character merchandise store in the world. Multiple floors of every Disney product imaginable. The ornament room at Christmas is overwhelming in the best way.'},
+        {name:'LEGO Imagination Center', type:'Store/Experience', note:'Giant outdoor LEGO sculptures beside the lake. The store has the most comprehensive LEGO selection in Florida including Disney exclusives.'},
+        {name:'Gideon\'s Bakehouse', type:'Bakery', note:'The famous half-pound cookies with genuine national cult status. Flavors change daily. Arrive at opening (10 AM) for the widest selection before the line gets long.'},
+      ],
+    },
+    {
+      zone:'Town Center', emoji:'🏙️', color:'#7B1FA2',
+      desc:'Upscale shopping with national and international brands. The most sophisticated retail environment in the Disney Springs complex.',
+      highlights:[
+        {name:'Uniqlo', type:'Clothing', note:'Japanese casual wear — one of the few Florida locations. The collaborative Disney and Pixar graphic tee collections are outstanding value.'},
+        {name:'Kate Spade', type:'Fashion', note:'Handbag and accessories boutique with occasional Disney collaboration pieces unavailable elsewhere.'},
+        {name:'Sprinkles Cupcakes', type:'Bakery', note:'LA-originated gourmet cupcake chain. The 24-hour ATM dispenses cupcakes — one of the most photographed vending machines in Florida.'},
+      ],
+    },
+    {
+      zone:'West Side', emoji:'🎭', color:'#C62828',
+      desc:'Entertainment and dining zone with the most distinctly adult atmosphere in Disney Springs.',
+      highlights:[
+        {name:'House of Blues Orlando', type:'Live music venue', note:'National acts, local bands, and the famous Sunday Gospel Brunch. One of the best live music venues in Central Florida.'},
+        {name:'Splitsville Luxury Lanes', type:'Bowling/Entertainment', note:'Upscale bowling lanes with full restaurant service. The combination of bowling and sushi in a themed environment is genuinely excellent.'},
+        {name:'AMC Disney Springs 24', type:'Cinema', note:'24-screen premium cinema with Dolby and IMAX. Best movie theater in the Disney Springs area.'},
+      ],
+    },
+  ];
+
+  const CITYWALK = [
+    {
+      name:'Voodoo Doughnut', emoji:'🍩', color:'#6A1B9A',
+      note:'Portland-originated doughnut shop with the most creative (and irreverent) doughnut selection in Florida. The pink box is iconic. The Bacon Maple Bar justifies the trip. Midnight hours on weekends.',
+    },
+    {
+      name:'Antojitos Authentic Mexican Food', emoji:'🌮', color:'#2E7D32',
+      note:'Best restaurant at CityWalk. Authentic Mexican street food on three levels with a rooftop bar. The guacamole tableside preparation is the best in Orlando.',
+    },
+    {
+      name:'Toothsome Chocolate Emporium', emoji:'🍫', color:'#8B4513',
+      note:'Steampunk-themed chocolate factory and milkshake bar. Elaborate table service brunch and dinner. The milkshakes are architectural marvels — three-tiered constructions of cake, candy, and ice cream.',
+    },
+    {
+      name:'Rising Star Karaoke', emoji:'🎤', color:'#C62828',
+      note:'Private karaoke rooms with live band accompaniment instead of backing tracks. The most unique entertainment at CityWalk — actual musicians play your songs. Book rooms in advance.',
+    },
+    {
+      name:'The Cowfish Sushi Burger Bar', emoji:'🍣', color:'#E65100',
+      note:'The most creative menu concept at CityWalk — sushi and gourmet burgers in one restaurant. The "burgushi" (burger rolls) combine both. Surprisingly excellent execution of an unlikely premise.',
+    },
+    {
+      name:'NBC Sports Grill & Brew', emoji:'🏆', color:'#003087',
+      note:'The best sports bar in the Universal complex. 100 HD screens, extensive craft beer selection, and surprisingly good food. For sports events, this is the most complete experience in the Universal area.',
+    },
+  ];
+
+  const DS_TIPS = [
+    {icon:'🚗', tip:'Disney Springs parking is free in the multi-story garages. No park ticket required. Arrive in the Orange or Lime garage for the best central location. Evening parking fills by 7 PM on weekends.'},
+    {icon:'🌃', tip:'Disney Springs transforms after 7 PM — lights come on, entertainment intensifies, restaurants fill. The best time to visit is 6–10 PM when the full atmosphere is active.'},
+    {icon:'🎵', tip:'Live music is scattered throughout Disney Springs without additional charge. Raglan Road has live Irish bands every night. The Landing amphitheater hosts free concerts.'},
+    {icon:'🎡', tip:'CityWalk is free to walk and explore. Individual entertainment venues (bowling, karaoke) charge admission. No Universal park ticket required to access CityWalk dining and shopping.'},
+    {icon:'💳', tip:'Annual Passholders at Disney and Universal get discounts at most Disney Springs and CityWalk restaurants — present your pass when seated, not when paying.'},
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-springs-citywalk';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#003087,#C9A96E,#C62828);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Disney Springs & CityWalk</div>
+          <div style="font-size:11px;opacity:.8;">Gideon\'s · Raglan Road · Jock Lindsey\'s · Voodoo Doughnuts</div>
+        </div>
+        <span style="font-size:28px;">🎡</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        Disney Springs and Universal's CityWalk are free-admission entertainment districts that rival any mall or downtown entertainment district in Florida. No park ticket required — free parking, world-class dining, and entertainment until midnight.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    const dsHdr = document.createElement('div');
+    dsHdr.style.cssText = 'font-family:"Playfair Display",serif;font-size:16px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:10px;padding:8px 0 5px;border-bottom:2px solid #C9A96E;';
+    dsHdr.textContent = '🛍️ Disney Springs — By Zone';
+    body.appendChild(dsHdr);
+
+    DISNEY_SPRINGS.forEach(zone => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:9px 14px;background:${zone.color}18;border-left:4px solid ${zone.color};">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:18px;">${zone.emoji}</span>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${zone.zone}</div>
+              <div style="font-size:10px;color:var(--text-secondary,#888);">${zone.desc}</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:8px 14px;">
+          ${zone.highlights.map(h=>`<div style="margin-bottom:7px;padding-left:8px;border-left:3px solid ${zone.color};">
+            <div style="display:flex;align-items:center;gap:5px;margin-bottom:1px;">
+              <div style="font-size:11px;font-weight:700;color:var(--text-primary,#212121);">${h.name}</div>
+              <span style="font-size:9px;padding:1px 4px;background:${zone.color}18;color:${zone.color};border-radius:8px;">${h.type}</span>
+            </div>
+            <div style="font-size:10px;color:var(--text-secondary,#666);">${h.note}</div>
+          </div>`).join('')}
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const cwHdr = document.createElement('div');
+    cwHdr.style.cssText = 'font-family:"Playfair Display",serif;font-size:16px;font-weight:700;color:var(--text-primary,#212121);margin:6px 0 10px;padding:8px 0 5px;border-bottom:2px solid #C62828;';
+    cwHdr.textContent = '🎭 Universal CityWalk Must-Visits';
+    body.appendChild(cwHdr);
+
+    CITYWALK.forEach(spot => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:12px;margin-bottom:8px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:9px 14px;display:flex;gap:8px;align-items:flex-start;">
+          <span style="font-size:20px;">${spot.emoji}</span>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:${spot.color};margin-bottom:2px;">${spot.name}</div>
+            <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${spot.note}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const tipCard = document.createElement('div');
+    tipCard.style.cssText = 'background:linear-gradient(135deg,#003087,#C9A96E);border-radius:14px;margin-bottom:20px;padding:14px;color:#fff;';
+    tipCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;margin-bottom:8px;">💡 District Tips</div>
+    ${DS_TIPS.map(t=>`<div style="display:flex;gap:10px;margin-bottom:7px;align-items:flex-start;">
+      <span style="font-size:18px;flex-shrink:0;">${t.icon}</span>
+      <div style="font-size:11px;opacity:.9;line-height:1.5;">${t.tip}</div>
+    </div>`).join('')}`;
+    body.appendChild(tipCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-springs-citywalk')) buildScreen();
+
+  const _prevSS_fffffff = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_fffffff) _prevSS_fffffff(name, el);
+    if (name === 'springs-citywalk') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-springs-citywalk');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectSCCard() {
+    if (document.getElementById('springs-citywalk-home-card')) return true;
+    const ref = document.getElementById('checklist-home-card') || document.getElementById('wildlife-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'springs-citywalk-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#003087,#C9A96E,#C62828 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('springs-citywalk');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🎡</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Disney Springs & CityWalk</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Gideon\'s · Raglan Road · Jock Lindsey\'s · Voodoo Doughnuts</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _scCard = false;
+  setInterval(() => { if (!_scCard) _scCard = injectSCCard(); }, 92000);
+  setTimeout(() => { _scCard = injectSCCard(); }, 88500);
+  const _prevRH_fffffff = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_fffffff) _prevRH_fffffff.apply(this, arguments);
+    setTimeout(() => { _scCard = false; _scCard = injectSCCard(); }, 31800);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK GGGGGGG: Orlando Kids Under 5 — The Toddler Guide ===== */
+(function initOrlandoToddlers() {
+
+  const TODDLER_RIDES = [
+    {
+      park:'Magic Kingdom', emoji:'🏰', color:'#003087',
+      rides:[
+        {name:'Dumbo the Flying Elephant', height:'None', note:'The classic. Gentle spinner with the most beloved character. Perfect for ages 2–5.'},
+        {name:'The Many Adventures of Winnie the Pooh', height:'None', note:'Gentle dark ride through the Hundred Acre Wood. Wind-in-the-Willows pacing with familiar characters.'},
+        {name:'Peter Pan\'s Flight', height:'None', note:'Flying pirate ship over nighttime London. No height minimum. Calming, beautiful, universally appropriate.'},
+        {name:'Buzz Lightyear\'s Space Ranger Spin', height:'None', note:'Shooting ride with big buttons and colorful targets. Toddlers can spin the car and press buttons — maximum engagement.'},
+        {name:'It\'s a Small World', height:'None', note:'The most accessible Disney ride — extremely slow boat through singing puppets. A mandatory first Disney ride for any child.'},
+        {name:'Liberty Belle Riverboat', height:'None', note:'20-minute relaxing cruise on a working steamboat. Zero intensity. Great for tired toddlers.'},
+        {name:'Prince Charming Regal Carrousel', height:'None', note:'Spinning horses. The quintessential first theme park experience. Free (included with admission).'},
+      ],
+      tip:'Magic Kingdom is the toddler park. Plan 1 full day at MK — it has more small-child appropriate rides than any other Disney park. Fantasyland is the epicenter.',
+    },
+    {
+      park:'EPCOT', emoji:'🌐', color:'#1565C0',
+      rides:[
+        {name:'Soarin\' Around the World', height:'40"', note:'Gentle hang glider film. For taller toddlers (40"+). The scent effects and simulated wind are magical for first-timers.'},
+        {name:'The Seas with Nemo & Friends', height:'None', note:'Gentle clamshell ride through the Finding Nemo world and into the actual giant aquarium. Then the aquarium gallery after — extend with 30 minutes of fish watching.'},
+        {name:'Frozen Ever After', height:'None', note:'Gentle boat through Arendelle with singing. Elsa and Anna animatronics. No surprises.'},
+        {name:'Turtle Talk with Crush', height:'None', note:'Live interactive animated sea turtle talks to the audience in real-time. Toddlers are frequently called on by Crush — magical interaction.'},
+        {name:'Journey Into Imagination with Figment', height:'None', note:'Purple dragon and sensory surprises. The sound and light effects are gentle and delightful for young children.'},
+        {name:'Gran Fiesta Tour Starring The Three Caballeros', height:'None', note:'Gentle boat through Mexico Pavilion. Very low stimulation. Great for winding down.'},
+      ],
+      tip:'EPCOT\'s World Showcase is excellent for toddlers who tire easily — walk the pavilions, eat international food (Norway\'s school bread is universally loved by children), and use it as a gentle day.',
+    },
+    {
+      park:'Animal Kingdom', emoji:'🌿', color:'#2E7D32',
+      rides:[
+        {name:'Kilimanjaro Safaris', height:'None', note:'Open-vehicle safari through actual African savanna with live animals (elephants, rhinos, lions). One of the most extraordinary experiences at any theme park for children of all ages.'},
+        {name:'Na\'vi River Journey', height:'None', note:'Gentle nighttime boat through bioluminescent Pandora. The Shaman of Songs animatronic at the end is one of the most beautiful figures ever created. Completely peaceful.'},
+        {name:'Wildlife Express Train', height:'None', note:'Functional train to Rafiki\'s Planet Watch. Slow, narrated, suitable for all ages.'},
+        {name:'Triceratop Spin', height:'None', note:'Gentle spinner themed to dinosaurs. Very short wait. Ideal for ages 2–5.'},
+      ],
+      tip:'Kilimanjaro Safaris early morning (first hour of park) gives the best animal activity. Animals are fed in the morning and most active. For toddlers, seeing real elephants at 50 feet is a defining childhood memory.',
+    },
+    {
+      park:'Universal', emoji:'🎡', color:'#7B1FA2',
+      rides:[
+        {name:'Despicable Me: Minion Mayhem', height:'40"', note:'Motion ride with fun pre-show. The minions speak and the humor works for toddlers.'},
+        {name:'Cat in the Hat', height:'None', note:'IOA gentle dark ride through the Dr. Seuss book. Perfect for young children.'},
+        {name:'One Fish, Two Fish, Red Fish, Blue Fish', height:'None', note:'Seuss-themed gentle spinner. Water squirts from fish at certain heights — toddlers can control the height.'},
+        {name:'Caro-Seuss-El', height:'None', note:'Seuss-themed carousel with moving parts. Superior to standard carousels.'},
+        {name:'Kang & Kodos\' Twirl \'n\' Hurl', height:'None', note:'Gentle Simpsons spinner. The alien characters delight young children who don\'t even know the show.'},
+      ],
+      tip:'Seuss Landing at Islands of Adventure is specifically designed for ages 3–7. The architecture, characters, and rides are all optimized for the youngest visitors.',
+    },
+  ];
+
+  const TODDLER_TIPS = [
+    {icon:'🍼', tip:'Disney Baby Care Centers are in every park — not just first aid. They have changing tables, nursing rooms, microwaves for baby food, and strollers available for rent. MK center is next to the Crystal Palace.'},
+    {icon:'🛒', tip:'Stroller rentals are available at all Disney and Universal parks. Disney single strollers $15/day, doubles $31/day. Bring your own if possible — pickup/return lines add time. Note: Disney allows any stroller up to 36" × 52" wide.'},
+    {icon:'🔄', tip:'Rider Switch (Disney) / Child Swap (Universal) allows one adult to ride while the other waits with a small child, then switches without waiting in line again. Available at any ride with a height requirement.'},
+    {icon:'🌡️', tip:'Toddlers overheat and dehydrate faster than adults. Watch for signs of heat exhaustion: unusual fussiness, stopping eating, lethargy. Cool down proactively — misting stations, indoor areas, cold water.'},
+    {icon:'😴', tip:'The midday park break is non-negotiable with toddlers. Back to the hotel at noon, nap (or quiet time), return at 4 PM. This structure doubles the day\'s quality for the entire family.'},
+    {icon:'📸', tip:'Character meets are the most meaningful moments for toddlers at Disney. The character interaction — getting a hug from Mickey or Cinderella at age 3 — creates memories that outlast any ride. Prioritize 1–2 character experiences over filling the day with attractions.'},
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-toddlers';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#003087,#C9A96E,#2E7D32);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Orlando with Toddlers (Under 5)</div>
+          <div style="font-size:11px;opacity:.8;">Dumbo · Safaris · Na\'vi River · Small World · Baby Care Centers</div>
+        </div>
+        <span style="font-size:28px;">🧸</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        Visiting Orlando with children under 5 requires a different approach — fewer rides, slower pace, character meets, and the midday nap break as a non-negotiable. This guide identifies every toddler-appropriate ride across all parks.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    TODDLER_RIDES.forEach(park => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:9px 14px;background:${park.color}18;border-left:4px solid ${park.color};">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:20px;">${park.emoji}</span>
+            <div style="font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${park.park}</div>
+          </div>
+        </div>
+        <div style="padding:8px 14px;">
+          ${park.rides.map(r=>`<div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid var(--border,#f5f5f5);">
+            <div style="flex:1;">
+              <div style="font-size:11px;font-weight:700;color:var(--text-primary,#212121);">${r.name}</div>
+              <div style="font-size:10px;color:var(--text-secondary,#666);">${r.note}</div>
+            </div>
+            <div style="font-size:10px;font-weight:700;color:${r.height==='None'?'#2E7D32':park.color};flex-shrink:0;">${r.height}</div>
+          </div>`).join('')}
+          <div style="font-size:10px;font-style:italic;color:var(--text-secondary,#888);margin-top:3px;">${park.tip}</div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const tipCard = document.createElement('div');
+    tipCard.style.cssText = 'background:linear-gradient(135deg,#003087,#2E7D32);border-radius:14px;margin-bottom:20px;padding:14px;color:#fff;';
+    tipCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;margin-bottom:8px;">🧸 Toddler Trip Essentials</div>
+    ${TODDLER_TIPS.map(t=>`<div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
+      <span style="font-size:18px;flex-shrink:0;">${t.icon}</span>
+      <div style="font-size:11px;opacity:.95;line-height:1.5;">${t.tip}</div>
+    </div>`).join('')}`;
+    body.appendChild(tipCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-toddlers')) buildScreen();
+
+  const _prevSS_ggggggg = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_ggggggg) _prevSS_ggggggg(name, el);
+    if (name === 'toddlers') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-toddlers');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectToddlersCard() {
+    if (document.getElementById('toddlers-home-card')) return true;
+    const ref = document.getElementById('springs-citywalk-home-card') || document.getElementById('checklist-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'toddlers-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#003087,#C9A96E,#2E7D32 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('toddlers');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🧸</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Orlando with Toddlers (Under 5)</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Dumbo · Safaris · Small World · Character meets · Baby Care</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _toddlersCard = false;
+  setInterval(() => { if (!_toddlersCard) _toddlersCard = injectToddlersCard(); }, 93000);
+  setTimeout(() => { _toddlersCard = injectToddlersCard(); }, 89500);
+  const _prevRH_ggggggg = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_ggggggg) _prevRH_ggggggg.apply(this, arguments);
+    setTimeout(() => { _toddlersCard = false; _toddlersCard = injectToddlersCard(); }, 32200);
+  };
+})();
+</script>
