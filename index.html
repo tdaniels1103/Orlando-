@@ -54988,3 +54988,202 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK DDDDDD: Universal Studios Florida Complete Guide ===== */
+(function initUniversalStudiosFL() {
+
+  const LANDS = [
+    {
+      id:'hollywood', name:'Hollywood', emoji:'🎬', color:'#C62828',
+      desc:'The Hollywood-themed entrance to the park. Classic Universal movie history and the gateway to all other lands.',
+      rides:[
+        { name:'Hollywood Rip Ride Rockit', type:'Vertical launched coaster', wait:'30–60 min', note:'65 mph, vertical ascent, personal soundtrack selector on the ride. Intense. Single rider line available.' },
+      ],
+      dining:[{ name:'Mel\'s Drive-In', tip:'Authentic 1950s diner theming with great milkshakes. Classic diner food at reasonable park prices.' }],
+      tip:'Check out the classic Hollywood facade buildings — they\'re movie prop quality. The wand of Universal Studios Hollywood is visible from the entrance area.',
+    },
+    {
+      id:'ny', name:'New York', emoji:'🗽', color:'#37474F',
+      desc:'A vibrant recreation of New York City streetscapes with iconic film landmarks.',
+      rides:[
+        { name:'Revenge of the Mummy', type:'Indoor steel coaster (psychological)', wait:'30–60 min', note:'Psychological roller coaster with darkness, fire, and sudden reversals. One of the best classic dark coasters anywhere.' },
+        { name:'Race Through New York starring Jimmy Fallon', type:'Motion simulator', wait:'15–30 min', note:'Fun motion ride through NYC landmarks. Lower intensity. Good for families or heat breaks.' },
+      ],
+      dining:[{ name:'Finnegan\'s Bar & Grill', tip:'Irish pub atmosphere with Guinness and Irish comfort food. Good table service option on this side of the park.' }],
+      tip:'The New York building facades are some of the most detailed in the park. The Delancey Street area has photo opportunities that look genuinely like NYC.',
+    },
+    {
+      id:'minion', name:'Villain-Con Minion Land', emoji:'🟡', color:'#FFD600',
+      desc:'Replaced the Despicable Me area with a fully immersive Minion theme. One of the best family areas at Universal.',
+      rides:[
+        { name:'Despicable Me: Minion Mayhem', type:'Motion ride', wait:'20–45 min', note:'You become a minion. Fun, immersive, great for families. 40" height requirement.' },
+        { name:'Illumination\'s Villain-Con Minion Blast', type:'Interactive walk-through shooter', wait:'15–30 min', note:'New walk-through experience where you use a blaster to complete villain missions. Unique format.' },
+      ],
+      dining:[{ name:'Purple Minion Cafe', tip:'Counter service with minion-themed foods and drinks. Fun for kids, surprisingly decent food.' }],
+      tip:'The Minion Land area theming is more elaborate than the original Despicable Me land. The immersive Villain-Con convention center concept is creative.',
+    },
+    {
+      id:'krustyland', name:'Springfield / Krustyland (Simpsons)', emoji:'🍩', color:'#FF7F00',
+      desc:'Step into the actual animated world of Springfield. Every detail matches the show — Moe\'s Tavern, Kwik-E-Mart, Krusty\'s.',
+      rides:[
+        { name:'The Simpsons Ride', type:'Motion simulator', wait:'15–35 min', note:'High-speed simulator through Krustyland with Springfield characters. Family-friendly, motion sensitive.' },
+        { name:'Kang & Kodos\' Twirl \'n\' Hurl', type:'Spinner', wait:'5–15 min', note:'Gentle spinner ride themed to the aliens. Very short wait. For kids or completionists.' },
+      ],
+      dining:[{ name:'Moe\'s Tavern', tip:'Order a Flaming Moe — the non-alcoholic smoke-filled novelty drink from the show. It\'s genuinely exactly like the TV version.' },
+               { name:'Lard Lad Donuts', tip:'Giant frosted donuts visible from the attraction. The pink frosted version is the show\'s signature. Better than you\'d expect.' }],
+      tip:'The attention to show detail is extraordinary — every sign, every shop matches Springfield perfectly. Moe\'s Tavern has the actual booth where Homer sits. Kwik-E-Mart sells actual products.',
+    },
+    {
+      id:'wworld', name:'The Wizarding World of Harry Potter – Diagon Alley', emoji:'🔮', color:'#1565C0',
+      desc:'The companion to Hogsmeade (Islands of Adventure). Diagon Alley is London-facing and includes the most ambitious attraction in Universal history.',
+      rides:[
+        { name:'Harry Potter and the Escape from Gringotts', type:'Multi-dimensional ride', wait:'45–90 min', note:'Trackless dark ride through Gringotts Bank with fire, 3D screens, and motion elements. Slower-paced than Rise but spectacular.' },
+        { name:'Hogwarts Express: London to Hogsmeade', type:'Train ride (requires park-to-park ticket)', wait:'20–45 min', note:'The only ride requiring park-to-park. Each direction tells a different story. Worth doing both ways.' },
+      ],
+      dining:[
+        { name:'The Leaky Cauldron', tip:'Full-service British dining. Butterbeer, English comfort food, treacle tart. Good atmosphere if you want a meal in the Wizarding World.' },
+        { name:'Florean Fortescue\'s Ice-Cream Parlour', tip:'Wizarding ice cream flavors including Earl Grey and Lavender. Butterbeer ice cream is the signature.' },
+      ],
+      tip:'Diagon Alley is a hidden street — you walk through the King\'s Cross Station facade to reach it. Interactive wand experience here: Weasleys\' Wizard Wheezes has the most elaborate wand display. Gringotts dragon on top breathes actual fire every 20 minutes.',
+    },
+    {
+      id:'sfinanciero', name:'San Francisco', emoji:'🌁', color:'#00695C',
+      desc:'A recreation of the Embarcadero area of San Francisco with maritime and city theming.',
+      rides:[
+        { name:'Fast & Furious: Supercharged', type:'Motion ride / tram', wait:'20–40 min', note:'Tram-based experience through F&F world with giant screen and vehicle effects. For F&F fans — others find it lacks substance.' },
+      ],
+      dining:[{ name:'Richter\'s Burger Co.', tip:'Counter service burgers in an earthquake-themed environment. Standard park food, convenient location.' }],
+      tip:'This area is primarily transitional between major lands. Good for a quick meal or to navigate between New York and Springfield.',
+    },
+  ];
+
+  const STRATEGY = [
+    { icon:'⏰', tip:'Universal Studios Florida is best done as a second park alongside Islands of Adventure on the same day (park-to-park ticket). The Hogwarts Express connects them — both directions tell different stories.' },
+    { icon:'🚀', tip:'Rope drop priority: Escape from Gringotts (Diagon Alley) first thing. Then Hollywood Rip Ride Rockit or Revenge of the Mummy while momentum holds.' },
+    { icon:'🎟️', tip:'Express Pass for Universal Studios Florida is shared with Islands of Adventure — it covers both parks. Buy it or stay at an on-site hotel to get it free.' },
+    { icon:'🍺', tip:'The Leaky Cauldron is the best full-service lunch option in USF. Book a time when lines for Gringotts are building (11 AM – 1 PM) — eat while the crowds peak, ride while they thin.' },
+    { icon:'🌮', tip:'Moe\'s Tavern and Lard Lad Donuts are the two must-try food experiences purely for the novelty. Neither is gourmet — both are essential for Simpsons fans.' },
+    { icon:'🔥', tip:'The Gringotts dragon above Diagon Alley breathes fire every 20 minutes. Set a reminder to be underneath it for the spectacle — it\'s louder and more impressive up close than expected.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-universal-studios';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#C62828,#1565C0,#FFD600);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Universal Studios Florida</div>
+          <div style="font-size:11px;opacity:.8;">Diagon Alley · Springfield · Mummy · Minions</div>
+        </div>
+        <span style="font-size:28px;">🎬</span>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:15px;font-weight:800;">6</div><div style="font-size:9px;opacity:.8;">LANDS</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:15px;font-weight:800;">Harry</div><div style="font-size:9px;opacity:.8;">DIAGON ALLEY</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:15px;font-weight:800;">P2P</div><div style="font-size:9px;opacity:.8;">EXPRESS NEEDED</div>
+        </div>
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    LANDS.forEach(land => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+      let ridesHTML = land.rides.map(r=>`<div style="background:var(--bg,#f8f8f8);border-radius:10px;padding:10px;margin-bottom:6px;">
+        <div style="font-size:12px;font-weight:800;color:var(--text-primary,#212121);margin-bottom:3px;">${r.name}</div>
+        <div style="font-size:10px;font-weight:600;color:${land.color};margin-bottom:3px;">${r.type}</div>
+        <div style="font-size:11px;color:var(--text-secondary,#666);">${r.note}</div>
+      </div>`).join('');
+      let diningHTML = land.dining.map(d=>`<div style="display:flex;gap:6px;margin-bottom:5px;">
+        <span style="font-size:13px;flex-shrink:0;">🍽️</span>
+        <div><div style="font-size:11px;font-weight:700;color:var(--text-primary,#212121);">${d.name}</div>
+        <div style="font-size:10px;color:var(--text-secondary,#666);">${d.tip}</div></div>
+      </div>`).join('');
+      card.innerHTML = `
+        <div style="padding:10px 14px;background:${land.color}18;border-left:4px solid ${land.color};">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:22px;">${land.emoji}</span>
+            <div><div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--text-primary,#212121);">${land.name}</div>
+            <div style="font-size:11px;color:var(--text-secondary,#555);">${land.desc}</div></div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          ${ridesHTML}
+          ${diningHTML ? `<div style="font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin:6px 0 4px;">DINING</div>${diningHTML}` : ''}
+          <div style="display:flex;gap:6px;background:${land.color}0d;border-radius:8px;padding:7px;margin-top:6px;">
+            <span style="font-size:12px;flex-shrink:0;">💡</span>
+            <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${land.tip}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const stratCard = document.createElement('div');
+    stratCard.style.cssText = 'background:linear-gradient(135deg,#C62828,#1565C0);border-radius:16px;margin-bottom:20px;padding:14px;color:#fff;';
+    stratCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">🎯 Universal Studios Strategy</div>
+    ${STRATEGY.map(s=>`<div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
+      <span style="font-size:18px;flex-shrink:0;">${s.icon}</span>
+      <div style="font-size:12px;opacity:.95;line-height:1.5;">${s.tip}</div>
+    </div>`).join('')}`;
+    body.appendChild(stratCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-universal-studios')) buildScreen();
+
+  const _prevSS_dddddd = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_dddddd) _prevSS_dddddd(name, el);
+    if (name === 'universal-studios') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-universal-studios');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectUSFCard() {
+    if (document.getElementById('usf-home-card')) return true;
+    const ref = document.getElementById('weather-home-card') || document.getElementById('access-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'usf-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#C62828,#1565C0,#FFD600 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('universal-studios');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🎬</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Universal Studios Florida</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Diagon Alley · Simpsons · Mummy · Minion Land</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _usfCard = false;
+  setInterval(() => { if (!_usfCard) _usfCard = injectUSFCard(); }, 64000);
+  setTimeout(() => { _usfCard = injectUSFCard(); }, 60500);
+  const _prevRH_dddddd = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_dddddd) _prevRH_dddddd.apply(this, arguments);
+    setTimeout(() => { _usfCard = false; _usfCard = injectUSFCard(); }, 20600);
+  };
+})();
+</script>
