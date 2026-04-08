@@ -52961,3 +52961,398 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK TTTTT: Orlando Hotel Guide — Where to Stay ===== */
+(function initOrlandoHotels() {
+
+  const HOTEL_ZONES = [
+    {
+      zone:'Disney World Resort (On-Site)', emoji:'🏰', color:'#1565C0',
+      pros:['Free Disney transportation (buses, monorail, boats, Skyliner)', 'Early Theme Park Entry (30 min before general public)', 'Extended Evening Hours (select nights, resort guests only)', 'Magical customer service — Disney cast members', 'No rental car needed for Disney-only trips'],
+      cons:['Premium pricing ($200–$750+/night)', 'Inconvenient for Universal/I-Drive activities', 'Food and shopping all Disney-priced'],
+      bestFor:'Disney-focused families, honeymoons, once-in-a-lifetime visits',
+      hotels:[
+        { name:'Disney\'s Grand Floridian Resort', tier:'Deluxe', price:'$600–1200/night', note:'The flagship. Victorian luxury, Magic Kingdom views, best dining.' },
+        { name:'Disney\'s Polynesian Village', tier:'Deluxe', price:'$500–900/night', note:'South Pacific theming. Monorail access. Great pool and atmosphere.' },
+        { name:'Disney\'s Contemporary Resort', tier:'Deluxe', price:'$400–800/night', note:'Monorail goes through the hotel. Walking distance to Magic Kingdom.' },
+        { name:'Disney\'s Beach Club', tier:'Deluxe', price:'$450–900/night', note:'Best pool complex at Disney. Walking distance to EPCOT and HS via Skyliner.' },
+        { name:'Disney\'s Animal Kingdom Lodge', tier:'Deluxe', price:'$350–700/night', note:'Savanna views of real giraffes and zebras from your balcony. Unique.' },
+        { name:'Disney\'s BoardWalk Inn', tier:'Deluxe', price:'$380–700/night', note:'EPCOT walking distance. Entertainment district outside front door.' },
+        { name:'Disney\'s Port Orleans Riverside', tier:'Moderate', price:'$200–380/night', note:'Charming Southern plantation theming. Disney\'s best moderate value.' },
+        { name:'Disney\'s Pop Century', tier:'Value', price:'$130–230/night', note:'Skyliner access. Clean and cheerful. Best value on Disney property.' },
+      ]
+    },
+    {
+      zone:'Universal Resort (On-Site)', emoji:'🎢', color:'#2E7D32',
+      pros:['Free Universal Express Unlimited Pass (worth $80–140/person/day)', 'Walking distance to all Universal parks', 'Extended morning hours for resort guests', 'Excellent themed hotels in various price ranges'],
+      cons:['No on-site Disney transportation', 'Rental car needed for Disney and other activities', 'More limited dining variety vs Disney resorts'],
+      bestFor:'Universal-focused visits, teens, coaster enthusiasts, Epic Universe visitors',
+      hotels:[
+        { name:'Universal\'s Loews Portofino Bay Hotel', tier:'Premier', price:'$350–700/night', note:'Italian coastal village theming. Highest tier Express Pass. Beautiful.' },
+        { name:'Universal\'s Loews Royal Pacific Resort', tier:'Premier', price:'$280–550/night', note:'South Pacific theming. Pool is fantastic. Good value vs Portofino.' },
+        { name:'Universal\'s Hard Rock Hotel', tier:'Premier', price:'$300–600/night', note:'Rock music theming. Walk to CityWalk. Large guitar-shaped pool.' },
+        { name:'Universal\'s Cabana Bay Beach Resort', tier:'Standard', price:'$140–280/night', note:'1950s Florida resort theming. Two pools. Best value in Universal portfolio.' },
+        { name:'Universal\'s Endless Summer Resort', tier:'Value', price:'$90–160/night', note:'Budget option with complimentary shuttle. No Express Pass. Acceptable value.' },
+      ]
+    },
+    {
+      zone:'International Drive (I-Drive)', emoji:'🎆', color:'#C62828',
+      pros:['Central location between Disney and Universal', 'Walking to many attractions and restaurants', 'Often cheapest rates for quality hotels', 'I-Ride trolley available for car-free I-Drive access'],
+      cons:['Requires car or rideshare for parks', 'Traffic congestion on I-Drive itself', 'Area can feel touristy and commercial'],
+      bestFor:'Multi-park trips, budget travelers, visitors wanting restaurant variety',
+      hotels:[
+        { name:'Hyatt Regency Orlando', tier:'Upscale', price:'$180–380/night', note:'Convention center adjacent. Large pool complex. Convention discounts available.' },
+        { name:'Rosen Shingle Creek', tier:'Upscale', price:'$200–380/night', note:'Resort feel without resort prices. Golf course, spa, multiple restaurants.' },
+        { name:'Drury Inn & Suites by Universal', tier:'Mid-scale', price:'$120–220/night', note:'Outstanding value — free hot breakfast, free evening drinks included.' },
+        { name:'B Resort & Spa (Disney Springs)', tier:'Upscale', price:'$200–380/night', note:'Modern boutique adjacent to Disney Springs. Rooftop pool. Walk to Disney Springs shopping.' },
+        { name:'Homewood Suites by Hilton (I-Drive)', tier:'Mid-scale', price:'$100–180/night', note:'Kitchen suites. Complimentary breakfast. Excellent for extended family stays.' },
+      ]
+    },
+    {
+      zone:'Winter Park / Downtown Orlando', emoji:'🌳', color:'#5D4037',
+      pros:['Authentic Florida character', 'Best independent restaurants and bars nearby', 'Less crowded than tourist corridors', 'Park Avenue shops and culture walkable'],
+      cons:['Furthest from theme parks (30–40 min to Disney)', 'Requires car for all park visits', 'Less suited for theme-park-first trips'],
+      bestFor:'Foodies, couples, cultural travelers, those escaping the theme park orbit',
+      hotels:[
+        { name:'The Alfond Inn', tier:'Boutique', price:'$250–450/night', note:'Winter Park\'s finest boutique hotel. Curated art collection, refined bar, Park Avenue location.' },
+        { name:'Marriott Orlando Downtown', tier:'Upper-midscale', price:'$150–280/night', note:'Rooftop pool with city views. Walking to Amway Center and downtown venues.' },
+      ]
+    },
+  ];
+
+  const BOOKING_TIPS = [
+    { icon:'📅', tip:'Book Disney on-site hotels as early as possible — 500 days in advance via the Disney reservation system. The best rooms and categories go quickly.' },
+    { icon:'💰', tip:'Off-peak season (September, early December, January–February excluding Presidents Week) shows 30–40% lower hotel rates than spring break and summer.' },
+    { icon:'🎯', tip:'Universal on-site hotels with Express Unlimited Pass often cost LESS than staying off-site and buying Express separately. Do the math before booking.' },
+    { icon:'🏠', tip:'VRBO and Airbnb vacation homes near Disney (Kissimmee, Champions Gate) offer 2–4 bedroom units with kitchens often cheaper per night than Disney Value hotels.' },
+    { icon:'🔑', tip:'Annual Passholders get hotel discounts at both Disney (AP room-only offers) and Universal (AP discounts up to 25% off). Apply discount codes at booking.' },
+    { icon:'⭐', tip:'Disney Deluxe hotels justify their premium ONLY if you\'re maximizing Early Entry, Extended Evening Hours, and the transportation network. Otherwise, moderate or off-site is better value.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-orlando-hotels';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#1565C0,#2E7D32,#C62828);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Where to Stay in Orlando</div>
+          <div style="font-size:11px;opacity:.8;">Disney · Universal · I-Drive · Winter Park</div>
+        </div>
+        <span style="font-size:28px;">🏨</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        Where you stay dramatically affects your vacation. On-site Disney hotels provide genuine perks. On-site Universal often pays for itself. Off-site is best for value and flexibility.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    HOTEL_ZONES.forEach(zone => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:12px 14px;background:${zone.color}18;border-left:4px solid ${zone.color};">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+            <span style="font-size:22px;">${zone.emoji}</span>
+            <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--text-primary,#212121);">${zone.zone}</div>
+          </div>
+          <div style="font-size:10px;font-weight:700;color:${zone.color};">Best for: ${zone.bestFor}</div>
+        </div>
+        <div style="padding:10px 14px;">
+          <div style="display:flex;gap:8px;margin-bottom:10px;">
+            <div style="flex:1;background:#2E7D3210;border-radius:8px;padding:8px;">
+              <div style="font-size:9px;font-weight:700;color:#2E7D32;margin-bottom:3px;">✓ PROS</div>
+              ${zone.pros.map(p=>`<div style="font-size:10px;color:var(--text-secondary,#555);padding:1px 0;">${p}</div>`).join('')}
+            </div>
+            <div style="flex:1;background:#C6282810;border-radius:8px;padding:8px;">
+              <div style="font-size:9px;font-weight:700;color:#C62828;margin-bottom:3px;">✗ CONS</div>
+              ${zone.cons.map(c=>`<div style="font-size:10px;color:var(--text-secondary,#555);padding:1px 0;">${c}</div>`).join('')}
+            </div>
+          </div>
+          <div style="font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:6px;">RECOMMENDED HOTELS</div>
+          ${zone.hotels.map(h=>`<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:6px 0;border-bottom:1px solid var(--border,#eee);">
+            <div style="flex:1;margin-right:8px;">
+              <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);">${h.name}</div>
+              <div style="font-size:10px;color:var(--text-secondary,#666);">${h.note}</div>
+            </div>
+            <div style="text-align:right;flex-shrink:0;">
+              <div style="font-size:10px;font-weight:700;color:${zone.color};">${h.price}</div>
+              <div style="font-size:9px;color:var(--text-secondary,#aaa);">${h.tier}</div>
+            </div>
+          </div>`).join('')}
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const tipsCard = document.createElement('div');
+    tipsCard.style.cssText = 'background:linear-gradient(135deg,#1565C0,#2E7D32);border-radius:16px;margin-bottom:20px;padding:14px;color:#fff;';
+    tipsCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">💡 Hotel Booking Strategy</div>
+    ${BOOKING_TIPS.map(t=>`<div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
+      <span style="font-size:18px;flex-shrink:0;">${t.icon}</span>
+      <div style="font-size:12px;opacity:.95;line-height:1.5;">${t.tip}</div>
+    </div>`).join('')}`;
+    body.appendChild(tipsCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-orlando-hotels')) buildScreen();
+
+  const _prevSS_ttttt = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_ttttt) _prevSS_ttttt(name, el);
+    if (name === 'orlando-hotels') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-orlando-hotels');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectHotelsCard() {
+    if (document.getElementById('hotels-guide-home-card')) return true;
+    const ref = document.getElementById('sw-bg-home-card') || document.getElementById('transport-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'hotels-guide-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#1565C0,#2E7D32,#C62828);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('orlando-hotels');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🏨</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Where to Stay Guide</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Disney · Universal on-site · I-Drive · Winter Park</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _hotelsCard = false;
+  setInterval(() => { if (!_hotelsCard) _hotelsCard = injectHotelsCard(); }, 54000);
+  setTimeout(() => { _hotelsCard = injectHotelsCard(); }, 50500);
+  const _prevRH_ttttt = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_ttttt) _prevRH_ttttt.apply(this, arguments);
+    setTimeout(() => { _hotelsCard = false; _hotelsCard = injectHotelsCard(); }, 16600);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK UUUUU: Orlando Food Trucks & Hidden Gems Guide ===== */
+(function initOrlandoFoodHiddenGems() {
+
+  const HIDDEN_GEMS = [
+    {
+      name:'The Ravenous Pig', area:'Winter Park', emoji:'🐷', color:'#8B0000',
+      type:'Gastropub / Farm-to-table', price:'$$$',
+      why:'The restaurant that put Orlando on the national food map. James Beard-nominated James and Julie Petrakis built the definitive Florida gastropub. The charcuterie, craft cocktails, and Sunday brunch are extraordinary.',
+      mustOrder:['Pork belly BLT', 'Boar Bolognese', 'Local cheese board', 'Blood orange margarita'],
+      reservation:'Required — book 2–3 weeks ahead on Resy',
+    },
+    {
+      name:'Se7en Bites', area:'Milk District (Orlando)', emoji:'🥧', color:'#C9A96E',
+      type:'Southern comfort brunch', price:'$$',
+      why:'The most beloved breakfast spot in Orlando. Buttery biscuits, quiche, massive brunch plates, and homemade pastries. The line is part of the experience.',
+      mustOrder:['Biscuits and gravy (life-changing)', 'Pot pie', 'Any seasonal quiche', 'Banana pudding'],
+      reservation:'Walk-in only. Arrive before 9 AM on weekends.',
+    },
+    {
+      name:'Capa Steakhouse', area:'Four Seasons Orlando', emoji:'🥩', color:'#1a237e',
+      type:'Rooftop steakhouse', price:'$$$$',
+      why:'Spanish-influenced steakhouse on the Four Seasons rooftop with Magic Kingdom fireworks views from select tables. One of the most complete fine dining experiences in Central Florida.',
+      mustOrder:['Dry-aged prime cuts', 'Octopus appetizer', 'Smoked Spanish paprika butter', 'Churros dessert'],
+      reservation:'Essential — book 60 days in advance',
+    },
+    {
+      name:'Prato', area:'Park Avenue, Winter Park', emoji:'🍝', color:'#2E7D32',
+      type:'Northern Italian', price:'$$$',
+      why:'The best pasta in Central Florida. Handmade pasta program inspired by Northern Italy. Beautiful interior, Park Avenue location, and bar that stays open late.',
+      mustOrder:['Any handmade pasta (rotates seasonally)', 'Wood-fired flatbreads', 'Italian wine list', 'Negroni'],
+      reservation:'Recommended but not always required. Resy.',
+    },
+    {
+      name:'The Osprey Tavern', area:'Baldwin Park (Orlando)', emoji:'🦅', color:'#37474F',
+      type:'Coastal American', price:'$$$',
+      why:'The neighborhood restaurant that Winter Park residents fiercely guard. Excellent oyster bar, seasonal menu, exceptional craft cocktails. The wood-fire cooking technique shows through in every dish.',
+      mustOrder:['Raw bar (oysters)', 'Wood-fired chicken', 'Whole fish', 'Any citrus cocktail'],
+      reservation:'Highly recommended. OpenTable.',
+    },
+    {
+      name:'Yellow Dog Eats', area:'Gotha (30 min west)', emoji:'🌭', color:'#E65100',
+      type:'Gourmet sandwiches / BBQ', price:'$$',
+      why:'One of the most unique dining experiences in Florida — a vintage general store converted into a wildly creative sandwich/BBQ joint. 50+ sandwich combinations, local art on every wall. Worth the detour.',
+      mustOrder:['The Mama Mia (BBQ pork + coleslaw + pickles)', 'Sweet tea brined pulled pork sandwich', 'Any daily special'],
+      reservation:'Walk-in only',
+    },
+    {
+      name:'Paxia Alta Cocina Mexicana', area:'Downtown Orlando', emoji:'🇲🇽', color:'#C62828',
+      type:'Regional Mexican (not Tex-Mex)', price:'$$$',
+      why:'Authentic regional Mexican cuisine that has nothing to do with Tex-Mex chains. Mole negro, ceviche, mezcal cocktails, fresh tortillas. The most important Mexican restaurant in Orlando.',
+      mustOrder:['Mole negro (takes 3 days to prepare)', 'Ceviche', 'Tamales Oaxaqueños', 'Mezcal Negroni'],
+      reservation:'Recommended. Call or OpenTable.',
+    },
+    {
+      name:'Domu', area:'East End Market (Orlando)', emoji:'🍜', color:'#311B92',
+      type:'Japanese ramen', price:'$$',
+      why:'Voted best ramen outside of NYC and LA multiple times. Rich tonkotsu broths, handmade noodles, and creative flavor combinations. The line is real — go early or expect to wait.',
+      mustOrder:['Spicy Ninja (signature tonkotsu)', 'Black Garlic ramen', 'Kakuni pork belly', 'Japanese whisky highball'],
+      reservation:'Walk-in only — arrive at opening (11:30 AM) or expect 45+ min wait',
+    },
+    {
+      name:'The Boheme Restaurant', area:'Grand Bohemian Hotel (Downtown)', emoji:'🎸', color:'#5D4037',
+      type:'Contemporary American', price:'$$$',
+      why:'Inside the Grand Bohemian Hotel\'s extraordinary art collection. The restaurant is itself a gallery. Extensive wine program, excellent weekend brunch, and one of the most beautiful dining rooms in Orlando.',
+      mustOrder:['Weekend brunch: eggs benedict options', 'Grouper', 'Local mushroom dishes', 'The Bohemian cocktail'],
+      reservation:'Recommended. Call or OpenTable.',
+    },
+  ];
+
+  const FOOD_TRUCKS = [
+    { name:'Hunger Street Tacos', type:'Tacos', note:'James Beard Award semifinalist operation. The absolute best tacos in Orlando, period. Find location via Instagram.' },
+    { name:'The Yardbird Food Truck', type:'Southern BBQ', note:'Competition-level BBQ from a truck. Check Instagram for schedule — usually weekend events.' },
+    { name:'EverythingU (East End Market area)', type:'Various trucks at market', note:'East End Market food hall hosts rotating vendors. The entire complex is worth exploring.' },
+    { name:'Condado Tacos', type:'Build-your-own tacos', note:'Growing chain with outstanding customizable tacos. Multiple Orlando locations. Excellent margaritas.' },
+    { name:'Orlando Food Truck Bazaar', type:'Multi-truck events', note:'Regular pop-up events throughout the metro area. Check local Facebook groups for schedule.' },
+  ];
+
+  const LOCAL_MARKETS = [
+    { name:'East End Market', desc:'Curated food hall with local vendors: Lineage Coffee, Gideon\'s Bakehouse (cookie phenomenon), Domu ramen, local produce. The best food market in Orlando.' },
+    { name:'Winter Park Saturday Farmer\'s Market', desc:'Every Saturday 7 AM – 1 PM at the train station. Fresh produce, local honey, artisanal food vendors. 40+ years tradition.' },
+    { name:'Audubon Park Community Market', desc:'Tuesday evenings in the Milk District. Local neighborhood market with emphasis on organic and locally sourced food.' },
+    { name:'Orlando Saturday Market (Downtown)', desc:'Sundays at Lake Eola. Larger than Winter Park market. Arts, crafts, and food mixed together.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-orlando-food-gems';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#8B0000,#C9A96E,#2E7D32);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Hidden Gems & Local Food</div>
+          <div style="font-size:11px;opacity:.8;">Secret restaurants · Food trucks · Markets</div>
+        </div>
+        <span style="font-size:28px;">🍽️</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        Orlando's real food scene exists entirely outside the theme parks. These are the restaurants that locals fight over, that food critics travel to visit, and that most tourists never find.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    HIDDEN_GEMS.forEach(gem => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:10px 14px;background:${gem.color}18;border-left:4px solid ${gem.color};">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div style="display:flex;gap:8px;align-items:center;">
+              <span style="font-size:20px;">${gem.emoji}</span>
+              <div>
+                <div style="font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${gem.name}</div>
+                <div style="font-size:10px;color:var(--text-secondary,#888);">${gem.area} · ${gem.type} · ${gem.price}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;margin-bottom:8px;">${gem.why}</div>
+          <div style="font-size:10px;font-weight:700;color:${gem.color};margin-bottom:4px;">MUST ORDER</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;">
+            ${gem.mustOrder.map(m=>`<span style="font-size:10px;padding:2px 8px;background:${gem.color}18;color:${gem.color};border-radius:20px;">${m}</span>`).join('')}
+          </div>
+          <div style="font-size:11px;font-weight:600;color:var(--text-secondary,#666);">📅 ${gem.reservation}</div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    /* Food Trucks */
+    const ftCard = document.createElement('div');
+    ftCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+    ftCard.innerHTML = `<div style="padding:12px 14px;background:linear-gradient(135deg,#E65100,#F57F17);color:#fff;">
+      <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;">🚚 Best Food Trucks & Mobile Dining</div>
+    </div>
+    <div style="padding:12px 14px;">
+      ${FOOD_TRUCKS.map(ft=>`<div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border,#eee);">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+          <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${ft.name}</div>
+          <span style="font-size:9px;padding:2px 6px;background:#E6500018;color:#E65100;border-radius:20px;font-weight:700;">${ft.type}</span>
+        </div>
+        <div style="font-size:11px;color:var(--text-secondary,#666);">${ft.note}</div>
+      </div>`).join('')}
+    </div>`;
+    body.appendChild(ftCard);
+
+    const mkCard = document.createElement('div');
+    mkCard.style.cssText = 'background:linear-gradient(135deg,#2E7D32,#558B2F);border-radius:16px;margin-bottom:20px;padding:14px;color:#fff;';
+    mkCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">🥬 Local Markets Worth Visiting</div>
+    ${LOCAL_MARKETS.map(m=>`<div style="margin-bottom:10px;">
+      <div style="font-size:13px;font-weight:700;margin-bottom:3px;">${m.name}</div>
+      <div style="font-size:12px;opacity:.9;line-height:1.5;">${m.desc}</div>
+    </div>`).join('')}`;
+    body.appendChild(mkCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-orlando-food-gems')) buildScreen();
+
+  const _prevSS_uuuuu = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_uuuuu) _prevSS_uuuuu(name, el);
+    if (name === 'orlando-food-gems') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-orlando-food-gems');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectFoodGemsCard() {
+    if (document.getElementById('food-gems-home-card')) return true;
+    const ref = document.getElementById('hotels-guide-home-card') || document.getElementById('sw-bg-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'food-gems-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#8B0000,#C9A96E,#2E7D32);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('orlando-food-gems');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🍽️</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Hidden Gems & Local Food</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Ravenous Pig · Domu Ramen · Se7en Bites · Markets</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _foodGemsCard = false;
+  setInterval(() => { if (!_foodGemsCard) _foodGemsCard = injectFoodGemsCard(); }, 55000);
+  setTimeout(() => { _foodGemsCard = injectFoodGemsCard(); }, 51500);
+  const _prevRH_uuuuu = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_uuuuu) _prevRH_uuuuu.apply(this, arguments);
+    setTimeout(() => { _foodGemsCard = false; _foodGemsCard = injectFoodGemsCard(); }, 17000);
+  };
+})();
+</script>
