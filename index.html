@@ -52558,3 +52558,406 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK RRRRR: Orlando Transportation & Getting Around Guide ===== */
+(function initOrlandoTransport() {
+
+  const TRANSPORT_OPTIONS = [
+    {
+      name:'Rental Car', emoji:'🚗', color:'#1565C0',
+      bestFor:'Maximum flexibility, multiple parks across the trip, day trips',
+      cost:'$40–80/day + fuel + parking ($30–45/day at Disney)',
+      pros:['Go anywhere anytime', 'Day trips to beaches, KSC easily', 'No waiting for schedules', 'Essential for nature/outdoor activities'],
+      cons:['Disney parking adds $30–45/day', 'Downtown Orlando parking difficult', 'Traffic on I-4 is notoriously bad'],
+      tip:'Book well in advance through MCO airport for best rates. Major brands at the rental car facility connected to the terminal. Bypass CDW if your credit card covers rental car insurance (most Visa/MC Signature do).',
+    },
+    {
+      name:'Disney\'s Magical Express Successor / Mears Connect', emoji:'🚌', color:'#0B77BD',
+      bestFor:'Disney-only trips staying on-site',
+      cost:'$32–39/person round trip (Mears Connect standard)',
+      pros:['Direct MCO to Disney resort', 'Shared shuttle — no navigation', 'Premium option for more private experience'],
+      cons:['Disney\'s original free service ended — now paid', 'Can take 90+ minutes with multiple resort stops', 'Limited to Disney area'],
+      tip:'If staying exclusively at Disney and doing only Disney parks, Mears Connect is perfectly adequate. For trips involving Universal, KSC, beaches — rent a car.',
+    },
+    {
+      name:'Lyft / Uber', emoji:'📱', color:'#E91E63',
+      bestFor:'Occasional rides, nights out, avoiding parking',
+      cost:'$15–40 depending on destination and time',
+      pros:['Available at all hours', 'No parking costs', 'Good for nightlife/restaurants', 'Easy airport pickup'],
+      cons:['Surge pricing during park close times', 'Post-event (Magic after-dark) surge can be extreme', 'Not cost-effective for park visits'],
+      tip:'Outstanding for Disney Springs evening, Downtown Orlando bars, or when you don\'t want to deal with parking. During park closing times (especially Disney), order your Uber 20+ minutes before you exit the park.',
+    },
+    {
+      name:'Disney Transportation System', emoji:'🏰', color:'#7B1FA2',
+      bestFor:'Disney resort guests moving between Disney properties',
+      cost:'Free for Disney resort guests',
+      pros:['Free buses, boats, and monorail', 'Disney Springs to parks', 'Skyliner gondola (EPCOT/Hollywood Studios area resorts)', 'No need for rental car for Disney-only trip'],
+      cons:['Buses can take 45–90 min resort-to-park', 'No service to Universal or I-Drive', 'Buses run on Disney schedule, not yours'],
+      tip:'The Skyliner gondola (connecting Caribbean Beach, Art of Animation, Pop Century to EPCOT/Hollywood Studios) is one of Disney\'s best transportation experiences — free, scenic, fast. Use it instead of buses when possible.',
+    },
+    {
+      name:'I-Ride Trolley', emoji:'🚋', color:'#FF6D00',
+      bestFor:'I-Drive corridor movement',
+      cost:'$5/day, $9/3 days, $18/week unlimited',
+      pros:['Connects ICON Park to SeaWorld', 'Convenient for I-Drive hotels', 'Avoids traffic within the corridor'],
+      cons:['I-Drive only — doesn\'t reach Disney or Universal', 'Stops frequently', 'Slow compared to rideshare'],
+      tip:'Great value for families staying on I-Drive. The day pass covers unlimited rides — useful for moving up and down the strip without parking hassles. Stop list covers most I-Drive hotels and attractions.',
+    },
+    {
+      name:'SunRail (Commuter Rail)', emoji:'🚂', color:'#2E7D32',
+      bestFor:'Downtown Orlando access for locals and some tourist use',
+      cost:'$2–4 per ride',
+      pros:['Connects DeBary, Orlando, Poinciana', 'Bypasses I-4 traffic completely', 'Useful for downtown events'],
+      cons:['Doesn\'t reach theme parks or I-Drive', 'Limited hours (ends ~9 PM weekdays, no Sunday service)'],
+      tip:'Underutilized gem for visiting downtown Orlando without parking. Connects to several neighborhoods and the main downtown station. Not useful for theme park visits but excellent for Amway Center events.',
+    },
+  ];
+
+  const PARKING_GUIDE = [
+    { venue:'Magic Kingdom', cost:'$30/day surface, $40 preferred', tip:'Take the Disney monorail or ferry from the TTC parking lot — this is part of the experience. Arrive 75 min before park open.' },
+    { venue:'EPCOT', cost:'$30/day surface, $40 preferred', tip:'EPCOT parking lot is enormous. Use your parking lot row marker photo to find your car at end of day.' },
+    { venue:'Hollywood Studios', cost:'$30/day surface, $40 preferred', tip:'Skyliner guests can park at EPCOT and take gondola to HS — saves $30/day. EPCOT parking included with EPCOT admission.' },
+    { venue:'Animal Kingdom', cost:'$30/day surface, $40 preferred', tip:'Most distant Disney park from hotels. Morning rope drop is critical — get there 75 min early.' },
+    { venue:'Universal Studios/IoA/Epic Universe', cost:'$30 general, $50–60 preferred or garage', tip:'On-site hotel guests park for free. General parking garage is connected to CityWalk — easy walk.' },
+    { venue:'Disney Springs', cost:'Free in all garages', tip:'Park in Lime Garage or Orange Garage (both free). Arrive before noon on weekends.' },
+    { venue:'Downtown Orlando (nightlife)', cost:'$10–20 street/garage', tip:'Numerous public garages near Wall Street Plaza. Church Street Garage is usually cheaper. Expect $5+ for surface lots.' },
+  ];
+
+  const GETTING_AROUND_TIPS = [
+    { icon:'📍', tip:'Book your accommodations on or near the specific resort/area you\'ll spend the most time. Staying on Disney property saves 2+ hours/day in transportation.' },
+    { icon:'🕐', tip:'I-4 is Orlando\'s main artery and is consistently ranked one of the most dangerous highways in the US. Leave early and use traffic apps (Waze, Google Maps) to route around backups.' },
+    { icon:'🚘', tip:'Highway exits near Disney (Exit 65–68) and Universal (Exit 74) are heavily congested during park opening times (8–10 AM) and closing times (8–11 PM). Plan around these windows.' },
+    { icon:'📱', tip:'Set Google Maps to "Avoid Tolls" if you don\'t have SunPass (Florida\'s E-ZPass equivalent). Rental cars without SunPass incur plate fees + a $15/day administrative charge from the rental company.' },
+    { icon:'⛽', tip:'Gas stations near theme parks are expensive. Fill up at Costco, Sam\'s Club, or Walmart gas stations 5+ miles from the parks for significantly lower prices.' },
+    { icon:'🛫', tip:'MCO (Orlando International Airport) is one of the busiest in the US. Budget 90 minutes for departure — security lines can be 45+ min. Terminal C is the newest and least crowded security.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-orlando-transport';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#1565C0,#0B77BD,#2E7D32);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Getting Around Orlando</div>
+          <div style="font-size:11px;opacity:.8;">Rental cars · Disney transit · Rideshare · Parking</div>
+        </div>
+        <span style="font-size:28px;">🗺️</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        Orlando is a driving city. Unlike New York or Chicago, public transit does not connect the main attractions. Understanding your transportation options before arriving saves significant time and money.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    TRANSPORT_OPTIONS.forEach(opt => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:12px 14px;background:${opt.color}18;border-left:4px solid ${opt.color};">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:26px;">${opt.emoji}</span>
+            <div style="flex:1;">
+              <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--text-primary,#212121);">${opt.name}</div>
+              <div style="font-size:10px;color:${opt.color};font-weight:700;">Cost: ${opt.cost}</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          <div style="font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:4px;">BEST FOR: <span style="color:${opt.color};">${opt.bestFor}</span></div>
+          <div style="display:flex;gap:8px;margin:8px 0;">
+            <div style="flex:1;background:#2E7D3210;border-radius:8px;padding:8px;">
+              <div style="font-size:9px;font-weight:700;color:#2E7D32;margin-bottom:4px;">✓ PROS</div>
+              ${opt.pros.map(p=>`<div style="font-size:10px;color:var(--text-secondary,#555);padding:1px 0;">${p}</div>`).join('')}
+            </div>
+            <div style="flex:1;background:#C6282810;border-radius:8px;padding:8px;">
+              <div style="font-size:9px;font-weight:700;color:#C62828;margin-bottom:4px;">✗ CONS</div>
+              ${opt.cons.map(c=>`<div style="font-size:10px;color:var(--text-secondary,#555);padding:1px 0;">${c}</div>`).join('')}
+            </div>
+          </div>
+          <div style="display:flex;gap:6px;background:${opt.color}0d;border-radius:8px;padding:7px;">
+            <span style="font-size:12px;flex-shrink:0;">💡</span>
+            <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${opt.tip}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const parkCard = document.createElement('div');
+    parkCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+    parkCard.innerHTML = `<div style="padding:12px 14px;background:linear-gradient(135deg,#1565C0,#0B77BD);color:#fff;">
+      <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;">🅿️ Parking Guide</div>
+    </div>
+    <div style="padding:12px 14px;">
+      ${PARKING_GUIDE.map(p=>`<div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border,#eee);">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3px;">
+          <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${p.venue}</div>
+          <span style="font-size:10px;font-weight:700;color:#C62828;flex-shrink:0;margin-left:8px;">${p.cost}</span>
+        </div>
+        <div style="font-size:11px;color:var(--text-secondary,#666);">${p.tip}</div>
+      </div>`).join('')}
+    </div>`;
+    body.appendChild(parkCard);
+
+    const tipsCard = document.createElement('div');
+    tipsCard.style.cssText = 'background:linear-gradient(135deg,#1565C0,#2E7D32);border-radius:16px;margin-bottom:20px;padding:14px;color:#fff;';
+    tipsCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">🗺️ Essential Orlando Navigation Tips</div>
+    ${GETTING_AROUND_TIPS.map(t=>`<div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
+      <span style="font-size:18px;flex-shrink:0;">${t.icon}</span>
+      <div style="font-size:12px;opacity:.95;line-height:1.5;">${t.tip}</div>
+    </div>`).join('')}`;
+    body.appendChild(tipsCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-orlando-transport')) buildScreen();
+
+  const _prevSS_rrrrr = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_rrrrr) _prevSS_rrrrr(name, el);
+    if (name === 'orlando-transport') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-orlando-transport');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectTransportCard() {
+    if (document.getElementById('transport-home-card')) return true;
+    const ref = document.getElementById('epcot-ws-home-card') || document.getElementById('sports-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'transport-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#1565C0,#0B77BD,#2E7D32);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('orlando-transport');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🗺️</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Getting Around Orlando</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Rental cars · Disney transit · Parking · I-4 tips</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _transCard = false;
+  setInterval(() => { if (!_transCard) _transCard = injectTransportCard(); }, 52000);
+  setTimeout(() => { _transCard = injectTransportCard(); }, 48500);
+  const _prevRH_rrrrr = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_rrrrr) _prevRH_rrrrr.apply(this, arguments);
+    setTimeout(() => { _transCard = false; _transCard = injectTransportCard(); }, 15800);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK SSSSS: SeaWorld & Busch Gardens Complete Guide ===== */
+(function initSeaWorldBuschGardens() {
+
+  const SEAWORLD_RIDES = [
+    { name:'Ice Breaker', type:'Launched coaster', thrill:'High', wait:'30–60 min', ll:true,
+      tip:'Multi-directional launched coaster with four launches and a 93-foot beyond-vertical spike. One of the best coasters in Florida. Morning or Lightning Lane.' },
+    { name:'Mako', type:'Hypercoaster', thrill:'High', wait:'30–60 min', ll:true,
+      tip:'Tallest, fastest coaster in Florida at 200 feet and 73 mph. Airtime-focused with massive hills. Front row for the complete experience.' },
+    { name:'Manta', type:'Flying coaster', thrill:'High', wait:'30–50 min', ll:false,
+      tip:'You fly face-down like a ray through hills, spirals, and a water skim. Incredibly unique sensation — unlike any other coaster type.' },
+    { name:'Kraken (VR optional)', type:'Floorless coaster', thrill:'High', wait:'20–45 min', ll:false,
+      tip:'Classic floorless coaster with 7 inversions. One of the most reliable and consistent coasters in Florida. VR option adds a different experience layer.' },
+    { name:'Emperor', type:'Dive coaster', thrill:'High', wait:'20–40 min', ll:false,
+      tip:'Hold on the edge of a 200-foot drop for 4 seconds then plunge straight down. Front row is unmatched. Straddles the line between "waiting for doom" and "exhilarating."' },
+    { name:'Journey to Atlantis', type:'Water coaster', thrill:'Moderate', wait:'20–40 min', ll:false,
+      tip:'Part water ride, part coaster. You WILL get wet. Classic SeaWorld attraction — fun summer cool-down.' },
+    { name:'Sesame Street Bay of Play', type:'Family area', thrill:'Low', wait:'10–20 min', ll:false,
+      tip:'Three kid-friendly rides for the youngest guests. Elmo\'s Choo Choo Train, Sky Ride, and more. Perfect for families with toddlers.' },
+  ];
+
+  const SEAWORLD_ANIMAL = [
+    { name:'Orca Encounter', emoji:'🐋', tip:'SeaWorld moved away from performing orca shows but the "Orca Encounter" presents behavioral demonstrations in an educational format. Still remarkable to see the animals up close.' },
+    { name:'Dolphin Days', emoji:'🐬', tip:'Dolphin behavioral show with incredible jumping and acrobatics. More performance-oriented than orca presentation. Fun for all ages.' },
+    { name:'Sea Lion High', emoji:'🦭', tip:'Comedy sea lion show — surprisingly funny for adults. One of the best entertainment experiences at SeaWorld.' },
+    { name:'Wild Arctic & Penguin Trek', emoji:'🐧', tip:'Penguin Trek is a walk-through Antarctic exhibit with hundreds of penguins. Wild Arctic has beluga whales. Both are walkable — no wait required.' },
+    { name:'Shark Encounter', emoji:'🦈', tip:'Walk through an underwater acrylic tunnel with sharks swimming overhead. One of the largest shark exhibits in the US.' },
+    { name:'Touch Pools', emoji:'🦀', tip:'Touch Atlantic stingrays at the Stingray Lagoon. Free with admission. Gentle rays that respond positively to gentle touch.' },
+  ];
+
+  const BUSCH_GARDENS = [
+    { name:'Iron Gwazi', type:'RMC Hybrid coaster', thrill:'Extreme', wait:'45–90 min',
+      tip:'Voted best roller coaster in the world multiple times. A wooden track rebuilt with steel — 206 feet tall, 76 mph, 13 inversions. Do NOT miss. Rope drop or Lightning Lane.' },
+    { name:'Tigris', type:'Premier Skyrocket II', thrill:'High', wait:'20–40 min',
+      tip:'Single-rail launched coaster that reaches 150 feet. Three launches, 60 mph. Compact but intense. Usually a shorter wait than Iron Gwazi.' },
+    { name:'Cheetah Hunt', type:'Multi-launch coaster', thrill:'High', wait:'30–60 min',
+      tip:'Beautiful outdoor coaster themed to African landscape. Three launches reaching 60 mph. Smooth, scenic, and excellent for coaster beginners who want a step up.' },
+    { name:'Montu', type:'Inverted coaster', thrill:'High', wait:'20–40 min',
+      tip:'Hanging feet coaster with 7 inversions. Classic B&M inverted coaster — smooth, intense, reliable. Often has a shorter wait than flagship rides.' },
+    { name:'SheiKra', type:'Dive coaster', thrill:'Extreme', wait:'20–40 min',
+      tip:'90-degree drop, 200 feet, 70 mph. Florida\'s first dive coaster and still one of the best. Unique 27-passenger wide-body car — 3 across.' },
+    { name:'Cobra\'s Curse', type:'Family coaster', thrill:'Moderate', wait:'30–50 min',
+      tip:'Spinning family coaster with Egyptian theme. Perfect transition coaster for older kids not yet ready for Iron Gwazi.' },
+    { name:'Kumba', type:'Classic B&M sit-down', thrill:'High', wait:'15–30 min',
+      tip:'One of the greatest roller coasters ever built (1993). Still smooth, still intense. 7 inversions, incredible roar. Walk-on possible — go immediately.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-seaworld-bg';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#006994,#1B5E20,#F57F17);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">SeaWorld & Busch Gardens</div>
+          <div style="font-size:11px;opacity:.8;">Orlando coasters · Animal encounters · Tampa thrills</div>
+        </div>
+        <span style="font-size:28px;">🐋</span>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:15px;font-weight:800;">#1</div><div style="font-size:9px;opacity:.8;">WORLD COASTER</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:15px;font-weight:800;">200ft</div><div style="font-size:9px;opacity:.8;">MAKO HEIGHT</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:15px;font-weight:800;">1.5h</div><div style="font-size:9px;opacity:.8;">TO BUSCH GARDENS</div>
+        </div>
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    /* SeaWorld section */
+    const swHeader = document.createElement('div');
+    swHeader.style.cssText = 'background:linear-gradient(135deg,#006994,#0277BD);border-radius:12px;padding:12px 14px;margin-bottom:12px;color:#fff;';
+    swHeader.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;margin-bottom:4px;">🌊 SeaWorld Orlando</div>
+    <div style="font-size:11px;opacity:.85;">Best for: Animal encounters + serious coasters · All ages · ~$60–80 online</div>`;
+    body.appendChild(swHeader);
+
+    SEAWORLD_RIDES.forEach(r => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:12px;margin-bottom:8px;padding:10px 12px;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px;">
+          <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${r.name}</div>
+          <div style="display:flex;gap:4px;">
+            ${r.ll?'<span style="background:#FF6D0018;color:#FF6D00;font-size:9px;font-weight:800;padding:2px 6px;border-radius:20px;">LL</span>':''}
+            <span style="font-size:9px;padding:2px 8px;border-radius:20px;font-weight:700;background:${r.thrill==='High'?'#1565C018':r.thrill==='Extreme'?'#C6282818':'#2E7D3218'};color:${r.thrill==='High'?'#1565C0':r.thrill==='Extreme'?'#C62828':'#2E7D32'};">${r.thrill}</span>
+          </div>
+        </div>
+        <div style="font-size:10px;color:var(--text-secondary,#888);margin-bottom:4px;">${r.type} · Wait: ${r.wait}</div>
+        <div style="font-size:11px;color:var(--text-secondary,#666);">${r.tip}</div>`;
+      body.appendChild(card);
+    });
+
+    const animalHeader = document.createElement('div');
+    animalHeader.style.cssText = 'background:rgba(0,105,148,.1);border-radius:10px;padding:8px 12px;margin:10px 0 8px;border-left:4px solid #006994;';
+    animalHeader.innerHTML = `<div style="font-size:12px;font-weight:700;color:#006994;">🐬 Animal Encounters & Shows</div>`;
+    body.appendChild(animalHeader);
+
+    SEAWORLD_ANIMAL.forEach(a => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:12px;margin-bottom:8px;padding:10px 12px;border:1px solid var(--border,#eee);';
+      card.innerHTML = `<div style="display:flex;gap:8px;align-items:flex-start;">
+        <span style="font-size:20px;flex-shrink:0;">${a.emoji}</span>
+        <div><div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:3px;">${a.name}</div>
+        <div style="font-size:11px;color:var(--text-secondary,#666);">${a.tip}</div></div>
+      </div>`;
+      body.appendChild(card);
+    });
+
+    /* Busch Gardens section */
+    const bgHeader = document.createElement('div');
+    bgHeader.style.cssText = 'background:linear-gradient(135deg,#1B5E20,#2E7D32);border-radius:12px;padding:12px 14px;margin:14px 0 12px;color:#fff;';
+    bgHeader.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;margin-bottom:4px;">🦁 Busch Gardens Tampa</div>
+    <div style="font-size:11px;opacity:.85;">1.5 hours west · Best roller coasters in the southeastern US · Iron Gwazi is legitimately world #1</div>`;
+    body.appendChild(bgHeader);
+
+    BUSCH_GARDENS.forEach(r => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:12px;margin-bottom:8px;padding:10px 12px;border:1px solid var(--border,#eee);';
+      const thrillColor = r.thrill==='Extreme'?'#C62828':r.thrill==='High'?'#1565C0':'#2E7D32';
+      card.innerHTML = `
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px;">
+          <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${r.name}</div>
+          <span style="font-size:9px;padding:2px 8px;border-radius:20px;font-weight:700;background:${thrillColor}18;color:${thrillColor};">${r.thrill}</span>
+        </div>
+        <div style="font-size:10px;color:var(--text-secondary,#888);margin-bottom:4px;">${r.type} · Wait: ${r.wait}</div>
+        <div style="font-size:11px;color:var(--text-secondary,#666);">${r.tip}</div>`;
+      body.appendChild(card);
+    });
+
+    const combineCard = document.createElement('div');
+    combineCard.style.cssText = 'background:linear-gradient(135deg,#006994,#1B5E20);border-radius:16px;margin-bottom:20px;padding:14px;color:#fff;margin-top:8px;';
+    combineCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">🎯 Planning Tips</div>
+    ${[
+      'SeaWorld is best for a single full day. Arrive at rope drop, do all 6 coasters before noon, then relax with animal exhibits and shows in the afternoon.',
+      'Busch Gardens pairs perfectly with Clearwater Beach — Tampa day trip: Iron Gwazi at BG in the morning, Clearwater Beach in the afternoon, excellent Tampa dinner.',
+      'SeaWorld + Busch Gardens annual pass holders can often add the other park for a small fee. Worth checking for multi-day visitors.',
+      'Neither park has the ADR complexity of Disney. Walk-up dining is fine. Counter service options are good quality for theme park food.',
+      'Both parks have single-rider lines at major attractions. Busch Gardens single rider at Iron Gwazi can save 60+ minutes.',
+    ].map(t=>`<div style="display:flex;gap:8px;margin-bottom:8px;align-items:flex-start;"><span style="font-size:12px;flex-shrink:0;">★</span><div style="font-size:12px;opacity:.95;line-height:1.5;">${t}</div></div>`).join('')}`;
+    body.appendChild(combineCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-seaworld-bg')) buildScreen();
+
+  const _prevSS_sssss = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_sssss) _prevSS_sssss(name, el);
+    if (name === 'seaworld-bg') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-seaworld-bg');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectSWCard() {
+    if (document.getElementById('sw-bg-home-card')) return true;
+    const ref = document.getElementById('transport-home-card') || document.getElementById('epcot-ws-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'sw-bg-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#006994,#1B5E20,#F57F17);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('seaworld-bg');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🐋</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">SeaWorld & Busch Gardens</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Mako · Iron Gwazi · Orca Encounter · Animal exhibits</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _swCard = false;
+  setInterval(() => { if (!_swCard) _swCard = injectSWCard(); }, 53000);
+  setTimeout(() => { _swCard = injectSWCard(); }, 49500);
+  const _prevRH_sssss = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_sssss) _prevRH_sssss.apply(this, arguments);
+    setTimeout(() => { _swCard = false; _swCard = injectSWCard(); }, 16200);
+  };
+})();
+</script>
