@@ -48400,3 +48400,160 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK XXXX2: Theme Park Scavenger Hunt & Hidden Details ===== */
+(function initScavengerHunt() {
+
+  const HUNTS = [
+    {
+      park:'Magic Kingdom', emoji:'🏰', color:'#003087',
+      items:[
+        { name:'Find the 5-pointed star on Main Street', clue:'Look at the patterns on the ground near Main Street U.S.A. as you enter. Hidden five-pointed stars are embedded in the pavement at intervals.' },
+        { name:'The Haunted Mansion Pet Cemetery', clue:'In the queue line for Haunted Mansion, explore the pet cemetery before entering the mansion. Each tombstone is for a specific beloved pet with a personalized epitaph.' },
+        { name:'Roy O. Disney & Minnie on Main Street', clue:'While everyone photographs the Cinderella Castle, look for the bronze statue of Roy O. Disney (Walt\'s brother) sitting on a bench on Main Street, with Minnie Mouse beside him.' },
+        { name:'Hidden Mickey in Space Mountain', clue:'On the Space Mountain loading area ceiling, a very large three-circle Hidden Mickey is formed by the control console lights. Look straight up as you board.' },
+        { name:'Walt\'s Apartment Window on Main Street', clue:'Look at the windows above the shops on Main Street. There is a lamp always lit in one of the upper windows — Walt Disney kept this apartment to stay at the park. The light is kept on in his honor.' },
+        { name:'The Utilidor Entrance', clue:'Near the base of Cinderella Castle, maintenance cast members access the underground utilidor tunnels. Look for low-profile doors that seem to be parts of themed buildings but lead underground.' },
+      ]
+    },
+    {
+      park:'EPCOT', emoji:'🌍', color:'#005B9A',
+      items:[
+        { name:'Hidden Mickey in Spaceship Earth', clue:'Near the scene where ancient humans are developing tools (early in the ride), look for three circular rock formations that create a Hidden Mickey.' },
+        { name:'The Backwards Fountain at EPCOT\'s Entrance', clue:'The fountains near Spaceship Earth appear to flow backwards — water runs up. This is achieved through carefully timed jets and cylindrical water "rods" moving upward.' },
+        { name:'Hidden Tiffany Lamps in France', clue:'Inside the shops in the France Pavilion, replicas of actual Tiffany glass lamps are displayed. Most visitors walk past them without realizing the craftsmanship.' },
+        { name:'The Secret Garden in the Morocco Pavilion', clue:'Walk through the Morocco Pavilion shops all the way to the back, behind the Tangierine Café. There is a small secret garden courtyard that most visitors never find.' },
+        { name:'Norway\'s Stave Church', clue:'The Norway Pavilion has a faithful reproduction of a 12th-century Norwegian stave church. Inside is a small museum with genuine Viking artifacts on loan from Norwegian museums.' },
+        { name:'The Mexico Pyramid Interior', clue:'Enter the Mexico Pyramid (La Hacienda de San Angel/Cantina de San Angel is outside, but enter the pyramid itself). Inside is an entire river ride, museum, restaurants, and shops — not just a dining hall as most visitors assume.' },
+      ]
+    },
+    {
+      park:'Hollywood Studios', emoji:'🎬', color:'#37474F',
+      items:[
+        { name:'The Resistance Message in Galaxy\'s Edge', clue:'Look for flickering screens and audio players throughout Galaxy\'s Edge that transmit Resistance messages. Download the Play Disney Parks app and use the "intercept transmissions" feature to find hidden messages.' },
+        { name:'The Droids in the Droid Depot Window', clue:'Look through the Droid Depot windows when the shop is closed. Droids are set up in specific positions that change — they appear to have moved on their own.' },
+        { name:'Keystone Sparkling Water bottle prop', clue:'In the 1950s-themed Echo Lake area, look for an extremely large prop bottle of Keystone Sparkling Water. It\'s a vintage prop that most guests walk past without noticing.' },
+        { name:'The Tower of Terror \"Boiler Room\" Loading Area', clue:'In the Twilight Zone Tower of Terror pre-show waiting area, there are details from the fictional "Hollywood Tower Hotel" embedded everywhere — room keys, a creepy letter, and props from the "missing guests."' },
+        { name:'Muppets Fountain Hidden Easter Eggs', clue:'Outside the Muppet*Vision 3D theater, the queue and exterior have dozens of Muppets jokes hidden in the architecture, signs, and props. Read everything — most are hilarious.' },
+      ]
+    },
+    {
+      park:'Animal Kingdom', emoji:'🦁', color:'#33691E',
+      items:[
+        { name:'The Tree of Life from behind', clue:'Walk around the Tree of Life to the back side. Most guests only see the front. The back has animals that the front doesn\'t — and a completely different perspective of the 14-story structure.' },
+        { name:'324 animals carved into the Tree of Life', clue:'The Tree of Life\'s bark contains 325 carved animals (one is fictional/hidden). Try to find as many as possible before entering the attached theater show.' },
+        { name:'The Wild Africa Trek Wildlife', clue:'Walk the Gorilla Falls Exploration Trail (free, no ticket needed) in Africa. It winds through actual gorilla habitats with glass viewing. Not a ride — a walking trail that 80% of Animal Kingdom guests miss.' },
+        { name:'Pandora Bio-Luminescence at Night', clue:'Stay until after 7pm and walk through Pandora. The ground, plants, and structures all glow with bio-luminescent light effects that only activate after dark. Completely transforms the land.' },
+        { name:'The Hidden Relic in Expedition Everest Queue', clue:'The Expedition Everest queue is an entire museum of Himalayan exploration artifacts. Near the mid-point, there is a plaque dedicated to the fictional expedition team that "never returned." Look for specific names.' },
+      ]
+    },
+    {
+      park:'Universal Wizarding World', emoji:'⚡', color:'#1a237e',
+      items:[
+        { name:'The Monster Book of Monsters', clue:'In Diagon Alley, look for an actual Monster Book of Monsters from the Harry Potter films displayed in a shop window. It appears to move/breathe.' },
+        { name:'Knockturn Alley Secret Entrance', clue:'There is a second entrance to Knockturn Alley in Diagon Alley that most visitors miss — look for a dark passage between shops rather than the main entrance.' },
+        { name:'Dragon on top of Gringotts Bank', clue:'Look up at the top of the Gringotts Bank in Diagon Alley. The dragon periodically breathes real fire. Most guests are inside the building on the ride and miss the exterior dragon entirely.' },
+        { name:'The Hog\'s Head Pub Boar', clue:'In the Hog\'s Head pub in Hogsmeade, the actual Hog\'s Head (the boar trophy behind the bar) is animatronic and moves. Most visitors are drinking Butterbeer and miss this detail.' },
+        { name:'Interactive Wand Spell Locations Map', clue:'There is a free paper map of all interactive wand spell locations in Hogsmeade and Diagon Alley. Get it at any wand shop. Most wand-owners don\'t know all 20+ locations exist.' },
+      ]
+    },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-scavenger-hunt';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const header = document.createElement('div');
+    header.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#4A148C,#7B1FA2,#AB47BC);padding:16px 14px 14px;';
+    header.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:#fff;">Scavenger Hunt & Hidden Details</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">5 parks · 30 hidden secrets · For all ages</div>
+        </div>
+        <span style="font-size:24px;">🔎</span>
+      </div>
+      <div style="background:rgba(255,255,255,.12);border-radius:8px;padding:7px 12px;font-size:11px;color:rgba(255,255,255,.9);">
+        These parks are filled with details that 99% of visitors never notice. This scavenger hunt turns a park day into a discovery mission — perfect for return visitors and detail-obsessed first-timers.
+      </div>`;
+
+    const content = document.createElement('div');
+    content.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    HUNTS.forEach(park => {
+      const parkHeader2 = document.createElement('div');
+      parkHeader2.style.cssText = `background:${park.color};border-radius:10px 10px 0 0;padding:8px 14px;margin-top:12px;display:flex;align-items:center;gap:8px;`;
+      parkHeader2.innerHTML = `<span style="font-size:18px;">${park.emoji}</span><div style="font-size:13px;font-weight:700;color:#fff;">${park.park}</div>`;
+      content.appendChild(parkHeader2);
+
+      park.items.forEach((item, idx) => {
+        const row = document.createElement('div');
+        const isLast = idx === park.items.length - 1;
+        row.style.cssText = `background:var(--card-bg,#fff);padding:10px 14px;${isLast ? 'border-radius:0 0 10px 10px;margin-bottom:4px;' : 'border-bottom:1px solid var(--border,#f0f0f0);'}`;
+        row.innerHTML = `
+          <div style="display:flex;gap:8px;align-items:flex-start;">
+            <div style="min-width:20px;height:20px;border-radius:50%;background:${park.color};color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">${idx+1}</div>
+            <div>
+              <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:3px;">🔎 ${item.name}</div>
+              <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${item.clue}</div>
+            </div>
+          </div>`;
+        content.appendChild(row);
+      });
+    });
+
+    const spacer = document.createElement('div');
+    spacer.style.height = '20px';
+    content.appendChild(spacer);
+
+    s.appendChild(header);
+    s.appendChild(content);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-scavenger-hunt')) buildScreen();
+
+  const _prevSS_xxxx2 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_xxxx2) _prevSS_xxxx2(name, el);
+    if (name === 'scavenger-hunt') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-scavenger-hunt');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectScavengerCard() {
+    if (document.getElementById('scavenger-home-card')) return true;
+    const ref = document.getElementById('souvenir-home-card') || document.getElementById('airport-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'scavenger-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#4A148C,#7B1FA2,#AB47BC);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('scavenger-hunt');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:3px;">🔎 Scavenger Hunt Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">30 hidden details · All 5 parks · For all ages</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.5);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _scavengerCard = false;
+  setInterval(() => { if (!_scavengerCard) _scavengerCard = injectScavengerCard(); }, 36000);
+  setTimeout(() => { _scavengerCard = injectScavengerCard(); }, 32500);
+
+  const _prevRH_xxxx2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_xxxx2) _prevRH_xxxx2.apply(this, arguments);
+    setTimeout(() => { _scavengerCard = false; _scavengerCard = injectScavengerCard(); }, 9300);
+  };
+})();
+</script>
