@@ -54186,3 +54186,197 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK ZZZZZ: Discovery Cove & Special Experiences Guide ===== */
+(function initDiscoveryCove() {
+
+  const EXPERIENCES = [
+    {
+      name:'Discovery Cove — Swim with Dolphins', emoji:'🐬', color:'#0277BD',
+      type:'All-inclusive day resort', price:'$249–$489 per person (seasonal)',
+      capacity:'Limited to ~1,000 guests per day (Discovery Cove caps attendance)',
+      highlights:['30-min structured dolphin swim session (guaranteed 1-on-1 interaction)', 'All-inclusive: food, drinks, snorkeling gear, wetsuit, sunscreen included', 'Unlimited access to Grand Reef coral reef snorkel', 'Aviary walk-through with exotic birds', 'Lazy river winding through tropical gardens', 'Unlimited SeaWorld and Busch Gardens tickets bundled'],
+      tip:'Book 3–6 months in advance — this genuinely sells out. The dolphin interaction is one of the most emotionally moving experiences in Florida. Worth every dollar as a trip centerpiece.',
+      bestFor:'Families with kids 6+, couples, nature lovers, birthday/anniversary splurge',
+    },
+    {
+      name:'Disney\'s Keys to the Kingdom Tour', emoji:'🔑', color:'#1565C0',
+      type:'Behind-the-scenes Magic Kingdom tour', price:'$109 per person + park admission',
+      capacity:'Limited to 12 guests per tour',
+      highlights:['Access to the famous underground "utilidors" (not actually underground)', 'Disney history told by expert guides', 'Backstage Magic Kingdom areas normally off-limits', '5 hours walking tour with small group'],
+      tip:'A transformative experience for Disney fans who want to understand how the park actually functions. Book at 60 days in advance via My Disney Experience. Age requirement: 16+.',
+      bestFor:'Serious Disney fans, adult groups, those wanting to see behind the curtain',
+    },
+    {
+      name:'Wild Africa Trek (Animal Kingdom)', emoji:'🦁', color:'#33691E',
+      type:'VIP Animal Kingdom backstage safari', price:'$189–$249 per person + park admission',
+      capacity:'Limited to 12 per trek',
+      highlights:['Exclusive hippo and crocodile area access via rope bridge', 'Behind-scenes areas of the savanna', 'Private jeep safari with extended animal time', 'Gourmet African-inspired snack spread included', '3-hour experience'],
+      tip:'For Animal Kingdom, this is the ultimate premium experience. The hippo viewing from a footbridge over the water is extraordinary. Weight requirements apply (max 310 lbs). Ages 8+ only.',
+      bestFor:'Animal lovers, photography enthusiasts, those wanting maximum safari access',
+    },
+    {
+      name:'Savor the Savanna (Animal Kingdom)', emoji:'🌅', color:'#5D4037',
+      type:'Exclusive private safari experience', price:'$169–$249 per person + park admission',
+      capacity:'Limited small groups',
+      highlights:['After-hours private savanna viewing deck', 'Exclusive Africa habitat access', 'Food and beverage included', 'Personal guide narrating animal behavior', 'Sunset timing for best photography light'],
+      tip:'The sunset timing is key — as the park closes, you have exclusive access while the animals return for evening feeding. Stunning photography opportunity. Pairs perfectly with Tiffins dinner.',
+      bestFor:'Couples, photographers, those wanting a quiet premium experience',
+    },
+    {
+      name:'Universal\'s Hagrid Motorbike VIP', emoji:'🏍️', color:'#2E7D32',
+      type:'VIP queue bypass + ride experience', price:'ILL $25–35 + optional VIP tour',
+      capacity:'Standard (not capacity-limited like DC)',
+      highlights:['Individual Lightning Lane access', 'VIP tours offer backstage views of Universal operations', 'Priority access to all Universal attractions'],
+      tip:'Hagrid\'s is worth any price to skip the 3-hour standby line. The VIP day experience at Universal ($300+) includes unlimited Express, private guide, reserved parking, and backstage access to select areas.',
+      bestFor:'Coaster enthusiasts, families wanting to maximize Universal',
+    },
+    {
+      name:'Gator Spotting — Airboat Night Tour', emoji:'🐊', color:'#1B5E20',
+      type:'Authentic Florida experience', price:'$55–85 per person',
+      capacity:'Varies by tour operator',
+      highlights:['Airboat across Florida wetlands at night', 'Alligator eyes reflect red in flashlights — dozens visible', 'Real Florida wilderness experience', 'Various operators near Kissimmee and Lake Toho'],
+      tip:'Boggy Creek Airboat Rides is the most established operator near Orlando. Night tours (7–9 PM) are the best time — alligator eyes glow in the dark. Completely safe, genuinely wild experience.',
+      bestFor:'Nature enthusiasts, those wanting authentic Florida over theme parks',
+    },
+    {
+      name:'Savi\'s Workshop — Handbuilt Lightsaber', emoji:'⚔️', color:'#37474F',
+      type:'Disney Hollywood Studios immersive experience', price:'$249.99 per person (lightsaber included)',
+      capacity:'Very limited — reservation required',
+      highlights:['45-minute immersive ceremony', 'Fully custom lightsaber built by you', 'Four kyber crystal types (four different saber colors)', 'Ceremonial atmosphere with cast member "Gatherers"'],
+      tip:'One of the most beloved experiential products Disney has ever created. The ceremony is genuinely affecting even for adults. Reserve at exactly 60 days — sells out. The lightsaber is real quality and a lasting keepsake.',
+      bestFor:'Star Wars fans of any age, adults and kids alike, those wanting a premium souvenir experience',
+    },
+    {
+      name:'Cirque du Soleil at Disney Springs', emoji:'🎪', color:'#7B1FA2',
+      type:'Permanent resident show', price:'$75–200 per person depending on tier',
+      capacity:'Shows run most evenings',
+      highlights:['Drawn to Life — custom Disney animation + acrobatics', 'Custom-built theater at Disney Springs', 'World-class acrobatics, aerial performance, clowning'],
+      tip:'The Drawn to Life show was developed with Disney animation archives specifically for Orlando. Tier 1 seating (front sections) is worth the premium. Book in advance during busy seasons.',
+      bestFor:'Families with children 6+, couples, performance arts lovers',
+    },
+  ];
+
+  const UNIQUE_FLORIDA = [
+    { name:'Swimming with Manatees (Crystal River)', emoji:'🦭', price:'~$60 per person', note:'Crystal River, 1.5 hours from Orlando. Swim with wild, non-captive manatees in natural springs. November–March optimal. Multiple tour operators available.' },
+    { name:'Canoeing the Wekiva River', emoji:'🌿', price:'~$40 rental', note:'Put in at Wekiwa Springs State Park. The spring run is 8+ miles of Old Florida wilderness canoeing. Half-day or full-day adventures.' },
+    { name:'Night Sky Telescope Viewing', emoji:'🔭', price:'~$25 per person', note:'Florida\'s flat, south-latitude skies offer excellent astronomy opportunities. Stargazing programs through various nature centers. Dark sky locations away from park lighting.' },
+    { name:'Glassbottom Boat at Silver Springs', emoji:'🐠', price:'~$20 per person', note:'Silver Springs State Park (1 hour north). Original classic Florida tourist experience — see crystal-clear spring bottom from glass boats. James Bond was filmed here.' },
+    { name:'Florida Man Canoe Trail', emoji:'🛶', price:'Free (kayak rental ~$40)', note:'Multiple options: Alexander Springs, Silver River, Juniper Springs Run. Paddling on wild Florida rivers through old-growth cypress is extraordinarily peaceful.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-discovery-cove';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#0277BD,#33691E,#7B1FA2);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Special Experiences</div>
+          <div style="font-size:11px;opacity:.8;">Discovery Cove · VIP tours · Unique Florida</div>
+        </div>
+        <span style="font-size:28px;">✨</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        Beyond the standard park experiences, Orlando offers extraordinary premium and unique moments — from swimming with wild dolphins to walking the Magic Kingdom tunnels to manatee encounters in crystal springs.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    EXPERIENCES.forEach(exp => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:12px 14px;background:${exp.color}18;border-left:4px solid ${exp.color};">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
+            <div style="display:flex;gap:8px;align-items:flex-start;">
+              <span style="font-size:22px;">${exp.emoji}</span>
+              <div>
+                <div style="font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${exp.name}</div>
+                <div style="font-size:10px;color:var(--text-secondary,#888);">${exp.type}</div>
+              </div>
+            </div>
+            <div style="text-align:right;flex-shrink:0;">
+              <div style="font-size:11px;font-weight:800;color:${exp.color};">${exp.price}</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;">
+            ${exp.highlights.map(h=>`<span style="font-size:10px;padding:2px 8px;background:${exp.color}18;color:${exp.color};border-radius:20px;">${h}</span>`).join('')}
+          </div>
+          <div style="display:flex;gap:6px;background:${exp.color}0d;border-radius:8px;padding:7px;margin-bottom:6px;">
+            <span style="font-size:12px;flex-shrink:0;">💡</span>
+            <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${exp.tip}</div>
+          </div>
+          <div style="font-size:10px;font-weight:700;color:${exp.color};">Best for: ${exp.bestFor}</div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const uniqueCard = document.createElement('div');
+    uniqueCard.style.cssText = 'background:linear-gradient(135deg,#1B5E20,#0277BD);border-radius:16px;margin-bottom:20px;padding:14px;color:#fff;';
+    uniqueCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">🌴 Unique Florida Experiences</div>
+    ${UNIQUE_FLORIDA.map(u=>`<div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.15);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+        <div style="font-size:13px;font-weight:700;">${u.emoji} ${u.name}</div>
+        <span style="font-size:10px;font-weight:800;background:rgba(255,255,255,.2);padding:2px 8px;border-radius:20px;">${u.price}</span>
+      </div>
+      <div style="font-size:12px;opacity:.9;line-height:1.5;">${u.note}</div>
+    </div>`).join('')}`;
+    body.appendChild(uniqueCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-discovery-cove')) buildScreen();
+
+  const _prevSS_zzzzz = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_zzzzz) _prevSS_zzzzz(name, el);
+    if (name === 'discovery-cove') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-discovery-cove');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectDCCard() {
+    if (document.getElementById('dc-home-card')) return true;
+    const ref = document.getElementById('itinerary-home-card') || document.getElementById('ak-deep-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'dc-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#0277BD,#33691E,#7B1FA2);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('discovery-cove');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">✨</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Special Experiences</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Discovery Cove · VIP tours · Swim with manatees</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _dcCard = false;
+  setInterval(() => { if (!_dcCard) _dcCard = injectDCCard(); }, 60000);
+  setTimeout(() => { _dcCard = injectDCCard(); }, 56500);
+  const _prevRH_zzzzz = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_zzzzz) _prevRH_zzzzz.apply(this, arguments);
+    setTimeout(() => { _dcCard = false; _dcCard = injectDCCard(); }, 19000);
+  };
+})();
+</script>
