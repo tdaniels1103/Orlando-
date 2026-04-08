@@ -49726,3 +49726,195 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK EEEEE: Magic Kingdom Deep Dive ===== */
+(function initMagicKingdom() {
+
+  const LANDS = [
+    {
+      name:'Main Street, U.S.A.', emoji:'🏪', color:'#003087',
+      desc:'The entrance to Magic Kingdom — a turn-of-the-century American small town leading to Cinderella Castle. Not a "land" per se, but worth exploring.',
+      highlights:[
+        { name:'Town Square Theater (Mickey Meet)', note:'The flagship Mickey Mouse character meet in Magic Kingdom. Indoor, A/C, long waits. Get Lightning Lane or arrive at rope drop.' },
+        { name:'Emporium', note:'The largest shop in Magic Kingdom — runs the entire length of Main Street. Last chance for merchandise on your way out.' },
+        { name:'Walt\'s Apartment Window', note:'Look up at the windows above the shops. One window has a perpetually lit lamp — Walt Disney\'s private apartment is marked in his memory.' },
+        { name:'Dapper Dans', note:'Barbershop quartet on Main Street. Performs multiple times daily — one of the best free entertainments in any Disney park.' },
+      ]
+    },
+    {
+      name:'Fantasyland', emoji:'🏰', color:'#7B1FA2',
+      desc:'Behind Cinderella Castle. The most classic Disney land — fairy tales, princesses, and the iconic "small world" feeling.',
+      highlights:[
+        { name:'Seven Dwarfs Mine Train', note:'The most popular ride in Magic Kingdom. Family coaster — smooth and beautiful. Height 38". Get Lightning Lane first.' },
+        { name:"Princess Fairytale Hall", note:'Princess character meets — Anna & Elsa, Cinderella, Rapunzel, and others rotate. Long waits — get Lightning Lane.' },
+        { name:'Peter Pan\'s Flight', note:'One of the most popular attractions in Walt Disney World history despite being a simple flying vehicle ride. Get Lightning Lane — always busy.' },
+        { name:"it's a small world", note:'The quintessential Disney experience. Long, slow, memorable. The song WILL be stuck in your head for days.' },
+        { name:'Haunted Mansion', note:'In Liberty Square (adjacent to Fantasyland). Classic dark ride with 999 happy haunts. One of Disney\'s most beloved attractions. Get there before 11am.' },
+      ]
+    },
+    {
+      name:'Tomorrowland', emoji:'🚀', color:'#1565C0',
+      desc:'A vision of the optimistic future as imagined in 1955 and updated through the decades.',
+      highlights:[
+        { name:'TRON Lightcycle / Run', note:'The newest and fastest ride in Magic Kingdom (2023). Launched coaster straddling a motorcycle-style seat. Height 48". The #1 Lightning Lane priority at MK.' },
+        { name:'Space Mountain', note:'Classic indoor coaster in the dark. Rougher than modern coasters but still beloved. Height 44". Best in the morning.' },
+        { name:'Buzz Lightyear\'s Space Ranger Spin', note:'Interactive laser blaster ride. Compete for the highest score. No height requirement — great for families.' },
+        { name:'Carousel of Progress', note:'Walt Disney\'s personal favorite attraction. 25-minute journey through 100 years of American progress. Never busy. Always interesting.' },
+        { name:'Tomorrowland Speedway', note:'Gas-powered go-karts on a fixed track. No height req (54" to drive alone). Long wait for what it is — skip during busy times.' },
+      ]
+    },
+    {
+      name:'Adventureland & Liberty Square', emoji:'⚓', color:'#E65100',
+      desc:'Tropical adventure and colonial America. Home to two of the oldest and most beloved Disney attractions.',
+      highlights:[
+        { name:'Pirates of the Caribbean', note:'One of Walt Disney\'s personal projects. Boat ride through pirate ports. No height requirement. The scene-for-scene inspiration for the film franchise.' },
+        { name:'The Haunted Mansion', note:'999 ghosts, interactive waiting area, and one of the best dark rides in any theme park. No height requirement.' },
+        { name:'Jungle Cruise', note:'Slow boat through animated jungle animals with terrible pun-based narration. The humor is the entire point. Beloved for 70 years.' },
+        { name:'Walt Disney\'s Enchanted Tiki Room', note:'Animatronic birds singing "In the Tiki Tiki Tiki Room." The original Disney Audio-Animatronics experience (1963). Genuine piece of park history.' },
+      ]
+    },
+    {
+      name:'Frontierland', emoji:'🤠', color:'#5D4037',
+      desc:'The American frontier. Home to the second and fourth most popular MK coasters.',
+      highlights:[
+        { name:'Big Thunder Mountain Railroad', note:'Wild mine train coaster through a desert canyon. Height 40". Excellent family coaster — fun for all ages without being terrifying.' },
+        { name:"Tiana's Bayou Adventure", note:'Replaced Splash Mountain. New Orleans bayou flume ride with a 52-foot drop. Height 40". Still very popular — get LL or go early.' },
+        { name:'Tom Sawyer Island', note:'A free-exploration island in the middle of the river. Kids love it for the freedom. Often skipped by adults — genuinely enjoyable for families.' },
+      ]
+    },
+  ];
+
+  const MK_DAY_PLAN = [
+    { time:'45 min before open', action:'Arrive at the park entrance. Main Street opens early — walk to Cinderella Castle for photos in the golden light with no crowds.' },
+    { time:'7:00 AM (from hotel)', action:'Buy TRON Lightning Lane Single Pass the moment the app allows it. If TRON is sold out, pivot to Seven Dwarfs LLMP.' },
+    { time:'Rope drop', action:'Walk directly to Seven Dwarfs Mine Train (go straight, don\'t stop). Ride before the line builds. Then walk to Princess Fairytale Hall if applicable.' },
+    { time:'10:00 AM', action:'Use your TRON LL. Then explore Fantasyland — Peter Pan, it\'s a small world, Dumbo. Book your next LLMP immediately after each redemption.' },
+    { time:'12:30 PM', action:'Mobile order lunch. Best options: Columbia Harbour House (Liberty Square, excellent seafood), Pinocchio\'s (Fantasyland, watch the clock show while eating).' },
+    { time:'2:00–4:00 PM', action:'Festival of Fantasy Parade (check times). Take A/C break at Carousel of Progress or Tomorrowland Speedway area.' },
+    { time:'6:00 PM', action:'Haunted Mansion and Pirates of the Caribbean — shorter evening waits. Dinner reservation if booked.' },
+    { time:'9:45 PM', action:'Position on Main Street for Happily Ever After fireworks. Stay until the very end — the final castle display is the best moment.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-magic-kingdom';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const header = document.createElement('div');
+    header.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#00203F,#003087,#0057A8);padding:16px 14px 14px;';
+    header.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:#fff;">Magic Kingdom Deep Dive</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">5 lands · TRON · Perfect day plan · Secrets</div>
+        </div>
+        <span style="font-size:24px;">🏰</span>
+      </div>
+      <div style="background:rgba(255,255,255,.12);border-radius:8px;padding:7px 12px;font-size:11px;color:rgba(255,255,255,.9);">
+        The original. The most iconic. Magic Kingdom is the park Walt Disney himself most closely envisioned. It rewards those who understand its layers.
+      </div>`;
+
+    const content = document.createElement('div');
+    content.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    // Perfect day plan
+    const planHeader = document.createElement('div');
+    planHeader.style.cssText = 'font-size:13px;font-weight:800;color:#003087;margin:0 0 8px;';
+    planHeader.textContent = '📅 MAGIC KINGDOM PERFECT DAY PLAN';
+    content.appendChild(planHeader);
+
+    const planCard = document.createElement('div');
+    planCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;padding:12px 14px;margin-bottom:14px;border:1px solid var(--border,#eee);';
+    MK_DAY_PLAN.forEach(step => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;';
+      row.innerHTML = `
+        <div style="min-width:90px;font-size:10px;font-weight:700;color:#003087;flex-shrink:0;margin-top:2px;">${step.time}</div>
+        <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;flex:1;">${step.action}</div>`;
+      planCard.appendChild(row);
+    });
+    content.appendChild(planCard);
+
+    // Lands
+    LANDS.forEach(land => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+
+      const lh = document.createElement('div');
+      lh.style.cssText = `background:${land.color};padding:10px 14px;display:flex;align-items:center;gap:8px;`;
+      lh.innerHTML = `
+        <span style="font-size:22px;">${land.emoji}</span>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:#fff;">${land.name}</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.8);">${land.desc.substring(0,60)}...</div>
+        </div>`;
+      card.appendChild(lh);
+
+      const lb = document.createElement('div');
+      lb.style.cssText = 'padding:10px 14px;';
+      land.highlights.forEach((h, idx) => {
+        const row = document.createElement('div');
+        row.style.cssText = `padding:6px 0;${idx < land.highlights.length-1 ? 'border-bottom:1px solid var(--border,#f0f0f0);' : ''}`;
+        row.innerHTML = `
+          <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:2px;">${h.name}</div>
+          <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.4;">${h.note}</div>`;
+        lb.appendChild(row);
+      });
+      card.appendChild(lb);
+      content.appendChild(card);
+    });
+
+    const spacer = document.createElement('div');
+    spacer.style.height = '20px';
+    content.appendChild(spacer);
+
+    s.appendChild(header);
+    s.appendChild(content);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-magic-kingdom')) buildScreen();
+
+  const _prevSS_eeeee = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_eeeee) _prevSS_eeeee(name, el);
+    if (name === 'magic-kingdom') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-magic-kingdom');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectMKCard() {
+    if (document.getElementById('mk-home-card')) return true;
+    const ref = document.getElementById('epcot-home-card') || document.getElementById('ak-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'mk-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#00203F,#003087,#0057A8);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('magic-kingdom');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:3px;">🏰 Magic Kingdom Deep Dive</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.85);">TRON · Perfect day plan · All 5 lands · Fireworks</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.5);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _mkCard = false;
+  setInterval(() => { if (!_mkCard) _mkCard = injectMKCard(); }, 39500);
+  setTimeout(() => { _mkCard = injectMKCard(); }, 36000);
+
+  const _prevRH_eeeee = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_eeeee) _prevRH_eeeee.apply(this, arguments);
+    setTimeout(() => { _mkCard = false; _mkCard = injectMKCard(); }, 10700);
+  };
+})();
+</script>
