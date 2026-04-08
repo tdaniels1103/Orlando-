@@ -40425,3 +40425,399 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK HHH2: Transportation & Getting Around Guide ===== */
+(function initTransportationGuide() {
+
+  const TRANSPORT_OPTIONS = [
+    {
+      method:'Disney\'s Free Transportation System',
+      emoji:'🚌',
+      cost:'FREE for Disney resort guests',
+      color:'#1565C0',
+      modes:['Buses: All resorts to all parks and Disney Springs (20–45 min)','Monorail: Magic Kingdom ↔ EPCOT ↔ Polynesian/Grand Floridian/Contemporary','Disney Skyliner: EPCOT ↔ Hollywood Studios ↔ Caribbean Beach/Riviera/Pop Century/Art of Animation','Water Taxis: BoardWalk ↔ Hollywood Studios ↔ EPCOT via International Gateway','Disney Friendship Boats: World Showcase pavilions at EPCOT'],
+      pros:['Completely free · No driving/parking stress · Park-to-park between some parks','The Skyliner gondola is a genuine attraction experience with beautiful views','Resort guests save $30/day on parking by using free transport'],
+      cons:['Bus waits can be 20–30 minutes · No direct routes between parks', 'Monorail often at capacity in the morning rush', 'No free transport between resort areas if you want to visit a different resort'],
+      tips:["Add 45–60 minutes for bus transport each way — it's slower than driving", 'The Skyliner is the fastest and most scenic transport. Stay at Riviera or Caribbean Beach to maximize it.', 'Download the My Disney Experience app — it shows real-time bus arrivals at most stops'],
+    },
+    {
+      method:'Uber & Lyft in Orlando',
+      emoji:'🚗',
+      cost:'$8–30 per trip depending on distance/surge',
+      color:'#E65100',
+      modes:["UberX: Standard ride · 4 passengers max · Most common option", "Uber XL: Minivan/SUV · Up to 6 passengers · Good for families", "Lyft: Direct competitor, often similar pricing — check both apps"],
+      pros:['Door-to-door convenience', 'Faster than Disney buses between parks', 'Easy to book, typically 3–5 min wait time in resort areas', 'No parking fee'],
+      cons:["Surge pricing during park close times (9:30–11 PM) can be 2–3× normal rates", "Wait areas at Disney parks can be crowded — find designated rideshare pickup points", "Not free — costs add up for multiple daily trips"],
+      tips:["Pre-order your ride 15 minutes before you leave the park to beat the surge wave", "Designated Uber/Lyft pickup zones exist outside all major parks — ask a cast member", "For Airport → Disney (25 miles): $35–55 standard; cheaper than a rental for the drive alone"],
+    },
+    {
+      method:'Rental Car Strategy',
+      emoji:'🚙',
+      cost:'$40–120/day + parking $25–35/day',
+      color:'#2E7D32',
+      modes:["Economy/Compact: sufficient for 2 people with standard luggage", "Midsize/SUV: best for families with stroller, park bags, and gear", "Pre-book at MCO: Alamo, National, Enterprise are the airport car rental complex"],
+      pros:['Complete flexibility', 'Essential for off-property dining, day trips, shopping', 'Best option if visiting multiple parks across different resort areas', 'Orlando roads are generally easy and well-marked'],
+      cons:["Disney parking: $25–35/day at theme parks (free for resort guests)", "Driving with young children in Florida heat + unfamiliar roads is stressful", "I-4 traffic (Orlando's main highway) is notoriously dangerous and congested"],
+      tips:["Reserve at National or Alamo for flexible car selection — walk up and choose your car", "Get the SunPass add-on from your rental company to automatically pay Florida tolls", "Gas near Disney: avoid gas stations on Disney property ($0.40–0.60/gallon premium) — go to I-192 or US 27"],
+    },
+    {
+      method:'Orlando International Airport (MCO) Connections',
+      emoji:'✈️',
+      cost:'Varies by method',
+      color:'#37474F',
+      modes:["Disney's Magical Express: DISCONTINUED (ended January 2022)", "Mears Connect: Official Disney shuttle replacement · $39 one-way, $70 round-trip · Shared or express options", "Rental Car: 20–25 min to Disney, 25–30 min to Universal", "Uber/Lyft from MCO: $35–55 to Disney area, $25–40 to Universal area", "SunRail: Light rail from MCO to downtown Orlando (not practical for theme parks)"],
+      pros:['MCO is a well-organized airport — ground transport is clearly signed', 'Mears Connect express (private vehicle) is the easiest no-stress option'],
+      cons:["Mears shared shuttle can take 60–90 min with stops", "Rideshare from MCO has a separate pickup zone (Level 1, Ground Transport)"],
+      tips:["For families: Mears Express ($16–22 extra per person) vs. Uber XL (~$55) for a family of 4 — the math often favors Uber XL", "Pre-arrange transport before you land — pickup lines after major flights can be 20–30 min wait for Uber"],
+    },
+    {
+      method:'SunRail & Lynx Bus (Local Transit)',
+      emoji:'🚆',
+      cost:'$2–3 per ride',
+      color:'#7B1FA2',
+      modes:["SunRail: Commuter rail downtown to suburbs (not useful for parks)", "Lynx Bus #50: Disney area bus route, useful for some I-Drive destinations", "I-Ride Trolley: I-Drive tourist strip, $2/ride, useful between I-Drive hotels and attractions"],
+      pros:['Cheapest option for I-Drive area exploration', "Good for reaching downtown Orlando from LYNX Central Station"],
+      cons:["Not practical for Disney or Universal directly", "Bus schedules are infrequent and not designed for tourist patterns"],
+      tips:["I-Ride Trolley is legitimate and useful if you're staying on International Drive", "Check the lynxbus.com route planner — it's better than Google Maps for local buses here"],
+    },
+  ];
+
+  const PARKING_CHEATSHEET = [
+    { location:'Magic Kingdom', cost:'$30/day', note:'Requires parking + free monorail/ferry to park entrance' },
+    { location:'EPCOT', cost:'$30/day', note:'Walking distance from the parking lot to the front gate via bridge' },
+    { location:'Hollywood Studios', cost:'$30/day', note:'Closest Disney lot to park entrance' },
+    { location:'Animal Kingdom', cost:'$30/day', note:'Large lot, good signage, closest walk of all Disney parks' },
+    { location:'Universal CityWalk garage', cost:'$30/day (first 3 hours free after 6 PM)', note:'Preferred is adjacent to park entrance' },
+    { location:'Universal Preferred parking', cost:'$50/day', note:'Closest to park entrance, 200 steps from security' },
+    { location:'SeaWorld', cost:'$20–30/day', note:'Large flat lot, easy in/out' },
+    { location:'Disney Springs (all day)', cost:'FREE', note:'Garage parking is always free at Disney Springs' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-transportation';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;';
+    s.innerHTML = `
+      <div style="background:linear-gradient(135deg,#006064,#0097A7,#26C6DA);padding:18px 14px 20px;
+        display:flex;align-items:center;gap:12px;flex-shrink:0;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;
+          border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#fff;">Transportation Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">Airport · Buses · Uber · Rental car · Parking</div>
+        </div>
+        <span style="font-size:28px;">🚌</span>
+      </div>
+      <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;">
+
+        ${TRANSPORT_OPTIONS.map(opt => `
+          <div style="background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;
+            border:1px solid var(--border,#eee);overflow:hidden;">
+            <div style="background:${opt.color};padding:10px 14px;display:flex;align-items:center;gap:8px;">
+              <span style="font-size:24px;">${opt.emoji}</span>
+              <div style="flex:1;">
+                <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:#fff;">${opt.method}</div>
+                <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.8);">💰 ${opt.cost}</div>
+              </div>
+            </div>
+            <div style="padding:10px 14px;">
+              <div style="font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:4px;">AVAILABLE OPTIONS</div>
+              ${opt.modes.map(m => `<div style="font-size:12px;color:var(--text-secondary,#555);padding:2px 0;">• ${m}</div>`).join('')}
+
+              <div style="display:flex;gap:10px;margin-top:8px;">
+                <div style="flex:1;">
+                  <div style="font-size:10px;font-weight:700;color:#2E7D32;margin-bottom:3px;">PROS</div>
+                  ${opt.pros.map(p => `<div style="font-size:11px;color:var(--text-secondary,#555);padding:1px 0;">✓ ${p}</div>`).join('')}
+                </div>
+                <div style="flex:1;">
+                  <div style="font-size:10px;font-weight:700;color:#B71C1C;margin-bottom:3px;">CONS</div>
+                  ${opt.cons.map(c => `<div style="font-size:11px;color:var(--text-secondary,#555);padding:1px 0;">✗ ${c}</div>`).join('')}
+                </div>
+              </div>
+
+              <div style="margin-top:8px;border-top:1px solid var(--border,#f0f0f0);padding-top:8px;">
+                <div style="font-size:10px;font-weight:700;color:${opt.color};margin-bottom:4px;">TIPS</div>
+                ${opt.tips.map(t => `<div style="font-size:11px;color:var(--text-secondary,#666);padding:2px 0;">💡 ${t}</div>`).join('')}
+              </div>
+            </div>
+          </div>`).join('')}
+
+        <!-- Parking cheat sheet -->
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;
+          color:var(--text-primary,#212121);margin-bottom:10px;">🅿️ Parking Cost Cheat Sheet</div>
+        <div style="background:var(--card-bg,#fff);border-radius:14px;margin-bottom:20px;border:1px solid var(--border,#eee);overflow:hidden;">
+          ${PARKING_CHEATSHEET.map((p, i) => `
+            <div style="padding:10px 14px;${i < PARKING_CHEATSHEET.length-1 ? 'border-bottom:1px solid var(--border,#f0f0f0)' : ''};display:flex;gap:10px;align-items:flex-start;">
+              <div style="flex:1;">
+                <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${p.location}</div>
+                <div style="font-size:11px;color:var(--text-secondary,#666);">${p.note}</div>
+              </div>
+              <div style="font-size:14px;font-weight:800;color:#006064;white-space:nowrap;">${p.cost}</div>
+            </div>`).join('')}
+        </div>
+      </div>`;
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-transportation')) buildScreen();
+
+  const _prevSS_hhh2 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_hhh2) _prevSS_hhh2(name, el);
+    if (name === 'transportation') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-transportation');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectTransportCard() {
+    if (document.getElementById('transport-home-card')) return true;
+    const ref = document.getElementById('dr-home-card') || document.getElementById('kids-age-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'transport-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#006064,#0097A7,#26C6DA);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('transportation');
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:28px;">🚌</span>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Transportation Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.85);">Airport · Disney buses · Uber · Parking costs</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _tCard = false;
+  setInterval(() => { if (!_tCard) _tCard = injectTransportCard(); }, 15000);
+  setTimeout(() => { _tCard = injectTransportCard(); }, 11500);
+
+  const _prevRH_hhh2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_hhh2) _prevRH_hhh2.apply(this, arguments);
+    setTimeout(() => { _tCard = false; _tCard = injectTransportCard(); }, 2800);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK III2: Crowd Calendar & Best Times Interactive Tool ===== */
+(function initCrowdCalendar() {
+
+  /* Crowd level calculation: 1=empty, 10=insane */
+  function getCrowdScore(month, dayOfWeek, isHoliday) {
+    const BASE_BY_MONTH = { 0:5,1:5,2:7,3:8,4:6,5:8,6:9,7:9,8:6,9:5,10:6,11:9 };
+    const DAY_MULT = { 0:1.3,1:0.75,2:0.75,3:0.8,4:0.9,5:1.35,6:1.25 }; // 0=Sun
+    let base = BASE_BY_MONTH[month] || 5;
+    base = Math.round(base * (DAY_MULT[dayOfWeek] || 1));
+    if (isHoliday) base = Math.min(10, base + 2);
+    return Math.max(1, Math.min(10, base));
+  }
+
+  const HOLIDAY_WINDOWS = [
+    { name:'New Year\'s', startMonth:0, startDay:1, endDay:2 },
+    { name:'MLK Weekend', startMonth:0, startDay:13, endDay:16 },
+    { name:'Presidents Week', startMonth:1, startDay:15, endDay:21 },
+    { name:'Spring Break', startMonth:2, startDay:13, endDay:27 },
+    { name:'Easter Weekend', startMonth:3, startDay:17, endDay:22 },
+    { name:'Memorial Day', startMonth:4, startDay:23, endDay:28 },
+    { name:'July 4th', startMonth:6, startDay:2, endDay:7 },
+    { name:'Labor Day', startMonth:8, startDay:2, endDay:7 },
+    { name:'Thanksgiving', startMonth:10, startDay:22, endDay:30 },
+    { name:'Christmas Week', startMonth:11, startDay:20, endDay:31 },
+  ];
+
+  function isHolidayWindow(month, day) {
+    for (const h of HOLIDAY_WINDOWS) {
+      if (h.startMonth === month && day >= h.startDay && day <= h.endDay) return h.name;
+    }
+    return null;
+  }
+
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const CROWD_LABELS = {
+    1:'Ghost Town 👻', 2:'Very Quiet 😊', 3:'Low Crowds 😌', 4:'Manageable 👍',
+    5:'Moderate 😐', 6:'Getting Busy 🤔', 7:'Busy 😬', 8:'Very Busy 😰',
+    9:'Packed 😱', 10:'Insane 🤯'
+  };
+  const CROWD_COLORS = {
+    1:'#1B5E20',2:'#2E7D32',3:'#388E3C',4:'#558B2F',
+    5:'#F9A825',6:'#F57F17',7:'#E65100',8:'#BF360C',9:'#B71C1C',10:'#7B0000'
+  };
+
+  const BEST_WEEKS = [
+    { period:'First 2 weeks of January', score:2, note:'After New Year\'s rush ends — cheapest hotels, shortest lines of the year.' },
+    { period:'Late January / February (non-President\'s week)', score:2, note:'Flower & Garden at EPCOT starts. Excellent weather. Low crowds.' },
+    { period:'Early May (before Memorial Day)', score:3, note:'Schools still in session. Beautiful weather. Lines are manageable.' },
+    { period:'Early September (after Labor Day)', score:3, note:'Hurricane season but historically Disney\'s emptiest weeks. Discounts everywhere.' },
+    { period:'Early November (before Thanksgiving week)', score:3, note:'Halloween ends, Christmas hasn\'t started. Perfect weather. Low crowds.' },
+    { period:'Late August (back-to-school)', score:4, note:'Hot and humid but kids back in school = noticeably shorter lines.' },
+  ];
+
+  function buildCrowdBar(score) {
+    const color = CROWD_COLORS[score] || '#888';
+    const width = (score / 10 * 100).toFixed(0);
+    return `<div style="background:rgba(0,0,0,.08);border-radius:4px;height:8px;overflow:hidden;margin:4px 0;">
+      <div style="width:${width}%;height:100%;background:${color};border-radius:4px;transition:width .4s;"></div>
+    </div>`;
+  }
+
+  function buildCalendarView() {
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    let html = '';
+    for (let m = 0; m < 12; m++) {
+      const mon = (currentMonth + m) % 12;
+      const year = currentYear + Math.floor((currentMonth + m) / 12);
+
+      // Sample weekday crowd scores (Mon–Sun of first full week)
+      const firstDay = new Date(year, mon, 1).getDay();
+      const days = [];
+      for (let d = 0; d < 28; d++) {
+        const dateNum = d + 1;
+        const dayOfWeek = (firstDay + d) % 7;
+        const holiday = isHolidayWindow(mon, dateNum);
+        const score = getCrowdScore(mon, dayOfWeek, !!holiday);
+        days.push({ d: dateNum, score, holiday, dayOfWeek });
+      }
+
+      const avgScore = Math.round(days.reduce((sum, d) => sum + d.score, 0) / days.length);
+      const color = CROWD_COLORS[avgScore] || '#888';
+      const label = CROWD_LABELS[avgScore] || '';
+
+      html += `<div style="background:var(--card-bg,#fff);border-radius:12px;margin-bottom:8px;
+        border:1px solid var(--border,#eee);overflow:hidden;">
+        <div style="background:${color}18;padding:10px 14px;border-bottom:1px solid ${color}22;
+          display:flex;align-items:center;justify-content:space-between;">
+          <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--text-primary,#212121);">
+            ${MONTHS[mon]} ${year}
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="font-size:12px;font-weight:800;color:${color};">${avgScore}/10</span>
+            <span style="font-size:11px;color:${color};">${label}</span>
+          </div>
+        </div>
+        <div style="padding:8px 14px;">
+          ${buildCrowdBar(avgScore)}
+          <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;">
+            ${days.filter(d => d.holiday).map(d => `<span style="font-size:10px;background:#B71C1C20;color:#B71C1C;padding:2px 8px;border-radius:20px;font-weight:700;">🎉 ${d.holiday} (day ${d.d})</span>`).join('')}
+          </div>
+        </div>
+      </div>`;
+    }
+    return html;
+  }
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-crowd-calendar';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;';
+    s.innerHTML = `
+      <div style="background:linear-gradient(135deg,#311B92,#4527A0,#7E57C2);padding:18px 14px 20px;
+        display:flex;align-items:center;gap:12px;flex-shrink:0;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;
+          border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#fff;">Crowd Calendar</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">12 months of crowd predictions · Best weeks to visit</div>
+        </div>
+        <span style="font-size:28px;">📅</span>
+      </div>
+      <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;">
+
+        <!-- Legend -->
+        <div style="background:var(--card-bg,#fff);border-radius:12px;padding:10px 14px;margin-bottom:12px;border:1px solid var(--border,#eee);">
+          <div style="font-size:11px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:6px;">CROWD SCALE</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;">
+            ${[1,3,5,7,9,10].map(n => `<span style="font-size:10px;padding:3px 8px;border-radius:20px;font-weight:700;
+              background:${CROWD_COLORS[n]}18;color:${CROWD_COLORS[n]};">${n}: ${CROWD_LABELS[n]}</span>`).join('')}
+          </div>
+        </div>
+
+        <!-- Best weeks to visit -->
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;
+          color:var(--text-primary,#212121);margin-bottom:10px;">🏆 Best Weeks to Visit</div>
+        ${BEST_WEEKS.map(bw => `
+          <div style="background:var(--card-bg,#fff);border-radius:12px;margin-bottom:8px;
+            border:1px solid var(--border,#eee);padding:10px 12px;display:flex;gap:10px;">
+            <div style="font-size:24px;font-weight:800;color:${CROWD_COLORS[bw.score]};flex-shrink:0;min-width:28px;text-align:center;">${bw.score}</div>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${bw.period}</div>
+              <div style="font-size:12px;color:var(--text-secondary,#555);margin-top:2px;">${bw.note}</div>
+            </div>
+          </div>`).join('')}
+
+        <!-- Monthly calendar -->
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;
+          color:var(--text-primary,#212121);margin:16px 0 10px;">📅 12-Month Crowd Forecast</div>
+        <div style="font-size:11px;color:var(--text-secondary,#888);margin-bottom:8px;">
+          Based on historical patterns, school calendars, and holiday schedules. Disney Magic Kingdom data.
+        </div>
+        ${buildCalendarView()}
+
+        <!-- Strategy tips -->
+        <div style="background:linear-gradient(135deg,#311B92,#4527A0);border-radius:14px;padding:14px;margin-top:8px;margin-bottom:20px;color:#fff;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">🎯 Crowd Strategy</div>
+          ${[
+            'Monday–Wednesday are consistently the lowest-crowd days at all Orlando parks.',
+            'Saturday is universally the highest-crowd day. Avoid if possible.',
+            "Rope Drop (first 90 minutes of park open) consistently gives 3–4 hours' worth of afternoon wait times.",
+            "2–4 PM is the daily crowd peak — use it for sit-down dining, shows, or return to hotel.",
+            "Parks are emptier 30 minutes before close — often the best time for headliner attractions.",
+          ].map(tip => `<div style="font-size:12px;color:rgba(255,255,255,.9);padding:4px 0;border-bottom:1px solid rgba(255,255,255,.15);line-height:1.5;">→ ${tip}</div>`).join('')}
+        </div>
+      </div>`;
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-crowd-calendar')) buildScreen();
+
+  const _prevSS_iii2 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_iii2) _prevSS_iii2(name, el);
+    if (name === 'crowd-calendar') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-crowd-calendar');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectCrowdCard() {
+    if (document.getElementById('crowd-home-card')) return true;
+    const ref = document.getElementById('transport-home-card') || document.getElementById('dr-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'crowd-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#311B92,#4527A0,#7E57C2);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('crowd-calendar');
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:28px;">📅</span>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Crowd Calendar</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.85);">12-month forecast · Best weeks · Holiday patterns</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _crowdCard = false;
+  setInterval(() => { if (!_crowdCard) _crowdCard = injectCrowdCard(); }, 15500);
+  setTimeout(() => { _crowdCard = injectCrowdCard(); }, 12000);
+
+  const _prevRH_iii2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_iii2) _prevRH_iii2.apply(this, arguments);
+    setTimeout(() => { _crowdCard = false; _crowdCard = injectCrowdCard(); }, 2900);
+  };
+})();
+</script>
