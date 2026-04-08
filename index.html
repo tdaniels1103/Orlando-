@@ -45505,3 +45505,372 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK HHHH2: Orlando Arts & Culture Guide ===== */
+(function initArtsGuide() {
+
+  const VENUES = [
+    {
+      category:'Museums & Galleries', icon:'🎨', color:'#7B1FA2',
+      places:[
+        { name:'Orlando Museum of Art (OMA)', neighborhood:'Loch Haven Cultural Park', admission:'$15/adult', hours:'Tue–Sun',
+          desc:'The city\'s leading fine art museum. Rotating exhibitions plus permanent American art collection. Beautiful neoclassical building in a park setting.' },
+        { name:'Mennello Museum of American Folk Art', neighborhood:'Loch Haven Cultural Park', admission:'$5/adult', hours:'Tue–Sun',
+          desc:'Intimate, underrated gem. Focuses on Earl Cunningham\'s luminous Florida landscapes. The museum itself is charming — lakeside setting, small scale, no crowds.' },
+        { name:'Orange County Regional History Center', neighborhood:'Downtown Orlando', admission:'$9/adult', hours:'Mon–Sat',
+          desc:'Four floors covering Orlando history from Seminole Nation to space age. Surprisingly engaging — the Tinker Field and citrus industry exhibits are fascinating.' },
+        { name:'Charles Hosmer Morse Museum of American Art', neighborhood:'Winter Park', admission:'$6/adult', hours:'Tue–Sun',
+          desc:'World\'s most comprehensive collection of Louis Comfort Tiffany art and Studios glass. The Tiffany Chapel recreation is breathtaking. Winter Park\'s crown jewel.' },
+        { name:'Cornell Fine Arts Museum at Rollins College', neighborhood:'Winter Park', admission:'Free', hours:'Varies',
+          desc:'Small college museum with a surprisingly strong permanent collection. Free admission makes it an easy stop near Park Avenue.' },
+      ]
+    },
+    {
+      category:'Performing Arts', icon:'🎭', color:'#c62828',
+      places:[
+        { name:'Dr. Phillips Center for the Performing Arts', neighborhood:'Downtown Orlando', admission:'Varies by show', hours:'By event',
+          desc:'Orlando\'s premier performing arts venue. Broadway touring shows, Orlando Philharmonic, ballet, and major concerts. The Steinmetz Hall is one of the most acoustically perfect small halls in the US.' },
+        { name:'Mad Cow Theatre', neighborhood:'Downtown Orlando', admission:'$20–40', hours:'Evening performances',
+          desc:'Intimate 100-seat theater known for bold, intelligent productions. One of the best small theaters in Florida.' },
+        { name:'Orlando Shakes (Shakespeare Theater)', neighborhood:'Loch Haven Cultural Park', admission:'$20–55', hours:'By show',
+          desc:'Outstanding classical and contemporary theater. Beautiful lakeside amphitheater for outdoor summer Shakespeare. Indoor productions are world-class for a regional theater.' },
+        { name:'Bach Festival Society (Rollins College)', neighborhood:'Winter Park', admission:'Free–$45', hours:'Performance schedule',
+          desc:'Annual Bach Festival in February is internationally recognized. Year-round concerts at Annie Russell Theatre at Rollins — exceptional quality in a gorgeous intimate venue.' },
+      ]
+    },
+    {
+      category:'Film & Cinema', icon:'🎬', color:'#1565C0',
+      places:[
+        { name:'Enzian Theater', neighborhood:'Maitland', admission:'$12–15', hours:'Daily (check schedule)',
+          desc:'Orlando\'s beloved independent cinema. Shows art house films, foreign films, documentaries. The Eden Bar outside is one of Orlando\'s most relaxed drinking spots. Florida Film Festival headquarters.' },
+        { name:'Regal Winter Park Village 20 + RPX', neighborhood:'Winter Park', admission:'$14–18', hours:'Daily',
+          desc:'Standard multiplex for major releases but notably good screens and sound. IMAX available for blockbusters.' },
+        { name:'Florida Film Festival (Annual)', neighborhood:'Enzian + venues', admission:'$12/screening', hours:'April',
+          desc:'Nationally recognized independent film festival anchored by Enzian. Running since 1992. Submissions, premieres, and retrospectives over 10 days in April.' },
+      ]
+    },
+    {
+      category:'Public Art & Outdoor Culture', icon:'🌳', color:'#2E7D32',
+      places:[
+        { name:'Loch Haven Cultural Park', neighborhood:'Audubon Park area', admission:'Free (park)', hours:'Always open',
+          desc:'Orlando\'s cultural campus — OMA, Mennello Museum, and Orlando Science Center all share this beautiful lakeside park. Free to walk around, great for evening strolls.' },
+        { name:'Mills 50 Street Art', neighborhood:'Mills 50', admission:'Free', hours:'Always',
+          desc:'The Mills 50 corridor has dozens of murals and street art installations. Orlando\'s most vibrant outdoor gallery. Walk E. Colonial Drive from Mills to Bumby for the full experience.' },
+        { name:'Thornton Park / Lake Eola Area', neighborhood:'Downtown', admission:'Free', hours:'Dawn–dusk',
+          desc:'Lakeside neighborhood with art installations, the iconic Lake Eola amphitheater, and frequent public events. The Walt Disney Amphitheater hosts free concerts and events.' },
+        { name:'Park Avenue Gallery Walks', neighborhood:'Winter Park', admission:'Free', hours:'Monthly on Fridays',
+          desc:'Monthly gallery opening nights on Park Avenue in Winter Park. Champagne, new exhibitions, and the chance to meet artists. One of the best free cultural events in Orlando.' },
+      ]
+    },
+  ];
+
+  const CULTURAL_CALENDAR = [
+    { name:'Florida Film Festival', month:'April', type:'Film' },
+    { name:'Bach Festival', month:'February', type:'Music' },
+    { name:'Orlando Fringe Festival', month:'May', type:'Theater' },
+    { name:'Orlando International Fringe', month:'May', type:'Theater' },
+    { name:'Gallery at Avalon Island First Fridays', month:'Monthly', type:'Art' },
+    { name:'Enzian Outdoor Cinema', month:'Year-round', type:'Film' },
+    { name:'Shakespeare in the Park', month:'Summer', type:'Theater' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-arts-guide';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const header = document.createElement('div');
+    header.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#4A148C,#7B1FA2,#AB47BC);padding:16px 14px 14px;';
+    header.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:#fff;">Arts & Culture Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">Museums · Theater · Film · Public Art</div>
+        </div>
+        <span style="font-size:24px;">🎨</span>
+      </div>
+      <div style="background:rgba(255,255,255,.12);border-radius:8px;padding:8px 12px;font-size:11px;color:rgba(255,255,255,.85);line-height:1.5;">
+        Orlando's arts scene is larger than its theme park reputation suggests. The Morse Museum alone is worth a special trip, and the Dr. Phillips Center rivals major city venues.
+      </div>`;
+
+    const content = document.createElement('div');
+    content.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    VENUES.forEach(cat => {
+      const catHeader = document.createElement('div');
+      catHeader.style.cssText = `display:flex;align-items:center;gap:8px;margin:14px 0 8px;`;
+      catHeader.innerHTML = `<span style="font-size:20px;">${cat.icon}</span><div style="font-size:13px;font-weight:800;color:${cat.color};">${cat.category.toUpperCase()}</div>`;
+      content.appendChild(catHeader);
+
+      cat.places.forEach(place => {
+        const card = document.createElement('div');
+        card.style.cssText = 'background:var(--card-bg,#fff);border-radius:12px;margin-bottom:8px;padding:11px 13px;border:1px solid var(--border,#eee);';
+        card.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2px;">
+            <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);flex:1;line-height:1.3;">${place.name}</div>
+            <span style="font-size:10px;font-weight:700;color:${cat.color};flex-shrink:0;margin-left:8px;">${place.admission}</span>
+          </div>
+          <div style="font-size:10px;color:var(--text-secondary,#aaa);margin-bottom:5px;">📍 ${place.neighborhood} · ${place.hours}</div>
+          <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${place.desc}</div>`;
+        content.appendChild(card);
+      });
+    });
+
+    // Calendar
+    const calHeader = document.createElement('div');
+    calHeader.style.cssText = 'font-size:13px;font-weight:800;color:#7B1FA2;margin:14px 0 8px;';
+    calHeader.textContent = '📅 CULTURAL CALENDAR';
+    content.appendChild(calHeader);
+
+    const calGrid = document.createElement('div');
+    calGrid.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px;';
+    CULTURAL_CALENDAR.forEach(ev => {
+      const chip = document.createElement('div');
+      chip.style.cssText = 'background:var(--card-bg,#fff);border-radius:8px;padding:7px 10px;border:1px solid var(--border,#eee);';
+      chip.innerHTML = `
+        <div style="font-size:11px;font-weight:700;color:var(--text-primary,#212121);">${ev.name}</div>
+        <div style="font-size:9px;color:var(--text-secondary,#888);">${ev.month} · ${ev.type}</div>`;
+      calGrid.appendChild(chip);
+    });
+    content.appendChild(calGrid);
+
+    s.appendChild(header);
+    s.appendChild(content);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-arts-guide')) buildScreen();
+
+  const _prevSS_hhhh2 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_hhhh2) _prevSS_hhhh2(name, el);
+    if (name === 'arts-guide') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-arts-guide');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectArtsCard() {
+    if (document.getElementById('arts-home-card')) return true;
+    const ref = document.getElementById('brewery-home-card') || document.getElementById('packing-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'arts-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#4A148C,#7B1FA2,#AB47BC);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('arts-guide');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:3px;">🎨 Arts & Culture Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">Morse Museum · Dr. Phillips · Enzian Cinema</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.5);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _artsCard = false;
+  setInterval(() => { if (!_artsCard) _artsCard = injectArtsCard(); }, 28000);
+  setTimeout(() => { _artsCard = injectArtsCard(); }, 24500);
+
+  const _prevRH_hhhh2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_hhhh2) _prevRH_hhhh2.apply(this, arguments);
+    setTimeout(() => { _artsCard = false; _artsCard = injectArtsCard(); }, 6100);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK IIII2: Orlando Sports Scene ===== */
+(function initSportsGuide() {
+
+  const TEAMS = [
+    {
+      name:'Orlando City SC', sport:'Soccer (MLS)', emoji:'🦁', color:'#63259B',
+      venue:'Exploria Stadium', capacity:'25,500', neighborhood:'Downtown Orlando',
+      season:'March–October',
+      tips:[
+        'The North End (section 15) has the most passionate supporter culture — standing all game, drums, flags',
+        'Pre-game at The Pub on Church Street or Latitudes Bar near the stadium',
+        'Affordable tickets ($25–70) — great value for live professional sports',
+        'Best seats: East Stand mid-level for full view; North End for atmosphere',
+        'Tailgating starts 2 hours before kickoff in the stadium parking lots',
+      ]
+    },
+    {
+      name:'Orlando Pride', sport:'Soccer (NWSL)', emoji:'🌺', color:'#63259B',
+      venue:'Exploria Stadium', capacity:'25,500', neighborhood:'Downtown Orlando',
+      season:'April–October',
+      tips:[
+        'Same stadium as Orlando City SC — family-friendly atmosphere',
+        'Growing rapidly since 2022 expansion of NWSL — top-tier talent on the field',
+        'Tickets often cheaper than City SC — great value and usually exciting football',
+        'Championship contender in recent years — momentum is building',
+      ]
+    },
+    {
+      name:'Orlando Magic', sport:'Basketball (NBA)', emoji:'🏀', color:'#0B77BD',
+      venue:'Kia Center (Downtown Orlando)', capacity:'20,000', neighborhood:'Downtown Orlando',
+      season:'October–April',
+      tips:[
+        'Young, exciting team rebuilding around top draft picks — fun era to watch',
+        'Kia Center is right downtown — easy rideshare access',
+        'Upper deck tickets from $25 — some of the best NBA value in the league',
+        'Post-game nightlife on Orange Ave and Church Street is excellent',
+        'The premium club seats offer in-seat waiter service — worth it for a special night',
+      ]
+    },
+    {
+      name:'UCF Knights', sport:'College Football (Big 12)', emoji:'🏈', color:'#000000',
+      venue:'FBC Mortgage Stadium (UCF campus)', capacity:'45,000', neighborhood:'UCF Area',
+      season:'September–November',
+      tips:[
+        'UCF is now in the Big 12 — major conference matchups against Texas, Oklahoma, etc.',
+        'Tailgating on campus starts 4+ hours before kickoff — extremely festive',
+        'Tickets ($25–80) are very affordable for Big 12 football',
+        'The Knight Walk pregame parade is a fan tradition worth seeing',
+        'Check for rivalry games vs USF (the War on I-4) — the most heated game of the year',
+      ]
+    },
+    {
+      name:'Orlando Solar Bears', sport:'Ice Hockey (ECHL)', emoji:'🐻', color:'#0B77BD',
+      venue:'Kia Center', capacity:'20,000', neighborhood:'Downtown Orlando',
+      season:'October–April',
+      tips:[
+        'ECHL is one level below AHL. Excellent hockey at a fraction of NHL prices',
+        'Tickets from $12 — probably the most affordable professional sports in Orlando',
+        'Great family option — fast-paced, physical, and entertaining',
+        'Friday night games tend to have the best atmosphere',
+      ]
+    },
+  ];
+
+  const SPORTING_EVENTS = [
+    { name:'Arnold Palmer Invitational (PGA Tour)', month:'March', venue:'Bay Hill Club', desc:'One of the most prestigious non-Major tournaments. Star-studded field. General admission tickets available.' },
+    { name:'Camping World Bowl / Gasparilla Bowl', month:'December', venue:'Camping World Stadium', desc:'College football bowl games in late December. Great end-of-year sports entertainment.' },
+    { name:'Daytona 500 (nearby)', month:'February', venue:'Daytona Beach (1 hr drive)', desc:'World\'s most famous auto race is just 1 hour from Orlando. A pilgrimage for motorsports fans.' },
+    { name:'NASCAR Coke Zero Sugar 400 at Daytona', month:'August', venue:'Daytona Beach', desc:'August NASCAR race at Daytona. Typically less crowded than February 500. Easier tickets.' },
+    { name:'Central Florida Fighting Knights MBB', month:'Nov–March', venue:'Kia Center (some games)', desc:'UCF basketball in the Big 12 — improved level of competition makes this a more interesting watch.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-sports-guide2';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const header = document.createElement('div');
+    header.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#0D47A1,#1565C0,#1E88E5);padding:16px 14px 14px;';
+    header.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:#fff;">Orlando Sports Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">MLS · NBA · College · Events</div>
+        </div>
+        <span style="font-size:24px;">🏆</span>
+      </div>
+      <div style="background:rgba(255,255,255,.12);border-radius:8px;padding:7px 12px;font-size:11px;color:rgba(255,255,255,.85);line-height:1.5;">
+        Orlando has surprisingly strong sports offerings — an MLS team with genuine culture, an NBA franchise, and one of the fastest-growing college football programs in the country.
+      </div>`;
+
+    const content = document.createElement('div');
+    content.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    // Teams
+    TEAMS.forEach(team => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="background:${team.color};padding:10px 14px;display:flex;align-items:center;gap:10px;">
+          <span style="font-size:24px;">${team.emoji}</span>
+          <div style="flex:1;">
+            <div style="font-size:14px;font-weight:700;color:#fff;">${team.name}</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.8);">${team.sport} · ${team.season}</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:10px;color:rgba(255,255,255,.8);">${team.venue}</div>
+            <div style="font-size:9px;color:rgba(255,255,255,.6);">${team.capacity}</div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          ${team.tips.slice(0,3).map(t=>`<div style="font-size:11px;color:var(--text-secondary,#555);padding:3px 0;line-height:1.4;">• ${t}</div>`).join('')}
+        </div>`;
+      content.appendChild(card);
+    });
+
+    // Events
+    const evHeader = document.createElement('div');
+    evHeader.style.cssText = 'font-size:13px;font-weight:800;color:#1565C0;margin:14px 0 8px;';
+    evHeader.textContent = '🏆 MAJOR SPORTING EVENTS';
+    content.appendChild(evHeader);
+
+    SPORTING_EVENTS.forEach(ev => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:12px;margin-bottom:8px;padding:11px 13px;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="display:flex;justify-content:space-between;margin-bottom:3px;">
+          <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);">${ev.name}</div>
+          <span style="font-size:10px;font-weight:700;color:#1565C0;">${ev.month}</span>
+        </div>
+        <div style="font-size:10px;color:var(--text-secondary,#aaa);margin-bottom:3px;">${ev.venue}</div>
+        <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.4;">${ev.desc}</div>`;
+      content.appendChild(card);
+    });
+
+    const spacer = document.createElement('div');
+    spacer.style.height = '20px';
+    content.appendChild(spacer);
+
+    s.appendChild(header);
+    s.appendChild(content);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-sports-guide2')) buildScreen();
+
+  const _prevSS_iiii2 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_iiii2) _prevSS_iiii2(name, el);
+    if (name === 'sports-guide2') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-sports-guide2');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectSportsCard() {
+    if (document.getElementById('sports2-home-card')) return true;
+    const ref = document.getElementById('arts-home-card') || document.getElementById('brewery-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'sports2-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#0D47A1,#1565C0,#1E88E5);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('sports-guide2');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:3px;">🏆 Orlando Sports Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">Orlando City · Magic · UCF · Events</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.5);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _sports2Card = false;
+  setInterval(() => { if (!_sports2Card) _sports2Card = injectSportsCard(); }, 28500);
+  setTimeout(() => { _sports2Card = injectSportsCard(); }, 25000);
+
+  const _prevRH_iiii2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_iiii2) _prevRH_iiii2.apply(this, arguments);
+    setTimeout(() => { _sports2Card = false; _sports2Card = injectSportsCard(); }, 6300);
+  };
+})();
+</script>
