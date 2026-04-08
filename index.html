@@ -46943,3 +46943,181 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK PPPP2: Orlando Family Planner by Age Group ===== */
+(function initFamilyPlanner() {
+
+  const AGE_GROUPS = [
+    {
+      label:'Babies & Toddlers (0–3)', emoji:'👶', color:'#FF6B9D',
+      parks:['Magic Kingdom is best — stroller-friendly, many indoor rides, baby swap policy','EPCOT Flower & Garden or Food & Wine for relaxed atmosphere'],
+      rides:['The Many Adventures of Winnie the Pooh (no height req)','Dumbo the Flying Elephant (no height req)','Carousel of Progress (no height req)','Tomorrowland Speedway (no height req, but slow)','Under the Sea - Journey of the Little Mermaid'],
+      services:['Baby Care Centers at every Disney park — nursing room, changing area, microwave, formula','Stroller rental available at all Disney and Universal parks','Disney Baby Care Centers have private rooms — better than park restrooms for feeding'],
+      tips:['"Baby Swap" policy: while one parent rides, other waits with baby in a special area. Then swap without re-queuing.','Pack more diapers and formula than you think you need.','Rope drop and early park entry matters most for this age — nap time will cut your day short.','Skip Universal with under-3s — most Universal attractions have height requirements.'],
+      avoid:['All coasters','Haunted Mansion (may frighten)','Loud shows like Festival of the Lion King','Evening fireworks (too loud for infants)'],
+    },
+    {
+      label:'Young Kids (4–7)', emoji:'🧒', color:'#7B1FA2',
+      parks:['Magic Kingdom has the most suitable rides for this age','EPCOT for Frozen Ever After and Remy\'s Ratatouille','Hollywood Studios for Mickey & Minnie\'s Runaway Railway and Slinky Dog Dash'],
+      rides:['Seven Dwarfs Mine Train (38" — first real coaster for many kids)','Slinky Dog Dash (38")','Frozen Ever After (no height req)','Na\'vi River Journey (no height req)','Remy\'s Ratatouille Adventure (no height req)','Big Thunder Mountain (40")','Tiana\'s Bayou Adventure (40")'],
+      services:['Disney Junior character meets daily at Hollywood Studios','Princess Makeover at Bibbidi Bobbidi Boutique ($$$, pre-book)','Character breakfast reservations — best bang for buck for this age group'],
+      tips:['Character dining is worth every penny at this age — your child won\'t care about which restaurant, they\'ll remember Mickey hugging them.','Bring your child\'s favorite small toy or stuffed animal to meet characters — CMs engage beautifully with this.','Park days should be 6–8 hours max. Plan a rest period midday, even if just sitting in A/C.'],
+      avoid:['Expedition Everest (44", too intense for most 4-7 year olds)','Space Mountain (44", dark and rough)','Tower of Terror (must be 8+ emotionally)'],
+    },
+    {
+      label:'Tweens (8–12)', emoji:'🧑', color:'#E65100',
+      parks:['Hollywood Studios for Star Wars (this is the sweet spot age)','Islands of Adventure for Wizarding World','All Disney and Universal parks now fully accessible'],
+      rides:['Rise of the Resistance (40" — this age group loves it most)','Avatar Flight of Passage (44")','VelociCoaster (51" — verify height)','Expedition Everest (44")','Hagrid\'s Motorbike (48")','TRON Lightcycle / Run (48")'],
+      services:['Build Your Own Lightsaber at Savi\'s Workshop ($249)','Build Your Own Droid at Droid Depot ($119)','Wilderness Explorers at Animal Kingdom (free scout program throughout the park)'],
+      tips:['This is the golden age for theme parks — old enough for all major rides, young enough to still be amazed by the magic.','Let them lead the day\'s agenda (with your guidance). Ownership of the plan increases engagement dramatically.','Introduce Lightning Lane management — give them the app and let them participate in ride planning.'],
+      avoid:['Nothing at this age! Everything is accessible. Focus on managing the schedule so they don\'t burn out.'],
+    },
+    {
+      label:'Teenagers (13–17)', emoji:'🧑‍🦱', color:'#1565C0',
+      parks:['Islands of Adventure for VelociCoaster','Hollywood Studios for the combination of thrills and theming','Universal for best coaster collection'],
+      rides:['VelociCoaster (51" — fastest and most intense in Florida)','Hagrid\'s Motorbike (48")','Hollywood Rip Ride Rockit (51")','Incredible Hulk Coaster (54")','TRON Lightcycle / Run (48")','Rock \'n\' Roller Coaster (48")'],
+      services:['Many teens prefer navigating parks mostly independently — give them their own LL and meet at designated spots','Disney After Hours events are teen favorites','Halloween Horror Nights at Universal (13+ recommended) is a teen bucket-list experience'],
+      tips:['Teens often connect most with the "achievement" aspects of parks — completing all coasters, getting high scores in Smugglers Run, earning Wilderness Explorer badges.','Universal\'s Velocicoaster is the #1 thing to show teens — it\'s an objective world-class thrill coaster.','Let them stay up for closing fireworks and parades, even if it means a late start the next morning.'],
+      avoid:['Character meets (usually)','It\'s a Small World','Slowest family-oriented dark rides unless the teen specifically requests them'],
+    },
+  ];
+
+  const LOGISTICS = [
+    { icon:'🚻', tip:'Baby Care Centers at every Disney park have nursing rooms, changing tables, microwave, formula, and diapers for sale. Far better than any restroom.' },
+    { icon:'🧴', tip:'Sunscreen and hat application before you leave the hotel, not in the parking lot — saves 20 min of wrangling in the heat.' },
+    { icon:'🍔', tip:'Pack kids\' snacks from outside the park. Familiar snacks prevent "I don\'t like anything here" meltdowns in expensive restaurants.' },
+    { icon:'💤', tip:'Plan one rest break per 4 hours. The hotel pool or a quiet A/C spot resets energy better than pushing through.' },
+    { icon:'📸', tip:'Photograph your child at the beginning of each park day. Tired end-of-day photos never capture the joy.' },
+    { icon:'🎯', tip:'Give kids ownership: let them pick ONE non-negotiable activity each day. This reduces conflict and increases satisfaction for everyone.' },
+    { icon:'💊', tip:'First aid kits at every Disney park are stocked with kid-size bandaids, children\'s pain relievers, and sting relief. Know where they are.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-family-planner';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const header = document.createElement('div');
+    header.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#FF6B9D,#FF8C69,#FFD700);padding:16px 14px 14px;';
+    header.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:#fff;">Family Planner by Age</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.85);">Baby to teen · Rides · Character dining · Tips</div>
+        </div>
+        <span style="font-size:24px;">👨‍👩‍👧‍👦</span>
+      </div>`;
+
+    const content = document.createElement('div');
+    content.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    // Logistics first
+    const logCard = document.createElement('div');
+    logCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;padding:12px 14px;margin-bottom:14px;border:1px solid var(--border,#eee);';
+    logCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:8px;">🧳 Family Logistics</div>`;
+    LOGISTICS.forEach(l => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;gap:8px;margin-bottom:6px;align-items:flex-start;';
+      row.innerHTML = `<span style="font-size:16px;">${l.icon}</span><div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${l.tip}</div>`;
+      logCard.appendChild(row);
+    });
+    content.appendChild(logCard);
+
+    // Age groups
+    AGE_GROUPS.forEach(age => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+
+      const ageHeader = document.createElement('div');
+      ageHeader.style.cssText = `background:${age.color};padding:10px 14px;display:flex;align-items:center;gap:8px;`;
+      ageHeader.innerHTML = `<span style="font-size:24px;">${age.emoji}</span><div style="font-size:13px;font-weight:700;color:#fff;">${age.label}</div>`;
+      card.appendChild(ageHeader);
+
+      const body = document.createElement('div');
+      body.style.cssText = 'padding:12px 14px;';
+
+      const ridesLabel = document.createElement('div');
+      ridesLabel.style.cssText = 'font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:5px;';
+      ridesLabel.textContent = 'TOP RIDES';
+      body.appendChild(ridesLabel);
+
+      const ridesGrid = document.createElement('div');
+      ridesGrid.style.cssText = 'display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;';
+      age.rides.slice(0,5).forEach(r => {
+        const chip = document.createElement('span');
+        chip.style.cssText = `padding:2px 8px;border-radius:20px;font-size:10px;background:${age.color}12;color:${age.color};font-weight:600;`;
+        chip.textContent = r;
+        ridesGrid.appendChild(chip);
+      });
+      body.appendChild(ridesGrid);
+
+      const tipsLabel = document.createElement('div');
+      tipsLabel.style.cssText = 'font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:5px;';
+      tipsLabel.textContent = 'KEY TIPS';
+      body.appendChild(tipsLabel);
+
+      age.tips.slice(0,2).forEach(t => {
+        const tip = document.createElement('div');
+        tip.style.cssText = 'font-size:11px;color:var(--text-secondary,#555);padding:2px 0;line-height:1.5;';
+        tip.textContent = '• ' + t;
+        body.appendChild(tip);
+      });
+
+      card.appendChild(body);
+      content.appendChild(card);
+    });
+
+    const spacer = document.createElement('div');
+    spacer.style.height = '20px';
+    content.appendChild(spacer);
+
+    s.appendChild(header);
+    s.appendChild(content);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-family-planner')) buildScreen();
+
+  const _prevSS_pppp2 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_pppp2) _prevSS_pppp2(name, el);
+    if (name === 'family-planner') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-family-planner');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectFamilyCard() {
+    if (document.getElementById('family-home-card')) return true;
+    const ref = document.getElementById('sd-home-card') || document.getElementById('rain-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'family-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#FF6B9D,#FF8C69,#FFD700);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('family-planner');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:3px;">👨‍👩‍👧‍👦 Family Planner by Age</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.9);">Baby to teen · Rides · Character dining · Tips</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.5);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _familyCard = false;
+  setInterval(() => { if (!_familyCard) _familyCard = injectFamilyCard(); }, 32000);
+  setTimeout(() => { _familyCard = injectFamilyCard(); }, 28500);
+
+  const _prevRH_pppp2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_pppp2) _prevRH_pppp2.apply(this, arguments);
+    setTimeout(() => { _familyCard = false; _familyCard = injectFamilyCard(); }, 7700);
+  };
+})();
+</script>
