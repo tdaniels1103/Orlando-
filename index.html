@@ -41292,3 +41292,434 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK LLL2: Gluten-Free & Dietary Restrictions Guide ===== */
+(function initDietaryGuide() {
+
+  const DIETARY_PARKS = [
+    {
+      park:'Walt Disney World — Gold Standard',
+      emoji:'🏰',
+      color:'#1565C0',
+      rating:5,
+      overview:"Disney is universally considered the world's best theme park destination for dietary restrictions. Dedicated allergy menus, chef meet-and-greets at table service restaurants, and gluten-free bread/buns at every quick service location make this achievable.",
+      gfHighlights:[
+        "Guests who speak to a chef at any table service restaurant get completely customized meals — this is genuine, not marketing",
+        "Gluten-free buns available at every burger/hot dog QS location (request at the counter)",
+        "Gluten-free pizza and pasta available at Via Napoli in EPCOT, Trattoria al Forno at BoardWalk",
+        "Allergy-friendly Mickey waffles at all breakfast locations",
+        "Mobile Order shows allergen filters — select your restrictions and the menu highlights safe options",
+      ],
+      veganHighlights:[
+        "EPCOT's World Showcase has the highest concentration of plant-based options anywhere in a theme park",
+        "Disney's Cosmic Ray's Starlight Café (Magic Kingdom) has dedicated plant-based section",
+        "Tiffins restaurant at Animal Kingdom — extraordinary vegan tasting menu available on request",
+        "EPCOT's Flower & Garden and Food & Wine festivals have extensive plant-based selections",
+      ],
+      practicalTips:[
+        "Call 407-WDW-DINE (407-939-3463) before your trip to discuss special dietary needs",
+        "Alert dining cast members at the start of the meal — they will involve the chef for any allergy",
+        "Disney Allergy Menu is available via the My Disney Experience app — filter by restriction",
+        "The allergy-friendly food carts throughout parks have dedicated GF cupcakes, treats, and snacks",
+      ],
+    },
+    {
+      park:'Universal Orlando Resort',
+      emoji:'🎬',
+      color:'#1B5E20',
+      rating:4,
+      overview:"Universal has improved significantly for dietary restrictions. Not at Disney's level but very manageable. The Wizarding World's butterbeer is NOT gluten-free (contains barley), but most other attractions have accommodating options.",
+      gfHighlights:[
+        "Three Broomsticks and Leaky Cauldron both offer gluten-free versions of Great Feast",
+        "Butterbeer: the regular and frozen versions contain gluten. The Butterbeer ice cream in cups is gluten-free",
+        "Springfield area (Universal Studios) has the most gluten-free options — ask the Fat Tony's staff",
+        "CityWalk: Hard Rock Cafe has excellent dedicated gluten-free menu",
+      ],
+      veganHighlights:[
+        "Universal has added plant-based options across both parks in recent years",
+        "Mythos Restaurant (IoA) has vegan-marked items and chef consultation available",
+        "Voodoo Doughnut in CityWalk has plant-based doughnut options",
+      ],
+      practicalTips:[
+        "Ask to speak to a manager at any full-service Universal restaurant for allergy accommodation",
+        "Universal's allergy menus are not as readily available online as Disney's — ask in-person",
+        "Carry your own gluten-free snacks as backup — selection is less comprehensive than Disney",
+      ],
+    },
+    {
+      park:'EPCOT — Special Mention',
+      emoji:'🌍',
+      color:'#006064',
+      rating:5,
+      overview:"EPCOT deserves its own section for dietary restrictions. The World Showcase's international pavilions contain some of the most diverse allergy-accommodating food in the entire state of Florida.",
+      gfHighlights:[
+        "Japan Pavilion (Teppan Edo): gluten-free soy sauce available, fully customizable teppanyaki",
+        "Morocco Pavilion (Spice Road Table): most North African cuisine is naturally gluten-free",
+        "Mexico Pavilion (La Hacienda de San Angel): naturally gluten-free corn tortillas and dishes",
+        "France Pavilion (Monsieur Paul): upscale French with genuine chef accommodation for GF",
+        "Canada Pavilion (Le Cellier): can modify most dishes and provides GF bread",
+      ],
+      veganHighlights:[
+        "During Food & Wine Festival: dedicated plant-based section with 6–10 countries represented",
+        "Via Napoli (Italy): vegan pizza and pasta accommodated with advance notice",
+        "Japan Katsura Grill: vegetable tempura and sushi options are naturally plant-forward",
+      ],
+      practicalTips:[
+        "EPCOT is the best single park for dietary-restricted foodies in the entire Disney portfolio",
+        "Book dinner reservations at World Showcase restaurants when you make your other reservations",
+        "Ask each pavilion specifically — some have unlisted gluten-free/vegan options not on the standard menu",
+      ],
+    },
+  ];
+
+  const OFF_PROPERTY = [
+    { name:'Dandelion Cafe', cuisine:'100% Vegan / GF-friendly', neighborhood:'College Park, Orlando', desc:"Orlando's premier vegan restaurant. Everything plant-based, most items gluten-free or adaptable. The burgers are extraordinary.", price:'$$' },
+    { name:'Ethos Vegan Kitchen', cuisine:'Vegan / GF options', neighborhood:'Ivanhoe Village', desc:'Casual vegan comfort food. The mac & cheese and chicken sandwiches are famous. Many GF options.', price:'$' },
+    { name:'Kasa Indian Eatery', cuisine:'Indian (naturally GF / vegan options)', neighborhood:'Multiple locations', desc:'Indian cuisine is naturally accommodating — rice-based, legume-heavy, many vegan and GF options. Excellent quality.', price:'$$' },
+    { name:'Jinya Ramen Bar', cuisine:'Japanese (GF broth available)', neighborhood:'I-Drive / Dr. Phillips', desc:'Request gluten-free soy sauce and rice noodles. Detailed allergen information available.', price:'$$' },
+    { name:'Publix supermarket', cuisine:'Grocery', neighborhood:'Multiple locations near all parks', desc:'Best supermarket chain in the South. Extensive gluten-free and plant-based section. Make your own safe food for park days.', price:'$' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-dietary-guide';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;';
+    s.innerHTML = `
+      <div style="background:linear-gradient(135deg,#33691E,#558B2F,#8BC34A);padding:18px 14px 20px;
+        display:flex;align-items:center;gap:12px;flex-shrink:0;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;
+          border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#fff;">Dietary Restrictions Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">Gluten-free · Vegan · Allergies · Off-property</div>
+        </div>
+        <span style="font-size:28px;">🥗</span>
+      </div>
+      <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;">
+
+        <div style="background:linear-gradient(135deg,#33691E,#558B2F);border-radius:16px;padding:14px;margin-bottom:14px;color:#fff;">
+          <div style="font-size:13px;line-height:1.6;opacity:.9;">
+            Disney World is genuinely one of the best places on earth to travel with food allergies or dietary restrictions. Universal follows, and off-property Orlando has excellent options too. Here's everything you need.
+          </div>
+        </div>
+
+        ${DIETARY_PARKS.map(park => `
+          <div style="background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;
+            border:1px solid var(--border,#eee);overflow:hidden;">
+            <div style="background:${park.color};padding:10px 14px;display:flex;align-items:center;gap:8px;">
+              <span style="font-size:22px;">${park.emoji}</span>
+              <div style="flex:1;">
+                <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:#fff;">${park.park}</div>
+              </div>
+              <div style="font-size:13px;">${'⭐'.repeat(park.rating)}</div>
+            </div>
+            <div style="padding:10px 14px;">
+              <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;margin-bottom:8px;">${park.overview}</div>
+
+              <div style="font-size:10px;font-weight:700;color:#558B2F;margin-bottom:4px;">🌾 GLUTEN-FREE HIGHLIGHTS</div>
+              ${park.gfHighlights.map(h => `<div style="font-size:12px;color:var(--text-secondary,#555);padding:2px 0;">• ${h}</div>`).join('')}
+
+              <div style="font-size:10px;font-weight:700;color:#2E7D32;margin:8px 0 4px;">🌱 VEGAN/PLANT-BASED HIGHLIGHTS</div>
+              ${park.veganHighlights.map(h => `<div style="font-size:12px;color:var(--text-secondary,#555);padding:2px 0;">• ${h}</div>`).join('')}
+
+              <div style="font-size:10px;font-weight:700;color:${park.color};margin:8px 0 4px;">💡 PRACTICAL TIPS</div>
+              ${park.practicalTips.map(t => `<div style="font-size:12px;color:var(--text-secondary,#555);padding:2px 0;">→ ${t}</div>`).join('')}
+            </div>
+          </div>`).join('')}
+
+        <!-- Off-property options -->
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;
+          color:var(--text-primary,#212121);margin-bottom:10px;">🌆 Off-Property Dietary Options</div>
+        ${OFF_PROPERTY.map(r => `
+          <div style="background:var(--card-bg,#fff);border-radius:12px;margin-bottom:8px;
+            border:1px solid var(--border,#eee);padding:10px 12px;display:flex;gap:10px;">
+            <div style="flex:1;">
+              <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${r.name}</div>
+              <div style="font-size:11px;color:#558B2F;font-weight:700;">${r.cuisine}</div>
+              <div style="font-size:11px;color:var(--text-secondary,#888);">📍 ${r.neighborhood}</div>
+              <div style="font-size:12px;color:var(--text-secondary,#555);margin-top:3px;">${r.desc}</div>
+            </div>
+            <div style="font-size:14px;font-weight:800;color:#558B2F;flex-shrink:0;">${r.price}</div>
+          </div>`).join('')}
+
+        <!-- Emergency food kit -->
+        <div style="background:linear-gradient(135deg,#33691E,#558B2F);border-radius:14px;padding:14px;margin-top:12px;margin-bottom:20px;color:#fff;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">🎒 Park Food Safety Kit</div>
+          ${[
+            'Tamari packets (GF soy sauce) — available at Asian markets near Orlando',
+            'GF granola bars: RxBar and LÄRABAR are crowd-free, compact options',
+            'Approved snacks from home: familiar safe foods eliminate stress',
+            'Allergy card printed in English + any relevant language (especially for EPCOT World Showcase)',
+            'Enzymatic digestive supplements (if prescribed) — refill before your trip',
+            'Disney\'s allergy menu PDF saved offline on your phone before you arrive',
+          ].map(item => `<div style="font-size:12px;color:rgba(255,255,255,.9);padding:4px 0;border-bottom:1px solid rgba(255,255,255,.15);line-height:1.5;">• ${item}</div>`).join('')}
+        </div>
+      </div>`;
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-dietary-guide')) buildScreen();
+
+  const _prevSS_lll2 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_lll2) _prevSS_lll2(name, el);
+    if (name === 'dietary-guide') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-dietary-guide');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectDietaryCard() {
+    if (document.getElementById('dietary-home-card')) return true;
+    const ref = document.getElementById('tech-home-card') || document.getElementById('budget-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'dietary-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#33691E,#558B2F,#8BC34A);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('dietary-guide');
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:28px;">🥗</span>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Dietary Restrictions Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.85);">GF · Vegan · Allergies · Off-property dining</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _dietCard = false;
+  setInterval(() => { if (!_dietCard) _dietCard = injectDietaryCard(); }, 17000);
+  setTimeout(() => { _dietCard = injectDietaryCard(); }, 13500);
+
+  const _prevRH_lll2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_lll2) _prevRH_lll2.apply(this, arguments);
+    setTimeout(() => { _dietCard = false; _dietCard = injectDietaryCard(); }, 3200);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK MMM2: Rollercoaster Rankings & Thrill Guide ===== */
+(function initThrillGuide() {
+
+  const COASTERS = [
+    {
+      rank:1, name:'Velocicoaster', park:'Universal — Islands of Adventure', emoji:'🦕',
+      thrill:10, height:'51"', duration:'1:50', topSpeed:'70 mph', inversions:12,
+      type:'Launched Multi-Inversion',
+      desc:"Florida's best roller coaster by a wide margin. Four launches, 12 inversions, 0-to-70 in 2.4 seconds. The top hat element at 155 feet is the most breathtaking single moment in any Orlando coaster. A world-class attraction by any measure.",
+      insider:"Single rider line is usually 30–40% shorter than the standby line. Go multiple times.",
+      category:'Extreme',
+    },
+    {
+      rank:2, name:"Hagrid's Magical Creatures Motorbike Adventure", park:'Universal — Islands of Adventure', emoji:'⚡',
+      thrill:7, height:'48"', duration:'5:00', topSpeed:'50 mph', inversions:1,
+      type:'Multi-Vehicle Dark Coaster',
+      desc:"The most themed ride ever built. Not the most intense, but the most impressive. A 5-minute journey through the Forbidden Forest on a motorbike with Hagrid as your guide. Creatures, surprises, reversals, and a backwards drop make this an experience no other park can match.",
+      insider:"The virtual queue releases at park open via the app. Join IMMEDIATELY when you walk through the park gates.",
+      category:'Family-Extreme',
+    },
+    {
+      rank:3, name:'TRON Lightcycle / Run', park:"Disney's Magic Kingdom", emoji:'🏍️',
+      thrill:8, height:'48"', duration:'1:30', topSpeed:'60 mph', inversions:0,
+      type:'Motorbike Coaster',
+      desc:"Disney's fastest and most thrilling coaster. You ride in a motorcycle position on a Lightcycle through a neon-lit TRON universe. The outdoor section over the grid at full speed is extraordinary. Disney waited 20 years to build something at this thrill level.",
+      insider:"Virtual queue at 7 AM or Lightning Lane Premier purchase. Both sell out. Be ready.",
+      category:'Extreme',
+    },
+    {
+      rank:4, name:'Guardians of the Galaxy: Cosmic Rewind', park:"Disney's EPCOT", emoji:'🚀',
+      thrill:7, height:'42"', duration:'4:30', topSpeed:'60 mph', inversions:0,
+      type:"World's first backward-launching coaster",
+      desc:"The coaster rotates so your seat always faces the action. Launched backward into a space chase scene to a killer soundtrack. One of the most innovative rides ever built. The height requirement of 42 inches makes it accessible to more guests than Velocicoaster.",
+      insider:"Virtual queue at 7 AM and 1 PM. Lightning Lane Premier at 7 AM. ILL consistently sells out by 8 AM.",
+      category:'Thrilling',
+    },
+    {
+      rank:5, name:'Millennium Falcon: Smugglers Run', park:"Disney's Hollywood Studios", emoji:'🛸',
+      thrill:5, height:'38"', duration:'5:00', topSpeed:'N/A', inversions:0,
+      type:'Interactive Simulator',
+      desc:"Not a coaster but an interactive simulator where you pilot the Millennium Falcon. The pilot seats control the speed and firing — your performance determines whether you achieve the mission. The physical hydraulic motion platform and screen effects are impressive.",
+      insider:"Pilot seats (front two) have the most interactive controls. Request them when asked your preference.",
+      category:'Moderate',
+    },
+    {
+      rank:6, name:'Mako', park:'SeaWorld Orlando', emoji:'🦈',
+      thrill:9, height:'54"', duration:'2:30', topSpeed:'73 mph', inversions:0,
+      type:'Hypercoaster',
+      desc:"Florida's fastest roller coaster. A 200-foot drop into pure speed. No inversions, just raw airtime and velocity. The sustained speed after the first drop is relentless. SeaWorld's crown jewel and genuinely world-class.",
+      insider:"SeaWorld is significantly less crowded than Disney or Universal — Mako rarely has more than a 30-minute wait.",
+      category:'Extreme',
+    },
+    {
+      rank:7, name:'Manta', park:'SeaWorld Orlando', emoji:'🐟',
+      thrill:8, height:'54"', duration:'2:00', topSpeed:'56 mph', inversions:4,
+      type:'Flying Coaster',
+      desc:"You lay face-down and 'fly' like a ray. Skims 2 feet above a lagoon at the ride's midpoint. Four inversions while prone is an unusual and exhilarating sensation unlike any other coaster.",
+      insider:"Ride Manta and Mako on the same SeaWorld day — together they're one of Florida's best coaster combos.",
+      category:'Extreme',
+    },
+    {
+      rank:8, name:'Iron Gwazi', park:'Busch Gardens Tampa (90 min)', emoji:'🐊',
+      thrill:10, height:'54"', duration:'2:30', topSpeed:'76 mph', inversions:7,
+      type:'Hybrid Wood/Steel',
+      desc:"If you make the drive to Tampa, Iron Gwazi is waiting. World's fastest and most intense hybrid coaster. 7 inversions, 91-degree drop, 76 mph. A day at Busch Gardens + Iron Gwazi is worth the 90-minute drive from Orlando.",
+      insider:"Busch Gardens is significantly less crowded than Disney or Universal. Wait times rarely exceed 30 min.",
+      category:'Extreme',
+    },
+    {
+      rank:9, name:'Seven Dwarfs Mine Train', park:"Disney's Magic Kingdom", emoji:'⛏️',
+      thrill:4, height:'38"', duration:'2:30', topSpeed:'34 mph', inversions:0,
+      type:'Family Mine Train',
+      desc:"Disney's best family coaster. Swinging mine cars, charming story, beautiful theming. The most in-demand family ride in Disney World with some of the longest wait times of any ride in any park.",
+      insider:"Book Lightning Lane Premier or ride at Rope Drop. Average wait: 80–120 minutes on busy days without LL.",
+      category:'Family',
+    },
+    {
+      rank:10, name:'Slinky Dog Dash', park:"Disney's Hollywood Studios", emoji:'🐕',
+      thrill:4, height:'38"', duration:'2:00', topSpeed:'40 mph', inversions:0,
+      type:'Family Launched Coaster',
+      desc:"The Toy Story Land coaster is genuinely well-designed for families. Colorful, fun, and paced perfectly for kids experiencing their first coaster thrill. The park theming in Toy Story Land makes it an experience beyond just the ride.",
+      insider:"Rope Drop strategy: run straight to Slinky Dog — it's at the far end of the park and becomes an 80+ min wait by 10 AM.",
+      category:'Family',
+    },
+  ];
+
+  const CATEGORIES = {
+    'Extreme': { color:'#B71C1C', emoji:'💀' },
+    'Extreme (off-property)': { color:'#880E4F', emoji:'💀' },
+    'Thrilling': { color:'#E65100', emoji:'⚡' },
+    'Family-Extreme': { color:'#F57F17', emoji:'🌟' },
+    'Moderate': { color:'#2E7D32', emoji:'😊' },
+    'Family': { color:'#1565C0', emoji:'👨‍👩‍👧' },
+  };
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-thrill-guide';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;';
+    s.innerHTML = `
+      <div style="background:linear-gradient(135deg,#B71C1C,#D32F2F,#EF9A9A);padding:18px 14px 20px;
+        display:flex;align-items:center;gap:12px;flex-shrink:0;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;
+          border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#fff;">Coaster & Thrill Rankings</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">Top 10 ranked · Stats · Insider tips · Categories</div>
+        </div>
+        <span style="font-size:28px;">🎢</span>
+      </div>
+      <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;">
+
+        ${COASTERS.map(c => {
+          const cat = CATEGORIES[c.category] || { color:'#888', emoji:'🎢' };
+          const thrillFill = (c.thrill / 10 * 100).toFixed(0);
+          return `<div style="background:var(--card-bg,#fff);border-radius:14px;margin-bottom:10px;
+            border:1px solid var(--border,#eee);overflow:hidden;">
+            <div style="background:linear-gradient(135deg,#B71C1C,#D32F2F);padding:10px 14px;">
+              <div style="display:flex;align-items:flex-start;gap:8px;">
+                <div style="font-size:22px;font-weight:800;color:rgba(255,255,255,.4);flex-shrink:0;min-width:30px;">#${c.rank}</div>
+                <div style="flex:1;">
+                  <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:#fff;">${c.emoji} ${c.name}</div>
+                  <div style="font-size:10px;color:rgba(255,255,255,.8);">${c.park}</div>
+                  <div style="font-size:10px;color:rgba(255,255,255,.7);">${c.type}</div>
+                </div>
+                <span style="font-size:10px;font-weight:800;padding:3px 8px;border-radius:20px;
+                  background:${cat.color};color:#fff;flex-shrink:0;">${cat.emoji} ${c.category}</span>
+              </div>
+              <!-- Thrill bar -->
+              <div style="margin-top:6px;">
+                <div style="display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,.7);margin-bottom:3px;">
+                  <span>Thrill Level</span><span>${c.thrill}/10</span>
+                </div>
+                <div style="background:rgba(255,255,255,.2);border-radius:4px;height:6px;overflow:hidden;">
+                  <div style="width:${thrillFill}%;height:100%;background:#fff;border-radius:4px;"></div>
+                </div>
+              </div>
+            </div>
+            <div style="padding:10px 14px;">
+              <div style="display:flex;gap:12px;margin-bottom:8px;font-size:11px;color:var(--text-secondary,#888);">
+                <span>⬆ Height: ${c.height}</span>
+                <span>⏱ ${c.duration}</span>
+                <span>💨 ${c.topSpeed}</span>
+                ${c.inversions > 0 ? `<span>🔄 ${c.inversions} inversions</span>` : ''}
+              </div>
+              <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;margin-bottom:6px;">${c.desc}</div>
+              <div style="background:#B71C1C10;border-left:3px solid #D32F2F;padding:7px 10px;border-radius:0 8px 8px 0;">
+                <div style="font-size:11px;font-weight:700;color:#B71C1C;">🤫 INSIDER</div>
+                <div style="font-size:12px;color:var(--text-primary,#333);margin-top:2px;">${c.insider}</div>
+              </div>
+            </div>
+          </div>`;
+        }).join('')}
+
+        <!-- Thrill selector guide -->
+        <div style="background:linear-gradient(135deg,#B71C1C,#D32F2F);border-radius:14px;padding:14px;margin-bottom:20px;color:#fff;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">🎯 How to Choose Your Thrill Level</div>
+          ${Object.entries(CATEGORIES).map(([cat, info]) => `
+            <div style="display:flex;gap:10px;margin-bottom:6px;align-items:center;">
+              <span style="font-size:16px;">${info.emoji}</span>
+              <div style="background:${info.color};padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;">${cat}</div>
+              <div style="font-size:11px;color:rgba(255,255,255,.8);">
+                ${cat === 'Family' ? 'Most anyone can ride. Good starting point for first-timers.' :
+                  cat === 'Moderate' ? 'Some motion/speed. Most adults comfortable.' :
+                  cat === 'Family-Extreme' ? 'Exciting but accessible. The Hagrid\'s sweet spot.' :
+                  cat === 'Thrilling' ? 'Significant speed and/or inversions. Thrill seekers.' :
+                  'Intense launches, inversions, extreme speed. Experienced riders.'}
+              </div>
+            </div>`).join('')}
+        </div>
+      </div>`;
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-thrill-guide')) buildScreen();
+
+  const _prevSS_mmm2 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_mmm2) _prevSS_mmm2(name, el);
+    if (name === 'thrill-guide') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-thrill-guide');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectThrillCard() {
+    if (document.getElementById('thrill-home-card')) return true;
+    const ref = document.getElementById('dietary-home-card') || document.getElementById('tech-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'thrill-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#B71C1C,#D32F2F,#EF9A9A);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('thrill-guide');
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:28px;">🎢</span>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Coaster & Thrill Rankings</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.85);">Top 10 ranked · Thrill levels · Height requirements</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _thrillCard = false;
+  setInterval(() => { if (!_thrillCard) _thrillCard = injectThrillCard(); }, 17500);
+  setTimeout(() => { _thrillCard = injectThrillCard(); }, 14000);
+
+  const _prevRH_mmm2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_mmm2) _prevRH_mmm2.apply(this, arguments);
+    setTimeout(() => { _thrillCard = false; _thrillCard = injectThrillCard(); }, 3300);
+  };
+})();
+</script>
