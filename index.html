@@ -42527,3 +42527,194 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK RRR2: Water Parks Complete Guide ===== */
+(function initWaterParks() {
+
+  const WATER_PARKS = [
+    {
+      name:"Disney's Typhoon Lagoon",
+      emoji:'🌊',
+      color:'#006064',
+      price:'$74 adults / $65 children (ages 3–9)',
+      hours:'Opens 11 AM most days · Check Disney app',
+      desc:"Typhoon Lagoon has the original wave pool — still one of the largest and most powerful in America. The giant surf waves (3–6 feet) are a genuine experience. Shark Reef snorkeling is the unexpected hidden gem. A real tropical paradise feel.",
+      bestFor:'Wave pool lovers · Families · Adults who want real surf waves',
+      topAttractions:[
+        { name:'Crush \'n\' Gusher', type:'Water coaster — goes UP as well as down. Wild ride.', thrill:'High' },
+        { name:'Shark Reef Snorkeling', type:'Swim with actual sharks and rays in a salt water snorkel tank. Free with admission.', thrill:'Unique/Calm' },
+        { name:'Typhoon Lagoon Surf Pool', type:"America's best wave pool. 6-foot Hawaiian-style surf waves every 90 seconds.", thrill:'Moderate-High' },
+        { name:'Humunga Kowabunga', type:'5-story speed slides. Steep. Very fast.', thrill:'High' },
+        { name:"Miss Adventure Falls", type:"A family raft ride through the wreckage of a 'treasure hunting' expedition. Great theming.", thrill:'Low-Moderate' },
+      ],
+      tips:["Arrive 30 min before open to get a prime beach chair location — they go fast", "Shark Reef is one of the most underrated Disney experiences — don't skip it", "Weekdays in September–October are the lowest-crowd water park days"],
+    },
+    {
+      name:"Disney's Blizzard Beach",
+      emoji:'⛄',
+      color:'#1565C0',
+      price:'$74 adults / $65 children (ages 3–9)',
+      hours:'Opens 11 AM most days · Check Disney app (may close for weather or refurbishment)',
+      desc:"The ski resort that melted into a water park. Summit Plummet is the most extreme water slide in Florida and one of the fastest in the world. The winter/snow theming is charmingly absurd and completely unique in the world of water parks.",
+      bestFor:'Thrill seekers · First-time water park visitors · Unique experience',
+      topAttractions:[
+        { name:'Summit Plummet', type:"60-mph near-vertical free fall. Florida's fastest water slide. Extremely intense.", thrill:'Extreme' },
+        { name:"Slush Gusher", type:"The second fastest slide. 90-foot vertical drop. Slightly less terrifying than Summit Plummet.", thrill:'High' },
+        { name:'Teamboat Springs', type:'Longest family white water raft ride in the world at 1,400 feet. Fun for all ages.', thrill:'Low-Moderate' },
+        { name:'Cross Country Creek (lazy river)', type:'A complete circuit around the entire park. Full theming. Best lazy river at Disney.', thrill:'Relaxing' },
+        { name:"Tike's Peak", type:'Dedicated kids water play area. Perfect for toddlers and young children.', thrill:'Kid-Friendly' },
+      ],
+      tips:["Summit Plummet requires waving goodbye to your dignity — you will be extremely exposed at the bottom", "Blizzard Beach sometimes closes for annual refurbishment — check the Disney app before your trip", "Ski lodges and chairlift props create legitimately good photo opportunities"],
+    },
+    {
+      name:'Aquatica (SeaWorld)',
+      emoji:'🐬',
+      color:'#006064',
+      price:'$45–$65 (often bundled with SeaWorld tickets for major savings)',
+      hours:'Opens 10 AM · Typically closes before dark',
+      desc:"SeaWorld's water park is a hidden gem with some genuinely innovative attractions and usually far shorter lines than Disney's water parks. Dolphins and other animals are integrated into the park experience.",
+      bestFor:'Value seekers · Families · Animal lovers',
+      topAttractions:[
+        { name:'Ihu\'s Breakaway Falls', type:"Florida's tallest drop slide. Trapdoor launch into a near-vertical drop. Terrifying.", thrill:'Extreme' },
+        { name:'Roa\'s Rapids', type:'Fast-moving rapid river with splashing jets and surprises throughout the circuit.', thrill:'Moderate' },
+        { name:'Walkabout Waters', type:"5-story interactive water play structure for kids and adults. The giant tipping bucket is its centerpiece.", thrill:'Family' },
+        { name:'Tassie\'s Twisters', type:'Side-by-side racing water slides. Competitive fun.', thrill:'Moderate-High' },
+      ],
+      tips:["Usually far less crowded than Disney water parks on the same day", "Bundle SeaWorld + Aquatica tickets for best value — saves $20–30 per person", "The animal areas (penguin, otter habitats near the park) are a unique water park bonus"],
+    },
+    {
+      name:'Universal Volcano Bay',
+      emoji:'🌋',
+      color:'#1B5E20',
+      price:'$90–$110 (separate from park admission)',
+      hours:'Opens 10 AM · Typically closes at 9 PM',
+      desc:"Universal's technologically advanced water park. TapuTapu wristbands let you 'virtually queue' for rides while relaxing at the wave pool or lazy river — no waiting in long lines in the sun. The volcano is genuinely impressive engineering.",
+      bestFor:'Tech-savvy guests · Adults · Thrill seekers who hate lines',
+      topAttractions:[
+        { name:'Krakatau Aqua Coaster', type:"A water coaster that goes UP using blasts of water. The most innovative ride in any Orlando water park.", thrill:'Moderate-High' },
+        { name:'Ko\'okiri Body Plunge', type:"Florida's steepest drop slide — a trapdoor opens beneath you into a near-vertical face-first drop.", thrill:'Extreme' },
+        { name:'The Honu (wave pool / lagoon)', type:"Massive multi-wave lagoon with 6-foot waves and river areas. Centerpiece of the park.", thrill:'Relaxing-Moderate' },
+        { name:'Ohyah and Ohno Drop Slides', type:'4- and 6-story drop slides into a deep plunge pool with a large splash landing.', thrill:'High' },
+        { name:'Punga Racers', type:'Side-by-side racing mat slides through tunnels. Great for groups and families.', thrill:'Moderate' },
+      ],
+      tips:["TapuTapu virtual queue means you can actually enjoy the park without standing in sun lines — the system works well", "Volcano Bay doesn't take Express Pass — TapuTapu is the only way", "The park is most enjoyable when it's not at full capacity — check crowd predictions before booking a day"],
+    },
+  ];
+
+  const WATER_PARK_TIPS = [
+    { icon:'🌤️', tip:"Best days for water parks: weekday mornings after schools return in September–October. Minimum crowds, maximum fun." },
+    { icon:'☀️', tip:"Sunscreen is essential — reapply every 90 minutes especially after water. SPF 50+ spray sunscreen applies fastest. Don't skip it." },
+    { icon:'🩴', tip:"Water shoes are useful at all parks but mandatory at Typhoon Lagoon's rocky areas and Volcano Bay's volcanic walking areas." },
+    { icon:'🎒', tip:"Lockers at all parks: ~$10–15 for full day. Rent one locker and share with your group." },
+    { icon:'🚫', tip:"Cameras with straps and smartphones in protective waterproof cases are allowed. GoPros are welcome. No large cameras or DSLRs on most slides." },
+    { icon:'🏊', tip:"Height requirements vary significantly by ride — Blizzard Beach's Summit Plummet requires 48\". Check each park's website for exact requirements before arriving with children." },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-water-parks';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f0f8ff);flex-direction:column;overflow:hidden;';
+    s.innerHTML = `
+      <div style="background:linear-gradient(135deg,#006064,#00838F,#26C6DA);padding:18px 14px 20px;
+        display:flex;align-items:center;gap:12px;flex-shrink:0;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;
+          border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#fff;">Water Parks Complete Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">4 parks · Best rides · Tips · Best days</div>
+        </div>
+        <span style="font-size:28px;">🌊</span>
+      </div>
+      <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;">
+
+        ${WATER_PARKS.map(wp => `
+          <div style="background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;
+            border:1px solid var(--border,#eee);overflow:hidden;">
+            <div style="background:${wp.color};padding:12px 14px;">
+              <div style="display:flex;align-items:flex-start;gap:8px;">
+                <span style="font-size:26px;">${wp.emoji}</span>
+                <div style="flex:1;">
+                  <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">${wp.name}</div>
+                  <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.8);">💰 ${wp.price}</div>
+                  <div style="font-size:10px;color:rgba(255,255,255,.7);">⏰ ${wp.hours}</div>
+                </div>
+              </div>
+            </div>
+            <div style="padding:12px 14px;">
+              <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;margin-bottom:8px;">${wp.desc}</div>
+              <div style="font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:5px;">TOP ATTRACTIONS</div>
+              ${wp.topAttractions.map(a => `
+                <div style="background:${wp.color}08;border-radius:8px;padding:6px 10px;margin-bottom:4px;">
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);">${a.name}</div>
+                    <span style="font-size:9px;font-weight:800;padding:2px 7px;border-radius:20px;
+                      background:${a.thrill==='Extreme'?'#B71C1C':a.thrill==='High'?'#E65100':a.thrill==='Relaxing'?'#2E7D32':'#1565C0'};
+                      color:#fff;flex-shrink:0;margin-left:6px;">${a.thrill}</span>
+                  </div>
+                  <div style="font-size:11px;color:var(--text-secondary,#666);margin-top:2px;">${a.type}</div>
+                </div>`).join('')}
+              <div style="margin-top:8px;">
+                ${wp.tips.map(t => `<div style="font-size:11px;color:var(--text-secondary,#666);padding:2px 0;">💡 ${t}</div>`).join('')}
+              </div>
+              <div style="font-size:10px;color:${wp.color};font-weight:700;margin-top:6px;">Best for: ${wp.bestFor}</div>
+            </div>
+          </div>`).join('')}
+
+        <!-- Tips section -->
+        <div style="background:linear-gradient(135deg,#006064,#00838F);border-radius:14px;padding:14px;margin-bottom:20px;color:#fff;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">💡 Water Park Essentials</div>
+          ${WATER_PARK_TIPS.map(wpt => `
+            <div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
+              <span style="font-size:18px;flex-shrink:0;">${wpt.icon}</span>
+              <div style="font-size:12px;color:rgba(255,255,255,.9);line-height:1.5;">${wpt.tip}</div>
+            </div>`).join('')}
+        </div>
+      </div>`;
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-water-parks')) buildScreen();
+
+  const _prevSS_rrr2 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_rrr2) _prevSS_rrr2(name, el);
+    if (name === 'water-parks') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-water-parks');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectWPCard() {
+    if (document.getElementById('wp-home-card')) return true;
+    const ref = document.getElementById('meal-home-card') || document.getElementById('qr-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'wp-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#006064,#00838F,#26C6DA);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('water-parks');
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:28px;">🌊</span>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Water Parks Complete Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.85);">4 parks · Best rides ranked · Day tips</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _wpCard = false;
+  setInterval(() => { if (!_wpCard) _wpCard = injectWPCard(); }, 20000);
+  setTimeout(() => { _wpCard = injectWPCard(); }, 16500);
+
+  const _prevRH_rrr2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_rrr2) _prevRH_rrr2.apply(this, arguments);
+    setTimeout(() => { _wpCard = false; _wpCard = injectWPCard(); }, 3800);
+  };
+})();
+</script>
