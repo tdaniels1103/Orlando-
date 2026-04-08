@@ -44792,3 +44792,352 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK DDDD: Theme Park Height Requirements & Ride Guide ===== */
+(function initHeightGuide() {
+
+  const PARKS = [
+    {
+      park:'Magic Kingdom', emoji:'🏰', color:'#003087',
+      rides:[
+        { name:'Seven Dwarfs Mine Train', height:'38"', thrill:'Moderate', notes:'Family coaster — smooth, beautiful. Most popular ride in Magic Kingdom.' },
+        { name:'Big Thunder Mountain Railroad', height:'40"', thrill:'Moderate', notes:'Wild mine train coaster. Fun for all ages, not too intense.' },
+        { name:'Space Mountain', height:'44"', thrill:'Moderate-High', notes:'Classic indoor coaster in the dark. Feels more intense than it is.' },
+        { name:'Tron Lightcycle / Run', height:'48"', thrill:'High', notes:'Launched coaster — fastest at Magic Kingdom. Straddling a motorcycle position. Thrilling.' },
+        { name:'Splash Mountain (now closed)', height:'40"', thrill:'Moderate', notes:'Replaced by Tiana\'s Bayou Adventure (same height req).' },
+        { name:'Haunted Mansion', height:'None', thrill:'Mild', notes:'No height requirement. Family dark ride.' },
+        { name:'Pirates of the Caribbean', height:'None', thrill:'Mild', notes:'No height requirement. Classic boat ride.' },
+        { name:'Peter Pan\'s Flight', height:'None', thrill:'Mild', notes:'No height requirement. Very popular — get Lightning Lane.' },
+      ]
+    },
+    {
+      park:'EPCOT', emoji:'🌍', color:'#005B9A',
+      rides:[
+        { name:'Guardians of the Galaxy: Cosmic Rewind', height:'42"', thrill:'High', notes:'Reverse-launch coaster (first ever at Disney). Indoor, cosmic theming. Virtual queue or LL only.' },
+        { name:'Test Track', height:'40"', thrill:'Moderate', notes:'Car design simulation with 65mph outdoor run. Very popular — get LL or go at rope drop.' },
+        { name:'Soarin\'', height:'40"', thrill:'Mild-Moderate', notes:'Hang gliding simulation. Stunning visuals. Great for all ages.' },
+        { name:'Frozen Ever After', height:'None', thrill:'Mild', notes:'No height requirement. Gentle boat ride through Frozen world.' },
+        { name:'Mission: SPACE', height:'44"', thrill:'High (Orange) / Moderate (Green)', notes:'Orange mission = intense centrifuge. Green = no spinning, much milder. Choose carefully.' },
+        { name:'Remy\'s Ratatouille Adventure', height:'None', thrill:'Mild', notes:'No height requirement. Family dark ride through a kitchen.' },
+      ]
+    },
+    {
+      park:'Hollywood Studios', emoji:'🎬', color:'#37474F',
+      rides:[
+        { name:'Star Wars: Rise of the Resistance', height:'40"', thrill:'Moderate', notes:'Dark ride — not physically intense but emotionally immersive. Best attraction Disney has ever built.' },
+        { name:'Millennium Falcon: Smugglers Run', height:'38"', thrill:'Moderate', notes:'Interactive cockpit ride. Pilot role is the most fun.' },
+        { name:'Slinky Dog Dash', height:'38"', thrill:'Moderate', notes:'Family coaster. Great starter coaster for young riders.' },
+        { name:'Tower of Terror', height:'40"', thrill:'High', notes:'Elevator drop attraction with randomized fall sequences. Intense but not too fast.' },
+        { name:'Rock \'n\' Roller Coaster', height:'48"', thrill:'High', notes:'Launch coaster with inversions and Aerosmith soundtrack. Intense.' },
+        { name:'Mickey & Minnie\'s Runaway Railway', height:'None', thrill:'Mild', notes:'No height requirement. Family dark ride — charming, funny, great for all ages.' },
+      ]
+    },
+    {
+      park:'Animal Kingdom', emoji:'🦁', color:'#33691E',
+      rides:[
+        { name:'Avatar Flight of Passage', height:'44"', thrill:'High', notes:'Best ride at Disney World. Banshee simulator with incredible immersion. Get LL first thing.' },
+        { name:'Expedition Everest', height:'44"', thrill:'High', notes:'Backward and forward mountain coaster with Yeti encounter. Very popular.' },
+        { name:'DINOSAUR', height:'40"', thrill:'Moderate-High', notes:'Dark jeep ride with intense dino encounters. Louder and darker than expected.' },
+        { name:'Kilimanjaro Safaris', height:'None', thrill:'Mild', notes:'No height req. Best safari experience outside Africa. Do in early morning.' },
+        { name:'Kali River Rapids', height:'38"', thrill:'Moderate', notes:'Raft ride — you WILL get wet. Pack dry change of clothes.' },
+        { name:'Na\'vi River Journey', height:'None', thrill:'Mild', notes:'No height req. Peaceful boat ride through Pandora at night — beautiful visuals.' },
+      ]
+    },
+    {
+      park:'Universal Studios', emoji:'🎬', color:'#c62828',
+      rides:[
+        { name:'Hagrid\'s Magical Creatures Motorbike Adventure', height:'48"', thrill:'High', notes:'Universally considered the best theme park ride in the world. Do first, no exceptions.' },
+        { name:'Harry Potter and the Escape from Gringotts', height:'42"', thrill:'Moderate-High', notes:'Multi-dimensional ride with fire effects. Incredible theming.' },
+        { name:'Jurassic World Ride', height:'42"', thrill:'Moderate-High', notes:'Flume ride with 84-ft drop. You will get drenched.' },
+        { name:'Hollywood Rip Ride Rockit', height:'51"', thrill:'Very High', notes:'Vertical launch coaster. Choose your soundtrack. One of the tallest coasters in FL.' },
+        { name:'Despicable Me Minion Mayhem', height:'40" or 48" w/o adult', thrill:'Mild', notes:'Motion simulator — fun for families.' },
+        { name:'MEN IN BLACK: Alien Attack', height:'42"', thrill:'Mild-Moderate', notes:'Interactive spinning shooter ride. Fun for all ages.' },
+      ]
+    },
+    {
+      park:'Islands of Adventure', emoji:'🏝️', color:'#E65100',
+      rides:[
+        { name:'Velocicoaster', height:'51"', thrill:'Very High', notes:'Top launch coaster in the world. 70mph, 155ft, zero gravity roll. Absolutely thrilling.' },
+        { name:'Hagrid\'s Motorbike', height:'48"', thrill:'High', notes:'Shared with USF — same ride, different entrance.' },
+        { name:'Harry Potter Forbidden Journey', height:'48"', thrill:'High', notes:'Original Wizarding World ride. Still incredible. Motion simulator + track hybrid.' },
+        { name:'The Incredible Hulk Coaster', height:'54"', thrill:'Very High', notes:'Classic launch coaster. Very loud. Intense inversions.' },
+        { name:'Hagrid\'s Magical Creatures Motorbike', height:'48"', thrill:'High', notes:'In IoA. Queue through the Forbidden Forest — worth every step.' },
+        { name:'Jurassic World VelociCoaster', height:'51"', thrill:'Very High', notes:'Near the Jurassic Park area.' },
+      ]
+    },
+  ];
+
+  const HEIGHT_TIERS = [
+    { label:'Under 40"', desc:'Small children — most family rides available. No roller coasters.' },
+    { label:'40–43"', desc:'Family coasters, moderate thrill rides, most dark rides.' },
+    { label:'44–47"', desc:'Most coasters available. Skip Hulk and VelociCoaster.' },
+    { label:'48–50"', desc:'Hagrid\'s, Forbidden Journey, Rock \'n\' Roller Coaster, Expedition Everest.' },
+    { label:'51"+', desc:'VelociCoaster, Hollywood Rip Ride Rockit, Incredible Hulk, all major coasters.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-height-guide';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const header = document.createElement('div');
+    header.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#B71C1C,#E53935,#FF7043);padding:16px 14px 14px;';
+    header.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:#fff;">Height Requirements Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">6 parks · All major rides · Thrill levels</div>
+        </div>
+        <span style="font-size:24px;">📏</span>
+      </div>
+      <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;">
+        ${HEIGHT_TIERS.map(t=>`<div style="flex-shrink:0;background:rgba(255,255,255,.15);border-radius:8px;padding:5px 10px;">
+          <div style="font-size:11px;font-weight:700;color:#fff;">${t.label}</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.75);">${t.desc.substring(0,40)}...</div>
+        </div>`).join('')}
+      </div>`;
+
+    const content = document.createElement('div');
+    content.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    const THRILL_COLORS = { 'Mild':'#2E7D32','Mild-Moderate':'#558B2F','Moderate':'#F57F17','Moderate-High':'#E65100','High':'#c62828','Very High':'#7B1FA2' };
+
+    PARKS.forEach(park => {
+      const parkCard = document.createElement('div');
+      parkCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+
+      const parkHeader2 = document.createElement('div');
+      parkHeader2.style.cssText = `background:${park.color};padding:10px 14px;display:flex;align-items:center;gap:8px;`;
+      parkHeader2.innerHTML = `<span style="font-size:20px;">${park.emoji}</span><div style="font-size:14px;font-weight:700;color:#fff;">${park.park}</div>`;
+      parkCard.appendChild(parkHeader2);
+
+      park.rides.forEach((ride, idx) => {
+        const row = document.createElement('div');
+        const isLast = idx === park.rides.length - 1;
+        row.style.cssText = `padding:9px 14px;${isLast ? '' : 'border-bottom:1px solid var(--border,#f0f0f0);'}`;
+        const tc = THRILL_COLORS[ride.thrill] || '#888';
+        row.innerHTML = `
+          <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:2px;">
+            <div style="flex:1;font-size:12px;font-weight:700;color:var(--text-primary,#212121);line-height:1.3;">${ride.name}</div>
+            <div style="display:flex;gap:4px;flex-shrink:0;">
+              <span style="font-size:10px;font-weight:800;padding:1px 6px;border-radius:20px;background:rgba(0,0,0,.07);color:var(--text-secondary,#555);">${ride.height}</span>
+              <span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;background:${tc}15;color:${tc};">${ride.thrill}</span>
+            </div>
+          </div>
+          <div style="font-size:11px;color:var(--text-secondary,#666);line-height:1.4;">${ride.notes}</div>`;
+        parkCard.appendChild(row);
+      });
+
+      content.appendChild(parkCard);
+    });
+
+    const spacer = document.createElement('div');
+    spacer.style.height = '20px';
+    content.appendChild(spacer);
+
+    s.appendChild(header);
+    s.appendChild(content);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-height-guide')) buildScreen();
+
+  const _prevSS_dddd = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_dddd) _prevSS_dddd(name, el);
+    if (name === 'height-guide') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-height-guide');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectHeightCard() {
+    if (document.getElementById('height-home-card')) return true;
+    const ref = document.getElementById('honeymoon-home-card') || document.getElementById('char-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'height-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#B71C1C,#E53935,#FF7043);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('height-guide');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:3px;">📏 Height Requirements Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.85);">All 6 parks · Every major ride · Thrill levels</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.5);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _heightCard = false;
+  setInterval(() => { if (!_heightCard) _heightCard = injectHeightCard(); }, 26000);
+  setTimeout(() => { _heightCard = injectHeightCard(); }, 22500);
+
+  const _prevRH_dddd = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_dddd) _prevRH_dddd.apply(this, arguments);
+    setTimeout(() => { _heightCard = false; _heightCard = injectHeightCard(); }, 5300);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK EEEE: Orlando Insider Tips & Secrets ===== */
+(function initInsiderTips() {
+
+  const SECRETS = [
+    {
+      category:'Disney Hidden Gems', icon:'🏰', color:'#003087',
+      tips:[
+        { title:'Club 33 Exists', tip:'Walt Disney World\'s most exclusive secret — members-only clubs at all 4 parks. Membership costs $33,000+ annually. You might spot the entrance at EPCOT\'s France Pavilion or MK near Pirates.' },
+        { title:'The Utilidors Under Magic Kingdom', tip:'The entire Magic Kingdom sits on a second floor. The actual "ground floor" is a network of tunnels where Cast Members travel. You\'re always walking on level 2.' },
+        { title:'Dream Maker Program', tip:'Guest Relations has a "Dream Maker" system where CMs can grant small perks for guests celebrating special events. Mention birthdays, anniversaries, proposals honestly — not to game the system.' },
+        { title:'Free Buttons for Every Occasion', tip:'Guest Services gives free celebratory buttons for: birthdays, anniversaries, first visit, "Happy Place" and more. Cast Members treat button-wearers differently all day.' },
+        { title:'Cast Member Lunch Cafeterias', tip:'If you befriend a CM, ask them about employee cafeterias. Some areas have CM-only spaces with incredible food at discount prices. You need a CM escort but it\'s a unique experience.' },
+        { title:'Fantasmic! Front Row Secret', tip:'For Hollywood Studios\' Fantasmic!, arrive 45 min early. But the very front row stays empty until 5 min before showtime — it\'s held for guests in wheelchairs. If no one claims it, it opens to all.' },
+      ]
+    },
+    {
+      category:'Universal Secrets', icon:'🎬', color:'#c62828',
+      tips:[
+        { title:'The Purple Dragon in Diagon Alley', tip:'There\'s a tiny dragon painting hidden inside the Leaky Cauldron restaurant. Most visitors walk past it. It\'s on the wall near the ordering counter — look carefully.' },
+        { title:'Butterbeer Float Hack', tip:'Order a Butterbeer and ask for vanilla soft-serve ice cream on top. It\'s not on the menu but they\'ll do it. Better than the standard float and roughly the same price.' },
+        { title:'Velocicoaster Back Row', tip:'The back row of VelociCoaster is significantly more intense — the "crack the whip" effect amplifies every turn and inversion. Request it specifically for the most intense experience.' },
+        { title:'Hagrid\'s Virtual Line Secret', tip:'Hagrid\'s often releases more virtual queue spots mid-afternoon (1-3pm). If you miss the morning drop, check back around 1:30pm — a second wave frequently appears.' },
+        { title:'The CityWalk Concert Myth', tip:'CityWalk entertainment is often listed as having cover charges. Many nights it\'s completely free — the cover charge applies only for specific headlining acts. Always check before paying.' },
+        { title:'Single Rider Lines', tip:'Hollywood Rip Ride Rockit, Men in Black, and several others have single-rider lines that move dramatically faster. Perfect for thrill-seekers who don\'t mind splitting up for 5 minutes.' },
+      ]
+    },
+    {
+      category:'Money Secrets', icon:'💰', color:'#2E7D32',
+      tips:[
+        { title:'Disney Dining Plan Hack', tip:'The DDP is rarely a good value for adults. Calculate your actual dining plan: counter service + 1 table service. If you prefer alcohol with meals (not covered), it almost never pays off.' },
+        { title:'Target Circle for Universal Tickets', tip:'Target Circle app frequently offers 5% off Universal theme park tickets purchased at Target. On expensive multi-day tickets, this saves $30–60/ticket.' },
+        { title:'Military Discount Stacking', tip:'Active and retired military get massive Disney discounts (up to 40% off hotels). Combined with Florida Resident discounts on tickets, this can save thousands on a week-long trip.' },
+        { title:'Free Disney Transportation', tip:'Disney transportation is free between all Disney properties: Magical Express (discontinued but Mears still runs), monorail, buses, boats. Never pay for an Uber between Disney parks if you\'re staying on property.' },
+        { title:'Disney Store vs Park Prices', tip:'Most Disney merchandise is identical in price at shopDisney.com, Disney Stores, and parks. Buy online and ship home to avoid carrying merchandise through the parks.' },
+        { title:'Hotel Hopping at Disney', tip:'You can visit any Disney resort to dine or explore without a park ticket. Walking the Grand Floridian boardwalk, dining at Wilderness Lodge\'s Territory Lounge, or having a drink at Nomad Lounge are all free entry.' },
+      ]
+    },
+    {
+      category:'Timing Secrets', icon:'⏰', color:'#7B1FA2',
+      tips:[
+        { title:'The 2-Hour Window', tip:'The 2 hours after park open and 2 hours before park close are when waits drop 40–60%. Most visitors eat lunch from 11:30–1:30 and dinner from 5:30–7:30. Do your biggest rides at those exact times.' },
+        { title:'Ride Re-Ride at Closing', tip:'If you\'re already in line for an attraction at park closing time, Disney will let you complete the ride (and often re-ride several times). Don\'t leave the queue at closing — stay in it.' },
+        { title:'EPCOT After Hours Hack', tip:'EPCOT World Showcase doesn\'t open until noon. But arrive at park open (9am) and conquer all of Future World with minimal crowds. Guardians, Test Track, Mission Space all in under 2 hours.' },
+        { title:'Rope Drop Misconception', tip:'Everyone rushes to Magic Kingdom at open but forgets Hollywood Studios rope drop. Rise of the Resistance walk-on is possible in the first 20 minutes. It\'s never walk-on after 9:30am on a typical day.' },
+        { title:'Rainy Day Strategy', tip:'Light rain at theme parks means 20–30% shorter waits immediately. Most rides run in light rain. Bring a cheap poncho (buy before the trip — parks charge $12+). Rainy mornings are secretly perfect park days.' },
+        { title:'Spring Break Paradox', tip:'The week after most schools have spring break (typically 3rd week of April) has resort-level crowds that suddenly drop 50%. If your school schedule allows flexibility, shift 1 week later and you\'ll save hours per day.' },
+      ]
+    },
+    {
+      category:'Food Secrets', icon:'🍽️', color:'#E65100',
+      tips:[
+        { title:'EPCOT Food Festival Year-Round', tip:'EPCOT has some version of a food festival nearly year-round now: Flower & Garden (spring), Food & Wine (fall/winter), Festival of Arts (winter), Festival of Holidays (Nov–Dec). There\'s almost always a festival.' },
+        { title:'Dole Whip is at Multiple Locations', tip:'Dole Whip is at Magic Kingdom\'s Aloha Isle AND EPCOT\'s Hawaii area AND Animal Kingdom. The MK line is famously long. Skip it and get your Dole Whip at AK or EPCOT with far shorter waits.' },
+        { title:'The Ronto Wrap', tip:'Ronto Wrap at Galaxy\'s Edge (Hollywood Studios) is considered one of the best quick-service items in any theme park worldwide. It sells out on busy days — buy before 11am.' },
+        { title:'Mobile Order Priority', tip:'Every Disney park now has mobile order on the app. Ordering 15 minutes ahead lets you skip the queue entirely. At busy counter-service locations, this saves 20–40 min per meal.' },
+        { title:'Hidden Wine at EPCOT', tip:'EPCOT\'s World Showcase has several "unofficial" wine and beer locations that aren\'t heavily marketed. The wine cart between France and UK pavilions is never crowded but excellent.' },
+        { title:'Lunch at Signature Restaurants', tip:'Many Disney signature restaurants offer lunch menus at 30–40% less than dinner prices for identical quality. Victoria & Albert\'s doesn\'t do lunch, but nearly every other signature does.' },
+      ]
+    },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-insider-tips';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const header = document.createElement('div');
+    header.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#1a1a1a,#333,#555);padding:16px 14px 14px;';
+    header.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:#fff;">Insider Tips & Secrets</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.7);">30 secrets the parks don't advertise</div>
+        </div>
+        <span style="font-size:24px;">🔍</span>
+      </div>
+      <div style="background:rgba(255,255,255,.1);border-radius:8px;padding:7px 12px;font-size:11px;color:rgba(255,255,255,.8);">
+        These are legitimate tips from experienced park visitors and Cast Members — not hacks or exploitation. Use them to get more out of your visit.
+      </div>`;
+
+    const content = document.createElement('div');
+    content.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    SECRETS.forEach(cat => {
+      const catBadge = document.createElement('div');
+      catBadge.style.cssText = `display:flex;align-items:center;gap:8px;margin:14px 0 8px;`;
+      catBadge.innerHTML = `
+        <span style="font-size:18px;">${cat.icon}</span>
+        <div style="font-size:13px;font-weight:800;color:${cat.color};">${cat.category.toUpperCase()}</div>`;
+      content.appendChild(catBadge);
+
+      cat.tips.forEach(tip => {
+        const card = document.createElement('div');
+        card.style.cssText = 'background:var(--card-bg,#fff);border-radius:12px;margin-bottom:8px;padding:11px 13px;border:1px solid var(--border,#eee);border-left:3px solid ' + cat.color + ';';
+        card.innerHTML = `
+          <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:4px;">🔍 ${tip.title}</div>
+          <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${tip.tip}</div>`;
+        content.appendChild(card);
+      });
+    });
+
+    const spacer = document.createElement('div');
+    spacer.style.height = '20px';
+    content.appendChild(spacer);
+
+    s.appendChild(header);
+    s.appendChild(content);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-insider-tips')) buildScreen();
+
+  const _prevSS_eeee = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_eeee) _prevSS_eeee(name, el);
+    if (name === 'insider-tips') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-insider-tips');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectInsiderCard() {
+    if (document.getElementById('insider-home-card')) return true;
+    const ref = document.getElementById('height-home-card') || document.getElementById('honeymoon-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'insider-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#1a1a1a,#333,#555);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('insider-tips');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:3px;">🔍 Insider Tips & Secrets</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.75);">30 park secrets · Hidden gems · Money tips</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.4);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _insiderCard = false;
+  setInterval(() => { if (!_insiderCard) _insiderCard = injectInsiderCard(); }, 26500);
+  setTimeout(() => { _insiderCard = injectInsiderCard(); }, 23000);
+
+  const _prevRH_eeee = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_eeee) _prevRH_eeee.apply(this, arguments);
+    setTimeout(() => { _insiderCard = false; _insiderCard = injectInsiderCard(); }, 5500);
+  };
+})();
+</script>
