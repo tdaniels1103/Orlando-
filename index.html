@@ -57069,3 +57069,375 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK NNNNNN: Hollywood Studios Complete Guide ===== */
+(function initHollywoodStudiosDeep() {
+
+  const HS_LANDS = [
+    {
+      name:'Galaxy\'s Edge (Star Wars Land)', emoji:'⭐', color:'#1a1a2e',
+      textColor:'#7B68EE',
+      desc:'Black Spire Outpost on the planet Batuu. The most immersive land ever built at a Disney park — a completely realized alien world with its own language, currency, and culture.',
+      rides:[
+        {name:'Rise of the Resistance', type:'Trackless dark ride (top 5 Disney worldwide)', wait:'45–120 min', note:'An operational set piece including a life-size AT-AT, Star Destroyer, and Kylo Ren/Rey characters. 15–18 minute ride. Widely considered the best theme park ride in the United States.'},
+        {name:'Millennium Falcon: Smugglers Run', type:'Interactive cockpit ride', wait:'30–60 min', note:'You pilot the Millennium Falcon — pilot (controls speed), gunner, or engineer roles. Results vary by how well the group performs. Pilots have the most agency.'},
+      ],
+      experiences:['Build a custom lightsaber at Savi\'s Workshop ($299)', 'Build a custom droid at Droid Depot ($119)', 'Oga\'s Cantina for drinks and Star Wars ambiance'],
+      tip:'Galaxy\'s Edge is the crown jewel of Hollywood Studios. Rise of the Resistance requires Lightning Lane Premier ($25–30) or extremely early arrival. The land is best experienced at park opening or after 7 PM when crowds thin.',
+    },
+    {
+      name:'Toy Story Land', emoji:'🧸', color:'#F57F17',
+      textColor:'#F57F17',
+      desc:'You\'ve been shrunk to the size of a toy in Andy\'s backyard. Immersive oversized toy architecture. Family-focused land adjacent to Galaxy\'s Edge.',
+      rides:[
+        {name:'Slinky Dog Dash', type:'Family launched coaster', wait:'45–90 min', note:'The best family coaster at Disney. Smooth, fun, surprising speed changes. 38" height minimum. Waits are persistent throughout the day — ride at opening or via Lightning Lane.'},
+        {name:'Toy Story Mania!', type:'4D interactive shooter', wait:'20–40 min', note:'The classic shooting ride with 3D glasses and air cannons. Fun competitive experience for all ages. Not the cutting edge it once was but still popular.'},
+        {name:'Alien Swirling Saucers', type:'Spinner', wait:'15–30 min', note:'Little Green Men themed swirling ride. For younger children or Toy Story fans. Very short and simple.'},
+      ],
+      tip:'Toy Story Land is overwhelming at midday heat — the theming is beautiful but there\'s very little shade. Best visited early morning or after the sun drops. Ronto Roasters (edge of the land) has surprisingly excellent pork wraps.',
+    },
+    {
+      name:'Hollywood Boulevard / Echo Lake', emoji:'🎬', color:'#C62828',
+      textColor:'#C62828',
+      desc:'The park\'s 1930s Hollywood-themed entrance and entertainment hub. Home to the park\'s most iconic stunt show and classic Hollywood movie theming.',
+      rides:[
+        {name:'Indiana Jones Epic Stunt Spectacular', type:'Live stunt show', wait:'30 min (theater fill)', note:'A 30-minute live-action stunt show featuring re-created scenes from Raiders of the Lost Ark. Professional stuntmen, real explosions, audience participation. One of Disney\'s best shows.'},
+        {name:'Star Tours: The Adventure Continues', type:'Motion simulator', wait:'20–40 min', note:'Randomized Star Wars simulator with 70+ possible scenarios. Different every ride — worth riding twice if time allows. 40" height minimum.'},
+      ],
+      tip:'Indiana Jones stunt show runs 3 times per day — check the app for exact times. The front 5 rows are audience participant selection zones. Arrive 20 minutes before the show to get good seats.',
+    },
+    {
+      name:'Sunset Boulevard', emoji:'🌅', color:'#7B1FA2',
+      textColor:'#7B1FA2',
+      desc:'The Hollywood Sunset strip reconstruction leading to two of Hollywood Studios\' biggest attractions.',
+      rides:[
+        {name:'Tower of Terror', type:'Drop tower (multiple sequences)', wait:'30–60 min', note:'The definitive drop tower. Random drop sequences (not predictable). Excellent pre-show and building atmosphere. One of Disney\'s best thrill rides with a story.'},
+        {name:'Rock \'n\' Roller Coaster', type:'Launched indoor coaster', wait:'30–60 min', note:'Launched from 0–60 mph in 2.8 seconds. Aerosmith soundtrack (may be retheming). Three inversions. Intense for a Disney coaster.'},
+      ],
+      tip:'Tower of Terror and Rock \'n\' Roller Coaster are the classic Hollywood Studios bookends. Ride both at park opening before they build to 60+ minute waits. The queue of Tower of Terror — inside the Hollywood Tower Hotel — is one of the best themed queues in Disney.',
+    },
+    {
+      name:'Grand Avenue / Muppet Courtyard', emoji:'🐸', color:'#2E7D32',
+      textColor:'#2E7D32',
+      desc:'San Francisco-inspired streetscape housing the beloved MuppetVision 3D show.',
+      rides:[
+        {name:'Muppet*Vision 3D', type:'4D theater show', wait:'10–20 min', note:'Jim Henson-era Muppets 3D movie with in-theater effects. Near-zero wait. 25-minute air-conditioned show. Classic Disney entertainment that holds up entirely.'},
+      ],
+      tip:'Muppet*Vision is the best emergency shade break at Hollywood Studios. Nearly always walk-on, 25 minutes of air conditioning, and genuinely funny. Use it during peak afternoon heat.',
+    },
+  ];
+
+  const HS_TIPS = [
+    {icon:'🚀', tip:'Rise of the Resistance Lightning Lane Premier sells out by 10 AM on most days. Purchase it immediately at park opening or the moment you walk through the gates. It\'s the #1 must-ride at Walt Disney World.'},
+    {icon:'⚡', tip:'Hollywood Studios is one of the most Lightning Lane-dependent parks. Two rides (Rise and Slinky Dog) generate waits that can define your entire day. Budget $25–30 for Rise LLP.'},
+    {icon:'⏰', tip:'Rope drop order: Buy Rise of the Resistance LLP immediately (if you haven\'t pre-purchased). Walk fast to Slinky Dog Dash for walk-on first thing. Then Millennium Falcon.'},
+    {icon:'🎭', tip:'Fantasmic! (evening show) is the best nighttime entertainment at Hollywood Studios. The 26-minute amphitheater show runs 2x on busy nights. VIP reserved seating available as a dining package.'},
+    {icon:'🌮', tip:'Ronto Roasters (Galaxy\'s Edge) has the best themed food at Hollywood Studios. The Ronto Wrap (spit-roasted pork, tangy slaw, grilled pork sausage in pita) is genuinely excellent food by any standard.'},
+    {icon:'📱', tip:'Galaxy\'s Edge has a companion app (Datapad within Disney Play app) that lets you interact with droids, hack shipments, and decode Aurebesh throughout the land. Activates hidden effects throughout the land.'},
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-hs-deep';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#1a1a2e,#C62828,#F57F17);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Hollywood Studios — Deep Dive</div>
+          <div style="font-size:11px;opacity:.8;">Rise of Resistance · Galaxy\'s Edge · Tower · Slinky Dog</div>
+        </div>
+        <span style="font-size:28px;">🎬</span>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:15px;font-weight:800;">5</div><div style="font-size:9px;opacity:.8;">LANDS</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:15px;font-weight:800;">Rise</div><div style="font-size:9px;opacity:.8;">TOP RIDE USA</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:15px;font-weight:800;">LLP</div><div style="font-size:9px;opacity:.8;">REQUIRED</div>
+        </div>
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    HS_LANDS.forEach(land => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+      let ridesHTML = land.rides.map(r=>`<div style="background:var(--bg,#f8f8f8);border-radius:10px;padding:9px;margin-bottom:5px;">
+        <div style="font-size:12px;font-weight:800;color:var(--text-primary,#212121);">${r.name}</div>
+        <div style="font-size:10px;font-weight:600;color:${land.textColor};margin:2px 0;">${r.type} · ${r.wait}</div>
+        <div style="font-size:11px;color:var(--text-secondary,#666);">${r.note}</div>
+      </div>`).join('');
+      let expHTML = land.experiences ? `<div style="display:flex;flex-wrap:wrap;gap:3px;margin:5px 0;">${land.experiences.map(e=>`<span style="font-size:10px;padding:2px 7px;background:${land.textColor}18;color:${land.textColor};border-radius:20px;">${e}</span>`).join('')}</div>` : '';
+      card.innerHTML = `
+        <div style="padding:10px 14px;background:${land.textColor}18;border-left:4px solid ${land.textColor};">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:22px;">${land.emoji}</span>
+            <div>
+              <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--text-primary,#212121);">${land.name}</div>
+              <div style="font-size:11px;color:var(--text-secondary,#555);">${land.desc}</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          ${ridesHTML}
+          ${expHTML}
+          <div style="display:flex;gap:5px;background:${land.textColor}0d;border-radius:8px;padding:7px;margin-top:5px;">
+            <span style="font-size:11px;flex-shrink:0;">💡</span>
+            <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${land.tip}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const tipsCard = document.createElement('div');
+    tipsCard.style.cssText = 'background:linear-gradient(135deg,#1a1a2e,#C62828);border-radius:16px;margin-bottom:20px;padding:14px;color:#fff;';
+    tipsCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">🎯 Hollywood Studios Strategy</div>
+    ${HS_TIPS.map(t=>`<div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
+      <span style="font-size:18px;flex-shrink:0;">${t.icon}</span>
+      <div style="font-size:12px;opacity:.95;line-height:1.5;">${t.tip}</div>
+    </div>`).join('')}`;
+    body.appendChild(tipsCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-hs-deep')) buildScreen();
+
+  const _prevSS_nnnnnn = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_nnnnnn) _prevSS_nnnnnn(name, el);
+    if (name === 'hs-deep') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-hs-deep');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectHSDeepCard() {
+    if (document.getElementById('hs-deep-home-card')) return true;
+    const ref = document.getElementById('mk-deep-home-card') || document.getElementById('adults-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'hs-deep-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#1a1a2e,#C62828,#F57F17 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('hs-deep');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🎬</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Hollywood Studios — Deep Dive</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Rise of Resistance · Galaxy\'s Edge · Tower of Terror</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _hsDeepCard = false;
+  setInterval(() => { if (!_hsDeepCard) _hsDeepCard = injectHSDeepCard(); }, 74000);
+  setTimeout(() => { _hsDeepCard = injectHSDeepCard(); }, 70500);
+  const _prevRH_nnnnnn = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_nnnnnn) _prevRH_nnnnnn.apply(this, arguments);
+    setTimeout(() => { _hsDeepCard = false; _hsDeepCard = injectHSDeepCard(); }, 24600);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK OOOOOO: Epic Universe — The Coming Attraction ===== */
+(function initEpicUniverse() {
+
+  const EU_WORLDS = [
+    {
+      name:'The Wizarding World of Harry Potter — Ministry of Magic', emoji:'🏛️', color:'#2c1654',
+      era:'1920s Paris — Fantastic Beasts setting',
+      desc:'A new Harry Potter land set in 1920s Paris. The Ministry of Magic in France is the centerpiece — a grand Art Deco ministry building that you explore from the inside.',
+      rides:[
+        {name:'Ministry of Magic (attraction)', type:'Dark ride (confirmed)', note:'Main attraction set inside the French Ministry of Magic. Massive scale dark ride. Likely involves Aurors, Obscurials, and the Deathly Hallows timeline.'},
+        {name:'Harry Potter and the Battle at the Ministry', type:'Indoor roller coaster', note:'High-speed coaster through the Ministry\'s corridors. Different character set from Hogsmeade/Diagon Alley — Fantastic Beasts characters.'},
+      ],
+      food:'French wizarding cuisine — pain au chocolat, crêpes, and Butterbeer variants in a French setting',
+      opening:'May 22, 2025 — confirmed',
+      tip:'This is the third Harry Potter land in one resort — after Hogsmeade (Islands of Adventure) and Diagon Alley (Universal Studios). Together, they create a nearly comprehensive Wizarding World experience.',
+    },
+    {
+      name:'How to Train Your Dragon Isle of Berk', emoji:'🐉', color:'#1B5E20',
+      era:'Viking village — How to Train Your Dragon films',
+      desc:'A fully realized Viking village with Toothless and Hiccup as the central characters. The land immerses guests in the Norse mythology of Berk — wooden longhouses, fire pits, and dragons.',
+      rides:[
+        {name:'Hiccup\'s Wing Gliders', type:'Suspended coaster (Dragon theming)', note:'A smooth suspended coaster through Berk\'s skies, flying alongside Night Furies and other dragons.'},
+        {name:'Dragon Racer\'s Rally', type:'Racing coaster', note:'Competitive racing coaster — two tracks race simultaneously. A format that hasn\'t been done at this scale in a Disney/Universal park.'},
+      ],
+      food:'Viking-inspired food — smoked meats, hearty stews, flatbreads',
+      opening:'May 22, 2025',
+      tip:'How to Train Your Dragon is Universal\'s answer to Disney\'s Avatar — a beloved film franchise translated into a fully realized 3D world. The dragon character encounters (live-action animatronics) are expected to rival Disney\'s animal encounter quality.',
+    },
+    {
+      name:'Super Nintendo World', emoji:'🍄', color:'#C62828',
+      era:'The Mushroom Kingdom',
+      desc:'Directly modeled after the Super Nintendo World at Universal Japan (opened 2020). Mario, Luigi, Princess Peach, Bowser\'s Castle. The land uses interactive wristbands to collect coins and defeat enemies throughout.',
+      rides:[
+        {name:'Mario Kart: Bowser\'s Challenge', type:'AR kart racer', note:'The centerpiece ride — race Mario Kart courses with augmented reality glasses. Universal Japan\'s most popular attraction. Florida version will be identical.'},
+        {name:'Yoshi\'s Adventure', type:'Omnimover family ride', note:'A gentle Yoshi-narrated tour of the Mushroom Kingdom. Family-focused companion ride to the Mario Kart headliner.'},
+      ],
+      food:'Mushroom Kingdom Marketplace — Power-Up Bands that track coins, interactive elements throughout the land',
+      opening:'May 22, 2025',
+      tip:'Power-Up Bands ($40) make the land fully interactive — every question block, every enemy, is activated by the band. The land without the bands is incomplete. Budget for them. The Universal Japan version has 3–4 hour waits for Mario Kart at opening.',
+    },
+    {
+      name:'The Magical World of Harry Potter — Ministry', emoji:'✨', color:'#4A148C',
+      era:'Classic Harry Potter — all eras',
+      desc:'Beyond the Ministry area, Epic Universe connects HP worlds. The Celestial Park hub provides connector experiences between all five worlds.',
+      rides:[
+        {name:'Constellation Carousel', type:'Classic carousel (hub)', note:'Celestial-themed carousel at the Celestial Park hub connecting all worlds.'},
+      ],
+      food:'Celestial Park Hub has multiple dining options connecting all five worlds',
+      opening:'May 22, 2025',
+      tip:'Celestial Park (the central hub) functions like the hub of a wheel — each land radiates from it. The design allows guests to move between any world without walking through another land.',
+    },
+    {
+      name:'Universal Monsters: Unmasked', emoji:'🧟', color:'#263238',
+      era:'Classic Universal Monster films',
+      desc:'The classic Universal monsters — Dracula, Frankenstein\'s Monster, the Mummy, the Wolfman — in a 1920s European village setting. A love letter to Universal\'s foundational horror films.',
+      rides:[
+        {name:'Frankenstein\'s Monster: The Ride', type:'Indoor launched coaster', note:'High-speed indoor coaster through Frankenstein\'s laboratory with the monster as protagonist. Expected to rival Velocicoaster in intensity.'},
+        {name:'Dracula\'s Curse', type:'Dark ride', note:'Dark ride through Transylvania encountering classic vampire lore. Immersive castle environment.'},
+      ],
+      food:'European village pub food — Transylvanian themes, German-inspired cuisine, Gothic atmosphere',
+      opening:'May 22, 2025',
+      tip:'Universal Monsters is the sleeper world of Epic Universe. The IP is classic and lesser-known to younger visitors, but the horror theming and 1920s European architecture create an atmosphere unlike anything else in Florida. Expect this to have the shortest waits at opening.',
+    },
+  ];
+
+  const EU_LOGISTICS = [
+    {icon:'📍', tip:'Epic Universe is located south of International Drive — 2.5 miles from the current Universal complex. A dedicated highway interchange is being built for the park. Not adjacent to the existing hotels.'},
+    {icon:'🏨', tip:'Cabana Bay Beach Resort is within walking distance of Epic Universe. Universal Helios Grand Hotel is a new on-site hotel opening with the park. Early park access and potential Express Pass for on-site guests.'},
+    {icon:'🎟️', tip:'Epic Universe tickets are expected to be $109–129/person for single-day access — similar to the existing Universal parks. Park-to-park tickets will be needed to visit the original Universal + Epic Universe.'},
+    {icon:'⏰', tip:'Epic Universe opens May 22, 2025. Summer 2025 will have extraordinary wait times across all major attractions — plan for 2–4 hour queues at Mario Kart, the HP Ministry dark ride, and Frankenstein\'s coaster at opening.'},
+    {icon:'💡', tip:'Universal Annual Pass holders gain access to Epic Universe (pricing tiers to be confirmed). Preferred Annual Pass is the most likely tier to include all-day Epic Universe access.'},
+    {icon:'🗺️', tip:'With five distinct worlds, Epic Universe requires a full day to experience properly. Budget 1 full day. A second day allows riding all major attractions with Lightning Lane vs. walking all day.'},
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-epic-universe';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:#0a0010;flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;color:#fff;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#0a0010,#2c1654,#C62828);padding:16px 14px 14px;border-bottom:1px solid rgba(150,100,255,.2);';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Epic Universe — Opening 2025</div>
+          <div style="font-size:11px;opacity:.7;">Harry Potter · Mario · Dragons · Monsters · May 22 opening</div>
+        </div>
+        <span style="font-size:28px;">🌌</span>
+      </div>
+      <div style="background:rgba(200,100,255,.15);border:1px solid rgba(200,100,255,.3);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        Universal's Epic Universe is the largest theme park expansion in Orlando history — a completely new park with five distinct worlds opening May 22, 2025. The Wizarding World, Nintendo, and new original lands will redefine the competitive landscape against Disney.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    EU_WORLDS.forEach(world => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:16px;margin-bottom:14px;overflow:hidden;';
+      let ridesHTML = world.rides.map(r=>`<div style="background:rgba(255,255,255,.06);border-radius:10px;padding:9px;margin-bottom:5px;">
+        <div style="font-size:12px;font-weight:800;color:#fff;">${r.name}</div>
+        <div style="font-size:10px;font-weight:600;color:rgba(200,150,255,.9);margin:2px 0;">${r.type}</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.65);">${r.note}</div>
+      </div>`).join('');
+      card.innerHTML = `
+        <div style="padding:10px 14px;background:${world.color}90;border-left:4px solid rgba(200,150,255,.6);">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:22px;">${world.emoji}</span>
+            <div>
+              <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:#fff;">${world.name}</div>
+              <div style="font-size:10px;color:rgba(255,255,255,.6);">${world.era} · ${world.opening}</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          <div style="font-size:12px;color:rgba(255,255,255,.8);line-height:1.5;margin-bottom:8px;">${world.desc}</div>
+          ${ridesHTML}
+          <div style="font-size:11px;color:rgba(255,200,100,.8);margin:6px 0;">${world.food}</div>
+          <div style="display:flex;gap:5px;background:rgba(255,255,255,.06);border-radius:8px;padding:7px;margin-top:5px;">
+            <span style="font-size:11px;flex-shrink:0;">💡</span>
+            <div style="font-size:11px;color:rgba(255,255,255,.65);line-height:1.5;">${world.tip}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const logCard = document.createElement('div');
+    logCard.style.cssText = 'background:linear-gradient(135deg,#0a0010,#2c1654);border:1px solid rgba(150,100,255,.3);border-radius:16px;margin-bottom:20px;padding:14px;';
+    logCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">🗺️ Epic Universe Logistics</div>
+    ${EU_LOGISTICS.map(l=>`<div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
+      <span style="font-size:18px;flex-shrink:0;">${l.icon}</span>
+      <div style="font-size:12px;opacity:.9;line-height:1.5;">${l.tip}</div>
+    </div>`).join('')}`;
+    body.appendChild(logCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-epic-universe')) buildScreen();
+
+  const _prevSS_oooooo = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_oooooo) _prevSS_oooooo(name, el);
+    if (name === 'epic-universe') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-epic-universe');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectEUCard() {
+    if (document.getElementById('eu-home-card')) return true;
+    const ref = document.getElementById('hs-deep-home-card') || document.getElementById('mk-deep-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'eu-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#0a0010,#2c1654,#C62828);border-radius:16px;padding:14px;cursor:pointer;border:1px solid rgba(150,100,255,.3);';
+    card.onclick = () => window.showScreen('epic-universe');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🌌</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Epic Universe — Opening 2025</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.75);">Harry Potter · Mario · Dragons · Monsters · May 22</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.5);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _euCard = false;
+  setInterval(() => { if (!_euCard) _euCard = injectEUCard(); }, 75000);
+  setTimeout(() => { _euCard = injectEUCard(); }, 71500);
+  const _prevRH_oooooo = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_oooooo) _prevRH_oooooo.apply(this, arguments);
+    setTimeout(() => { _euCard = false; _euCard = injectEUCard(); }, 25000);
+  };
+})();
+</script>
