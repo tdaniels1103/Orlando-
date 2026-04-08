@@ -55187,3 +55187,203 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK EEEEEE: Orlando International Drive Complete Guide ===== */
+(function initOrlandoIDrive() {
+
+  const ATTRACTIONS = [
+    { name:'ICON Park', emoji:'🎡', type:'Entertainment Complex', price:'$35–50 (wheel ride)', color:'#6A1B9A',
+      desc:'The ICON Observation Wheel (430 ft, largest in eastern US), Madame Tussauds, Sea Life Aquarium, FlyOver America simulator, Museum of Illusions. A full half-day of non-theme-park entertainment.',
+      tip:'Buy combination tickets for 2–3 experiences at once for the best value. The wheel is the signature — twilight timing gives the best views of I-Drive\'s lights.' },
+    { name:'WonderWorks', emoji:'🧠', type:'Family Entertainment', price:'$30–35 adults', color:'#1565C0',
+      desc:'Upside-down building housing 35,000 square feet of interactive science-based exhibits, laser tag, and rope courses. Not a theme park — more of an indoor entertainment center.',
+      tip:'Good rainy day activity for kids 7–14. The zip line and ropes course are the highlights. Not worth full price — look for AAA or hotel lobby coupons.' },
+    { name:'Ripley\'s Believe It or Not!', emoji:'🎪', type:'Museum / Attraction', price:'$25 adults', color:'#C62828',
+      desc:'Two-story attraction in a tilted building on I-Drive. Unusual and oddities collection spanning 20+ galleries with life-size replicas, shrunken heads, interactive exhibits.',
+      tip:'Entertaining for 60–90 minutes. More interesting than expected. Look for buy-one-get-one hotel lobby coupons.' },
+    { name:'Andretti Indoor Karting', emoji:'🏎️', type:'Family Entertainment', price:'$25–35/race', color:'#E65100',
+      desc:'Multi-level indoor kart racing facility with restaurants, arcade, bowling, and laser tag. One of the best go-kart experiences in Orlando for teens and adults.',
+      tip:'Wednesday–Thursday are the least crowded racing days. Speed karts reach 50 mph — fast enough to feel real. Height requirement 52" for adult karts.' },
+    { name:'Museum of Illusions', emoji:'🔮', type:'Interactive Museum', price:'$25 adults', color:'#7B1FA2',
+      desc:'Mind-bending optical illusions, holograms, and perception-challenging installations. Every room is designed to create impossibly confusing photographs.',
+      tip:'Excellent photo content — every square inch is designed to be photographed. Worth the 45–60 minutes for the social media content alone. Best for ages 8+.' },
+    { name:'I-Drive NASCAR Indoor Karts', emoji:'🏁', type:'Racing', price:'$25–30/race', color:'#C62828',
+      desc:'Indoor NASCAR-themed electric kart racing on a raised track. Not as fast as Andretti but more atmospheric with NASCAR theming and commentary.',
+      tip:'Better for younger teens (10–14) than Andretti due to lower speed and height requirements. Staff is enthusiastic about the NASCAR theming.' },
+    { name:'Fun Spot America Orlando', emoji:'🎢', type:'Amusement Park', price:'$42 (unlimited rides)', color:'#F57F17',
+      desc:'Small independent amusement park with multiple coasters including SkyCoaster (free fall bungee) and Mine Blower (wooden coaster). More old-school charm than Disney polish.',
+      tip:'Mine Blower wooden coaster is genuinely excellent and rough in the best way. SkyCoaster is separately priced ($20) and involves a 300-foot bungee free fall. Worth visiting for coaster enthusiasts who\'ve done everything else.' },
+  ];
+
+  const DINING_STRIP = [
+    { name:'Cuba Libre Restaurant & Rum Bar', emoji:'🥁', type:'Cuban', price:'$$$',
+      note:'Authentic Cuban cocktails, live music Friday–Saturday, great mojitos. One of I-Drive\'s best restaurant concepts.' },
+    { name:'Tin Roof', emoji:'🎸', type:'Live Music Bar', price:'$$',
+      note:'Live music every night, no cover charge, solid bar food. Great casual atmosphere for groups.' },
+    { name:'Cheddar\'s Scratch Kitchen', emoji:'🧀', type:'American Casual', price:'$$',
+      note:'Underrated quality scratch-made food at family prices. Honey butter croissants are legendary.' },
+    { name:'Seasons 52', emoji:'🍷', type:'Contemporary American', price:'$$$',
+      note:'Fresh seasonal menu, excellent wine list. One of the better nicer restaurant experiences on I-Drive.' },
+    { name:'The Rusty Spoon (if visiting downtown)', emoji:'🥄', type:'Gastropub', price:'$$$',
+      note:'Best gastropub in the Orlando metro area. Worth the 15-minute drive from I-Drive.' },
+    { name:'Pointe Orlando Food Court', emoji:'🍕', type:'Multi-concept', price:'$–$$',
+      note:'Outdoor entertainment complex with multiple restaurant concepts at various price points. The Yard Milkshake Bar is the Instagram hit.' },
+  ];
+
+  const SHOPPING_I = [
+    { name:'Orlando Premium Outlets (I-Drive)', desc:'180+ stores with genuine designer discounts. Gucci, Prada, Coach, Kate Spade. The best outlet shopping in Orlando. Open 10 AM – 10 PM.' },
+    { name:'Pointe Orlando', desc:'Open-air lifestyle center with restaurants, entertainment, and boutique retail. More upscale than the typical tourist strip.' },
+    { name:'Universal City Walk', desc:'Adjacent to Universal — free to enter. Live music, restaurants, shops, movie theater. Good pre or post-Universal visit destination.' },
+    { name:'I-Drive Souvenir Row', desc:'Dozens of gift shops along the main strip. Prices are competitive and negotiable in bulk. Best for Florida/Universal/Disney souvenirs in one pass.' },
+  ];
+
+  const LOGISTICS = [
+    { icon:'🚋', tip:'I-Ride Trolley covers the entire I-Drive strip — $5/day unlimited. Stops at every hotel and attraction. The smart way to move up and down the strip without parking.' },
+    { icon:'🅿️', tip:'Free parking at most I-Drive attractions. ICON Park has free self-parking. Pointe Orlando has a parking garage. Never pay for street parking on I-Drive itself.' },
+    { icon:'📍', tip:'I-Drive stretches 10+ miles from the Universal area to Sea World. The middle section (ICON Park area) has the highest density of attractions and restaurants.' },
+    { icon:'🌙', tip:'I-Drive transforms at night — the neon, the lights, the energy. If you\'re staying nearby, an evening walk from dinner to dessert to a bar is a classic I-Drive experience.' },
+    { icon:'🍹', tip:'Several bars allow walk-up ordering with drinks to go on I-Drive (Florida liquor laws permit). This is especially popular on the strip\'s entertainment section.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-idrive';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#6A1B9A,#C62828,#F57F17);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">International Drive Guide</div>
+          <div style="font-size:11px;opacity:.8;">ICON Park · Karting · Dining · Shopping · Nightlife</div>
+        </div>
+        <span style="font-size:28px;">🎆</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        International Drive is Orlando's entertainment spine — the 10-mile strip between Disney and Universal packed with attractions, restaurants, bars, outlet shopping, and hotel options.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    /* Attractions header */
+    const attrHdr = document.createElement('div');
+    attrHdr.style.cssText = 'font-family:"Playfair Display",serif;font-size:15px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:10px;';
+    attrHdr.textContent = '🎯 I-Drive Attractions';
+    body.appendChild(attrHdr);
+
+    ATTRACTIONS.forEach(a => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:10px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:10px 14px;background:${a.color}18;border-left:4px solid ${a.color};">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div style="display:flex;gap:8px;align-items:center;">
+              <span style="font-size:20px;">${a.emoji}</span>
+              <div>
+                <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${a.name}</div>
+                <div style="font-size:10px;color:var(--text-secondary,#888);">${a.type}</div>
+              </div>
+            </div>
+            <span style="font-size:11px;font-weight:800;color:${a.color};">${a.price}</span>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;margin-bottom:6px;">${a.desc}</div>
+          <div style="display:flex;gap:5px;background:${a.color}0d;border-radius:8px;padding:6px;">
+            <span style="font-size:11px;flex-shrink:0;">💡</span>
+            <div style="font-size:11px;color:var(--text-secondary,#555);">${a.tip}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    /* Dining */
+    const diningCard = document.createElement('div');
+    diningCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+    diningCard.innerHTML = `<div style="padding:10px 14px;background:linear-gradient(135deg,#C62828,#F57F17);color:#fff;">
+      <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;">🍽️ Best I-Drive Dining</div>
+    </div>
+    <div style="padding:10px 14px;">
+      ${DINING_STRIP.map(d=>`<div style="display:flex;gap:8px;margin-bottom:8px;align-items:flex-start;">
+        <span style="font-size:16px;">${d.emoji}</span>
+        <div><div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);">${d.name} <span style="color:var(--text-secondary,#aaa);font-weight:400;">${d.price}</span></div>
+        <div style="font-size:11px;color:var(--text-secondary,#666);">${d.note}</div></div>
+      </div>`).join('')}
+    </div>`;
+    body.appendChild(diningCard);
+
+    /* Shopping */
+    const shopCard = document.createElement('div');
+    shopCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+    shopCard.innerHTML = `<div style="padding:10px 14px;background:linear-gradient(135deg,#6A1B9A,#AD1457);color:#fff;">
+      <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;">🛍️ Shopping on I-Drive</div>
+    </div>
+    <div style="padding:10px 14px;">
+      ${SHOPPING_I.map(s=>`<div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--border,#eee);">
+        <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:2px;">${s.name}</div>
+        <div style="font-size:11px;color:var(--text-secondary,#666);">${s.desc}</div>
+      </div>`).join('')}
+    </div>`;
+    body.appendChild(shopCard);
+
+    const logCard = document.createElement('div');
+    logCard.style.cssText = 'background:linear-gradient(135deg,#6A1B9A,#C62828);border-radius:14px;margin-bottom:20px;padding:14px;color:#fff;';
+    logCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;margin-bottom:8px;">🗺️ I-Drive Logistics</div>
+    ${LOGISTICS.map(l=>`<div style="display:flex;gap:10px;margin-bottom:6px;align-items:flex-start;">
+      <span style="font-size:16px;flex-shrink:0;">${l.icon}</span>
+      <div style="font-size:11px;opacity:.95;line-height:1.5;">${l.tip}</div>
+    </div>`).join('')}`;
+    body.appendChild(logCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-idrive')) buildScreen();
+
+  const _prevSS_eeeeee = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_eeeeee) _prevSS_eeeeee(name, el);
+    if (name === 'idrive') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-idrive');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectIDriveCard() {
+    if (document.getElementById('idrive-home-card')) return true;
+    const ref = document.getElementById('usf-home-card') || document.getElementById('weather-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'idrive-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#6A1B9A,#C62828,#F57F17);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('idrive');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🎆</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">International Drive Guide</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">ICON Park · Karting · Dining · Outlets · Nightlife</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _idriveCard = false;
+  setInterval(() => { if (!_idriveCard) _idriveCard = injectIDriveCard(); }, 65000);
+  setTimeout(() => { _idriveCard = injectIDriveCard(); }, 61500);
+  const _prevRH_eeeeee = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_eeeeee) _prevRH_eeeeee.apply(this, arguments);
+    setTimeout(() => { _idriveCard = false; _idriveCard = injectIDriveCard(); }, 21000);
+  };
+})();
+</script>
