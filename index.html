@@ -47648,3 +47648,189 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK TTTT2: Disney Genie+ & Lightning Lane Master Guide ===== */
+(function initGenieGuide() {
+
+  const GENIE_TIERS = [
+    {
+      tier:'Lightning Lane Multi Pass (LLMP)', formerly:'Genie+', price:'$16–35/person/day (dynamic)',
+      color:'#003087', desc:'Replaces Genie+. Skip-the-line for a rotating selection of attractions. Not available for the most popular rides.',
+      pros:['Covers 15–20 attractions per park','Can book new LL every 2 hours or after using one','Lower cost than Individual LL','Worth it on busy days for most families'],
+      cons:['Does NOT cover the best rides (Rise, Guardians, TRON, etc.)','Price fluctuates — highest on busy days ($35+)','Can run out of availability for popular rides by mid-morning','Requires strategy to maximize value'],
+      bestFor:'Families with kids who want smooth park days. Adults who prioritize quantity of rides over specific must-do rides.',
+    },
+    {
+      tier:'Lightning Lane Single Pass (LLSP)', formerly:'Individual Lightning Lane', price:'$10–25/person per ride (dynamic)',
+      color:'#c62828', desc:'Purchase skip-the-line for ONE specific attraction. Covers the tier-1 headliners: TRON, Rise, Guardians, etc.',
+      pros:['Gets you into the absolute best rides','Worth every penny on busy days for flagship rides','No time restrictions — use when you choose'],
+      cons:['Can be $20+/person per ride','Rise of the Resistance frequently sells out before 8am','Price dynamic — highest on the most popular rides at busiest parks'],
+      bestFor:'Anyone who has one or two specific must-do experiences. Always buy LLSP for Rise of the Resistance and Guardians.',
+    },
+    {
+      tier:'Free Standby Queue', formerly:'Regular line', price:'Free (included in park admission)',
+      color:'#2E7D32', desc:'Wait in the regular line. Still the backbone of any park visit.',
+      pros:['Works best at rope drop, late evening (last 45 min), or bad weather','No additional cost','Single rider lines available at some attractions'],
+      cons:['60–120+ min waits at peak hours for popular rides','Standing in the Florida heat is exhausting'],
+      bestFor:'Rope drop arrivals, and as backup when LL availability sells out.',
+    },
+    {
+      tier:'Virtual Queue', formerly:'Virtual Queue (was free)', price:'Usually free or via LL',
+      color:'#7B1FA2', desc:'Some attractions (Guardians of the Galaxy, occasionally others) use virtual queues at launch or busy periods.',
+      pros:['Allows you to join a queue remotely while doing other things','Can do two things at once when timed well'],
+      cons:['Fills up within seconds of dropping — requires split-second app use','Causes anxiety and confusion for first-timers'],
+      bestFor:'Serious park-goers who practice the 7am app-refresh routine.',
+    },
+  ];
+
+  const STRATEGY_RULES = [
+    { priority:1, rule:'Buy Rise of the Resistance LLSP before leaving your hotel room. Available at 7am on your park day. It sells out in minutes.' },
+    { priority:2, rule:'Buy Guardians LLSP immediately after buying Rise. Both are EPCOT Tier 1 and both sell out early.' },
+    { priority:3, rule:'Book LLMP for the attractions you want but can\'t get LLSP for. Your first LLMP booking is available at 7am too.' },
+    { priority:4, rule:'After using your first LLMP, immediately book the next one. The 2-hour clock resets after you redeem, not when you book.' },
+    { priority:5, rule:'If LLMP is sold out for your target ride, keep refreshing — cancellations happen all day and slots reopen.' },
+    { priority:6, rule:'Evening strategy: LLMP for one big ride at 7pm can get you rides you missed. Availability often improves after 5pm as people leave.' },
+    { priority:7, rule:'Don\'t buy LLMP for every day automatically. On slow season days (Sept–Nov weekdays), standby lines may be short enough that LLMP isn\'t worth the cost.' },
+    { priority:8, rule:'LLSP is almost always worth it for the tier-1 headliners. A 90-min wait costs more in energy and vacation time than the $15–25 ticket.' },
+  ];
+
+  const BY_PARK = [
+    { park:'Magic Kingdom', color:'#003087', essential:['TRON Lightcycle / Run ($22-25)','Seven Dwarfs Mine Train (LLMP)','Peter Pan\'s Flight (LLMP — always busy)'] },
+    { park:'EPCOT', color:'#005B9A', essential:['Guardians of the Galaxy ($20-25)','Test Track (LLMP or early standby)','Soarin\' (LLMP)'] },
+    { park:'Hollywood Studios', color:'#37474F', essential:['Rise of the Resistance ($22-25)','Slinky Dog Dash (LLMP)','Star Tours (LLMP if time allows)'] },
+    { park:'Animal Kingdom', color:'#33691E', essential:['Avatar Flight of Passage ($18-22)','Expedition Everest (LLMP)','Na\'vi River Journey (LLMP)'] },
+    { park:'Universal Islands of Adventure', color:'#E65100', essential:['Hagrid\'s (virtual queue — free)','VelociCoaster (Express Pass or early AM)','Forbidden Journey (Express Pass)'] },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-genie-guide';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const header = document.createElement('div');
+    header.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#003087,#1565C0,#42A5F5);padding:16px 14px 14px;';
+    header.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:#fff;">Lightning Lane Master Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">LLMP · LLSP · Virtual Queue · Strategy</div>
+        </div>
+        <span style="font-size:24px;">⚡</span>
+      </div>
+      <div style="background:rgba(255,255,255,.12);border-radius:8px;padding:7px 12px;font-size:11px;color:rgba(255,255,255,.9);">
+        Disney's paid queue system is confusing. This guide breaks down every tier, what's worth buying, and exactly what to do at 7am on your park day.
+      </div>`;
+
+    const content = document.createElement('div');
+    content.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    // Tier breakdown
+    GENIE_TIERS.forEach(tier => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:10px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="background:${tier.color};padding:10px 14px;">
+          <div style="font-size:13px;font-weight:700;color:#fff;">${tier.tier}</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.8);">Formerly: ${tier.formerly} · ${tier.price}</div>
+        </div>
+        <div style="padding:11px 14px;">
+          <div style="font-size:12px;color:var(--text-secondary,#555);margin-bottom:8px;line-height:1.5;">${tier.desc}</div>
+          <div style="display:flex;gap:8px;margin-bottom:8px;">
+            <div style="flex:1;background:#e8f5e9;border-radius:8px;padding:7px 10px;">
+              <div style="font-size:10px;font-weight:700;color:#2E7D32;margin-bottom:3px;">✓ PROS</div>
+              ${tier.pros.slice(0,2).map(p=>`<div style="font-size:10px;color:#2E7D32;padding:1px 0;">${p}</div>`).join('')}
+            </div>
+            <div style="flex:1;background:#fce4ec;border-radius:8px;padding:7px 10px;">
+              <div style="font-size:10px;font-weight:700;color:#c62828;margin-bottom:3px;">✗ CONS</div>
+              ${tier.cons.slice(0,2).map(c=>`<div style="font-size:10px;color:#c62828;padding:1px 0;">${c}</div>`).join('')}
+            </div>
+          </div>
+          <div style="font-size:10px;color:var(--text-secondary,#888);">BEST FOR: ${tier.bestFor}</div>
+        </div>`;
+      content.appendChild(card);
+    });
+
+    // Strategy
+    const stratHeader = document.createElement('div');
+    stratHeader.style.cssText = 'font-size:13px;font-weight:800;color:#003087;margin:14px 0 8px;';
+    stratHeader.textContent = '⚡ 8-POINT LIGHTNING LANE STRATEGY';
+    content.appendChild(stratHeader);
+
+    STRATEGY_RULES.forEach(sr => {
+      const row = document.createElement('div');
+      row.style.cssText = 'background:var(--card-bg,#fff);border-radius:10px;margin-bottom:6px;padding:9px 13px;border:1px solid var(--border,#eee);display:flex;gap:10px;align-items:flex-start;';
+      row.innerHTML = `
+        <div style="min-width:24px;height:24px;border-radius:50%;background:#003087;color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${sr.priority}</div>
+        <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;">${sr.rule}</div>`;
+      content.appendChild(row);
+    });
+
+    // By park
+    const bpHeader = document.createElement('div');
+    bpHeader.style.cssText = 'font-size:13px;font-weight:800;color:#003087;margin:14px 0 8px;';
+    bpHeader.textContent = '🎢 WHAT TO BUY AT EACH PARK';
+    content.appendChild(bpHeader);
+
+    BY_PARK.forEach(p => {
+      const card = document.createElement('div');
+      card.style.cssText = `background:${p.color}12;border-radius:12px;margin-bottom:8px;padding:10px 13px;border:1px solid ${p.color}25;`;
+      card.innerHTML = `
+        <div style="font-size:12px;font-weight:700;color:${p.color};margin-bottom:5px;">${p.park}</div>
+        ${p.essential.map(e=>`<div style="font-size:11px;color:var(--text-secondary,#555);padding:2px 0;">⚡ ${e}</div>`).join('')}`;
+      content.appendChild(card);
+    });
+
+    const spacer = document.createElement('div');
+    spacer.style.height = '20px';
+    content.appendChild(spacer);
+
+    s.appendChild(header);
+    s.appendChild(content);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-genie-guide')) buildScreen();
+
+  const _prevSS_tttt2 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_tttt2) _prevSS_tttt2(name, el);
+    if (name === 'genie-guide') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-genie-guide');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectGenieCard() {
+    if (document.getElementById('genie-home-card')) return true;
+    const ref = document.getElementById('bkfst-home-card') || document.getElementById('nature-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'genie-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#003087,#1565C0,#42A5F5);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('genie-guide');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:3px;">⚡ Lightning Lane Master Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.85);">LLMP vs LLSP · What to buy · 7am strategy</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.5);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _genieCard = false;
+  setInterval(() => { if (!_genieCard) _genieCard = injectGenieCard(); }, 34000);
+  setTimeout(() => { _genieCard = injectGenieCard(); }, 30500);
+
+  const _prevRH_tttt2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_tttt2) _prevRH_tttt2.apply(this, arguments);
+    setTimeout(() => { _genieCard = false; _genieCard = injectGenieCard(); }, 8500);
+  };
+})();
+</script>
