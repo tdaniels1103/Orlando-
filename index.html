@@ -62273,3 +62273,444 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK PPPPPPP: Florida Gulf Coast vs Atlantic Coast Beach Guide ===== */
+(function initFloridaCoasts() {
+
+  const GULF_BEACHES = [
+    {
+      name:'Clearwater Beach', distance:'90 min from Orlando', emoji:'🌊', color:'#0277BD',
+      why:'The most famous Gulf Coast beach — consistently ranked in America\'s top 5 beaches. Powder-white sand so fine it squeaks underfoot. Calm, warm Gulf water ideal for swimming. Sunset is the event of the day, watched from the beach or Pier 60.',
+      details:[
+        {label:'Water temp', value:'78–86°F May–October; 60–70°F December–February'},
+        {label:'Waves', value:'Minimal — Gulf of Mexico is sheltered. Ideal for children and non-swimmers'},
+        {label:'Drive from I-Drive', value:'1 hour 40 minutes via I-4 West + Courtney Campbell Causeway'},
+        {label:'Parking', value:'Clearwater Beach Parking Garage: $4/hour. Arrive before 10 AM for easy parking'},
+      ],
+      tip:'Pier 60 hosts a sunset festival every evening — street performers, artisans, and musicians gather 2 hours before sunset and stay until 2 hours after. Free, festive, genuinely Orlando-area worthy.',
+    },
+    {
+      name:'St. Pete Beach (Pass-a-Grille)', distance:'2 hrs from Orlando', emoji:'🏖️', color:'#F57F17',
+      why:'Less commercial than Clearwater — the south end of St. Pete Beach (Pass-a-Grille historic district) feels like 1950s Florida. Hurricane restaurant dates to 1919. The Don CeSar Hotel (the "Pink Palace") is an architectural landmark visible from miles away.',
+      details:[
+        {label:'Atmosphere', value:'Historic, quieter than Clearwater, genuinely local flavor'},
+        {label:'Best for', value:'Adults seeking authentic Florida beach town vs. resort beach'},
+        {label:'Don CeSar Hotel', value:'Luxury beach resort open to day visitors for beach access ($35/day chair rental)'},
+      ],
+      tip:'The Gulf beaches have calm, warm water year-round. The sand is brilliantly white — it\'s quartz crystal ground fine by Gulf currents. Completely different from Atlantic coast sand which is harder-packed and darker.',
+    },
+    {
+      name:'Siesta Key', distance:'2 hrs 15 min from Orlando', emoji:'⭐', color:'#2E7D32',
+      why:'Often cited as the #1 beach in America by independent surveys. The sand is 99% quartz — the finest, whitest, coolest sand in the continental United States. Even on the hottest days, the sand stays cool to the touch. The village has good restaurants and a laid-back vibe.',
+      details:[
+        {label:'Sand quality', value:'99% pure quartz crystal — certified the finest sand in the US by scientists'},
+        {label:'Siesta Key Village', value:'Walkable collection of restaurants and shops 5 minutes from the beach'},
+        {label:'Turtle Beach', value:'Southern quieter section of Siesta Key for visitors seeking solitude'},
+      ],
+      tip:'Siesta Key is an island connected to Sarasota by bridges. Parking is free but limited — arrive before 9 AM on summer weekends or use the free park-and-ride shuttle from nearby lots.',
+    },
+  ];
+
+  const ATLANTIC_BEACHES = [
+    {
+      name:'Cocoa Beach', distance:'60 min from Orlando', emoji:'🚀', color:'#C62828',
+      why:'The closest Atlantic beach to Orlando. Home to the original Ron Jon Surf Shop (open 24 hours). Lively surf scene, pier with restaurants. Pairs perfectly with a Kennedy Space Center visit — 25 minutes apart. Atlantic waves make bodyboarding genuinely fun.',
+      details:[
+        {label:'Waves', value:'Atlantic surf — real waves 1–4 feet consistently. Rental boards available at the pier'},
+        {label:'Drive from Disney', value:'58 minutes via SR-528 (Beachline Expressway). Toll road $3–5 total'},
+        {label:'Kennedy Space Center', value:'25 minutes north of Cocoa Beach. Combine beach + rocket museum for a full day trip'},
+      ],
+      tip:'The Cocoa Beach Pier has a collection of restaurants and a surf shop. Lori Wilson Park (2 miles south) is quieter and more family-friendly than the pier area. Atlantic beach sand is firmer — better for volleyball, jogging, and building sandcastles.',
+    },
+    {
+      name:'New Smyrna Beach', distance:'1 hr 15 min from Orlando', emoji:'🤙', color:'#5D4037',
+      why:'The "locals\'" Atlantic beach — NSB has a genuine arts scene, good restaurants, and none of the carnival atmosphere of Daytona. Consistently ranked as having the best surf in Florida (note: also statistically high shark encounter rates — the surfing community knows and accepts this). The Flagler Avenue strip is excellent for dinner and drinks.',
+      details:[
+        {label:'Surfing', value:'Best surf in Florida — consistent Atlantic swells, long-period waves'},
+        {label:'Arts scene', value:'Atlantic Center for the Arts, galleries throughout the small town'},
+        {label:'Flagler Ave', value:'Walkable strip of restaurants, bars, and surf shops one block from the beach'},
+      ],
+      tip:'NSB has a significant shark encounter history — primarily shallow water bites on surfers\' hands. The risk is real but low (20–30 incidents recorded in 25 years, none fatal). Surfing at dawn/dusk increases risk. Swimming at the public beach is generally safe.',
+    },
+    {
+      name:'Canaveral National Seashore', distance:'75 min from Orlando', emoji:'🌿', color:'#2E7D32',
+      why:'24 miles of undeveloped barrier island — no development, no hotels, no condos. Just pristine Atlantic beach, scrub habitat, sea turtle nesting sites, and NASA in the background. The most authentic Florida beach experience available near Orlando. Apollo Beach (north end) is remotest; Playalinda Beach (south end) is closest to KSC.',
+      details:[
+        {label:'Entry fee', value:'$20/vehicle, valid for 7 days'},
+        {label:'Wildlife', value:'Sea turtle nesting season June–August (nighttime tours available). Manatees in lagoon.'},
+        {label:'Playalinda Beach', value:'Sometimes closed during NASA launches — check before driving. The launch view from Playalinda is extraordinary if timing aligns'},
+      ],
+      tip:'Canaveral\'s Mosquito Lagoon is one of the world\'s premier fishing destinations. Redfish, snook, and trout are abundant. If you fish, renting a kayak or canoe and poling the shallow flats is a legitimately world-class outdoor experience.',
+    },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-florida-coasts';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#0277BD,#F57F17,#2E7D32);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Florida Gulf Coast vs Atlantic Beaches</div>
+          <div style="font-size:11px;opacity:.8;">Clearwater · Siesta Key · Cocoa Beach · New Smyrna · Canaveral</div>
+        </div>
+        <span style="font-size:28px;">🌊</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        Orlando sits equidistant between two completely different coasts — 60 minutes east to Atlantic surf and 90 minutes west to the Gulf's calm white-sand beaches. The two coastlines have fundamentally different characters worth understanding before choosing.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    const compCard = document.createElement('div');
+    compCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+    compCard.innerHTML = `<div style="padding:9px 14px;background:#0277BD18;border-left:4px solid #0277BD;">
+      <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">🆚 Gulf vs. Atlantic — The Key Differences</div>
+    </div>
+    <div style="padding:8px 14px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <div style="background:#0277BD0d;border-radius:8px;padding:8px;">
+          <div style="font-size:11px;font-weight:700;color:#0277BD;margin-bottom:5px;">🌊 Gulf Coast</div>
+          ${['Calm, warm water — no surf','Sand is white quartz crystal powder','Sunsets over the water (west-facing)','Water temperature 78–86°F in summer','Best for: families, swimming, relaxing','90–120 minutes from Orlando'].map(i=>`<div style="font-size:10px;color:var(--text-secondary,#555);margin-bottom:2px;">• ${i}</div>`).join('')}
+        </div>
+        <div style="background:#C628280d;border-radius:8px;padding:8px;">
+          <div style="font-size:11px;font-weight:700;color:#C62828;margin-bottom:5px;">🏄 Atlantic Coast</div>
+          ${['Waves 1–6 feet — real surf','Sand is harder-packed, slightly coarser','Sunrises over the water (east-facing)','Water temperature 72–80°F in summer','Best for: surfing, fishing, adventure','60–75 minutes from Orlando'].map(i=>`<div style="font-size:10px;color:var(--text-secondary,#555);margin-bottom:2px;">• ${i}</div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+    body.appendChild(compCard);
+
+    const gulfHdr = document.createElement('div');
+    gulfHdr.style.cssText = 'font-family:"Playfair Display",serif;font-size:15px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:8px;padding:6px 0 4px;border-bottom:2px solid #0277BD;';
+    gulfHdr.textContent = '🌊 Gulf Coast Beaches';
+    body.appendChild(gulfHdr);
+
+    GULF_BEACHES.forEach(beach => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:10px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:9px 14px;background:${beach.color}18;border-left:4px solid ${beach.color};">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:18px;">${beach.emoji}</span>
+              <div>
+                <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${beach.name}</div>
+                <div style="font-size:10px;color:${beach.color};">${beach.distance}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:8px 14px;">
+          <div style="font-size:11px;color:var(--text-secondary,#444);line-height:1.6;margin-bottom:7px;">${beach.why}</div>
+          ${beach.details.map(d=>`<div style="display:flex;gap:6px;margin-bottom:3px;">
+            <div style="font-size:10px;font-weight:700;color:${beach.color};min-width:75px;flex-shrink:0;">${d.label}</div>
+            <div style="font-size:10px;color:var(--text-secondary,#555);">${d.value}</div>
+          </div>`).join('')}
+          <div style="display:flex;gap:5px;background:${beach.color}0d;border-radius:7px;padding:5px;margin-top:6px;">
+            <span style="font-size:10px;flex-shrink:0;">💡</span>
+            <div style="font-size:10px;color:var(--text-secondary,#555);line-height:1.5;">${beach.tip}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const atlHdr = document.createElement('div');
+    atlHdr.style.cssText = 'font-family:"Playfair Display",serif;font-size:15px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:8px;margin-top:4px;padding:6px 0 4px;border-bottom:2px solid #C62828;';
+    atlHdr.textContent = '🏄 Atlantic Coast Beaches';
+    body.appendChild(atlHdr);
+
+    ATLANTIC_BEACHES.forEach(beach => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:10px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:9px 14px;background:${beach.color}18;border-left:4px solid ${beach.color};">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:18px;">${beach.emoji}</span>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${beach.name}</div>
+              <div style="font-size:10px;color:${beach.color};">${beach.distance}</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:8px 14px;">
+          <div style="font-size:11px;color:var(--text-secondary,#444);line-height:1.6;margin-bottom:7px;">${beach.why}</div>
+          ${beach.details.map(d=>`<div style="display:flex;gap:6px;margin-bottom:3px;">
+            <div style="font-size:10px;font-weight:700;color:${beach.color};min-width:75px;flex-shrink:0;">${d.label}</div>
+            <div style="font-size:10px;color:var(--text-secondary,#555);">${d.value}</div>
+          </div>`).join('')}
+          <div style="display:flex;gap:5px;background:${beach.color}0d;border-radius:7px;padding:5px;margin-top:6px;">
+            <span style="font-size:10px;flex-shrink:0;">💡</span>
+            <div style="font-size:10px;color:var(--text-secondary,#555);line-height:1.5;">${beach.tip}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const summaryCard = document.createElement('div');
+    summaryCard.style.cssText = 'background:linear-gradient(135deg,#0277BD,#C62828);border-radius:14px;margin-bottom:20px;padding:14px;color:#fff;';
+    summaryCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;margin-bottom:8px;">🏖️ Which Coast to Choose?</div>
+    ${[
+      {icon:'👨‍👩‍👧', text:'Families with young children: Gulf Coast (Clearwater or Siesta Key). Calm water, white sand, safe swimming.'},
+      {icon:'🏄', text:'Surfers and adventure seekers: New Smyrna Beach. Best surf in Florida, good restaurants, authentic beach town.'},
+      {icon:'🚀', text:'Combining with Kennedy Space Center: Cocoa Beach. 25 minutes from KSC, easy I-4 access from Orlando.'},
+      {icon:'🌿', text:'Nature and solitude: Canaveral National Seashore. No development, sea turtles, NASA backdrop, world-class fishing.'},
+      {icon:'🌅', text:'Best sunsets: Gulf Coast (sun sets over the water). Best sunrises: Atlantic Coast (sun rises over the ocean).'},
+    ].map(t=>`<div style="display:flex;gap:10px;margin-bottom:7px;align-items:flex-start;">
+      <span style="font-size:18px;flex-shrink:0;">${t.icon}</span>
+      <div style="font-size:11px;opacity:.95;line-height:1.5;">${t.text}</div>
+    </div>`).join('')}`;
+    body.appendChild(summaryCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-florida-coasts')) buildScreen();
+
+  const _prevSS_ppppppp = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_ppppppp) _prevSS_ppppppp(name, el);
+    if (name === 'florida-coasts') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-florida-coasts');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectCOCard() {
+    if (document.getElementById('florida-coasts-home-card')) return true;
+    const ref = document.getElementById('bars-beer-home-card') || document.getElementById('universal-express-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'florida-coasts-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#0277BD,#F57F17,#2E7D32 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('florida-coasts');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🌊</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Gulf Coast vs. Atlantic Beaches</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Clearwater · Siesta Key · Cocoa Beach · New Smyrna · Canaveral</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _coCard = false;
+  setInterval(() => { if (!_coCard) _coCard = injectCOCard(); }, 102000);
+  setTimeout(() => { _coCard = injectCOCard(); }, 98500);
+  const _prevRH_ppppppp = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_ppppppp) _prevRH_ppppppp.apply(this, arguments);
+    setTimeout(() => { _coCard = false; _coCard = injectCOCard(); }, 35800);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK QQQQQQQ: Orlando Sports & Recreation Guide ===== */
+(function initOrlandoSports() {
+
+  const PRO_SPORTS = [
+    {
+      team:'Orlando City SC (MLS)', emoji:'⚽', color:'#633492',
+      venue:'Inter&Co Stadium (Exploria), downtown Orlando',
+      season:'March–October',
+      experience:'One of the best soccer atmospheres in MLS. The north end supporters section (Lions Nation) creates genuine stadium noise. The stadium holds 25,500 and sells out for rivalry games. Parking downtown is limited — take the SunRail train from the tourist corridor.',
+      tip:'Section 15 (north end, Lions Nation) is the atmosphere section — standing, chanting, flags. The rest of the stadium is traditional seated. Standing tickets are cheaper and the experience is better. Rivalries with Atlanta United and Inter Miami draw the best atmospheres.',
+    },
+    {
+      team:'Orlando Magic (NBA)', emoji:'🏀', color:'#0077C0',
+      venue:'Kia Center, downtown Orlando',
+      season:'October–April',
+      experience:'The Kia Center (renamed from Amway Center) is one of the better NBA arenas. The Magic have had draft success recently — Paolo Banchero has generated real fan excitement. Downtown basketball games are the social event of the evening.',
+      tip:'The Rosen Plaza Hotel tunnel leads directly to Kia Center — useful on rainy evenings. Parking garages downtown fill quickly; arrive 90+ minutes early for seats and dinner on Church Street.',
+    },
+    {
+      team:'Orlando Predators (Indoor Football)', emoji:'🏈', color:'#C62828',
+      venue:'Kia Center, downtown Orlando',
+      season:'January–May',
+      experience:'Arena football is a underrated live sports experience — extremely fast, high-scoring, intimate venue. The Predators have been a historic franchise. Tickets are inexpensive ($15–40) and the game moves quickly.',
+      tip:'Best kept secret in Orlando sports — indoor football tickets are $20 and the game is legitimately exciting. Orlando Predators have multiple championships. Perfect for a spontaneous evening.',
+    },
+    {
+      team:'Tampa Bay Lightning (NHL)', emoji:'🏒', color:'#003087',
+      venue:'Amalie Arena, Tampa',
+      season:'October–April (plus playoffs)',
+      experience:'90 minutes from Orlando but worth the drive for hockey. The Lightning are perennial playoff contenders. Amalie Arena is a top-5 NHL arena. Tampa is also a full evening destination — Ybor City for dinner before the game.',
+      tip:'The Lightning\'s lower bowl is one of the loudest arenas in the NHL during playoff games. If playoff hockey aligns with your Orlando trip, it\'s worth the Tampa drive. Combine with Tampa Bay Bucs game if football season.',
+    },
+  ];
+
+  const RECREATION = [
+    {
+      activity:'Skydiving — iFLY Indoor Skydiving', emoji:'🪂', color:'#E65100',
+      location:'ICON Park, I-Drive',
+      details:'Vertical wind tunnel creates skydiving conditions without the altitude. Instructors are professional skydivers. First-flight packages include 2 tunnel minutes (equivalent to a tandem skydive in experience). Ages 3+. $80–100/person.',
+      tip:'The actual freefall sensation is nearly identical to real skydiving. Excellent for families with older children or adults who want to try skydiving in a controlled environment.',
+    },
+    {
+      activity:'Axe Throwing — Dueling Axes', emoji:'🪓', color:'#5D4037',
+      location:'I-Drive',
+      details:'Competitive axe throwing in lanes with a bar attached. Instructors walk you through technique — most people hit targets within 15 minutes. Private lanes available for groups. Ages 13+. $25–35/person.',
+      tip:'Surprisingly addictive. The combination of cold beer and axe throwing is a proven entertainment formula. Best for groups of 4–8 people who want an activity beyond standard theme park options.',
+    },
+    {
+      activity:'Escape Rooms', emoji:'🔐', color:'#7B1FA2',
+      location:'Multiple locations throughout Orlando',
+      details:'Orlando has an unusually high concentration of escape room venues — driven by tourist demand and a competitive market that has elevated quality. Top venues: The Escape Game Orlando (ICON Park), Breakout Games, The Real Escape Room. Rooms run $30–45/person.',
+      tip:'The Escape Game Orlando is consistently rated one of the top escape room chains in the US. Book "Prison Break" or "The Heist" for the best production value. Works for groups of 2–8 people.',
+    },
+    {
+      activity:'Airboat Tours — Everglades/Kissimmee', emoji:'🐊', color:'#2E7D32',
+      location:'Boggy Creek Airboat Adventures (20 min from Disney)',
+      details:'Flat-bottomed airboats through Florida wetlands. Guaranteed alligator sightings. The speed, sound, and proximity to wildlife is genuinely thrilling. Boggy Creek is the closest airboat tour to Disney — 20 minutes from the parks. 30–60 minute tours, $35–55/person.',
+      tip:'Go at dawn or dusk for maximum alligator activity. Boggy Creek operates year-round; summer has more visible wildlife. The 60-minute private tour is worth the upgrade for guaranteed wildlife commentary and interaction.',
+    },
+    {
+      activity:'Wakeboarding & Skiing — Lake Louisa', emoji:'🏄', color:'#0277BD',
+      location:'Clermont area, 30 min from Disney',
+      details:'The Clermont/Minneola area has the highest concentration of freshwater lakes in Florida. Multiple outfitters offer lessons and rentals for wakeboarding, waterskiing, and tubing. Lake Louisa State Park has canoe/kayak rentals. No ocean required.',
+      tip:'Clermont\'s Chain of Lakes is where many Orlando-area water sports enthusiasts spend weekends. The water quality is excellent — spring-fed lakes. Families with older children should consider a half-day wakeboarding lesson.',
+    },
+    {
+      activity:'Rocket Launch Viewing', emoji:'🚀', color:'#1a1a2e',
+      location:'Cocoa Beach / Titusville (60 min east)',
+      details:'Kennedy Space Center launches rockets visible from 50 miles away. SpaceX Falcon 9 launches are now monthly or more frequent. Best viewing: Jetty Park in Cape Canaveral (closest), Titusville\'s Space View Park (free), or the KSC visitor complex. Check launch schedules at kennedyspacecenter.com.',
+      tip:'The sonic boom from a rocket launch is felt in your chest from 20 miles away. If a launch aligns with your Orlando trip dates, it\'s one of the most extraordinary free experiences available. The Falcon 9 booster landing is as spectacular as the launch.',
+    },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-sports-rec';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#633492,#0077C0,#C62828);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Orlando Sports & Recreation</div>
+          <div style="font-size:11px;opacity:.8;">Orlando City · Magic · Airboats · Skydiving · Rocket launches</div>
+        </div>
+        <span style="font-size:28px;">⚽</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        Beyond the theme parks, Orlando has professional sports, unique outdoor recreation, and activities available nowhere else. Airboat tours, rocket launches, and the most competitive MLS soccer in the south.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    const sportsHdr = document.createElement('div');
+    sportsHdr.style.cssText = 'font-family:"Playfair Display",serif;font-size:15px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:8px;padding:6px 0 4px;border-bottom:2px solid #633492;';
+    sportsHdr.textContent = '🏟️ Professional Sports';
+    body.appendChild(sportsHdr);
+
+    PRO_SPORTS.forEach(team => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:10px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:9px 14px;background:${team.color}18;border-left:4px solid ${team.color};">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:20px;">${team.emoji}</span>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${team.team}</div>
+              <div style="font-size:10px;color:${team.color};">${team.venue} · ${team.season}</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:8px 14px;">
+          <div style="font-size:11px;color:var(--text-secondary,#444);line-height:1.6;margin-bottom:5px;">${team.experience}</div>
+          <div style="font-size:10px;color:var(--text-secondary,#888);font-style:italic;">${team.tip}</div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const recHdr = document.createElement('div');
+    recHdr.style.cssText = 'font-family:"Playfair Display",serif;font-size:15px;font-weight:700;color:var(--text-primary,#212121);margin:4px 0 8px;padding:6px 0 4px;border-bottom:2px solid #E65100;';
+    recHdr.textContent = '🎯 Recreation & Adventure';
+    body.appendChild(recHdr);
+
+    RECREATION.forEach(act => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:12px;margin-bottom:8px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:8px 14px;display:flex;gap:8px;align-items:flex-start;">
+          <span style="font-size:22px;flex-shrink:0;">${act.emoji}</span>
+          <div style="flex:1;">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;">
+              <div style="font-size:12px;font-weight:700;color:${act.color};">${act.activity}</div>
+            </div>
+            <div style="font-size:10px;color:var(--text-secondary,#888);margin-bottom:3px;">${act.location}</div>
+            <div style="font-size:10px;color:var(--text-secondary,#555);line-height:1.5;margin-bottom:3px;">${act.details}</div>
+            <div style="font-size:10px;color:var(--text-secondary,#666);font-style:italic;">${act.tip}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const spacerDiv = document.createElement('div');
+    spacerDiv.style.cssText = 'height:20px;';
+    body.appendChild(spacerDiv);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-sports-rec')) buildScreen();
+
+  const _prevSS_qqqqqqq = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_qqqqqqq) _prevSS_qqqqqqq(name, el);
+    if (name === 'sports-rec') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-sports-rec');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectSRCard() {
+    if (document.getElementById('sports-rec-home-card')) return true;
+    const ref = document.getElementById('florida-coasts-home-card') || document.getElementById('bars-beer-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'sports-rec-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#633492,#0077C0,#C62828 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('sports-rec');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">⚽</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Sports & Recreation</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Orlando City · Magic · Airboats · Skydiving · Rocket launches</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _srCard = false;
+  setInterval(() => { if (!_srCard) _srCard = injectSRCard(); }, 103000);
+  setTimeout(() => { _srCard = injectSRCard(); }, 99500);
+  const _prevRH_qqqqqqq = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_qqqqqqq) _prevRH_qqqqqqq.apply(this, arguments);
+    setTimeout(() => { _srCard = false; _srCard = injectSRCard(); }, 36200);
+  };
+})();
+</script>
