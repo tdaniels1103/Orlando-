@@ -57441,3 +57441,366 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK PPPPPP: Orlando Day Trips Guide ===== */
+(function initOrlandoDayTrips() {
+
+  const DAYTRIPS = [
+    {
+      name:'St. Augustine', emoji:'🏰', color:'#8B4513',
+      distance:'1 hr 15 min (105 miles north)',
+      why:'The oldest city in the United States (founded 1565 by Spain). More authentic history than Colonial Williamsburg. Castillo de San Marcos, cobblestone streets, the oldest wooden schoolhouse in the US, and some of Florida\'s best seafood restaurants.',
+      highlights:['Castillo de San Marcos (1672 Spanish fort)', 'St. George Street — 19th-century shopping district', 'Flagler College campus (former Ponce de León Hotel)', 'St. Augustine Lighthouse (1874, climb to top)', 'Anastasia State Park for beach access'],
+      best:'March–May or October–November. Summer is hot; winter is mild and less crowded.',
+      tip:'Stay for sunset at the Bridge of Lions. Walk Old Town at night — the gas lamps, the Spanish architecture, the ghost tours. Park in the garage on Castillo Drive and walk everywhere. The city is small enough to cover on foot.',
+    },
+    {
+      name:'Clearwater Beach', emoji:'🌊', color:'#0277BD',
+      distance:'1 hr 30 min (110 miles west)',
+      why:'Consistently ranked #1 beach in the United States by TripAdvisor. Gulf Coast water is calm, warm, and turquoise. The sand is white quartz. The sunsets are famous worldwide.',
+      highlights:['Clearwater Beach (the main beach)', 'Pier 60 sunset celebration every evening', 'Dolphin and marine wildlife tours', 'Caladesi Island State Park (ferry access, more secluded)', 'Columbia Restaurant for Spanish Cuban cuisine'],
+      best:'Year-round. October–April is peak season (snowbirds). June–September is hot but less crowded. Water stays warm October–December.',
+      tip:'The Pier 60 sunset gathering happens every evening — street performers, artisans, and the entire community watches the sunset over the water. It\'s one of the best free events in Florida. Plan to arrive 45 minutes before sunset.',
+    },
+    {
+      name:'Tampa', emoji:'🦁', color:'#C62828',
+      distance:'1 hr (85 miles west)',
+      why:'Florida\'s most underrated major city. Busch Gardens, Ybor City (the historic Cuban cigar quarter), Tampa Riverwalk, the Florida Aquarium, and some of the best Cuban food in the United States.',
+      highlights:['Ybor City Historic District — 7th Avenue nightlife and restaurants', 'Columbia Restaurant (Tampa) — oldest restaurant in Florida (1905)', 'Florida Aquarium — one of the state\'s best', 'Tampa Riverwalk and Curtis Hixon Waterfront Park', 'Busch Gardens if you haven\'t been'],
+      best:'Year-round. Ybor City is best Thursday–Saturday nights.',
+      tip:'The Cuban sandwich was invented (or perfected — debate with Miami continues) in Tampa\'s Ybor City. Columbia Restaurant\'s Cuban sandwich is a bucket-list item. The flamenco show inside Columbia runs nightly — arrive early for the performance with dinner.',
+    },
+    {
+      name:'Cocoa Beach & Cape Canaveral', emoji:'🚀', color:'#0d47a1',
+      distance:'1 hr (65 miles east)',
+      why:'Kennedy Space Center, Atlantic Ocean beaches, and the Cocoa Beach surfing culture. The closest Atlantic beach to Orlando — different water character from Gulf Coast (waves, darker blue, wilder feel).',
+      highlights:['Kennedy Space Center Visitor Complex (full day)', 'Cocoa Beach for the full Atlantic experience', 'Ron Jon Surf Shop — the world\'s largest (open 24/7)', 'Port Canaveral for cruise departure and seafood restaurants', 'Launch viewing from Cocoa Beach'],
+      best:'Year-round. Atlantic water is swimmable October–April. Summer has frequent thunderstorms.',
+      tip:'If a rocket launch coincides with your trip, plan the Cocoa Beach day around it. Launch times at KSC.NASA.gov. Viewing from the public beach is free and unforgettable. The night launches visible from all of Central Florida are the most dramatic.',
+    },
+    {
+      name:'Sarasota & Siesta Key', emoji:'🎨', color:'#2E7D32',
+      distance:'1 hr 20 min (75 miles south)',
+      why:'Sarasota is Florida\'s arts capital — the Ringling Museum, the Asolo Repertory Theatre, and Siesta Key Beach (often ranked #1 beach in the country for soft quartz sand). More refined than Tampa Bay area.',
+      highlights:['Siesta Key Beach — finest quartz sand in the world', 'The Ringling Museum complex (art, circus, Venetian architecture)', 'St. Armands Circle for upscale shopping and dining', 'Myakka River State Park for wildlife and nature', 'Downtown Sarasota galleries and restaurants'],
+      best:'November–April. This is prime Gulf Coast season. Summer is extremely hot for non-beach activities.',
+      tip:'The Ringling Museum complex is one of the great art museums in Florida — the Baroque masters collection, the circus museum, and the Venetian Gothic Ca\' d\'Zan mansion on the water all in one property. Budget 3–4 hours for the complex alone.',
+    },
+    {
+      name:'Crystal River — Swim with Manatees', emoji:'🐟', color:'#00796B',
+      distance:'1 hr 20 min (100 miles northwest)',
+      why:'Crystal River is the only place in the United States where you can legally swim with wild West Indian manatees in their natural habitat. November through March, hundreds of manatees gather in the warm springs.',
+      highlights:['Guided snorkel tours with manatees (Nov–March)', 'Crystal River National Wildlife Refuge', 'Three Sisters Springs (manatee aggregation area)', 'Kayaking through the spring runs', 'Homosassa Springs Wildlife State Park (resident manatees year-round)'],
+      best:'November–March for manatee season. Peak manatee season is January–February (cold weather drives them to warm springs).',
+      tip:'Book the manatee snorkel tour well in advance for winter weekends — they fill up weeks ahead. The tour boats approach slowly; manatees often approach you. The rule: you can touch them if they initiate contact, but you cannot pursue them.',
+    },
+  ];
+
+  const TRIP_TIPS = [
+    {icon:'🚗', tip:'Most Orlando day trips require a car. Uber/Lyft are cost-prohibitive for 100-mile round trips. Rent a car for day trip days even if you use transit for park days.'},
+    {icon:'⛽', tip:'Florida gas prices are lower than national average. A full tank ($50–60) covers most day trip round trips. I-4 east to Daytona, I-75 west to Tampa, US-192 south to Kissimmee.'},
+    {icon:'🌧️', tip:'Always check weather for the destination — not Orlando. Tampa afternoon thunderstorms are different from St. Augustine conditions. Florida weather is hyper-local.'},
+    {icon:'🕐', tip:'Leave by 8 AM for day trips. Most Florida attractions open at 9–10 AM, traffic on I-4 and I-75 builds by 9 AM. Early departure gives 30–45 minutes of traffic advantage.'},
+    {icon:'🍽️', tip:'Research one excellent local restaurant at your destination before leaving. The best meals on day trips are not the tourist traps near attractions — they\'re the local spots 10 minutes away.'},
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-daytrips';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#8B4513,#0277BD,#C62828);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Orlando Day Trips Guide</div>
+          <div style="font-size:11px;opacity:.8;">St. Augustine · Clearwater · Tampa · Manatees · Sarasota</div>
+        </div>
+        <span style="font-size:28px;">🗺️</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        Orlando is the perfect hub for Florida day trips. Within 90 minutes: the oldest city in America, the #1-ranked beach in the US, space launches, wild manatees, and the arts capital of the Gulf Coast.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    DAYTRIPS.forEach(trip => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:10px 14px;background:${trip.color}18;border-left:4px solid ${trip.color};">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div style="display:flex;gap:8px;align-items:center;">
+              <span style="font-size:22px;">${trip.emoji}</span>
+              <div>
+                <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--text-primary,#212121);">${trip.name}</div>
+                <div style="font-size:10px;font-weight:600;color:${trip.color};">${trip.distance}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;margin-bottom:8px;">${trip.why}</div>
+          <div style="font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:4px;">HIGHLIGHTS</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px;">
+            ${trip.highlights.map(h=>`<span style="font-size:10px;padding:2px 7px;background:${trip.color}18;color:${trip.color};border-radius:20px;">${h}</span>`).join('')}
+          </div>
+          <div style="font-size:10px;font-weight:700;color:#2E7D32;margin-bottom:4px;">📅 Best season: ${trip.best}</div>
+          <div style="display:flex;gap:5px;background:${trip.color}0d;border-radius:8px;padding:7px;">
+            <span style="font-size:11px;flex-shrink:0;">💡</span>
+            <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${trip.tip}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const tipCard = document.createElement('div');
+    tipCard.style.cssText = 'background:linear-gradient(135deg,#8B4513,#C62828);border-radius:16px;margin-bottom:20px;padding:14px;color:#fff;';
+    tipCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">🚗 Day Trip Logistics</div>
+    ${TRIP_TIPS.map(t=>`<div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
+      <span style="font-size:18px;flex-shrink:0;">${t.icon}</span>
+      <div style="font-size:12px;opacity:.95;line-height:1.5;">${t.tip}</div>
+    </div>`).join('')}`;
+    body.appendChild(tipCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-daytrips')) buildScreen();
+
+  const _prevSS_pppppp = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_pppppp) _prevSS_pppppp(name, el);
+    if (name === 'daytrips') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-daytrips');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectDTCard() {
+    if (document.getElementById('daytrips-home-card')) return true;
+    const ref = document.getElementById('eu-home-card') || document.getElementById('hs-deep-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'daytrips-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#8B4513,#0277BD,#C62828 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('daytrips');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🗺️</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Orlando Day Trips Guide</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">St. Augustine · Clearwater · Tampa · Manatees · Sarasota</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _dtCard = false;
+  setInterval(() => { if (!_dtCard) _dtCard = injectDTCard(); }, 76000);
+  setTimeout(() => { _dtCard = injectDTCard(); }, 72500);
+  const _prevRH_pppppp = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_pppppp) _prevRH_pppppp.apply(this, arguments);
+    setTimeout(() => { _dtCard = false; _dtCard = injectDTCard(); }, 25400);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK QQQQQQ: Orlando Food Scene Deep Dive ===== */
+(function initOrlandoFoodScene() {
+
+  const NEIGHBORHOODS = [
+    {
+      name:'Mills 50 District', emoji:'🍜', color:'#C62828',
+      vibe:'Orlando\'s most diverse and vibrant dining corridor. Vietnamese, Thai, Korean, Filipino, and fusion restaurants that have defined Central Florida\'s Asian food scene for decades.',
+      musteat:[
+        {name:'Thuy Duong', note:'Best Vietnamese pho in Central Florida. The oxtail broth is slow-cooked for 12 hours. Packed every weekend.'},
+        {name:'Tako Cheena', note:'Korean-Mexican fusion tacos. James Beard buzz. The short rib tako is the dish that put Orlando street food on the map.'},
+        {name:'Hawker\'s Asian Street Fare', note:'Pan-Asian street food in a hip, loud environment. The best gateway into Asian food for visitors unfamiliar with the genre.'},
+        {name:'Sticky Rice Lao', note:'Laotian food — extremely rare in Florida. The papaya salad is the most authentic in the state.'},
+      ],
+      tip:'Arrive hungry and plan to try multiple restaurants. Portions are generally smaller than American expectations. Mills 50 is best experienced as a food tour — four courses at four restaurants.',
+    },
+    {
+      name:'Thornton Park / Lake Eola', emoji:'🍷', color:'#7B1FA2',
+      vibe:'Orlando\'s upscale urban neighborhood. Wine bars, farm-to-table restaurants, and the most beautiful street in downtown Orlando. Lake Eola provides the backdrop for outdoor dining.',
+      musteat:[
+        {name:'Osprey Tavern', note:'Best wood-fired pizza in Orlando. The burrata with San Marzano tomatoes is the dish that gets ordered at every table.'},
+        {name:'The Stubborn Mule', note:'Award-winning cocktail bar with surprisingly excellent food. The charcuterie board is a destination in itself.'},
+        {name:'Graffiti Junktion', note:'Legendary local burger bar. The Graffiti Burger has been winning best-of lists for 15 years. Loud, fun, very Orlando.'},
+      ],
+      tip:'Thornton Park on a Sunday morning (9 AM–noon) is peak neighborhood life. The dog walkers, the coffee shop lines, the brunch crowd — it\'s the most civilized hour in Orlando.',
+    },
+    {
+      name:'Park Avenue — Winter Park', emoji:'🌿', color:'#2E7D32',
+      vibe:'The most charming dining street in the Orlando metro area. Upscale boutiques, award-winning restaurants, and a Parisian boulevard atmosphere unique in Central Florida.',
+      musteat:[
+        {name:'The Ravenous Pig', note:'The restaurant that changed Orlando\'s dining scene. National-recognition chef-owned gastropub. Seasonal menu, locally sourced. Book weeks ahead.'},
+        {name:'Prato', note:'Italian wood-fired cuisine on Park Avenue. The pappardelle with pork ragù is the dish regulars order before looking at the menu.'},
+        {name:'Café de France', note:'Authentic French pastries and café on Park Avenue. Best croissants in Orlando. The pain au chocolat will calibrate you for Paris.'},
+        {name:'Swine & Sons', note:'Craft butcher and smoked meat restaurant. The pig ear salad is famous. Barbecue for people who usually don\'t eat barbecue.'},
+      ],
+      tip:'Park Avenue is walkable end to end in 15 minutes. Stroll north to south before choosing where to eat. Sunday brunch lines form by 9 AM. The Alfond Inn is two blocks away if you want to extend the experience.',
+    },
+    {
+      name:'Downtown / Dr. Phillips', emoji:'🔥', color:'#E65100',
+      vibe:'The densest concentration of destination restaurants in Central Florida. Restaurant Row on Sand Lake Road has 200+ restaurants in one mile.',
+      musteat:[
+        {name:'Christini\'s Ristorante', note:'Old-school Italian fine dining that has anchored Restaurant Row since 1984. The pasta is made in-house, the wine list is encyclopedic.'},
+        {name:'Eddie V\'s Prime Seafood', note:'Best seafood restaurant in the Orlando metro. The live jazz Thursday–Saturday transforms the dining room.'},
+        {name:'Capital Grille', note:'The definitive Orlando power lunch and special occasion restaurant. Dry-aged steaks, exceptional service, consistently perfect.'},
+        {name:'Se7en Bites', note:'The Milk District bakery that has become a Central Florida institution. Saturday brunch is a pilgrimage. The homemade biscuits are legendary.'},
+      ],
+      tip:'Restaurant Row (Sand Lake Road, Dr. Phillips) has a restaurant per every 20 feet for one mile. It\'s overwhelming without a reservation. Pre-book and arrive knowing exactly where you\'re going — walk-in waits can be 90+ minutes Friday nights.',
+    },
+  ];
+
+  const FOOD_EXPERIENCES = [
+    {
+      name:'East End Market', emoji:'🥕', color:'#2E7D32',
+      desc:'Orlando\'s premier artisan food market. Local producers, micro-restaurants, and an incubator for Orlando\'s food scene. Not a tourist attraction — genuinely where Orlando food professionals shop and eat.',
+      mustget:['Lineage Coffee — best coffee in Central Florida', 'Gideon\'s Bakehouse at East End (the original)', 'Skybird — the most creative brunch in Orlando'],
+    },
+    {
+      name:'Gideon\'s Bakehouse (Disney Springs)', emoji:'🍪', color:'#C9A96E',
+      desc:'Gideon\'s famous cookies have legitimate national cult status. The half-pound cookies are made fresh daily and sell out. The Disney Springs location creates the most ambitious and theatrical cookies on earth.',
+      mustget:['Original Chocolate Chip (the foundation)', 'Cold Brew Cookie (seasonal rotation)', 'Ice cream sandwich with fresh-baked cookie'],
+    },
+    {
+      name:'The Florida Wine Room (Winter Park)', emoji:'🍾', color:'#7B1FA2',
+      desc:'An intimate wine bar in a 100-year-old building in downtown Winter Park. Over 1,200 bottles, by-the-glass selection, charcuterie, and the most knowledgeable sommelier staff in Orlando.',
+      mustget:['Ask for sommelier recommendations — the staff is exceptional', 'Charcuterie board pairs with everything', 'Pre-theatre dinner before the Van Dyke Cafe jazz nearby'],
+    },
+    {
+      name:'4 Rivers Smokehouse', emoji:'🍖', color:'#8B4513',
+      desc:'Orlando-born barbecue chain that has become the standard for Central Florida BBQ. The brisket rivals Texas, the burnt ends are exceptional. Multiple locations.',
+      mustget:['Brisket (lean and fatty, order both)', 'Burnt End Baked Beans — the side dish that changes minds', 'The Sweet Shop dessert counter'],
+    },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-food-scene';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#C62828,#E65100,#C9A96E);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Orlando Food Scene</div>
+          <div style="font-size:11px;opacity:.8;">Mills 50 · Park Avenue · Restaurant Row · Gideon\'s · 4 Rivers</div>
+        </div>
+        <span style="font-size:28px;">🍽️</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        Orlando's food scene has transformed dramatically since 2010. What was once a chain restaurant corridor is now home to James Beard-recognized chefs, genuine international cuisine neighborhoods, and destination food experiences.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    NEIGHBORHOODS.forEach(n => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:10px 14px;background:${n.color}18;border-left:4px solid ${n.color};">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:22px;">${n.emoji}</span>
+            <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--text-primary,#212121);">${n.name}</div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;margin-bottom:8px;">${n.vibe}</div>
+          <div style="font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:5px;">MUST EAT</div>
+          ${n.musteat.map(m=>`<div style="margin-bottom:7px;padding-left:8px;border-left:3px solid ${n.color};">
+            <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);">${m.name}</div>
+            <div style="font-size:11px;color:var(--text-secondary,#666);">${m.note}</div>
+          </div>`).join('')}
+          <div style="display:flex;gap:5px;background:${n.color}0d;border-radius:8px;padding:7px;margin-top:5px;">
+            <span style="font-size:11px;flex-shrink:0;">💡</span>
+            <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${n.tip}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const expCard = document.createElement('div');
+    expCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+    expCard.innerHTML = `<div style="padding:12px 14px;background:linear-gradient(135deg,#C62828,#E65100);color:#fff;">
+      <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;">🏆 Food Destination Experiences</div>
+    </div>
+    <div style="padding:12px 14px;">
+      ${FOOD_EXPERIENCES.map(e=>`<div style="margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border,#eee);">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">${e.emoji}</span>
+          <div style="font-size:13px;font-weight:700;color:${e.color};">${e.name}</div>
+        </div>
+        <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;margin-bottom:5px;padding-left:26px;">${e.desc}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:3px;padding-left:26px;">
+          ${e.mustget.map(m=>`<span style="font-size:10px;padding:2px 7px;background:${e.color}18;color:${e.color};border-radius:20px;">${m}</span>`).join('')}
+        </div>
+      </div>`).join('')}
+    </div>`;
+    body.appendChild(expCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-food-scene')) buildScreen();
+
+  const _prevSS_qqqqqq = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_qqqqqq) _prevSS_qqqqqq(name, el);
+    if (name === 'food-scene') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-food-scene');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectFSCard() {
+    if (document.getElementById('food-scene-home-card')) return true;
+    const ref = document.getElementById('daytrips-home-card') || document.getElementById('eu-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'food-scene-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#C62828,#E65100,#C9A96E 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('food-scene');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🍽️</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Orlando Food Scene</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Mills 50 · Park Avenue · Gideon\'s · 4 Rivers · East End Market</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _fsCard = false;
+  setInterval(() => { if (!_fsCard) _fsCard = injectFSCard(); }, 77000);
+  setTimeout(() => { _fsCard = injectFSCard(); }, 73500);
+  const _prevRH_qqqqqq = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_qqqqqq) _prevRH_qqqqqq.apply(this, arguments);
+    setTimeout(() => { _fsCard = false; _fsCard = injectFSCard(); }, 25800);
+  };
+})();
+</script>
