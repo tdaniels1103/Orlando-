@@ -45141,3 +45141,367 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK FFFF: Packing List & What to Bring ===== */
+(function initPackingGuide() {
+
+  const CATEGORIES = [
+    {
+      name:'Footwear & Clothing', icon:'👟', color:'#1565C0',
+      items:[
+        { item:'Comfortable walking shoes (broken-in)', priority:'CRITICAL', note:'You will walk 8–15 miles per day. New shoes = blisters. Wear your park shoes 2 weeks before the trip.' },
+        { item:'Moisture-wicking socks (multiple pairs)', priority:'CRITICAL', note:'Regular cotton socks cause blisters in heat and humidity. Athletic socks make a huge difference.' },
+        { item:'Lightweight layers', priority:'HIGH', note:'Parks are freezing indoors (A/C runs heavily). Bring a light zip-up or cardigan even in July.' },
+        { item:'Rain poncho', priority:'HIGH', note:'Buy before the trip — parks charge $12+. Compact ponchos pack flat. Florida rains fast and hard.' },
+        { item:'Hat / sun visor', priority:'HIGH', note:'Sun protection is essential. Wide-brim hats protect neck and ears. Baseball caps leave ears/neck exposed.' },
+        { item:'Extra underwear (one more than you think)', priority:'MODERATE', note:'Sweat, splash rides, and Florida humidity. Pack extras. You\'ll thank yourself.' },
+        { item:'Swimsuit (even if no pool planned)', priority:'MODERATE', note:'Splash rides, water parks, hotel pools. Keep one easily accessible in your luggage.' },
+        { item:'Comfortable sandals (non-walking)', priority:'LOW', note:'For pool or resort time. Not for parks — sandals cause blisters on long walking days.' },
+      ]
+    },
+    {
+      name:'Sun & Heat Protection', icon:'☀️', color:'#E65100',
+      items:[
+        { item:'SPF 50+ sunscreen', priority:'CRITICAL', note:'Florida sun is intense. Reapply every 90 min. Buy in bulk before the trip — park prices are 3x retail.' },
+        { item:'Sunscreen lip balm (SPF 30+)', priority:'HIGH', note:'Lips burn fast and most people forget them. Pack in a fanny pack for easy access.' },
+        { item:'Sunglasses (polarized)', priority:'HIGH', note:'All-day sun exposure without sunglasses leads to eye fatigue and headaches.' },
+        { item:'Cooling towel', priority:'MODERATE', note:'Wet and keep on neck. Significantly reduces perceived temperature in 90°F heat.' },
+        { item:'Electrolyte packets', priority:'HIGH', note:'Add to water bottles. 12+ miles of walking in heat depletes electrolytes fast. Helps prevent exhaustion headaches.' },
+        { item:'After-sun gel', priority:'MODERATE', note:'Even with sunscreen, mild burns happen. Aloe gel for evening recovery.' },
+      ]
+    },
+    {
+      name:'Bags & Carrying', icon:'🎒', color:'#2E7D32',
+      items:[
+        { item:'Lightweight daypack (under 20L)', priority:'CRITICAL', note:'Carry all your supplies without weighing you down. Avoid full-size backpacks — they\'re uncomfortable after mile 10.' },
+        { item:'Waterproof bag liner or dry bag', priority:'HIGH', note:'For splash rides and sudden rain. Or use a simple $3 trash bag inside your daypack.' },
+        { item:'Cross-body bag (small, for valuables)', priority:'HIGH', note:'On crowded rides, keep phone and wallet in a zippered cross-body. Reduces pickpocket risk and items falling out.' },
+        { item:'Belt bag / fanny pack', priority:'MODERATE', note:'Having essential items (sunscreen, snacks, phone charger) hands-free while walking is game-changing.' },
+        { item:'Luggage tags with contact info', priority:'MODERATE', note:'Attach to all bags including day backpacks. If lost in a park, CMs can return it faster.' },
+      ]
+    },
+    {
+      name:'Technology', icon:'📱', color:'#7B1FA2',
+      items:[
+        { item:'Portable battery pack (10,000+ mAh)', priority:'CRITICAL', note:'Park apps drain phone batteries fast. You need your phone for Lightning Lane, Mobile Order, and Genie+. A dead phone is a disaster.' },
+        { item:'Multiple charging cables', priority:'HIGH', note:'USB-C and Lightning cables. Hotels have USB ports — charge overnight via bag.' },
+        { item:'Waterproof phone case', priority:'MODERATE', note:'For water rides or rainy days. At minimum, a ziplock bag in your pack.' },
+        { item:'Camera (if you want better than phone)', priority:'LOW', note:'If photography matters to you, a mirrorless camera fits in a daypack. Phone cameras have improved dramatically though.' },
+        { item:'Wired earbuds', priority:'LOW', note:'For waiting in queues. Wireless earbuds can fall out on coasters.' },
+      ]
+    },
+    {
+      name:'Health & First Aid', icon:'💊', color:'#c62828',
+      items:[
+        { item:'Pain reliever (Ibuprofen / Tylenol)', priority:'CRITICAL', note:'Foot pain, headaches, and general soreness are real after 12-mile park days. Don\'t rely on park first aid.' },
+        { item:'Blister treatment kit', priority:'HIGH', note:'Moleskin + anti-blister balm + bandaids. If a blister starts, treat it immediately or it becomes debilitating.' },
+        { item:'Antacids / digestive aid', priority:'HIGH', note:'Different foods, excitement, and heat can cause stomach issues. Pack Tums or Pepto.' },
+        { item:'Motion sickness medication', priority:'VARIES', note:'If prone to motion sickness: Dramamine or Bonine taken 1 hour before parks. Many rides trigger motion sickness.' },
+        { item:'Allergy medication', priority:'VARIES', note:'Florida has year-round pollen. If you have seasonal allergies, pack medication even if you don\'t normally need it.' },
+        { item:'Personal prescriptions (+ extra doses)', priority:'CRITICAL', note:'Bring more than you think you need. Losing prescription medication in Florida is expensive and difficult to resolve.' },
+      ]
+    },
+    {
+      name:'Snacks & Hydration', icon:'🍎', color:'#33691E',
+      items:[
+        { item:'Reusable water bottle (insulated)', priority:'CRITICAL', note:'Disney and Universal have free water cup stations and water fountains. Staying hydrated is the #1 way to maintain energy. Bring 20oz+ capacity.' },
+        { item:'High-protein snacks (bars, nuts, jerky)', priority:'HIGH', note:'Carry snacks to bridge long gaps between meals. Parks are expensive for snacks and you can bring your own.' },
+        { item:'Snacks for kids (if applicable)', priority:'HIGH', note:'Hungry children = meltdowns. Keep goldfish crackers, fruit pouches, and familiar snacks in the bag at all times.' },
+        { item:'Gum', priority:'LOW', note:'Not allowed at Disney (it\'s actually banned from being sold, though you can bring your own). Helps with jaw tension on high-thrill rides.' },
+      ]
+    },
+    {
+      name:'Practical Misc.', icon:'🔧', color:'#37474F',
+      items:[
+        { item:'Small umbrella or packable rain jacket', priority:'HIGH', note:'Ponchos work but umbrellas are nicer for extended rain. Compact ones fit in daypack side pocket.' },
+        { item:'Cash ($60–100 in smaller bills)', priority:'MODERATE', note:'Some food trucks, tips for valet/bell service, and emergency scenarios. Most parks accept cards everywhere but cash still has its moments.' },
+        { item:'Photo IDs for all adults', priority:'CRITICAL', note:'For alcohol purchase at parks (Disney/Universal check frequently). Also required for hotel check-in and some tours.' },
+        { item:'Pen', priority:'LOW', note:'For autograph books and signing receipts. Sounds trivial until you need one in a theme park.' },
+        { item:'Ziploc bags (gallon size, 3–4)', priority:'MODERATE', note:'Wet swimsuits, confiscated items at rides, protecting phone in rain. The most versatile packing item.' },
+        { item:'Paper copy of key reservations', priority:'MODERATE', note:'Backup if phone dies. Restaurant confirmations, hotel reservation numbers, and ticket QR codes printed in advance.' },
+      ]
+    },
+  ];
+
+  const PRIORITY_COLORS = { CRITICAL:'#c62828', HIGH:'#E65100', MODERATE:'#F57F17', VARIES:'#1565C0', LOW:'#888' };
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-packing-guide';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const header = document.createElement('div');
+    header.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#1B5E20,#388E3C,#81C784);padding:16px 14px 14px;';
+    header.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:#fff;">🎒 Orlando Packing Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">7 categories · Priority-ranked · Expert tips</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;">
+        ${Object.entries(PRIORITY_COLORS).filter(([k])=>k!=='LOW').map(([k,v])=>`<span style="padding:2px 8px;border-radius:20px;font-size:9px;font-weight:800;background:${v};color:#fff;">${k}</span>`).join('')}
+      </div>`;
+
+    const content = document.createElement('div');
+    content.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    CATEGORIES.forEach(cat => {
+      const catHeader = document.createElement('div');
+      catHeader.style.cssText = `background:${cat.color};border-radius:10px 10px 0 0;padding:8px 14px;margin-top:12px;display:flex;align-items:center;gap:8px;`;
+      catHeader.innerHTML = `<span style="font-size:18px;">${cat.icon}</span><div style="font-size:13px;font-weight:700;color:#fff;">${cat.name}</div>`;
+      content.appendChild(catHeader);
+
+      cat.items.forEach((item, idx) => {
+        const row = document.createElement('div');
+        const isLast = idx === cat.items.length - 1;
+        row.style.cssText = `background:var(--card-bg,#fff);padding:9px 14px;${isLast ? 'border-radius:0 0 10px 10px;margin-bottom:4px;' : 'border-bottom:1px solid var(--border,#f0f0f0);'}`;
+        const pc = PRIORITY_COLORS[item.priority] || '#888';
+        row.innerHTML = `
+          <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:3px;">
+            <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);flex:1;">${item.item}</div>
+            <span style="font-size:9px;font-weight:800;padding:1px 6px;border-radius:20px;background:${pc};color:#fff;flex-shrink:0;">${item.priority}</span>
+          </div>
+          <div style="font-size:11px;color:var(--text-secondary,#666);line-height:1.4;">${item.note}</div>`;
+        content.appendChild(row);
+      });
+    });
+
+    const spacer = document.createElement('div');
+    spacer.style.height = '20px';
+    content.appendChild(spacer);
+
+    s.appendChild(header);
+    s.appendChild(content);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-packing-guide')) buildScreen();
+
+  const _prevSS_ffff = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_ffff) _prevSS_ffff(name, el);
+    if (name === 'packing-guide') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-packing-guide');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectPackingCard() {
+    if (document.getElementById('packing-home-card')) return true;
+    const ref = document.getElementById('insider-home-card') || document.getElementById('height-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'packing-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#1B5E20,#388E3C,#81C784);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('packing-guide');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:3px;">🎒 Orlando Packing Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.85);">Priority-ranked list · Shoes · Sun · Tech</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.5);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _packingCard = false;
+  setInterval(() => { if (!_packingCard) _packingCard = injectPackingCard(); }, 27000);
+  setTimeout(() => { _packingCard = injectPackingCard(); }, 23500);
+
+  const _prevRH_ffff = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_ffff) _prevRH_ffff.apply(this, arguments);
+    setTimeout(() => { _packingCard = false; _packingCard = injectPackingCard(); }, 5700);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK GGGG2: Orlando Brewery & Craft Bar Scene ===== */
+(function initBreweryGuide() {
+
+  const NEIGHBORHOODS = [
+    {
+      name:'Mills 50 / Ivanhoe Village', emoji:'🍺', color:'#5D4037',
+      desc:'The heart of Orlando\'s craft beer scene. Walkable neighborhood with several world-class taprooms within minutes of each other.',
+      spots:[
+        { name:'Redlight Redlight Beer Parlour', type:'Taproom & Bottle Shop', specialty:'600+ bottle selections, 12 rotating taps', tip:'The finest craft beer bar in Central Florida. CAMRA-style, knowledgeable staff, serious beer selection.' },
+        { name:'Ten10 Brewing', type:'Brewery', specialty:'Experimental ales, lagers, sours', tip:'Excellent food program alongside great beer. The outdoor space fills up on weekends — arrive by 6pm for a seat.' },
+        { name:'Ivanhoe Park Brewing', type:'Brewery', specialty:'IPA-forward, Florida-inspired', tip:'Lovely taproom in a converted space. Good parking on weekdays. Rotating food trucks make this a full evening.' },
+      ]
+    },
+    {
+      name:'Downtown Orlando / Church Street', emoji:'🥂', color:'#37474F',
+      desc:'Higher energy, cocktail bars and craft spots mixed with clubs. Better for groups and those who want variety.',
+      spots:[
+        { name:'The Courtesy', type:'Cocktail Bar', specialty:'Craft cocktails, natural wine, charcuterie', tip:'The best cocktail bar in Orlando. Small, intimate, no sign outside. Reservations strongly recommended.' },
+        { name:'Stardust Video & Coffee', type:'Bar/Café', specialty:'Local scene, dive bar aesthetic, craft beer', tip:'Beloved local institution. Art, community events, outdoor movies. Best for meeting Orlando locals.' },
+        { name:'Hanson\'s Shoe Repair', type:'Speakeasy', specialty:'Prohibition-era cocktails', tip:'Requires a password (changes weekly — Google it). Hidden speakeasy vibe, excellent cocktails, expensive but worth it.' },
+      ]
+    },
+    {
+      name:'Audubon Park Garden District', emoji:'🌿', color:'#2E7D32',
+      desc:'Orlando\'s neighborhood bar scene. Locals only feel. Independent, no chains, strong sense of community.',
+      spots:[
+        { name:'The Guesthouse', type:'Bar', specialty:'Natural wine, local beer, small plates', tip:'Tiny and beloved. Get there before 8pm or expect a wait. No reservations.' },
+        { name:'Motorworks Brewing (Winter Park branch)', type:'Brewery', specialty:'German-style lagers, crisp sessionable beer', tip:'More accessible than the main taproom. Good for beer newcomers as well as enthusiasts.' },
+        { name:'Lil Indie\'s', type:'Dive Bar', specialty:'Local staple, cheap drinks, great jukebox', tip:'The unpretentious local bar everyone loves. Exactly what it sounds like. Perfectly executed.' },
+      ]
+    },
+    {
+      name:'Winter Park', emoji:'🍸', color:'#4A148C',
+      desc:'Upscale cocktails and wine bars. More expensive, quieter atmosphere, better suited for date nights.',
+      spots:[
+        { name:'Prato Bar', type:'Wine & Cocktail Bar', specialty:'Italian-inspired cocktails, natural wine', tip:'Sit at the bar and let the bartender guide you. One of the most romantic bar settings in all of Orlando.' },
+        { name:'Winter Park Wine & Taphouse', type:'Wine Bar', specialty:'100+ bottles, rotating glass pours', tip:'Perfect pre- or post-dinner stop. Curated selection from small producers. Staff is knowledgeable without being snobby.' },
+        { name:'The Wine Room', type:'Wine Bar + Enomatic', specialty:'Self-serve wine machines, large selection', tip:'Unique concept — buy a card, pour your own samples. Great for exploring wine styles at your own pace.' },
+      ]
+    },
+    {
+      name:'I-Drive & Lake Buena Vista', emoji:'🍹', color:'#E65100',
+      desc:'Tourist-focused area. Less authentic than neighborhood bars but convenient if staying on I-Drive. Some hidden gems.',
+      spots:[
+        { name:'Blake\'s Wine Bar', type:'Wine Bar', specialty:'Approachable wine selection, good by-the-glass', tip:'Surprisingly good for the area. Staff is helpful for non-experts. Nice spot to decompress after park days.' },
+        { name:'Tin Roof', type:'Live Music Bar', specialty:'Live music nightly, classic cocktails', tip:'CityWalk-area bar with consistent live music. Gets loud — great for a night out, not for conversation.' },
+        { name:'The Toothsome Chocolate Emporium', type:'Bar & Restaurant', specialty:'Creative cocktails, dessert-focused', tip:'Universal CityWalk. The cocktail bar is underrated — creative drinks, theatrical presentation.' },
+      ]
+    },
+  ];
+
+  const BEER_EVENTS = [
+    { name:'Orlando Beer Week', month:'October', desc:'Annual citywide celebration of craft beer. Tap takeovers, special releases, brewer dinners across 30+ venues.' },
+    { name:'Brewers\' Ball', month:'November', desc:'Annual charity event with 40+ Florida breweries. Tickets sell out — buy in advance if visiting in fall.' },
+    { name:'EPCOT Food & Wine Festival', month:'Aug–Nov', desc:'Technically a park event but has excellent beer and wine from around the world. Great way to explore global craft beers.' },
+    { name:'Saturday Morning Farmer\'s Market (Winter Park)', month:'Year-round', desc:'Local breweries often sample at this beloved market. Great way to discover new Florida craft beers.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-brewery-guide';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const header = document.createElement('div');
+    header.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#3E2723,#5D4037,#8D6E63);padding:16px 14px 14px;';
+    header.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:#fff;">Craft Beer & Bar Scene</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">5 neighborhoods · 15 top spots · Events</div>
+        </div>
+        <span style="font-size:24px;">🍺</span>
+      </div>
+      <div style="background:rgba(255,255,255,.1);border-radius:8px;padding:7px 12px;font-size:11px;color:rgba(255,255,255,.85);line-height:1.5;">
+        Orlando has quietly become one of Florida's best cities for craft beer and cocktails. Beyond the tourist corridor, there are genuine neighborhood bar scenes worth exploring.
+      </div>`;
+
+    const content = document.createElement('div');
+    content.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    NEIGHBORHOODS.forEach(nbhd => {
+      const nbhdCard = document.createElement('div');
+      nbhdCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+
+      const nbhdHeader2 = document.createElement('div');
+      nbhdHeader2.style.cssText = `background:${nbhd.color};padding:10px 14px;`;
+      nbhdHeader2.innerHTML = `
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
+          <span style="font-size:20px;">${nbhd.emoji}</span>
+          <div style="font-size:14px;font-weight:700;color:#fff;">${nbhd.name}</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.8);">${nbhd.desc}</div>`;
+      nbhdCard.appendChild(nbhdHeader2);
+
+      nbhd.spots.forEach((spot, idx) => {
+        const row = document.createElement('div');
+        const isLast = idx === nbhd.spots.length - 1;
+        row.style.cssText = `padding:10px 14px;${isLast ? '' : 'border-bottom:1px solid var(--border,#f0f0f0);'}`;
+        row.innerHTML = `
+          <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:2px;">${spot.name}</div>
+          <div style="display:flex;gap:6px;margin-bottom:4px;flex-wrap:wrap;">
+            <span style="font-size:10px;padding:1px 7px;border-radius:20px;background:${nbhd.color}15;color:${nbhd.color};font-weight:700;">${spot.type}</span>
+          </div>
+          <div style="font-size:11px;color:var(--text-secondary,#666);margin-bottom:3px;">🍺 ${spot.specialty}</div>
+          <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.4;font-style:italic;">"${spot.tip}"</div>`;
+        nbhdCard.appendChild(row);
+      });
+
+      content.appendChild(nbhdCard);
+    });
+
+    // Events
+    const evHeader = document.createElement('div');
+    evHeader.style.cssText = 'font-size:13px;font-weight:800;color:#5D4037;margin:14px 0 8px;';
+    evHeader.textContent = '📅 BEER & DRINK EVENTS';
+    content.appendChild(evHeader);
+
+    BEER_EVENTS.forEach(ev => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:12px;margin-bottom:8px;padding:11px 13px;border:1px solid var(--border,#eee);border-left:3px solid #5D4037;';
+      card.innerHTML = `
+        <div style="display:flex;justify-content:space-between;margin-bottom:3px;">
+          <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);">${ev.name}</div>
+          <span style="font-size:10px;font-weight:700;color:#5D4037;">${ev.month}</span>
+        </div>
+        <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.4;">${ev.desc}</div>`;
+      content.appendChild(card);
+    });
+
+    const spacer = document.createElement('div');
+    spacer.style.height = '20px';
+    content.appendChild(spacer);
+
+    s.appendChild(header);
+    s.appendChild(content);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-brewery-guide')) buildScreen();
+
+  const _prevSS_gggg2 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_gggg2) _prevSS_gggg2(name, el);
+    if (name === 'brewery-guide') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-brewery-guide');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectBreweryCard() {
+    if (document.getElementById('brewery-home-card')) return true;
+    const ref = document.getElementById('packing-home-card') || document.getElementById('insider-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'brewery-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#3E2723,#5D4037,#8D6E63);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('brewery-guide');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:3px;">🍺 Craft Beer & Bar Scene</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">Local breweries · Cocktail bars · Speakeasies</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.4);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _breweryCard = false;
+  setInterval(() => { if (!_breweryCard) _breweryCard = injectBreweryCard(); }, 27500);
+  setTimeout(() => { _breweryCard = injectBreweryCard(); }, 24000);
+
+  const _prevRH_gggg2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_gggg2) _prevRH_gggg2.apply(this, arguments);
+    setTimeout(() => { _breweryCard = false; _breweryCard = injectBreweryCard(); }, 5900);
+  };
+})();
+</script>
