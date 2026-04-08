@@ -42718,3 +42718,204 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK SSS2: Complete Shopping Guide ===== */
+(function initShoppingGuide() {
+
+  const SHOPPING_DESTINATIONS = [
+    {
+      name:'Disney Springs',
+      emoji:'🛍️',
+      color:'#1565C0',
+      type:'Entertainment District Shopping',
+      hours:'10 AM – 11 PM daily (restaurants later)',
+      admission:'FREE',
+      desc:'Over 100 stores and restaurants with free parking and no theme park ticket required. The combination of World of Disney (largest Disney store on earth), unique boutiques, and landmark restaurants makes this a destination in itself.',
+      topStores:[
+        { name:'World of Disney', what:'Largest Disney store on the planet. Exclusive merchandise, park-wear, collectibles.' },
+        { name:'LEGO Store', what:'The most elaborate permanent LEGO store anywhere, with giant sculptural builds outside and huge selection inside.' },
+        { name:'Anthropologie', what:'The Disney Springs location carries some Disney Springs-exclusive items not found elsewhere.' },
+        { name:'Basin', what:'Artisan bath and body products. The bath bomb demonstrations are genuinely entertaining.' },
+        { name:'Alex and Ani', what:'Disney charm bracelets and jewelry. Park-specific designs.' },
+        { name:'Star Wars Galactic Outpost', what:'Dedicated Star Wars merchandise. Exclusive Disney Springs-only items.' },
+      ],
+      tips:["The free Disney app has a Disney Springs shopping section with store hours and inventory hints", "World of Disney restocks Thursday nights — Friday morning has the freshest exclusive selection", "Evening crowd at Disney Springs peaks 7–9 PM. Shop in the morning for a quieter experience."],
+    },
+    {
+      name:'Universal CityWalk',
+      emoji:'🎸',
+      color:'#1B5E20',
+      type:'Entertainment Shopping',
+      hours:'9 AM – 2 AM (varies by store)',
+      admission:'FREE',
+      desc:"Universal's entertainment district with themed merchandise stores, unique clothing, and character items. More compact than Disney Springs but with unique Universal-exclusive items.",
+      topStores:[
+        { name:'Universal Studios Store', what:'All-in-one Universal merchandise. Exclusive CityWalk items vs. in-park items.' },
+        { name:'All Star Collectibles', what:'Licensed sports and pop culture memorabilia. Unique gift option.' },
+        { name:'Fossil', what:'Unique Universal CityWalk watches and accessories.' },
+      ],
+      tips:["CityWalk purchases don't require park admission", "Better to buy character merchandise inside the actual parks for authenticity", "CityWalk restaurants' merchandise sections often have items not in the main stores"],
+    },
+    {
+      name:'Park Avenue, Winter Park',
+      emoji:'🌸',
+      color:'#7B1FA2',
+      type:'Upscale Street Shopping',
+      hours:'Most shops 10 AM – 6 PM · Later on weekends',
+      admission:'FREE',
+      desc:"Consistently rated one of America's best shopping streets. Independently owned boutiques, galleries, antique stores, and luxury national brands lining a gorgeous tree-canopied boulevard.",
+      topStores:[
+        { name:'Timothy's Gallery', what:'Fine art photography and unique Orlando art. Beautiful pieces and reasonable prices.' },
+        { name:'The Written Word', what:'Excellent independent bookstore with strong local author section.' },
+        { name:'Pottery Barn', what:'Their Park Avenue location carries some exclusive designs.' },
+        { name:'Doggie Couture', what:'Upscale pet boutique — if you brought your dog to Orlando.' },
+        { name:'The Jewel Box', what:"Winter Park's premier fine jewelry since 1940." },
+      ],
+      tips:["Sunday is the busiest day — a morning Farmer's Market + shopping circuit is ideal", "Parking is free in the city garages one block off Park Ave", "The area also has excellent restaurants for a full-day experience"],
+    },
+    {
+      name:'Florida Mall',
+      emoji:'🏬',
+      color:'#E65100',
+      type:'Traditional Mall',
+      hours:'10 AM – 9 PM · Sun 11 AM – 7 PM',
+      admission:'FREE',
+      desc:"Central Florida's largest traditional mall with 250+ stores. Particularly good for practical needs: clothing, electronics, shoes, and everyday items at normal prices. International visitors love the American brands and pricing.",
+      topStores:[
+        { name:'Apple Store', what:'Largest Apple Store in Florida. Good for tech emergencies and accessories.' },
+        { name:'Macy\'s, Nordstrom, Saks OFF 5TH', what:'Multiple department stores anchor the mall with good selection.' },
+        { name:'Nike, Under Armour, Lululemon', what:'Good athletic wear prices, especially during sale periods.' },
+        { name:'M&M\'s World', what:'Three-story M&M experience store. Tourist attraction as much as store.' },
+        { name:'ZARA, H&M, Uniqlo', what:'Fast fashion with good selection at regular retail pricing.' },
+      ],
+      tips:["15 minutes from Disney World and 10 from Universal — convenient for a practical shopping break", "The international food court has authentic options beyond standard mall fare", "During peak season, avoid weekend afternoons — very crowded"],
+    },
+    {
+      name:'Premium Outlets (International Drive)',
+      emoji:'💰',
+      color:'#B71C1C',
+      type:'Outlet Mall',
+      hours:'10 AM – 10 PM · Sun 10 AM – 9 PM',
+      admission:'FREE',
+      desc:"Florida's best outlet mall. Designer and premium brand outlets with genuine savings of 25–65% off retail. The I-Drive location is the more tourist-accessible of Orlando's two Premium Outlets.",
+      topStores:[
+        { name:'Coach Factory Outlet', what:'Best Coach outlet in Florida. Large selection, 40–60% off retail.' },
+        { name:'Kate Spade Outlet', what:'Good selection of bags, accessories. 30–50% off regular retail.' },
+        { name:'Nike Factory Store', what:'Running shoes and athletic wear at factory pricing. Large stock.' },
+        { name:'Michael Kors Outlet', what:'Good handbag and accessory selection at outlet pricing.' },
+        { name:'Polo Ralph Lauren Factory', what:'Classic Ralph Lauren at factory prices. Great for kids and adults.' },
+      ],
+      tips:["International visitors: bring your passport for Sales Tax Exemption on qualifying purchases (rules vary — ask at stores)", "Tourist coupon books at the mall entrance save additional 10–15% at select stores", "The outlet nearest to Disney is on Vineland Road, slightly further from I-Drive"],
+    },
+  ];
+
+  const PARK_SHOPPING_TIPS = [
+    { icon:'🎁', tip:"Park exclusive items are genuinely exclusive — Disney Springs' World of Disney doesn't carry everything in the parks. Some in-park items are available online post-visit via shopDisney.com." },
+    { icon:'🛒', tip:"Package Pickup: Disney will hold your in-park purchases for free pickup at the park entrance at day's end. No need to carry bags all day." },
+    { icon:'💳', tip:"Disney resort guests can ship in-park purchases to their hotel room for free — ready the next day. Game-changer for large purchases." },
+    { icon:'⚠️', tip:"Customs declaration for international travelers: Keep receipts organized. Most countries have $800–1,500 duty-free limits for returning residents." },
+    { icon:'🛍️', tip:"Best gift value: Disney/Universal logo T-shirts are the most universally appreciated souvenir — usually $22–35. Multiple design options at Character Warehouse outlet stores near I-Drive." },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-shopping';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;';
+    s.innerHTML = `
+      <div style="background:linear-gradient(135deg,#880E4F,#C2185B,#F48FB1);padding:18px 14px 20px;
+        display:flex;align-items:center;gap:12px;flex-shrink:0;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;
+          border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#fff;">Complete Shopping Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">Disney Springs · Park Ave · Outlets · Malls</div>
+        </div>
+        <span style="font-size:28px;">🛍️</span>
+      </div>
+      <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;">
+
+        ${SHOPPING_DESTINATIONS.map(dest => `
+          <div style="background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;
+            border:1px solid var(--border,#eee);overflow:hidden;">
+            <div style="background:${dest.color};padding:10px 14px;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-size:22px;">${dest.emoji}</span>
+                <div style="flex:1;">
+                  <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:#fff;">${dest.name}</div>
+                  <div style="font-size:10px;color:rgba(255,255,255,.8);">${dest.type} · ${dest.hours}</div>
+                </div>
+                <span style="font-size:11px;font-weight:800;background:rgba(255,255,255,.2);padding:3px 8px;border-radius:20px;color:#fff;">${dest.admission}</span>
+              </div>
+            </div>
+            <div style="padding:10px 14px;">
+              <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;margin-bottom:8px;">${dest.desc}</div>
+              <div style="font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:5px;">TOP STORES</div>
+              ${dest.topStores.map(store => `
+                <div style="border-bottom:1px solid var(--border,#f5f5f5);padding:5px 0;">
+                  <div style="font-size:12px;font-weight:700;color:${dest.color};">${store.name}</div>
+                  <div style="font-size:11px;color:var(--text-secondary,#666);">${store.what}</div>
+                </div>`).join('')}
+              <div style="margin-top:8px;">
+                ${dest.tips.map(t => `<div style="font-size:11px;color:var(--text-secondary,#666);padding:2px 0;">💡 ${t}</div>`).join('')}
+              </div>
+            </div>
+          </div>`).join('')}
+
+        <!-- Shopping tips -->
+        <div style="background:linear-gradient(135deg,#880E4F,#C2185B);border-radius:14px;padding:14px;margin-bottom:20px;color:#fff;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">🛒 Smart Shopping Tips</div>
+          ${PARK_SHOPPING_TIPS.map(spt => `
+            <div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
+              <span style="font-size:18px;flex-shrink:0;">${spt.icon}</span>
+              <div style="font-size:12px;color:rgba(255,255,255,.9);line-height:1.5;">${spt.tip}</div>
+            </div>`).join('')}
+        </div>
+      </div>`;
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-shopping')) buildScreen();
+
+  const _prevSS_sss2 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_sss2) _prevSS_sss2(name, el);
+    if (name === 'shopping') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-shopping');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectShopCard() {
+    if (document.getElementById('shop-home-card')) return true;
+    const ref = document.getElementById('wp-home-card') || document.getElementById('meal-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'shop-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#880E4F,#C2185B,#F48FB1);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('shopping');
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:28px;">🛍️</span>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Complete Shopping Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.85);">5 destinations · Top stores · Smart tips</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _shopCard = false;
+  setInterval(() => { if (!_shopCard) _shopCard = injectShopCard(); }, 20500);
+  setTimeout(() => { _shopCard = injectShopCard(); }, 17000);
+
+  const _prevRH_sss2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_sss2) _prevRH_sss2.apply(this, arguments);
+    setTimeout(() => { _shopCard = false; _shopCard = injectShopCard(); }, 3900);
+  };
+})();
+</script>
