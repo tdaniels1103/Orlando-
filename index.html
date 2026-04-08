@@ -53788,3 +53788,401 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK XXXXX: Animal Kingdom Deep Dive ===== */
+(function initAnimalKingdom() {
+
+  const LANDS = [
+    {
+      id:'pandora', name:'Pandora – The World of Avatar', emoji:'🌿', color:'#1B5E20',
+      desc:'The most immersive land Disney has ever built. Step onto the alien world of Pandora — bioluminescent plants, floating mountains, Na\'vi culture.',
+      rides:[
+        { name:'Avatar: Flight of Passage', type:'Banshee riding simulator', wait:'90–150 min', ll:true,
+          tip:'Consistently rated the #1 attraction in all of Walt Disney World. You are physically mounted on a banshee and fly over Pandora. LLMP Tier 1 — book at 7 AM. Skip everything else if needed to ride this.' },
+        { name:'Na\'vi River Journey', type:'Dark ride', wait:'45–90 min', ll:true,
+          tip:'Short but stunningly beautiful boat ride through a bioluminescent forest. The Na\'vi Shaman is the most sophisticated Audio-Animatronic Disney has ever created. Brief but unforgettable.' },
+      ],
+      dining:[
+        { name:'Satu\'li Canteen', tip:'The best counter service meal in all of Walt Disney World, full stop. Build your bowl — customizable proteins and bases. Healthy, fresh, and genuinely delicious.' },
+        { name:'Pongu Pongu', tip:'Na\'vi-themed drink and snack stand. Night Blossom drink is the signature — beautiful and surprisingly tasty.' },
+      ],
+      tip:'Pandora is most magical at night when the bioluminescence activates. Even if you\'ve done all the rides, return after dark just to walk through. Genuinely unlike any other place on Earth.',
+    },
+    {
+      id:'africa', name:'Africa — Harambe Village', emoji:'🦁', color:'#8B4513',
+      desc:'A faithful recreation of an East African trading village. The most detailed, culturally respectful land Disney has ever created.',
+      rides:[
+        { name:'Kilimanjaro Safaris', type:'Open-air safari truck', wait:'30–60 min', ll:true,
+          tip:'Real animals — not animatronics. Lions, elephants, giraffes, rhinos, hippos, cheetahs. Morning is best for active animals. The 18-minute safari changes every time.' },
+        { name:'Wildlife Express Train to Rafiki\'s Planet Watch', type:'Train + conservation center', wait:'15–20 min', ll:false,
+          tip:'Behind-the-scenes look at Animal Kingdom\'s veterinary and conservation facilities. See animals being cared for. Underrated experience especially for animal lovers.' },
+      ],
+      dining:[
+        { name:'Tiffins Restaurant', tip:'Disney\'s best-kept full-service dining secret. James Beard-quality food, globally inspired menu, quiet and uncrowded. Request reservations like any signature restaurant.' },
+        { name:'Tusker House', tip:'Character dining buffet with Donald Duck and friends in safari outfits. Kids love it. Good food with African-inspired options.' },
+        { name:'Harambe Market', tip:'Counter service outdoor market with African street food. Grilled chicken, beef skewers, ribs. Excellent quality for park food.' },
+      ],
+      tip:'Harambe Village is one of Disney\'s most detailed environments. Spend time reading the "newspapers" posted around town — each tells a story of the village. The soundtrack has been playing on a continuous loop since 1998.',
+    },
+    {
+      id:'asia', name:'Asia — Anandapur Village', emoji:'🐅', color:'#B71C1C',
+      desc:'A Himalayan mountain village at the edge of a royal forest. Home to Disney\'s two thrill attractions.',
+      rides:[
+        { name:'Expedition Everest', type:'Roller coaster with yeti', wait:'40–80 min', ll:true,
+          tip:'Disney\'s most expensive ride at the time of construction ($100M). Forward AND backward elements. The yeti animatronic is still impressive even in "B-mode." Front row for the full mountain view.' },
+        { name:'Kali River Rapids', type:'River raft ride', wait:'20–40 min', ll:false,
+          tip:'You WILL get soaked. The ride is 5 minutes; the wet aftermath lasts hours. Ride only on hot days and when you\'re heading to the end of your visit.' },
+      ],
+      dining:[
+        { name:'Yak & Yeti Restaurant', tip:'Table service with Asian fusion menu. One of the better full-service restaurants at Animal Kingdom. ADR recommended.' },
+        { name:'Mr. Kamal\'s', tip:'Counter service fries and snacks. The seasoned fries are a fan favorite.' },
+      ],
+      tip:'The queue for Expedition Everest is one of the best in Disney — a full Himalayan monastery, prayer wheels, and Sherpa artifacts. Take your time in the queue even if it\'s short.',
+    },
+    {
+      id:'dinoland', name:'DinoLand U.S.A.', emoji:'🦕', color:'#37474F',
+      desc:'Currently being reimagined. The existing land has a carnival feel that\'s inconsistent with the rest of Animal Kingdom.',
+      rides:[
+        { name:'DINOSAUR', type:'Dark ride', wait:'15–30 min', ll:false,
+          tip:'Time travel dark ride to rescue a dinosaur. Intense and loud — can scare young children. Rarely has a significant wait. Interesting concept.' },
+      ],
+      dining:[
+        { name:'Restaurantosaurus', tip:'Counter service dinosaur-themed. Standard park food. Not a destination.' },
+      ],
+      tip:'Disney announced DinoLand U.S.A. is being replaced. New land (rumored Indiana Jones) coming in future years. Currently the weakest section of Animal Kingdom.',
+    },
+    {
+      id:'discovery', name:'Discovery Island & Oasis', emoji:'🦋', color:'#2E7D32',
+      desc:'The hub and entry. Tree of Life is the centerpiece — 145 feet tall with 325 animals carved into its bark.',
+      rides:[
+        { name:'It\'s Tough to Be a Bug!', type:'4D show (inside Tree of Life)', wait:'15–25 min', ll:false,
+          tip:'Fun 4D show using A Bug\'s Life characters. Scares young children (ages 3–4) — the bugs spray the audience and spiders drop from ceiling. Excellent for ages 6+.' },
+      ],
+      dining:[
+        { name:'Flame Tree Barbecue', tip:'The best BBQ at any Disney park. Counter service with stunning waterfront views of Discovery Island and sometimes Animal Kingdom\'s Tree of Life. Eat outside.' },
+        { name:'Pizzafari', tip:'Standard counter service pizza. Convenient, acceptable, not a destination.' },
+      ],
+      tip:'Walk around the Tree of Life slowly and find all 325 animal carvings. It takes 10 minutes and the detail is extraordinary. The best time is early morning when the light hits perfectly.',
+    },
+  ];
+
+  const PERFECT_AK_DAY = [
+    { time:'7:30 AM', icon:'🏃', action:'Arrive 30 min before park open. Join the queue at Animal Kingdom\'s entrance area.' },
+    { time:'8:00 AM', icon:'🚀', action:'Rope drop: Sprint to Avatar: Flight of Passage. This is your #1 priority. 30-min wait at rope drop becomes 150 min by 10 AM.' },
+    { time:'8:45 AM', icon:'🌊', action:'Na\'vi River Journey while Pandora is still quiet. Usually 20–30 min wait at rope drop.' },
+    { time:'9:15 AM', icon:'🦒', action:'Kilimanjaro Safaris early — animals are most active in morning. Best wildlife viewing.' },
+    { time:'10:15 AM', icon:'🍜', action:'Breakfast/brunch at Satu\'li Canteen. Early opening, freshest food.' },
+    { time:'11:00 AM', icon:'🏔️', action:'Expedition Everest (use LLMP or single rider) and Kali River Rapids if hot enough.' },
+    { time:'12:30 PM', icon:'🦋', action:'Tree of Life walk, Discovery Island exploration. Rest during peak midday heat.' },
+    { time:'1:30 PM', icon:'🎭', action:'Festival of the Lion King (check schedule) — a 30-minute theatrical show, one of the best live performances at WDW.' },
+    { time:'3:00 PM', icon:'🐅', action:'Asia village exploration, finding all the hidden details in Anandapur. Photography time.' },
+    { time:'4:00 PM', icon:'🍖', action:'Early dinner at Tiffins or Flame Tree BBQ.' },
+    { time:'5:30 PM', icon:'🌿', action:'Return to Pandora. The bioluminescence begins activating as day light fades. Magical.' },
+    { time:'7:00 PM', icon:'✨', action:'Rivers of Light or Tree of Life projection shows (check evening entertainment schedule).' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-animal-kingdom';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#1B5E20,#8B4513,#B71C1C);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Animal Kingdom Deep Dive</div>
+          <div style="font-size:11px;opacity:.8;">Pandora · Kilimanjaro Safaris · Tree of Life</div>
+        </div>
+        <span style="font-size:28px;">🐘</span>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:15px;font-weight:800;">5</div><div style="font-size:9px;opacity:.8;">LANDS</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:15px;font-weight:800;">#1</div><div style="font-size:9px;opacity:.8;">WDW ATTRACTION</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:15px;font-weight:800;">Real</div><div style="font-size:9px;opacity:.8;">ANIMALS</div>
+        </div>
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    LANDS.forEach(land => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+      let ridesHTML = land.rides.map(r=>`<div style="background:var(--bg,#f8f8f8);border-radius:10px;padding:10px;margin-bottom:6px;">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:3px;">
+          <div style="font-size:12px;font-weight:800;color:var(--text-primary,#212121);flex:1;">${r.name}</div>
+          ${r.ll?'<span style="background:#E6500018;color:#E65100;font-size:9px;font-weight:800;padding:2px 6px;border-radius:20px;flex-shrink:0;margin-left:4px;">LLMP</span>':''}
+        </div>
+        <div style="font-size:10px;font-weight:600;color:${land.color};margin-bottom:3px;">${r.type} · Wait: ${r.wait}</div>
+        <div style="font-size:11px;color:var(--text-secondary,#666);">${r.tip}</div>
+      </div>`).join('');
+      let diningHTML = land.dining.map(d=>`<div style="display:flex;gap:6px;margin-bottom:6px;">
+        <span style="font-size:13px;flex-shrink:0;">🍽️</span>
+        <div><div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);">${d.name}</div>
+        <div style="font-size:11px;color:var(--text-secondary,#666);">${d.tip}</div></div>
+      </div>`).join('');
+      card.innerHTML = `
+        <div style="padding:12px 14px;background:${land.color}18;border-left:4px solid ${land.color};">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:24px;">${land.emoji}</span>
+            <div><div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--text-primary,#212121);">${land.name}</div>
+            <div style="font-size:11px;color:var(--text-secondary,#555);margin-top:2px;">${land.desc}</div></div>
+          </div>
+        </div>
+        <div style="padding:12px 14px;">
+          ${ridesHTML}
+          ${diningHTML ? `<div style="font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin:6px 0 5px;">DINING</div>${diningHTML}` : ''}
+          <div style="display:flex;gap:6px;background:${land.color}0d;border-radius:8px;padding:7px;margin-top:6px;">
+            <span style="font-size:12px;flex-shrink:0;">💡</span>
+            <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${land.tip}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const planCard = document.createElement('div');
+    planCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+    planCard.innerHTML = `<div style="padding:12px 14px;background:linear-gradient(135deg,#1B5E20,#8B4513);color:#fff;">
+      <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;">🐘 Perfect Animal Kingdom Day</div>
+    </div>
+    <div style="padding:12px 14px;">
+      ${PERFECT_AK_DAY.map((step,i)=>`<div style="display:flex;gap:10px;margin-bottom:${i<PERFECT_AK_DAY.length-1?'10':'0'}px;align-items:flex-start;">
+        <div style="text-align:center;flex-shrink:0;width:48px;">
+          <div style="font-size:16px;">${step.icon}</div>
+          <div style="font-size:9px;font-weight:700;color:#1B5E20;">${step.time}</div>
+        </div>
+        <div style="font-size:12px;color:var(--text-primary,#212121);line-height:1.5;padding-top:2px;">${step.action}</div>
+      </div>`).join('')}
+    </div>`;
+    body.appendChild(planCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-animal-kingdom')) buildScreen();
+
+  const _prevSS_xxxxx = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_xxxxx) _prevSS_xxxxx(name, el);
+    if (name === 'animal-kingdom') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-animal-kingdom');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectAKCard() {
+    if (document.getElementById('ak-deep-home-card')) return true;
+    const ref = document.getElementById('genie-home-card') || document.getElementById('arts-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'ak-deep-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#1B5E20,#8B4513,#B71C1C);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('animal-kingdom');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🐘</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Animal Kingdom Deep Dive</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Pandora · Flight of Passage · Safari · Tree of Life</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _akDeepCard = false;
+  setInterval(() => { if (!_akDeepCard) _akDeepCard = injectAKCard(); }, 58000);
+  setTimeout(() => { _akDeepCard = injectAKCard(); }, 54500);
+  const _prevRH_xxxxx = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_xxxxx) _prevRH_xxxxx.apply(this, arguments);
+    setTimeout(() => { _akDeepCard = false; _akDeepCard = injectAKCard(); }, 18200);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK YYYYY: Orlando Week-by-Week Itinerary Planner ===== */
+(function initOrlandoItinerary() {
+
+  const ITINERARIES = [
+    {
+      days:3, title:'3-Day Disney Focus', emoji:'🏰', color:'#1565C0',
+      bestFor:'First-time visitors, families, Disney fans',
+      days_detail:[
+        {
+          day:1, label:'Magic Kingdom + Evening EPCOT',
+          am:['Arrive rope drop (7:45 AM at tapstiles)', 'Tron Lightcycle / Run (ILL or rope drop first)', 'Seven Dwarfs Mine Train', 'Haunted Mansion, Pirates of the Caribbean', 'Splash Mountain area (if operational)'],
+          pm:['Lunch at Be Our Guest', 'Space Mountain, Big Thunder', 'Afternoon return to hotel 2–4 PM', 'EPCOT evening: World Showcase dinner (Via Napoli or Tokyo Dining)', 'Harmonious fireworks over the lagoon'],
+          tip:'ILL for Tron at exactly 7 AM. LLMP for Seven Dwarfs next. Buy both in the My Disney Experience app before you leave the hotel room.'
+        },
+        {
+          day:2, label:'Hollywood Studios Full Day',
+          am:['Rope drop Rise of the Resistance (or ILL purchased night before)', 'Slinky Dog Dash (LLMP Tier 1 — book at 7 AM)', 'Millennium Falcon: Smugglers Run', 'Docking Bay 7 breakfast/lunch'],
+          pm:['Toy Story Mania, Alien Swirling Saucers', 'Indiana Jones Stunt Spectacular (check time)', 'Rock n Roller Coaster (single rider)', 'Tower of Terror', 'Galaxy\'s Edge evening (Oga\'s Cantina if reserved)', 'Fantasmic! if running'],
+          tip:'Rise is the crown jewel of all Disney World. Budget $25–35 for the ILL and use it on this day. Everything else works around it.'
+        },
+        {
+          day:3, label:'EPCOT & Animal Kingdom',
+          am:['Animal Kingdom rope drop: Flight of Passage LLMP (7 AM)', 'Na\'vi River Journey', 'Kilimanjaro Safaris (9 AM — still active animals)', 'Satu\'li Canteen breakfast/brunch'],
+          pm:['Drive/bus to EPCOT', 'Guardians of the Galaxy ILL (book before you left for AK)', 'Remy\'s Ratatouille Adventure', 'World Showcase lunch walk', 'Soarin\' Around the World', 'EPCOT fireworks farewell'],
+          tip:'LLMP booking for AK starts at 7 AM — Flight of Passage is Tier 1. Book Guardians ILL simultaneously or as soon as your AK LLMP is confirmed.'
+        },
+      ]
+    },
+    {
+      days:5, title:'5-Day Disney + Universal', emoji:'🎢', color:'#2E7D32',
+      bestFor:'Comprehensive theme park experience, teens and adults, coaster enthusiasts',
+      days_detail:[
+        { day:1, label:'Magic Kingdom', am:['Tron, Seven Dwarfs, Haunted Mansion, Pirates, Big Thunder, Space Mountain'], pm:['Fantasyland afternoon, dinner, fireworks'], tip:'Start with MK\'s most time-sensitive rides.' },
+        { day:2, label:'Hollywood Studios', am:['Rise of the Resistance, Slinky, Millennium Falcon'], pm:['Toy Story Land, Galaxy\'s Edge, Tower, Rock n Roller, Fantasmic!'], tip:'Rise ILL purchased at midnight if visiting in busy season.' },
+        { day:3, label:'EPCOT Full Day', am:['Guardians ILL, Remy\'s, Test Track, Soarin\''], pm:['World Showcase afternoon and dinner, Harmonious'], tip:'EPCOT needs a full day — World Showcase alone is 3+ hours.' },
+        { day:4, label:'Universal Orlando (both parks)', am:['Islands of Adventure: Hagrid\'s ILL, Hogsmeade, Forbidden Journey, VelociCoaster'], pm:['Universal Studios: Hollywood Studios side, Simpsons, Dark Areas'], tip:'3-park ticket includes Epic Universe if visiting in 2025+. Single rider at VelociCoaster.' },
+        { day:5, label:'Animal Kingdom + Splurge Day', am:['Flight of Passage, Na\'vi, Safaris, Expedition Everest'], pm:['Tiffins lunch, Pandora evening, bioluminescence walk'], tip:'Capa Steakhouse at Four Seasons for final night dinner — fireworks view.' },
+      ]
+    },
+    {
+      days:7, title:'7-Day Complete Orlando', emoji:'🌟', color:'#7B1FA2',
+      bestFor:'Extended families, once-in-a-lifetime trips, Epic Universe opening visitors',
+      days_detail:[
+        { day:1, label:'Arrival + Disney Springs', am:['Check in, relax'], pm:['Disney Springs World of Disney, dinner, evening adjustment'], tip:'Don\'t try to do a park on arrival day. Rest and prep.' },
+        { day:2, label:'Magic Kingdom', am:['Tron, Seven Dwarfs, rope drop strategy'], pm:['Full day MK, fireworks finale'], tip:'MK needs a full day to do properly.' },
+        { day:3, label:'EPCOT', am:['Guardians, Remy\'s, Test Track, Soarin\''], pm:['World Showcase, festival activities, Harmonious'], tip:'Festival food marketplace if visiting during festival season.' },
+        { day:4, label:'Hollywood Studios', am:['Rise ILL, Slinky, Galaxy\'s Edge'], pm:['Tower, Rock n Roller, Fantasmic!'], tip:'Book Oga\'s Cantina ADR for this evening.' },
+        { day:5, label:'Islands of Adventure + Epic Universe', am:['Hagrid\'s rope drop, VelociCoaster, Hogsmeade'], pm:['Epic Universe: Mario World, Wizarding World Ministry of Magic'], tip:'Epic Universe opens May 2025 — buy 3-park ticket.' },
+        { day:6, label:'Animal Kingdom + Kennedy Space Center', am:['AK rope drop: Flight of Passage'], pm:['Drive to KSC afternoon: Atlantis, Saturn V'], tip:'AK opens 8 AM, KSC closes 6 PM — manageable on one day.' },
+        { day:7, label:'Beach Day + Discovery Cove', am:['Discovery Cove (swim with dolphins, all-day reserved)'], pm:['Clearwater Beach sunset'], tip:'Book Discovery Cove months in advance — capacity limited. Worth every dollar as trip finale.' },
+      ]
+    },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-itinerary-planner';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#1565C0,#7B1FA2,#2E7D32);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Orlando Itinerary Planner</div>
+          <div style="font-size:11px;opacity:.8;">3-day · 5-day · 7-day optimized plans</div>
+        </div>
+        <span style="font-size:28px;">📅</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        Pre-built optimized itineraries for 3, 5, and 7-day Orlando trips. Each plan is designed around rope drop strategy, LLMP booking order, and park-hopping logic.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    ITINERARIES.forEach(itin => {
+      const mainCard = document.createElement('div');
+      mainCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:16px;overflow:hidden;border:1px solid var(--border,#eee);';
+      mainCard.innerHTML = `
+        <div style="padding:12px 14px;background:${itin.color};color:#fff;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+            <span style="font-size:24px;">${itin.emoji}</span>
+            <div>
+              <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;">${itin.title}</div>
+              <div style="font-size:11px;opacity:.85;">${itin.bestFor}</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          ${itin.days_detail.map(day=>`<div style="margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border,#eee);">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+              <div style="width:28px;height:28px;border-radius:50%;background:${itin.color};color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;">${day.day}</div>
+              <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${day.label}</div>
+            </div>
+            <div style="padding-left:36px;">
+              <div style="font-size:10px;font-weight:700;color:${itin.color};margin-bottom:3px;">MORNING</div>
+              ${day.am.map(a=>`<div style="font-size:11px;color:var(--text-secondary,#555);padding:1px 0;">→ ${a}</div>`).join('')}
+              ${day.pm ? `<div style="font-size:10px;font-weight:700;color:${itin.color};margin:5px 0 3px;">AFTERNOON/EVENING</div>
+              ${day.pm.map(p=>`<div style="font-size:11px;color:var(--text-secondary,#555);padding:1px 0;">→ ${p}</div>`).join('')}` : ''}
+              <div style="display:flex;gap:5px;margin-top:6px;background:${itin.color}0d;border-radius:7px;padding:6px;">
+                <span style="font-size:11px;flex-shrink:0;">⚡</span>
+                <div style="font-size:11px;color:var(--text-secondary,#555);">${day.tip}</div>
+              </div>
+            </div>
+          </div>`).join('')}
+        </div>`;
+      body.appendChild(mainCard);
+    });
+
+    const globalCard = document.createElement('div');
+    globalCard.style.cssText = 'background:linear-gradient(135deg,#1565C0,#7B1FA2);border-radius:16px;margin-bottom:20px;padding:14px;color:#fff;';
+    globalCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">🎯 Universal Itinerary Rules</div>
+    ${[
+      'Rope drop every single morning. That first 60 minutes gives you the productivity of 3 afternoon hours.',
+      '7 AM is when LLMP booking opens for resort guests and ILL purchases unlock. Set your phone alarm for 6:58 AM.',
+      'One park per day. The one exception is morning Animal Kingdom + evening EPCOT (both in WDW, transportation is easy).',
+      'Build in a midday break (1–3 PM) every day. This is not wasted time — rested families enjoy the evening twice as much as exhausted ones.',
+      'Book all ADRs (dining reservations) at 60 days out before your itinerary plan means anything else.',
+      'The best souvenir is the one you saved on by using this guide instead of buying Lightning Lane strategies from a $40 tour company.',
+    ].map(r=>`<div style="display:flex;gap:8px;margin-bottom:8px;align-items:flex-start;"><span style="font-size:12px;flex-shrink:0;">★</span><div style="font-size:12px;opacity:.95;line-height:1.5;">${r}</div></div>`).join('')}`;
+    body.appendChild(globalCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-itinerary-planner')) buildScreen();
+
+  const _prevSS_yyyyy = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_yyyyy) _prevSS_yyyyy(name, el);
+    if (name === 'itinerary-planner') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-itinerary-planner');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectItinCard() {
+    if (document.getElementById('itinerary-home-card')) return true;
+    const ref = document.getElementById('ak-deep-home-card') || document.getElementById('genie-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'itinerary-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#1565C0,#7B1FA2,#2E7D32);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('itinerary-planner');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">📅</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Itinerary Planner</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">3-day · 5-day · 7-day optimized Orlando plans</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _itinCard = false;
+  setInterval(() => { if (!_itinCard) _itinCard = injectItinCard(); }, 59000);
+  setTimeout(() => { _itinCard = injectItinCard(); }, 55500);
+  const _prevRH_yyyyy = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_yyyyy) _prevRH_yyyyy.apply(this, arguments);
+    setTimeout(() => { _itinCard = false; _itinCard = injectItinCard(); }, 18600);
+  };
+})();
+</script>
