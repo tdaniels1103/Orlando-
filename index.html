@@ -46068,3 +46068,370 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK KKKK2: Orlando Neighborhoods Local Guide ===== */
+(function initNeighborhoodsGuide() {
+
+  const HOODS = [
+    {
+      name:'Winter Park', emoji:'🌳', color:'#2E7D32', vibe:'Upscale & Cultural',
+      tagline:'Old money charm, world-class art, Park Avenue perfection',
+      walkScore:75,
+      best:['Park Avenue dining & shopping','Morse Museum (world\'s best Tiffany collection)','Rollins College campus walks','Scenic boat tours through the lakes','Saturday Farmer\'s Market (8am–1pm)'],
+      eat:['Prato','The Ravenous Pig','4 Rivers Smokehouse','Bosphorous (Turkish)','Ethos Vegan Kitchen'],
+      drink:['Prato Bar','Winter Park Wine & Taphouse','The Wine Room','Stardust Video & Coffee'],
+      skip:'The shopping on Park Ave is lovely but can feel precious. Prices are 20–30% higher than comparable spots in the city.',
+      bestFor:'Couples, cultural travelers, day trippers from nearby parks, anyone who appreciates a slower, elegant pace.',
+    },
+    {
+      name:'Mills 50', emoji:'🎨', color:'#E65100', vibe:'Artsy & Multicultural',
+      tagline:'Orlando\'s most diverse neighborhood — Vietnamese, craft beer, murals',
+      walkScore:85,
+      best:['Street art murals on E. Colonial','Vietnamese food strip (best pho in FL)','Craft taprooms (Redlight Redlight, Ten10)','Independent record stores','Mills 50 First Fridays monthly events'],
+      eat:['Pho 88','Hawkers Asian Street Food','Tako Cheena','Pig Floyd\'s Urban Barbakoa','Maxine\'s on Shine'],
+      drink:['Redlight Redlight','Ten10 Brewing','Stardust Video & Coffee','Lil Indie\'s'],
+      skip:'Parking can be genuinely difficult on weekend evenings. Uber/Lyft from your hotel is highly recommended.',
+      bestFor:'Foodies, craft beer enthusiasts, solo travelers, locals-first experiences. The most authentic neighborhood in Orlando.',
+    },
+    {
+      name:'Thornton Park / Lake Eola', emoji:'🌊', color:'#1565C0', vibe:'Urban Lakefront',
+      tagline:'Walkable lakeside living with local restaurants and the city\'s best park',
+      walkScore:80,
+      best:['Lake Eola park loop (2 miles around the lake)','Paddle boats at sunset','Walt Disney Amphitheater (free events)','Downtown Orlando skyline views','Sunday Farmers\' Market'],
+      eat:['Harp & Celt Irish Pub','The Sanctum Café (vegan)','Kres Chophouse','Drunken Monkey Coffee Bar'],
+      drink:['Cask & Larder','The Courtesy','Hanson\'s Shoe Repair (speakeasy)'],
+      skip:'Street parking is difficult. The neighborhood is charming but very compact — you can explore it fully in 2 hours.',
+      bestFor:'Morning walkers, couples, people who want authentic Orlando vs. tourist-corridor experiences.',
+    },
+    {
+      name:'Audubon Park Garden District', emoji:'🌺', color:'#7B1FA2', vibe:'Hipster Village',
+      tagline:'Orlando\'s cutest neighborhood — vintage shops, independent cafés, no chains',
+      walkScore:70,
+      best:['Audubon Park Community Market','Sunday Brunch scene','Independent boutiques on Corrine Dr','Leu Gardens (botanical garden)','Bike-able neighborhood streets'],
+      eat:['Lineage Coffee Roasting','Foxtail Coffee Co.','Swine & Sons','Domu (ramen)','The Smiling Bison'],
+      drink:['The Guesthouse','Will\'s Pub (live music)','Lil Indie\'s'],
+      skip:'Not the right neighborhood if you want nightlife or large restaurant variety. Very quiet after 10pm.',
+      bestFor:'Solo travelers, couples, coffee lovers, people who want to feel like a local for a day.',
+    },
+    {
+      name:'International Drive (I-Drive)', emoji:'🎡', color:'#c62828', vibe:'Tourist Central',
+      tagline:'Everything is neon, everything is for tourists — and it\'s kind of wonderful',
+      walkScore:60,
+      best:['ICON Park (giant wheel + attractions)','SEA LIFE Aquarium','Ripley\'s Believe It or Not','Outlet shopping','Every chain restaurant you could want'],
+      eat:['Vines Grille & Wine Bar (hidden gem)','Slate (upscale burgers)','Funky Monkey Wine Company'],
+      drink:['Tin Roof (live music)','Howl at the Moon (dueling pianos)','High-end hotel bars'],
+      skip:'Skip the tourist trap restaurants (most chains here are overpriced). Walk 2 blocks off I-Drive for real options.',
+      bestFor:'Groups who want convenience, families staying in the area, people doing Universal + activities combo trips.',
+    },
+    {
+      name:'Baldwin Park', emoji:'🏡', color:'#33691E', vibe:'Planned Community Living',
+      tagline:'Orlando\'s most livable neighborhood — lakefront homes, restaurants, walkable village center',
+      walkScore:72,
+      best:['Village Center restaurants and shops','Lake Baldwin Park trail','Dog-friendly outdoor seating everywhere','Local community events','Peaceful residential streets'],
+      eat:['Izziban Sushi','Infusion Tea','Vesuvio Pizzeria','Henry\'s Depot','East End Market (food hall)'],
+      drink:['3 Sons Brewing Co.','Hourglass Brewing'],
+      skip:'Out of the way from theme parks (30+ min drive). Worth the detour for East End Market alone if you\'re a foodie.',
+      bestFor:'Families, local experience seekers, foodies (East End Market is extraordinary).',
+    },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-neighborhoods';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const header = document.createElement('div');
+    header.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#1B5E20,#388E3C,#66BB6A);padding:16px 14px 14px;';
+    header.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:#fff;">Orlando Neighborhood Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">6 neighborhoods · Eat · Drink · Local secrets</div>
+        </div>
+        <span style="font-size:24px;">🗺️</span>
+      </div>
+      <div style="background:rgba(255,255,255,.12);border-radius:8px;padding:7px 12px;font-size:11px;color:rgba(255,255,255,.9);">
+        Orlando is far more than theme parks. These neighborhoods are where locals actually live, eat, and drink — and they're accessible from any hotel.
+      </div>`;
+
+    const content = document.createElement('div');
+    content.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    HOODS.forEach(hood => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+
+      card.innerHTML = `
+        <div style="background:${hood.color};padding:12px 14px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
+            <span style="font-size:22px;">${hood.emoji}</span>
+            <div>
+              <div style="font-size:15px;font-weight:700;color:#fff;">${hood.name}</div>
+              <div style="font-size:10px;color:rgba(255,255,255,.8);">${hood.vibe}</div>
+            </div>
+          </div>
+          <div style="font-size:11px;color:rgba(255,255,255,.9);font-style:italic;">"${hood.tagline}"</div>
+        </div>
+        <div style="padding:12px 14px;">
+          <div style="font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:5px;">TOP EXPERIENCES</div>
+          ${hood.best.slice(0,3).map(b=>`<div style="font-size:11px;color:var(--text-secondary,#555);padding:2px 0;">📍 ${b}</div>`).join('')}
+          
+          <div style="display:flex;gap:16px;margin-top:10px;">
+            <div style="flex:1;">
+              <div style="font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:4px;">EAT</div>
+              ${hood.eat.slice(0,3).map(e=>`<div style="font-size:10px;color:var(--text-secondary,#555);padding:1px 0;">🍽️ ${e}</div>`).join('')}
+            </div>
+            <div style="flex:1;">
+              <div style="font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:4px;">DRINK</div>
+              ${hood.drink.slice(0,3).map(d=>`<div style="font-size:10px;color:var(--text-secondary,#555);padding:1px 0;">🍺 ${d}</div>`).join('')}
+            </div>
+          </div>
+          
+          <div style="margin-top:10px;background:rgba(0,0,0,.04);border-radius:8px;padding:8px 10px;">
+            <div style="font-size:10px;font-weight:700;color:${hood.color};margin-bottom:2px;">BEST FOR</div>
+            <div style="font-size:11px;color:var(--text-secondary,#555);">${hood.bestFor}</div>
+          </div>
+        </div>`;
+      content.appendChild(card);
+    });
+
+    const spacer = document.createElement('div');
+    spacer.style.height = '20px';
+    content.appendChild(spacer);
+
+    s.appendChild(header);
+    s.appendChild(content);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-neighborhoods')) buildScreen();
+
+  const _prevSS_kkkk2 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_kkkk2) _prevSS_kkkk2(name, el);
+    if (name === 'neighborhoods') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-neighborhoods');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectNbhdCard() {
+    if (document.getElementById('nbhd-home-card')) return true;
+    const ref = document.getElementById('food-bucket-home-card') || document.getElementById('sports2-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'nbhd-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#1B5E20,#388E3C,#66BB6A);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('neighborhoods');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:3px;">🗺️ Neighborhood Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.85);">Winter Park · Mills 50 · Lake Eola · 6 hoods</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.5);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _nbhdCard = false;
+  setInterval(() => { if (!_nbhdCard) _nbhdCard = injectNbhdCard(); }, 29500);
+  setTimeout(() => { _nbhdCard = injectNbhdCard(); }, 26000);
+
+  const _prevRH_kkkk2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_kkkk2) _prevRH_kkkk2.apply(this, arguments);
+    setTimeout(() => { _nbhdCard = false; _nbhdCard = injectNbhdCard(); }, 6700);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK LLLL2: Theme Park First-Timer Master Guide ===== */
+(function initFirstTimerGuide() {
+
+  const PARKS_OVERVIEW = [
+    {
+      name:'Magic Kingdom', rank:1, emoji:'🏰', color:'#003087',
+      bestFor:'First-time Disney visitors, families with young kids, classic Disney nostalgia',
+      mustDos:['TRON Lightcycle / Run (get LL first thing)','Seven Dwarfs Mine Train','Haunted Mansion','Festival of Fantasy Parade','Happily Ever After fireworks'],
+      skip:'Space Mountain can disappoint — the exterior is iconic but the ride is rougher than modern coasters. Skip if you have bad back.',
+      openingMove:'Get TRON LL the moment you enter. Then walk directly to Seven Dwarfs Mine Train for the virtual queue or standby.',
+      dontMiss:'Stay until the very end. The fireworks at 10pm and the walk out through an emptying Main Street are deeply emotional.',
+    },
+    {
+      name:'EPCOT', rank:2, emoji:'🌍', color:'#005B9A',
+      bestFor:'Adults, food lovers, couples, people who appreciate culture and drinking while walking',
+      mustDos:['Guardians of the Galaxy: Cosmic Rewind (virtual queue)','Avatar Flight of Passage (oh wait, wrong park — Soarin\')','Soarin\' Around the World','Test Track','World Showcase walkabout at night'],
+      skip:'Living with the Land is slow and educational. Fine for families but skip if time is short.',
+      openingMove:'Get Guardians Virtual Queue (tap the app at 7am and again at 1pm). Then go directly to Soarin\' at rope drop.',
+      dontMiss:'EPCOT at night with the World Showcase lit up, fireworks reflecting on the World Showcase Lagoon. The most underrated evening in any theme park.',
+    },
+    {
+      name:'Hollywood Studios', rank:3, emoji:'🎬', color:'#37474F',
+      bestFor:'Star Wars fans, thrill-seekers, tweens and teens, adults',
+      mustDos:['Rise of the Resistance (get LL before entering park)','Millennium Falcon: Smugglers Run','Slinky Dog Dash (LL)','Tower of Terror','Galaxy\'s Edge full exploration'],
+      skip:'Muppet*Vision 3D is a nostalgia play — save it for a slow moment. The 4D effects are dated.',
+      openingMove:'Book Rise of the Resistance LL at 7am before you leave your hotel. Be at Galaxy\'s Edge gate at rope drop. Walk straight to Smugglers Run standby while Rise queue is short.',
+      dontMiss:'Galaxy\'s Edge at night. The Millennium Falcon glows with engine light. Stormtroopers patrol the streets. It\'s magical.',
+    },
+    {
+      name:'Animal Kingdom', rank:4, emoji:'🦁', color:'#33691E',
+      bestFor:'Nature lovers, thrill-seekers (Flight of Passage), families with older kids',
+      mustDos:['Avatar Flight of Passage (LL immediately)','Kilimanjaro Safaris (first thing in AM)','Expedition Everest','Na\'vi River Journey at night (short wait late)','Harambe Market lunch'],
+      skip:'Primeval Whirl (now closed). DINOSAUR is rough and dark — some younger kids find it too frightening.',
+      openingMove:'Flight of Passage LL before leaving hotel. Walk directly to Kilimanjaro Safaris at rope drop — animals are most active in the cool morning. Then hit Flight of Passage.',
+      dontMiss:'Pandora at night. The bioluminescent ground lighting makes the entire land glow. It\'s otherworldly. Plan to be there 30 min before close.',
+    },
+    {
+      name:'Universal Studios Florida', rank:5, emoji:'🎬', color:'#c62828',
+      bestFor:'Harry Potter fans, action/thriller fans, adults and teens',
+      mustDos:['Hagrid\'s Motorbike (virtual queue or early AM)','Harry Potter escape from Gringotts','Diagon Alley full exploration','Minions ride (surprisingly fun)','Simpsons + Springfield food'],
+      skip:'Men in Black is dated but still fun. Shrek 4D has mostly been replaced — skip if lines are long.',
+      openingMove:'Join Hagrid\'s virtual queue exactly at 7am. Walk straight to Gringotts at rope drop — 15 min wait vs 90+ min by 10am.',
+      dontMiss:'Butterbeer at the Leaky Cauldron at Diagon Alley, then walk through the King\'s Cross portal to Hogsmeade. Doing the full two-park Harry Potter journey is the #1 theme park experience in Orlando.',
+    },
+    {
+      name:'Islands of Adventure', rank:6, emoji:'🏝️', color:'#E65100',
+      bestFor:'Thrill-seekers, coaster fans, Harry Potter fans',
+      mustDos:['VelociCoaster (LL or early AM)','Hagrid\'s Motorbike (shared queue from USF)','Harry Potter Forbidden Journey (LL)','Incredible Hulk Coaster','Hogsmeade village exploration'],
+      skip:'Flight of the Hippogriff is a short family coaster. Fine for kids but adults can skip.',
+      openingMove:'LL for VelociCoaster and Forbidden Journey. Walk directly to VelociCoaster at rope drop (it\'s in the back — power walk).',
+      dontMiss:'Hogsmeade in the early morning before crowds. The castle steams, the storefronts glow, and it\'s quiet enough to take it all in.',
+    },
+  ];
+
+  const GOLDEN_RULES = [
+    'Book Lightning Lane / Virtual Queues before you leave your hotel — at 7am on park day.',
+    'Rope drop (arrive 30–45 min before park open) is worth more than any paid line-skip system.',
+    'Mobile order food 15 min before you\'re hungry. Don\'t wait until you\'re starving — lines are long at peak meal times.',
+    'Plan one "rest afternoon" back at the hotel per 3 days of parks. Exhaustion is the #1 cause of bad memories.',
+    'Buy ponchos before your trip — $12 at the park vs $3 online. Florida rains every afternoon in summer.',
+    'Wear your walking shoes for 2 weeks before the trip. Blisters from new shoes have ruined countless vacations.',
+    'Take photos at the beginning of each day, not just the end. Tired families make for tired photos.',
+    'The last 45 minutes before close is when magic happens: short queues, golden light, emotional staff.',
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-first-timer';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const header = document.createElement('div');
+    header.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#E65100,#FF6F00,#FFA726);padding:16px 14px 14px;';
+    header.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:#fff;">First-Timer Master Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">6 parks · Golden rules · Opening moves</div>
+        </div>
+        <span style="font-size:24px;">🌟</span>
+      </div>
+      <div style="background:rgba(255,255,255,.12);border-radius:8px;padding:7px 12px;font-size:11px;color:rgba(255,255,255,.9);">
+        Everything a first-time visitor needs: the opening move for each park, what to prioritize, and what to skip.
+      </div>`;
+
+    const content = document.createElement('div');
+    content.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    // Golden rules
+    const rulesCard = document.createElement('div');
+    rulesCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:14px;border:1px solid var(--border,#eee);';
+    rulesCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:10px;">⭐ The 8 Golden Rules</div>`;
+    GOLDEN_RULES.forEach((rule, i) => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;gap:8px;margin-bottom:8px;align-items:flex-start;';
+      row.innerHTML = `
+        <div style="min-width:22px;height:22px;border-radius:50%;background:#E65100;color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${i+1}</div>
+        <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;">${rule}</div>`;
+      rulesCard.appendChild(row);
+    });
+    content.appendChild(rulesCard);
+
+    // Parks
+    PARKS_OVERVIEW.forEach(park => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="background:${park.color};padding:10px 14px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="background:rgba(255,255,255,.2);border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0;">${park.rank}</span>
+            <span style="font-size:20px;">${park.emoji}</span>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:#fff;">${park.name}</div>
+              <div style="font-size:10px;color:rgba(255,255,255,.8);">${park.bestFor.substring(0,50)}...</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:12px 14px;">
+          <div style="background:rgba(0,0,0,.04);border-radius:8px;padding:8px 10px;margin-bottom:8px;border-left:3px solid ${park.color};">
+            <div style="font-size:10px;font-weight:700;color:${park.color};margin-bottom:2px;">⚡ OPENING MOVE</div>
+            <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${park.openingMove}</div>
+          </div>
+          <div style="font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:4px;">MUST-DOs</div>
+          ${park.mustDos.slice(0,3).map(m=>`<div style="font-size:11px;color:var(--text-secondary,#555);padding:2px 0;">✓ ${m}</div>`).join('')}
+          <div style="margin-top:8px;background:rgba(255,152,0,.08);border-radius:8px;padding:7px 10px;">
+            <div style="font-size:10px;font-weight:700;color:#E65100;margin-bottom:2px;">🌟 DON'T MISS</div>
+            <div style="font-size:11px;color:var(--text-secondary,#555);">${park.dontMiss}</div>
+          </div>
+        </div>`;
+      content.appendChild(card);
+    });
+
+    const spacer = document.createElement('div');
+    spacer.style.height = '20px';
+    content.appendChild(spacer);
+
+    s.appendChild(header);
+    s.appendChild(content);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-first-timer')) buildScreen();
+
+  const _prevSS_llll2 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_llll2) _prevSS_llll2(name, el);
+    if (name === 'first-timer') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-first-timer');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectFirstTimerCard() {
+    if (document.getElementById('firsttimer-home-card')) return true;
+    const ref = document.getElementById('nbhd-home-card') || document.getElementById('food-bucket-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'firsttimer-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#E65100,#FF6F00,#FFA726);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('first-timer');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:3px;">🌟 First-Timer Master Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.85);">Opening moves · Must-dos · All 6 parks</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.5);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _ftCard = false;
+  setInterval(() => { if (!_ftCard) _ftCard = injectFirstTimerCard(); }, 30000);
+  setTimeout(() => { _ftCard = injectFirstTimerCard(); }, 26500);
+
+  const _prevRH_llll2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_llll2) _prevRH_llll2.apply(this, arguments);
+    setTimeout(() => { _ftCard = false; _ftCard = injectFirstTimerCard(); }, 6900);
+  };
+})();
+</script>
