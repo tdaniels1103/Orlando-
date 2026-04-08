@@ -52118,3 +52118,443 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK PPPPP: Orlando Sports Guide ===== */
+(function initOrlandoSports() {
+
+  const TEAMS = [
+    {
+      name:'Orlando Magic', sport:'NBA Basketball', emoji:'🏀', color:'#0B77BD',
+      venue:'Kia Center (Downtown Orlando)', season:'October–April (playoffs to June)',
+      avgTicket:'$60–$250',
+      tip:'The Magic are rebuilding around young stars Paolo Banchero and Franz Wagner — an exciting era to watch. Kia Center is a great arena with excellent sightlines. Lower bowl tickets are worth the premium for NBA games.',
+      experience:'Tailgate in the ICON Park area before games. The arena district has good bars and restaurants within walking distance. Game-day parking is pricey — ride Lynx or park at ICON.',
+      bonus:'Courtside seats occasionally appear on StubHub day-of at reduced prices when high rollers can\'t attend.'
+    },
+    {
+      name:'Orlando City SC', sport:'MLS Soccer', emoji:'⚽', color:'#633492',
+      venue:'Inter&Co Stadium (Downtown Orlando)', season:'February–October (playoffs to Nov)',
+      avgTicket:'$40–$150',
+      tip:'The most passionate fan culture in Orlando. The North End standing section (Lions\' Den) creates an electric atmosphere. Even if you don\'t follow MLS, attending an Orlando City game is an excellent live sports experience.',
+      experience:'Pre-match atmosphere at bars around Camping World Stadium area. The supporters\' groups bring drums, scarves, and genuine soccer culture. Orlando City has a passionate local fanbase.',
+      bonus:'The stadium sits next to the Amway Center — easy to combine both venues in the same trip.'
+    },
+    {
+      name:'Orlando Pride', sport:'NWSL Soccer', emoji:'⚽', color:'#633492',
+      venue:'Inter&Co Stadium (Downtown Orlando)', season:'March–October',
+      avgTicket:'$25–$80',
+      tip:'The Pride won the 2024 NWSL Championship — highest profile moment in club history. Talented roster with international stars. Excellent value tickets compared to NBA or NFL experiences.',
+      experience:'Often played at same stadium as Orlando City. Family-friendly atmosphere. Good food options and very accessible for out-of-town visitors.',
+      bonus:'Pride and City sometimes play home games in the same week — double-event visit possible.'
+    },
+    {
+      name:'Daytona International Speedway', sport:'NASCAR Racing', emoji:'🏎️', color:'#CC0000',
+      venue:'Daytona Beach (1 hour east)', season:'Daytona 500 in February; various races throughout year',
+      avgTicket:'$75–$350+ (Daytona 500 premium)',
+      tip:'The Daytona 500 is one of the most iconic sporting events in the US. If your visit coincides with any NASCAR race at Daytona, it\'s worth the hour drive. Even practice sessions are accessible and thrilling.',
+      experience:'Campground tailgating culture around Daytona is legendary. The infield access gives a unique perspective on the scale of the oval. Daytona Beach itself makes a solid day-trip addition.',
+      bonus:'The museum at the speedway (Daytona USA) is open year-round regardless of race schedule.'
+    },
+    {
+      name:'Tampa Bay Buccaneers', sport:'NFL Football', emoji:'🏈', color:'#D50A0A',
+      venue:'Raymond James Stadium (Tampa, 1.5 hrs west)', season:'September–January',
+      avgTicket:'$120–$500+',
+      tip:'With Tom Brady\'s era recently ended, the Bucs are in transition. But Raymond James Stadium is one of the most unique in the NFL with its replica pirate ship. A single NFL game is a bucket-list experience.',
+      experience:'Tampa has an excellent stadium district scene. Ybor City for pre-game is legendary. Channel Side and Armature Works for post-game.',
+      bonus:'Check secondary market for late-season games if Bucs are out of playoff contention — tickets drop significantly.'
+    },
+    {
+      name:'Tampa Bay Lightning', sport:'NHL Hockey', emoji:'🏒', color:'#002868',
+      venue:'Amalie Arena (Tampa, 1.5 hrs west)', season:'October–April',
+      avgTicket:'$80–$300',
+      tip:'The Lightning are perennial contenders with a passionate fanbase. Amalie Arena is one of the better arenas in the NHL. An NHL game in Florida is a unique experience — surprisingly intense atmosphere despite the sunshine state setting.',
+      experience:'Tampa\'s Channelside district has excellent pre-game options. The Arena district around Amalie is walkable with bars and restaurants.',
+      bonus:'Combine with a Tampa day-trip: Columbia Restaurant (100-year-old Cuban institution), Tampa Riverwalk, and Ybor City.'
+    },
+  ];
+
+  const SPRING_TRAINING = [
+    { team:'Atlanta Braves', venue:'CoolToday Park (North Port, 2.5 hrs south)', dates:'February–March' },
+    { team:'Houston Astros', venue:'The Ballpark of the Palm Beaches (West Palm, 3 hrs)', dates:'February–March' },
+    { team:'Washington Nationals', venue:'The Ballpark of the Palm Beaches (West Palm, 3 hrs)', dates:'February–March' },
+    { team:'Detroit Tigers', venue:'Publix Field at Joker Marchant (Lakeland, 1 hr)', dates:'February–March' },
+    { team:'Philadelphia Phillies', venue:'BayCare Ballpark (Clearwater, 1.5 hrs)', dates:'February–March' },
+    { team:'Toronto Blue Jays', venue:'TD Ballpark (Dunedin, 1.5 hrs)', dates:'February–March' },
+  ];
+
+  const SPECTATOR_TIPS = [
+    { icon:'🎫', tip:'StubHub, SeatGeek, and Vivid Seats consistently offer below-face-value tickets for non-premium games. Check 24–48 hours before game time for last-minute drops.' },
+    { icon:'🚗', tip:'Rideshare to downtown Orlando venues. Parking around Kia Center is $25–40 and traffic post-game is brutal. Uber/Lyft from I-Drive is 15–20 minutes.' },
+    { icon:'🎒', tip:'Clear bag policies at all major venues. Small clutch purses, gallon zip-lock bags, and approved clear bags only. Check venue policy before going.' },
+    { icon:'📱', tip:'Mobile tickets only at most Orlando venues. Download the team\'s app and add tickets to Apple Wallet before leaving the hotel — cellular service outside venues can be spotty.' },
+    { icon:'🌮', tip:'Eat before the game. Venue concession food is dramatically overpriced ($15 beers, $12 hot dogs). Have dinner, then enjoy one arena concession item guilt-free.' },
+    { icon:'🏈', tip:'For once-in-a-lifetime sports: Daytona 500 (February), an NBA playoff game at Kia Center, or an MLS Eastern Conference Final if Orlando qualifies.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-orlando-sports';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#0B77BD,#633492,#CC0000);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Orlando Sports Guide</div>
+          <div style="font-size:11px;opacity:.8;">NBA · MLS · NASCAR · NHL · Spring Training</div>
+        </div>
+        <span style="font-size:28px;">🏟️</span>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:15px;font-weight:800;">3</div><div style="font-size:9px;opacity:.8;">LOCAL TEAMS</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:15px;font-weight:800;">6+</div><div style="font-size:9px;opacity:.8;">NEARBY TEAMS</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:15px;font-weight:800;">Feb–Mar</div><div style="font-size:9px;opacity:.8;">SPRING TRAINING</div>
+        </div>
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    TEAMS.forEach(team => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:12px 14px;background:${team.color}18;border-left:4px solid ${team.color};">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:26px;">${team.emoji}</span>
+            <div style="flex:1;">
+              <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--text-primary,#212121);">${team.name}</div>
+              <div style="font-size:10px;color:var(--text-secondary,#888);">${team.sport} · ${team.venue}</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:11px;font-weight:800;color:${team.color};">${team.avgTicket}</div>
+              <div style="font-size:9px;color:var(--text-secondary,#aaa);">avg ticket</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          <div style="font-size:10px;color:var(--text-secondary,#888);margin-bottom:6px;">📅 ${team.season}</div>
+          <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;margin-bottom:8px;">${team.tip}</div>
+          <div style="background:var(--bg,#f8f8f8);border-radius:10px;padding:8px;margin-bottom:6px;">
+            <div style="font-size:10px;font-weight:700;color:${team.color};margin-bottom:3px;">EXPERIENCE</div>
+            <div style="font-size:11px;color:var(--text-secondary,#666);">${team.experience}</div>
+          </div>
+          <div style="font-size:11px;color:${team.color};font-weight:600;">💡 ${team.bonus}</div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    /* Spring Training */
+    const springCard = document.createElement('div');
+    springCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+    springCard.innerHTML = `<div style="padding:12px 14px;background:linear-gradient(135deg,#1B5E20,#2E7D32);color:#fff;">
+      <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;">⚾ Grapefruit League Spring Training</div>
+      <div style="font-size:11px;opacity:.8;margin-top:2px;">MLB teams train across Florida Feb–March · Tickets: $15–50</div>
+    </div>
+    <div style="padding:12px 14px;">
+      <div style="font-size:12px;color:var(--text-secondary,#555);margin-bottom:10px;line-height:1.5;">
+        Spring Training is one of America\'s great sporting traditions. Small stadiums, players signing autographs at the fence, games starting at 1 PM on perfect February afternoons. Tickets are inexpensive and the access to players is unmatched.
+      </div>
+      ${SPRING_TRAINING.map(st=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border,#eee);">
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);">${st.team}</div>
+          <div style="font-size:10px;color:var(--text-secondary,#888);">${st.venue}</div>
+        </div>
+        <div style="font-size:10px;font-weight:700;color:#1B5E20;">${st.dates}</div>
+      </div>`).join('')}
+    </div>`;
+    body.appendChild(springCard);
+
+    const tipsCard = document.createElement('div');
+    tipsCard.style.cssText = 'background:linear-gradient(135deg,#0B77BD,#633492);border-radius:16px;margin-bottom:20px;padding:14px;color:#fff;';
+    tipsCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">🎯 Spectator Tips</div>
+    ${SPECTATOR_TIPS.map(t=>`<div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
+      <span style="font-size:18px;flex-shrink:0;">${t.icon}</span>
+      <div style="font-size:12px;opacity:.95;line-height:1.5;">${t.tip}</div>
+    </div>`).join('')}`;
+    body.appendChild(tipsCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-orlando-sports')) buildScreen();
+
+  const _prevSS_ppppp = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_ppppp) _prevSS_ppppp(name, el);
+    if (name === 'orlando-sports') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-orlando-sports');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectSportsCard() {
+    if (document.getElementById('sports-home-card')) return true;
+    const ref = document.getElementById('nature-home-card') || document.getElementById('budget-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'sports-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#0B77BD,#633492,#CC0000);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('orlando-sports');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🏟️</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Sports Guide</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Magic · Orlando City · NASCAR · Spring Training</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _sportsCard = false;
+  setInterval(() => { if (!_sportsCard) _sportsCard = injectSportsCard(); }, 50000);
+  setTimeout(() => { _sportsCard = injectSportsCard(); }, 46500);
+  const _prevRH_ppppp = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_ppppp) _prevRH_ppppp.apply(this, arguments);
+    setTimeout(() => { _sportsCard = false; _sportsCard = injectSportsCard(); }, 15000);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK QQQQQ: EPCOT World Showcase Food & Culture Guide ===== */
+(function initEpcotWorldShowcase() {
+
+  const PAVILIONS = [
+    {
+      country:'Mexico', emoji:'🇲🇽', color:'#C62828',
+      must:['La Cava del Tequila (tequila bar — arrive early, no reservations)', 'Choza de Margarita (outdoor margaritas)', 'San Angel Inn (romantic indoor dining beneath pyramid)'],
+      food:['Tacos, tamales, churros, queso fundido'],
+      drink:'The Frozen Margaritas here are among the best in all Disney World. Try La Cava for mezcal flights.',
+      tip:'The pavilion is inside an ancient Maya pyramid. Even the outdoor area feels like a Mexican marketplace at night. La Cava del Tequila has over 200 tequilas and mezcals. Lines build by noon — go first.'
+    },
+    {
+      country:'Norway', emoji:'🇳🇴', color:'#003087',
+      must:['Frozen Ever After (Frozen-themed ride, popular with all ages)', 'Kringla Bakeri Og Kafe (school bread, lefse, salmon pastry)', 'Aquarum — free Viking/Norse history exhibit'],
+      food:['School bread (cardamom-scented roll with custard)', 'Lefse (potato flatbread)', 'Salmon-stuffed pastries'],
+      drink:'Aquavit cocktails, Viking Coffee',
+      tip:'Frozen Ever After is wildly popular — Lightning Lane or rope drop. The Kringla school bread is one of the best snacks at EPCOT. The Stave Church replica is a beautiful photo spot.'
+    },
+    {
+      country:'China', emoji:'🇨🇳', color:'#CC0000',
+      must:['Reflections of China (360-degree film)', 'Lotus Blossom Café (best counter service in WS)', 'Joy of Tea cart (bubble tea, frozen drinks)'],
+      food:['Egg rolls, Mongolian beef, pork dumplings, fried rice'],
+      drink:'Bubble tea, Plum Wine (Joy of Tea)',
+      tip:'The 360-degree Circle-Vision film inside the Temple of Heaven is exceptional. No seats — you stand surrounded by screen. Joy of Tea cart has the most unique beverages in World Showcase.'
+    },
+    {
+      country:'Germany', emoji:'🇩🇪', color:'#000000',
+      must:['Biergarten Restaurant (communal tables, live polka band, German buffet)', 'Karamell-Küche (caramel shop)', 'Sommerfest (counter service schnitzels, brats, pretzels)'],
+      food:['Bratwurst, schnitzel, spaetzle, sauerkraut, pretzels', 'Caramel apples and candy at Karamell-Küche'],
+      drink:'German beers on tap at Biergarten, excellent Riesling options',
+      tip:'Biergarten\'s communal seating means you\'ll be sharing tables with strangers — this becomes the best part. The oompah band performs every 30 minutes. One of the most fun dining experiences at EPCOT.'
+    },
+    {
+      country:'Italy', emoji:'🇮🇹', color:'#009246',
+      must:['Via Napoli Ristorante e Pizzeria (Neapolitan pizza, best at WDW)', 'Tutto Italia (classic Italian table service)', 'Tutto Gusto (wine bar in cellar — hidden gem)'],
+      food:['Wood-fired Neapolitan pizza (share a large pie)', 'Fresh pasta, osso buco, tiramisu'],
+      drink:'Aperol Spritz, Italian wine, Limoncello',
+      tip:'Via Napoli has three massive wood-burning ovens named Etna, Stromboli, and Vesuvius. The pizza is genuinely excellent — book Via Napoli ADR. Tutto Gusto wine bar rarely has a wait and offers the best Italian wine list in the park.'
+    },
+    {
+      country:'America', emoji:'🇺🇸', color:'#003087',
+      must:['The American Adventure (Audio-Animatronic historical show — Ben Franklin and Mark Twain)', 'Regal Eagle Smokehouse (counter service BBQ)', 'Block & Hans (beer garden)'],
+      food:['BBQ brisket, pulled pork, smoked ribs, mac & cheese'],
+      drink:'Craft beers at Block & Hans',
+      tip:'The American Adventure is one of Disney\'s most ambitious Audio-Animatronic productions — 35-minute historical journey through American history. Often overlooked but genuinely impressive. Regal Eagle BBQ is top-tier counter service.'
+    },
+    {
+      country:'Japan', emoji:'🇯🇵', color:'#BC002D',
+      must:['Teppan Edo (teppanyaki table service, hibachi)', 'Tokyo Dining (sushi, Japanese curry)', 'Mitsukoshi Department Store (excellent Japanese goods)'],
+      food:['Teppanyaki, sushi, ramen, udon, gyoza', 'Kakigori (Japanese shaved ice) from outdoor cart'],
+      drink:'Japanese whisky, sake, Kirin beer, Ramune sodas',
+      tip:'The Mitsukoshi store sells genuine Japanese goods — imported snacks, sake, ceramics, chopsticks. Better prices than specialty stores. Teppan Edo requires ADR and is consistently one of the best table service meals at EPCOT.'
+    },
+    {
+      country:'Morocco', emoji:'🇲🇦', color:'#C8102E',
+      must:['Spice Road Table (waterfront Mediterranean)', 'Restaurant Marrakesh (belly dancing entertainment)', 'Moroccan architecture (most faithful to real architecture in World Showcase)'],
+      food:['Tagines, couscous, hummus, kefta, baklava'],
+      drink:'Mint tea ceremony, North African wines',
+      tip:'Morocco\'s pavilion was built by artisans brought from Morocco itself — the tilework and architecture are authentic. Restaurant Marrakesh sometimes has walk-up availability even at peak times. The belly dancing show is spectacular.'
+    },
+    {
+      country:'France', emoji:'🇫🇷', color:'#003189',
+      must:['Remy\'s Ratatouille Adventure (Pixar ride)', 'Les Halles Boulangerie (croissants, macarons, quiche)', 'Monsieur Paul (fine dining — Michelin-level quality)'],
+      food:['Fresh croissants, crêpes, macarons, boeuf bourguignon', 'Pain au chocolat, quiche lorraine'],
+      drink:'French wine, champagne, Kir Royale, Champagne cocktails at Crepes des Chefs',
+      tip:'Les Halles opens at 9 AM — best breakfast at EPCOT by a wide margin. Croissants are baked fresh. Monsieur Paul is Michelin-adjacent quality and reservations are worth making. Remy\'s ride uses wristband/reservation — check availability.'
+    },
+    {
+      country:'United Kingdom', emoji:'🇬🇧', color:'#012169',
+      must:['Rose & Crown Pub & Dining Room (fish & chips, Scotch eggs, World Showcase Lagoon view)', 'Yorkshire County Fish Shop (counter service F&C)', 'The Tea Caddy (British tea shop)'],
+      food:['Fish and chips (both table service and counter)', 'Scotch eggs, cottage pie, sticky toffee pudding'],
+      drink:'British ales, cask beer, Pimm\'s Cup',
+      tip:'Rose & Crown has outdoor lagoon seating for watching EPCOT fireworks at no extra charge — request outdoor seating and arrive 30 min before IllumiNations/Harmonious. Fish & chips are authentically prepared.'
+    },
+    {
+      country:'Canada', emoji:'🇨🇦', color:'#FF0000',
+      must:['O Canada! (360-degree Circle-Vision film)', 'Le Cellier Steakhouse (one of the best steaks at WDW)', 'Canadian fare carts'],
+      food:['Canadian cheddar cheese soup (Le Cellier signature)', 'Filet mignon, Canadian maple selections'],
+      drink:'Canadian whisky, Ice wine, Molson beers',
+      tip:'Le Cellier is one of the hardest reservations at EPCOT — book at 60 days. The cheddar cheese soup is genuinely extraordinary and available only here. The 360-degree Canada film has beautiful cinematography.'
+    },
+  ];
+
+  const FESTIVALS = [
+    { name:'Festival of the Arts', months:'January–February', desc:'Artists creating work live, food studios with art-inspired dishes, Broadway performers at the America Gardens Theatre. One of the most underrated EPCOT events.' },
+    { name:'Flower & Garden Festival', months:'March–June', desc:'30+ outdoor kitchens with garden-fresh dishes, topiary Disney characters throughout the park, butterfly garden, live concerts. Best time to visit for food variety.' },
+    { name:'Food & Wine Festival', months:'August–November', desc:'The crown jewel EPCOT festival. 50+ global marketplaces with tasting portions. Celebrity chefs, Eat to the Beat concerts, and the most concentrated food experience in Orlando.' },
+    { name:'Festival of the Holidays', months:'November–January', desc:'Candlelight Processional with celebrity narrator reading the Christmas Story, holiday kitchens with seasonal dishes from each pavilion.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-epcot-showcase';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#003087,#CC0000,#009246);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">EPCOT World Showcase</div>
+          <div style="font-size:11px;opacity:.8;">11 countries · Global food & drink · Festivals</div>
+        </div>
+        <span style="font-size:28px;">🌍</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        World Showcase is one of the most unique concepts in theme park history — 11 countries recreated with authentic architecture, food, entertainment, and staff from each nation. Budget 4+ hours minimum.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    PAVILIONS.forEach(p => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:10px 14px;background:${p.color}18;border-left:4px solid ${p.color};">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:22px;">${p.emoji}</span>
+            <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--text-primary,#212121);">${p.country}</div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          <div style="font-size:10px;font-weight:700;color:${p.color};margin-bottom:4px;">MUST-DO</div>
+          ${p.must.map(m=>`<div style="font-size:11px;color:var(--text-secondary,#555);padding:2px 0;">→ ${m}</div>`).join('')}
+          <div style="display:flex;gap:8px;margin-top:8px;">
+            <div style="flex:1;background:var(--bg,#f8f8f8);border-radius:8px;padding:6px 8px;">
+              <div style="font-size:9px;font-weight:700;color:var(--text-secondary,#888);">FOOD</div>
+              <div style="font-size:10px;color:var(--text-secondary,#555);">${p.food[0]}</div>
+            </div>
+            <div style="flex:1;background:var(--bg,#f8f8f8);border-radius:8px;padding:6px 8px;">
+              <div style="font-size:9px;font-weight:700;color:var(--text-secondary,#888);">DRINK</div>
+              <div style="font-size:10px;color:var(--text-secondary,#555);">${p.drink.substring(0,40)}${p.drink.length>40?'…':''}</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:6px;background:${p.color}0d;border-radius:8px;padding:7px;margin-top:7px;">
+            <span style="font-size:12px;flex-shrink:0;">💡</span>
+            <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${p.tip}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const festCard = document.createElement('div');
+    festCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+    festCard.innerHTML = `<div style="padding:12px 14px;background:linear-gradient(135deg,#003087,#CC0000);color:#fff;">
+      <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;">🎪 EPCOT Festivals (Year-Round)</div>
+    </div>
+    <div style="padding:12px 14px;">
+      ${FESTIVALS.map(f=>`<div style="margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border,#eee);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+          <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${f.name}</div>
+          <span style="font-size:10px;font-weight:700;padding:2px 8px;background:#003087;color:#fff;border-radius:20px;">${f.months}</span>
+        </div>
+        <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;">${f.desc}</div>
+      </div>`).join('')}
+    </div>`;
+    body.appendChild(festCard);
+
+    const stratCard = document.createElement('div');
+    stratCard.style.cssText = 'background:linear-gradient(135deg,#003087,#009246);border-radius:16px;margin-bottom:20px;padding:14px;color:#fff;';
+    stratCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">🍷 World Showcase Drinking Tour</div>
+    <div style="font-size:12px;opacity:.9;line-height:1.5;margin-bottom:10px;">The "Drink Around the World" is an unofficial EPCOT tradition — one drink from each country pavilion. At 11 countries, pace yourself. Start at Mexico and go clockwise.</div>
+    ${['🇲🇽 Mexico: Frozen Margarita or La Cava Tequila flight',
+      '🇳🇴 Norway: Aquavit cocktail or Viking Coffee',
+      '🇨🇳 China: Plum Wine or Tsing Tao',
+      '🇩🇪 Germany: German beer (Biergarten) or Riesling',
+      '🇮🇹 Italy: Aperol Spritz or Limoncello',
+      '🇺🇸 America: Craft beer at Block & Hans',
+      '🇯🇵 Japan: Sake or Japanese whisky highball',
+      '🇲🇦 Morocco: Mint tea (non-alcoholic) or North African wine',
+      '🇫🇷 France: Champagne or Kir Royale',
+      '🇬🇧 UK: Cask ale at Rose & Crown',
+      '🇨🇦 Canada: Molson or Canadian Ice Wine'
+    ].map(d=>`<div style="font-size:12px;padding:4px 0;opacity:.9;">${d}</div>`).join('')}`;
+    body.appendChild(stratCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-epcot-showcase')) buildScreen();
+
+  const _prevSS_qqqqq = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_qqqqq) _prevSS_qqqqq(name, el);
+    if (name === 'epcot-showcase') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-epcot-showcase');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectEpcotWSCard() {
+    if (document.getElementById('epcot-ws-home-card')) return true;
+    const ref = document.getElementById('sports-home-card') || document.getElementById('nature-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'epcot-ws-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#003087,#CC0000,#009246);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('epcot-showcase');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🌍</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">EPCOT World Showcase</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">11 countries · Food & drink · Festivals · Drinking tour</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _epcotWSCard = false;
+  setInterval(() => { if (!_epcotWSCard) _epcotWSCard = injectEpcotWSCard(); }, 51000);
+  setTimeout(() => { _epcotWSCard = injectEpcotWSCard(); }, 47500);
+  const _prevRH_qqqqq = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_qqqqq) _prevRH_qqqqq.apply(this, arguments);
+    setTimeout(() => { _epcotWSCard = false; _epcotWSCard = injectEpcotWSCard(); }, 15400);
+  };
+})();
+</script>
