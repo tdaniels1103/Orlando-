@@ -60919,3 +60919,362 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK HHHHHHH: Orlando VIP & Luxury Experiences ===== */
+(function initOrlandoVIP() {
+
+  const VIP_EXPERIENCES = [
+    {
+      name:'Disney VIP Tour', emoji:'👑', color:'#C9A96E',
+      price:'$450–900/hour (7-hour minimum)',
+      includes:'Private guide, front-of-line access to any attraction, private transportation, personalized itinerary',
+      why:'For high-net-worth visitors or once-in-a-lifetime celebrations. Your private guide navigates you to any ride without waiting. In a 7-hour VIP tour, a family of 4 can experience 20+ attractions across multiple parks. Impossible any other way.',
+      tip:'The minimum cost is roughly $3,150–6,300 per tour. For a family celebrating a milestone (50th birthday, 25th anniversary), the math changes — what is 7 hours of no-wait access worth? Book 60+ days in advance through Disney VIP tour services.',
+    },
+    {
+      name:'Victoria & Albert\'s Tasting Menu', emoji:'🍽️', color:'#003087',
+      price:'$350+ per person',
+      includes:'8–10 course tasting menu, wine pairings, chef\'s table experience available',
+      why:'Disney World\'s only AAA Five Diamond restaurant. Located in the Grand Floridian. One of the most exclusive restaurant reservations in the United States — seating only 60 guests per night in a single dining room with live harp music.',
+      tip:'Opens at exactly 60 days from your dining date on My Disney Experience. It will be booked within hours of opening. The Chef\'s Table experience (inside the kitchen) requires direct phone reservation: 407-939-3862.',
+    },
+    {
+      name:'Savi\'s Workshop — Handbuilt Lightsaber', emoji:'⚔️', color:'#1a1a2e',
+      price:'$299.99',
+      includes:'Custom lightsaber assembly in a ceremonial workshop experience',
+      why:'Not just a toy — a 45-minute guided experience where you choose your kyber crystal and hilt from Galaxy\'s Edge\'s Workshop. The theatrical ceremony elevates it to a memorable experience. The saber is fully functional and visually striking.',
+      tip:'Book through My Disney Experience — it fills weeks in advance. For serious Star Wars fans of any age, this is the definitive Galaxy\'s Edge experience. The saber requires a carrying case for the flight home ($20 hard case available in the store).',
+    },
+    {
+      name:'Universal Behind the Scenes Tour', emoji:'🎬', color:'#7B1FA2',
+      price:'$149–199/person',
+      includes:'3–5 hour guided access to production areas, ride operators, set areas',
+      why:'Universal\'s VIP experience includes access to areas not normally visible to guests plus front-of-line access. Less prestigious than Disney VIP but reveals the genuine production side of theme park operation.',
+      tip:'Book directly through Universal\'s VIP Experience office. The tour includes Hagrid\'s Motorbike front-of-line and rarely accessible back-lot areas. Best for Universal enthusiasts who want a different perspective.',
+    },
+    {
+      name:'Four Seasons Private Poolside Cabana', emoji:'🏖️', color:'#2E7D32',
+      price:'$350–600/day',
+      includes:'Private shaded pool-side cabana, dedicated server, complimentary snacks and drinks, premium positioning',
+      why:'The Four Seasons Orlando pool complex is world-class — multiple pools including the one with water slides and adjacent to the lazy river. A private cabana turns a hot Florida pool day into a genuine resort experience.',
+      tip:'Book cabanas when you book your room. They sell out on summer weekends. Includes a dedicated server — order food and drinks without leaving your shaded space. Guests of non-Four Seasons hotels can purchase day passes.',
+    },
+    {
+      name:'Grand Floridian Suite Stay', emoji:'🏰', color:'#C62828',
+      price:'$5,000–20,000/night (suites)',
+      includes:'Turret suite with Magic Kingdom views, butler service, resort-wide premium amenities',
+      why:'The turret suites at the Grand Floridian overlook the Seven Seas Lagoon with Magic Kingdom in the distance. Fireworks from your private balcony. Butler service. The most glamorous theme park resort experience available.',
+      tip:'The Sugar Loaf Club level floor of the Grand Floridian provides Club Level services (concierge, food presentations throughout the day, dedicated staff) at a lower price point than suites. Consider Club Level as an accessible luxury option.',
+    },
+    {
+      name:'Sunrise Safari at Animal Kingdom', emoji:'🦁', color:'#5D4037',
+      price:'$175/person',
+      includes:'Small group safari at dawn before the park opens with a naturalist guide',
+      why:'A small group (maximum 12) safari at Kilimanjaro Safaris before the park opens. Animals are most active at dawn. The naturalist guide provides depth of knowledge unavailable on the standard safari. The early light is extraordinary for photography.',
+      tip:'Book directly through Disney for the Wild Africa Trek ($189) — the most comprehensive Animal Kingdom premium experience. Includes the Gorilla Waterfall overlook walk (normally inaccessible) and a picnic platform lunch over the savanna.',
+    },
+  ];
+
+  const LUXURY_DINING = [
+    {name:'Capa Rooftop (Four Seasons)', price:'$$$$', note:'Spanish steakhouse, 17th floor, Magic Kingdom fireworks view from window seats. Reserve the window.'},
+    {name:'The Boheme (Grand Bohemian Hotel)', price:'$$$', note:'Best downtown Orlando dinner. Art gallery surroundings, creative American cuisine, exceptional wine program.'},
+    {name:'Ravello at Four Seasons', price:'$$$', note:'Italian dining at Four Seasons. Chef\'s table experience available. Sunday brunch is the finest in the Disney area.'},
+    {name:'Narcoossee\'s (Grand Floridian)', price:'$$$', note:'Seafood on the Seven Seas Lagoon. Fireworks visible from the outdoor deck. Disney\'s most romantic waterfront restaurant.'},
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-vip-luxury';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:#0a0a0a;flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;color:#fff;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#0a0a0a,#1a1000,#C9A96E);padding:16px 14px 14px;border-bottom:1px solid rgba(201,169,110,.2);';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">VIP & Luxury Experiences</div>
+          <div style="font-size:11px;opacity:.7;">Disney VIP Tour · V&A\'s · Lightsaber · Sunrise Safari · Grand Floridian suites</div>
+        </div>
+        <span style="font-size:28px;">👑</span>
+      </div>
+      <div style="background:rgba(201,169,110,.15);border:1px solid rgba(201,169,110,.25);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;color:rgba(255,255,255,.9);">
+        For milestone celebrations, bucket-list travel, or visitors for whom money is not the primary constraint. Orlando's premium experiences rival any luxury destination in the world — and have a theme park context unavailable anywhere else.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    VIP_EXPERIENCES.forEach(exp => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:rgba(255,255,255,.06);border:1px solid rgba(201,169,110,.2);border-radius:16px;margin-bottom:12px;overflow:hidden;';
+      card.innerHTML = `
+        <div style="padding:10px 14px;background:${exp.color}50;border-left:4px solid rgba(201,169,110,.6);">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div style="display:flex;gap:8px;align-items:center;">
+              <span style="font-size:22px;">${exp.emoji}</span>
+              <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:#fff;">${exp.name}</div>
+            </div>
+            <div style="font-size:11px;font-weight:700;color:#C9A96E;">${exp.price}</div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          <div style="font-size:11px;color:rgba(201,169,110,.8);margin-bottom:5px;font-style:italic;">${exp.includes}</div>
+          <div style="font-size:12px;color:rgba(255,255,255,.8);line-height:1.5;margin-bottom:7px;">${exp.why}</div>
+          <div style="display:flex;gap:5px;background:rgba(201,169,110,.1);border-radius:8px;padding:7px;">
+            <span style="font-size:11px;flex-shrink:0;">💡</span>
+            <div style="font-size:11px;color:rgba(255,255,255,.65);line-height:1.5;">${exp.tip}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const ldCard = document.createElement('div');
+    ldCard.style.cssText = 'background:rgba(255,255,255,.05);border:1px solid rgba(201,169,110,.2);border-radius:14px;margin-bottom:20px;overflow:hidden;';
+    ldCard.innerHTML = `<div style="padding:10px 14px;background:linear-gradient(135deg,#1a1000,#C9A96E);">
+      <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;">🍷 Luxury Dining Destinations</div>
+    </div>
+    <div style="padding:10px 14px;">
+      ${LUXURY_DINING.map(d=>`<div style="display:flex;justify-content:space-between;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.07);">
+        <div style="flex:1;">
+          <div style="font-size:12px;font-weight:700;color:#C9A96E;">${d.name}</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.65);">${d.note}</div>
+        </div>
+        <div style="font-size:11px;font-weight:700;color:rgba(201,169,110,.6);flex-shrink:0;margin-left:8px;">${d.price}</div>
+      </div>`).join('')}
+    </div>`;
+    body.appendChild(ldCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-vip-luxury')) buildScreen();
+
+  const _prevSS_hhhhhhh = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_hhhhhhh) _prevSS_hhhhhhh(name, el);
+    if (name === 'vip-luxury') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-vip-luxury');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectVIPCard() {
+    if (document.getElementById('vip-luxury-home-card')) return true;
+    const ref = document.getElementById('toddlers-home-card') || document.getElementById('springs-citywalk-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'vip-luxury-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#0a0a0a,#1a1000,#C9A96E);border-radius:16px;padding:14px;cursor:pointer;border:1px solid rgba(201,169,110,.3);';
+    card.onclick = () => window.showScreen('vip-luxury');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">👑</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">VIP & Luxury Experiences</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.75);">Disney VIP Tour · Victoria & Albert\'s · Lightsaber · Grand Floridian suites</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.5);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _vipCard = false;
+  setInterval(() => { if (!_vipCard) _vipCard = injectVIPCard(); }, 94000);
+  setTimeout(() => { _vipCard = injectVIPCard(); }, 90500);
+  const _prevRH_hhhhhhh = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_hhhhhhh) _prevRH_hhhhhhh.apply(this, arguments);
+    setTimeout(() => { _vipCard = false; _vipCard = injectVIPCard(); }, 32600);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK IIIIIII: Busch Gardens Tampa Deep Dive ===== */
+(function initBuschGardens() {
+
+  const BG_AREAS = [
+    {
+      name:'Serengeti Plain', emoji:'🦁', color:'#8B4513',
+      desc:'The heart of Busch Gardens — a 65-acre African savanna where giraffes, elephants, rhinos, zebras, and wildebeest roam freely. The largest African-themed free-roaming habitat in the United States outside of a zoo.',
+      animals:['Giraffes (tallest land animals)', 'African elephants', 'White rhinos', 'Plains zebras', 'Blue wildebeest', 'African lions (separate habitat)'],
+      access:['Serengeti Express railway (complimentary)', 'Skyride gondola (overhead view)', 'Serengeti Safari (paid upgrade — feed animals from open vehicle)'],
+      tip:'The Serengeti Safari ($40/person) allows you to board an open-air truck and hand-feed giraffes and other animals. One of the only such experiences in Florida. The Skyride gondola provides a panoramic aerial view of the entire plain.',
+    },
+    {
+      name:'Coaster Zone (Gwazi Field)', emoji:'🎢', color:'#C62828',
+      desc:'The most concentrated collection of world-class roller coasters in one area of any Florida park.',
+      rides:[
+        {name:'Iron Gwazi', height:'54"', intensity:5, note:'Opened 2022. Repeatedly ranked #1 steel coaster in North America. Hybrid wooden/steel RMC conversion. 3,024 feet of track, 206-foot drop, 76 mph. The most talked-about roller coaster in the southeastern US.'},
+        {name:'Montu', height:'54"', intensity:5, note:'Inverted steel coaster — feet dangling, seven inversions. Opened 1996 and still one of the most intense inverted coasters in the world.'},
+        {name:'Kumba', height:'54"', intensity:5, note:'Original steel coaster (1993) that remains one of the most forceful sit-down coasters in the country. Thunderous roar and legendary airtime.'},
+        {name:'SheiKra', height:'54"', intensity:5, note:'97-foot vertical drop — you are held at the top for 3 seconds facing straight down before release. Floorless coaster. Among the most psychologically intense park experiences.'},
+      ],
+      tip:'For coaster enthusiasts, Busch Gardens is worth the 90-minute drive from Orlando. Iron Gwazi alone justifies the trip — it regularly competes for the title of world\'s best steel hybrid coaster. Arrive at park opening and ride all four before 10:30 AM.',
+    },
+    {
+      name:'Stanleyville / Pantopia', emoji:'🌊', color:'#0277BD',
+      desc:'Water-heavy zone with multiple water attractions perfect for Florida summer days.',
+      rides:[
+        {name:'Stanley Falls Flume', height:'None', intensity:2, note:'Classic log flume. Family-friendly water ride. The 40-foot drop finale is moderate. Expect to get mildly wet.'},
+        {name:'Tanganyika Tidal Wave', height:'42"', intensity:3, note:'River rapids ride that practically guarantees a soaking. The splash zone surrounds the attraction — bystanders get wet too.'},
+        {name:'Scorpion', height:'42"', intensity:4, note:'Classic steel coaster hidden in the park — often overlooked. Single loop, intense launch feel. Worth riding for completionists.'},
+      ],
+      tip:'The water rides are best visited in the afternoon when Florida heat is peak. Bring a change of clothes or wear quick-dry shorts.',
+    },
+    {
+      name:'Sesame Street Safari of Fun', emoji:'🐦', color:'#F57F17',
+      desc:'Dedicated children\'s section themed to Sesame Street with rides sized and paced for ages 2–8.',
+      rides:[
+        {name:'Air Grover', height:'42" (adult must accompany under 36")', intensity:1, note:'Swooping family coaster through Grover\'s cloud journey. The best family coaster in the Sesame Street zone.'},
+        {name:'Elmo\'s Cloud Chaser', height:'None', intensity:1, note:'Gentle spinner for young children. Big Bird and Elmo appearances throughout.'},
+      ],
+      tip:'Sesame Street Safari of Fun is Busch Gardens\' answer to Disney\'s Fantasyland for young children. Character meets with Elmo, Cookie Monster, and Big Bird are available here.',
+    },
+  ];
+
+  const BG_ANIMAL_EXTRAS = [
+    {name:'Serengeti Safari (open vehicle)', price:'$40/person', note:'Hand-feed giraffes and rhinos from an open-air vehicle on the actual Serengeti habitat. 30 minutes.'},
+    {name:'Cheetah Experience', price:'$30/person', note:'Stand behind the fence near the cheetah habitat for a close encounter with the fastest land animal.'},
+    {name:'Animal Care Center Tour', price:'$25/person', note:'Behind-the-scenes access to the animal care facilities. See animals being treated, fed, and exercised.'},
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-busch-gardens';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#8B4513,#C62828,#2E7D32);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Busch Gardens Tampa — Deep Dive</div>
+          <div style="font-size:11px;opacity:.8;">Iron Gwazi (#1 coaster) · Serengeti · Montu · African safari</div>
+        </div>
+        <span style="font-size:28px;">🦁</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        Busch Gardens Tampa is 90 minutes from Orlando and houses the most acclaimed roller coaster in North America (Iron Gwazi) on a 335-acre African-themed park with live animals, including a 65-acre free-roaming savanna.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    BG_AREAS.forEach(area => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+      let ridesHTML = area.rides ? area.rides.map(r=>`<div style="background:var(--bg,#f8f8f8);border-radius:8px;padding:8px;margin-bottom:4px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);">${r.name}</div>
+          <div style="font-size:10px;font-weight:700;color:${area.color};">${r.height}</div>
+        </div>
+        <div style="font-size:10px;color:var(--text-secondary,#666);margin-top:2px;">${r.note}</div>
+      </div>`).join('') : '';
+      let animalsHTML = area.animals ? `<div style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:7px;">${area.animals.map(a=>`<span style="font-size:10px;padding:2px 7px;background:${area.color}18;color:${area.color};border-radius:20px;">${a}</span>`).join('')}</div>` : '';
+      let accessHTML = area.access ? `<div style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:7px;">${area.access.map(a=>`<span style="font-size:10px;padding:2px 7px;background:${area.color}12;color:var(--text-secondary,#666);border-radius:20px;">${a}</span>`).join('')}</div>` : '';
+      card.innerHTML = `
+        <div style="padding:9px 14px;background:${area.color}18;border-left:4px solid ${area.color};">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:20px;">${area.emoji}</span>
+            <div>
+              <div style="font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${area.name}</div>
+              <div style="font-size:11px;color:var(--text-secondary,#555);">${area.desc}</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:8px 14px;">
+          ${animalsHTML}${accessHTML}${ridesHTML}
+          <div style="display:flex;gap:5px;background:${area.color}0d;border-radius:8px;padding:6px;margin-top:5px;">
+            <span style="font-size:11px;flex-shrink:0;">💡</span>
+            <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${area.tip}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const animalCard = document.createElement('div');
+    animalCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:12px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+    animalCard.innerHTML = `<div style="padding:9px 14px;background:linear-gradient(135deg,#8B4513,#2E7D32);color:#fff;">
+      <div style="font-size:13px;font-weight:700;">🦒 Premium Animal Encounters</div>
+    </div>
+    <div style="padding:8px 14px;">
+      ${BG_ANIMAL_EXTRAS.map(a=>`<div style="display:flex;justify-content:space-between;margin-bottom:7px;padding-bottom:7px;border-bottom:1px solid var(--border,#f0f0f0);align-items:flex-start;">
+        <div style="flex:1;margin-right:8px;">
+          <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);">${a.name}</div>
+          <div style="font-size:10px;color:var(--text-secondary,#666);">${a.note}</div>
+        </div>
+        <div style="font-size:11px;font-weight:700;color:#8B4513;flex-shrink:0;">${a.price}</div>
+      </div>`).join('')}
+    </div>`;
+    body.appendChild(animalCard);
+
+    const logisticsCard = document.createElement('div');
+    logisticsCard.style.cssText = 'background:linear-gradient(135deg,#8B4513,#C62828);border-radius:12px;margin-bottom:20px;padding:14px;color:#fff;';
+    logisticsCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;margin-bottom:8px;">🗺️ Day Trip from Orlando</div>
+    ${[
+      {icon:'🚗', tip:'1 hour 20 minutes from I-Drive / Universal area. Take I-4 West to I-75 South. Direct route with no toll roads.'},
+      {icon:'🎟️', tip:'Combined SeaWorld + Busch Gardens tickets available. Both parks on the same visit or adjacent days for maximum Florida thrill park coverage.'},
+      {icon:'⏰', tip:'Open 10 AM most days. Arrive at 9:30 AM to be first through the gates for Iron Gwazi. The coaster line builds to 60+ minutes by noon.'},
+      {icon:'💰', tip:'Busch Gardens price is typically $100–130 for a single day. AAA and online advance purchase discounts available. SeaWorld Annual Pass often includes Busch Gardens.'},
+    ].map(t=>`<div style="display:flex;gap:10px;margin-bottom:7px;align-items:flex-start;">
+      <span style="font-size:18px;flex-shrink:0;">${t.icon}</span>
+      <div style="font-size:11px;opacity:.9;line-height:1.5;">${t.tip}</div>
+    </div>`).join('')}`;
+    body.appendChild(logisticsCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-busch-gardens')) buildScreen();
+
+  const _prevSS_iiiiiii = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_iiiiiii) _prevSS_iiiiiii(name, el);
+    if (name === 'busch-gardens') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-busch-gardens');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectBGCard() {
+    if (document.getElementById('busch-gardens-home-card')) return true;
+    const ref = document.getElementById('vip-luxury-home-card') || document.getElementById('toddlers-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'busch-gardens-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#8B4513,#C62828,#2E7D32 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('busch-gardens');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🦁</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Busch Gardens Tampa — Deep Dive</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Iron Gwazi (#1 coaster) · Serengeti · Montu · SheiKra</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _bgCard = false;
+  setInterval(() => { if (!_bgCard) _bgCard = injectBGCard(); }, 95000);
+  setTimeout(() => { _bgCard = injectBGCard(); }, 91500);
+  const _prevRH_iiiiiii = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_iiiiiii) _prevRH_iiiiiii.apply(this, arguments);
+    setTimeout(() => { _bgCard = false; _bgCard = injectBGCard(); }, 33000);
+  };
+})();
+</script>
