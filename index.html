@@ -43596,3 +43596,667 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK XXX3: Universal Resorts Deep Dive ===== */
+(function initUniversalResorts() {
+
+  const RESORTS = [
+    {
+      id:'portofino', name:'Loews Portofino Bay Hotel', tier:'Premier', stars:5,
+      emoji:'⛵', color:'#1565C0', priceRange:'$350–$650/night',
+      theme:'Italian coastal village — Portofino, Italy',
+      perks:['Early Park Admission (1 hr)','Unlimited Express Pass','Water taxi to parks','Lagoon-front dining'],
+      pools:['3 pools including lagoon pool','Bocce ball courts','Villa pool (quiet)','Beach pool with slides'],
+      dining:['Mama Della\'s Ristorante (fine Italian)','The Thirsty Fish (lagoon bar)','Bar American','Trattoria del Porto (breakfast)'],
+      highlights:['Gondola rides on the lagoon','Nightly bocce tournaments','Cobblestone piazza atmosphere','Best hotel at Universal by most metrics'],
+      note:'The gold standard Universal hotel. Express Pass alone is worth the premium if you\'re doing both parks.',
+    },
+    {
+      id:'hardrock', name:'Hard Rock Hotel Orlando', tier:'Premier', stars:5,
+      emoji:'🎸', color:'#37474F', priceRange:'$300–$580/night',
+      theme:'Rock \'n\' roll music — Sunset Strip energy',
+      perks:['Early Park Admission (1 hr)','Unlimited Express Pass','Pool access to music','Guitar-shaped pool'],
+      pools:['Guitar-shaped pool with sand beach','Underwater sound system','Poolside service all day'],
+      dining:['The Kitchen (24-hour diner vibes)','The Palm (steakhouse)','Velvet Bar (live music)','Emack & Bolio\'s ice cream'],
+      highlights:['Authentic rock memorabilia throughout','Closest hotel to park entrance (5-min walk)','Sound system in every shower','Music plays at the pool underwater'],
+      note:'Best for music fans and families who want walkability. The 5-min walk to CityWalk is unbeatable.',
+    },
+    {
+      id:'royalpacific', name:'Loews Royal Pacific Resort', tier:'Premier', stars:5,
+      emoji:'🌴', color:'#2E7D32', priceRange:'$280–$520/night',
+      theme:'1930s South Seas / Pacific Rim luxury',
+      perks:['Early Park Admission (1 hr)','Unlimited Express Pass','Water taxi','Luau entertainment'],
+      pools:['Lagoon pool with zero entry','Water slide','Pool bar (Orchid Court)'],
+      dining:['Islands Dining Room (tropical buffet)','Jake\'s American Bar','Bula Bar & Grille (pool)','Wantilan Luau (Saturdays)'],
+      highlights:['Most affordable Premier hotel','Wantilan Luau is a must-do Saturday experience','Bamboo & teak architecture throughout','Hammocks by the lagoon'],
+      note:'Best value of the three Premier hotels. Same Express Pass benefit at a lower price point.',
+    },
+    {
+      id:'sapphire', name:'Loews Sapphire Falls Resort', tier:'Preferred', stars:4,
+      emoji:'💎', color:'#0277BD', priceRange:'$180–$380/night',
+      theme:'Caribbean island resort',
+      perks:['Early Park Admission (1 hr)','Water taxi to parks','No Express Pass included'],
+      pools:['Zero-entry lagoon pool','200-ft water slide','Poolside bar'],
+      dining:['Amatista Cookhouse (Caribbean)','Strong Water Tavern (rum bar — 100+ rums)','Drhum Club Kantine (pool bar)'],
+      highlights:['Strong Water Tavern is one of the best bars in all of Orlando','Caribbean village architecture','Fire pit evenings by the water','Best mid-tier hotel at Universal'],
+      note:'No Express Pass but significantly cheaper than Premier. Strong Water Tavern alone makes this worth a visit.',
+    },
+    {
+      id:'cabanabay', name:'Universal\'s Cabana Bay Beach Resort', tier:'Value Plus', stars:3,
+      emoji:'🏊', color:'#E65100', priceRange:'$120–$250/night',
+      theme:'Retro 1950s–60s Florida beach resort',
+      perks:['Early Park Admission (1 hr)','No Express Pass','Lazy river access','Free parking for guests'],
+      pools:['2 pools with retro theme','Lazy river (only Universal hotel with one)','Atomic Tonic pool bar'],
+      dining:['Bayliner Diner (food court, open 24 hrs)','Galaxy Bowl (bowling + food)','Swizzle Lounge'],
+      highlights:['The only Universal hotel with a lazy river','Bowling alley on-site','Largest hotel at Universal (2,200 rooms)','Fantastic family value'],
+      note:'Best budget pick with the biggest pool complex. Families with kids under 12 often prefer this over Premier hotels.',
+    },
+    {
+      id:'aventura', name:'Universal\'s Aventura Hotel', tier:'Value Plus', stars:3,
+      emoji:'🏙️', color:'#4A148C', priceRange:'$110–$230/night',
+      theme:'Modern urban tower — sleek minimalist design',
+      perks:['Early Park Admission (1 hr)','No Express Pass','Rooftop bar + restaurant','Best views of any Universal hotel'],
+      pools:['Rooftop pool on 16th floor','Stunning views of both parks'],
+      dining:['Bar 17 Bistro (rooftop — best views)','Urban Pantry (food hall concept)','Starbucks on-site'],
+      highlights:['Bar 17 Bistro has the best vantage point in all of Universal property','Rooms are compact but modern','Teens love the aesthetic','Adjacent to Endless Summer — can share amenities'],
+      note:'The "Instagram hotel" of Universal. The rooftop bar at sunset is spectacular even if you\'re not staying here.',
+    },
+    {
+      id:'endless', name:'Universal\'s Endless Summer Resort', tier:'Value', stars:2,
+      emoji:'🌊', color:'#00838F', priceRange:'$75–$160/night',
+      theme:'Florida beach surf culture',
+      perks:['Early Park Admission (1 hr)','No Express Pass','Largest rooms of any value hotel','Shuttle to parks'],
+      pools:['Surfboard-themed pool','Zero-entry pool area'],
+      dining:['Pier 8 Market (food hall)','Driftwood Bar & Grill'],
+      highlights:['Most affordable on-site hotel','Rooms sleep up to 6 (great for groups)','Surfboard wall art and beach murals','15 min shuttle to parks (longer than other hotels)'],
+      note:'Best for budget-conscious families. The shuttle adds time but Early Park Admission still makes it worth on-site status.',
+    },
+  ];
+
+  const TIER_ORDER = ['Premier','Preferred','Value Plus','Value'];
+  const TIER_COLORS = { Premier:'#C9A96E', Preferred:'#1565C0', 'Value Plus':'#2E7D32', Value:'#00838F' };
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-universal-resorts';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const header = document.createElement('div');
+    header.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);padding:16px 14px 14px;';
+    header.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:#fff;">Universal Resorts Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.7);">7 on-site hotels · Express Pass · Early Entry</div>
+        </div>
+      </div>
+      <div style="background:rgba(255,255,255,.1);border-radius:10px;padding:10px 12px;">
+        <div style="font-size:11px;font-weight:700;color:#C9A96E;margin-bottom:4px;">⚡ THE KEY BENEFIT</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.85);line-height:1.5;">Premier hotels (Portofino, Hard Rock, Royal Pacific) include <strong style="color:#C9A96E;">unlimited Express Pass</strong> — worth $100+/person/day. At busy times, this benefit pays for the hotel upgrade.</div>
+      </div>`;
+
+    const content = document.createElement('div');
+    content.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    // Express Pass comparison banner
+    const epBanner = document.createElement('div');
+    epBanner.style.cssText = 'background:linear-gradient(135deg,#1565C0,#0d47a1);border-radius:14px;padding:14px;margin-bottom:14px;color:#fff;';
+    epBanner.innerHTML = `
+      <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">🎢 Express Pass — Is It Worth It?</div>
+      ${[
+        { crowd:'Slow Season (Sep–Nov)', rec:'Skip — 15–30 min waits. Save money with Value hotels.', color:'#4CAF50' },
+        { crowd:'Average (Jan–Feb, May)', rec:'Consider — adds 4–6 extra rides per day. Borderline value.', color:'#FF9800' },
+        { crowd:'Busy (Mar–Apr, Dec)', rec:'Essential — saves 2–4 hours of waiting per day. Book Premier.', color:'#F44336' },
+        { crowd:'Peak (Summer, Holidays)', rec:'Non-negotiable. Without it, you\'ll wait 120+ min for flagship rides.', color:'#c62828' },
+      ].map(r=>`<div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
+        <div style="width:8px;height:8px;border-radius:50%;background:${r.color};flex-shrink:0;margin-top:5px;"></div>
+        <div>
+          <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.7);">${r.crowd}</div>
+          <div style="font-size:12px;color:#fff;">${r.rec}</div>
+        </div>
+      </div>`).join('')}`;
+    content.appendChild(epBanner);
+
+    // Resorts by tier
+    TIER_ORDER.forEach(tier => {
+      const tierResorts = RESORTS.filter(r => r.tier === tier);
+      if (!tierResorts.length) return;
+
+      const tierHeader = document.createElement('div');
+      tierHeader.style.cssText = `display:flex;align-items:center;gap:8px;margin:14px 0 8px;`;
+      tierHeader.innerHTML = `
+        <div style="width:4px;height:20px;background:${TIER_COLORS[tier]};border-radius:2px;"></div>
+        <div style="font-size:13px;font-weight:800;color:${TIER_COLORS[tier]};">${tier.toUpperCase()} TIER</div>
+        ${tier==='Premier'?'<span style="background:#C9A96E22;border-radius:20px;padding:2px 8px;font-size:9px;font-weight:800;color:#C9A96E;">INCLUDES EXPRESS PASS</span>':''}`;
+      content.appendChild(tierHeader);
+
+      tierResorts.forEach(resort => {
+        const card = document.createElement('div');
+        card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:10px;overflow:hidden;border:1px solid var(--border,#eee);';
+
+        card.innerHTML = `
+          <div style="height:60px;background:linear-gradient(135deg,${resort.color},${resort.color}99);
+            display:flex;align-items:center;padding:0 14px;gap:10px;">
+            <span style="font-size:28px;">${resort.emoji}</span>
+            <div style="flex:1;">
+              <div style="font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:#fff;">${resort.name}</div>
+              <div style="font-size:10px;color:rgba(255,255,255,.8);">${resort.theme}</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:12px;font-weight:800;color:#C9A96E;">${resort.priceRange}</div>
+            </div>
+          </div>
+          <div style="padding:12px 14px;">
+            <div style="font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:5px;">KEY PERKS</div>
+            <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;">
+              ${resort.perks.map(p=>`<span style="padding:3px 8px;border-radius:20px;font-size:10px;font-weight:700;
+                background:${resort.color}15;color:${resort.color};">${p}</span>`).join('')}
+            </div>
+            <div style="font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:5px;">DINING HIGHLIGHTS</div>
+            <div style="margin-bottom:10px;">
+              ${resort.dining.slice(0,2).map(d=>`<div style="font-size:11px;color:var(--text-primary,#333);padding:2px 0;">🍽️ ${d}</div>`).join('')}
+            </div>
+            <div style="background:rgba(201,169,110,.08);border-radius:8px;padding:8px 10px;border-left:3px solid #C9A96E;">
+              <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">💡 ${resort.note}</div>
+            </div>
+          </div>`;
+        content.appendChild(card);
+      });
+    });
+
+    // Comparison table
+    const compareCard = document.createElement('div');
+    compareCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:20px;border:1px solid var(--border,#eee);';
+    compareCard.innerHTML = `
+      <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:10px;">🏆 Quick Comparison</div>
+      ${[
+        { label:'Best Luxury', val:'Portofino Bay', icon:'⛵' },
+        { label:'Best Value (Express Pass)', val:'Royal Pacific', icon:'🌴' },
+        { label:'Best Families (No EP)', val:'Cabana Bay', icon:'🏊' },
+        { label:'Best Views', val:'Aventura (rooftop)', icon:'🏙️' },
+        { label:'Best Bar', val:'Strong Water (Sapphire Falls)', icon:'💎' },
+        { label:'Best Walkability', val:'Hard Rock Hotel', icon:'🎸' },
+        { label:'Most Affordable', val:'Endless Summer', icon:'🌊' },
+      ].map(r=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border,#f0f0f0);">
+        <div style="font-size:11px;color:var(--text-secondary,#888);">${r.label}</div>
+        <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);">${r.icon} ${r.val}</div>
+      </div>`).join('')}`;
+    content.appendChild(compareCard);
+
+    s.appendChild(header);
+    s.appendChild(content);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-universal-resorts')) buildScreen();
+
+  const _prevSS_xxx3 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_xxx3) _prevSS_xxx3(name, el);
+    if (name === 'universal-resorts') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-universal-resorts');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectURCard() {
+    if (document.getElementById('ur-home-card')) return true;
+    const ref = document.getElementById('www3-home-card') || document.getElementById('vvv2-home-card') || document.getElementById('eu-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'ur-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('universal-resorts');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:3px;">🏨 Universal Resorts Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);margin-bottom:6px;">7 hotels · Express Pass · Early Entry</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <span style="background:rgba(201,169,110,.25);border-radius:20px;padding:2px 8px;font-size:9px;font-weight:700;color:#C9A96E;">⚡ EXPRESS PASS</span>
+            <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:2px 8px;font-size:9px;font-weight:700;color:#fff;">7 HOTELS</span>
+          </div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.5);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _urCard = false;
+  setInterval(() => { if (!_urCard) _urCard = injectURCard(); }, 23000);
+  setTimeout(() => { _urCard = injectURCard(); }, 19500);
+
+  const _prevRH_xxx3 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_xxx3) _prevRH_xxx3.apply(this, arguments);
+    setTimeout(() => { _urCard = false; _urCard = injectURCard(); }, 4100);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK YYY3: Galaxy's Edge & Star Wars Complete Guide ===== */
+(function initGalaxysEdge() {
+
+  const ATTRACTIONS = [
+    { name:"Millennium Falcon: Smugglers Run", type:'Interactive Ride', thrill:'Moderate', height:'38"',
+      roles:['Pilot (best)','Gunner','Engineer'], fastpass:true,
+      tips:['Request pilot role at boarding — most agency','Front of queue = pilot seats','Get Lightning Lane — waits hit 90+ min on busy days','Single rider line moves fastest'] },
+    { name:"Star Wars: Rise of the Resistance", type:'Mega Dark Ride', thrill:'Moderate', height:'40"',
+      roles:[], fastpass:true,
+      tips:['The best attraction Disney has ever built','Get Lightning Lane the moment the park opens','Arrive 60 min before park open on busy days — Virtual Queue sometimes used','If down at open, check back — it often reopens'] },
+    { name:'Star Wars: Hyperspace Mountain', type:'Classic Coaster + Star Wars overlay', thrill:'High', height:'44"',
+      roles:[], fastpass:true,
+      tips:['Original Space Mountain with Star Wars elements','Less theming than the dedicated GE rides','Great for coaster fans who want to fit it in'] },
+  ];
+
+  const DINING = [
+    { name:"Oga's Cantina", icon:'🍸', type:'Bar / Drinks',
+      desc:"The bar from the movies. Droid DJ, exotic cocktails, alien-themed drinks. Limited snack food.",
+      tips:['Reservations essential — books 60 days out','Walk-up list opens at 7am in the app','Limit 2 drinks per person, 45 min max stay','Batuu Brew and Fuzzy Tauntaun are fan favorites'] },
+    { name:"Docking Bay 7 Food & Cargo", icon:'🍖', type:'Counter Service',
+      desc:"The main food hall in GE. Theming is excellent. Menu changes occasionally.",
+      tips:['Ronto Wrap is the signature item — don\'t miss it','Outdoor seating has great atmosphere','Gets crowded at peak meal times — eat at 11am or 3pm'] },
+    { name:"Milk Stand", icon:'🥛', type:'Snack Stand',
+      desc:"Blue and Green milk from the films. Creamy frozen drinks — not actual milk.",
+      tips:['Blue Milk is sweeter, Green Milk more citrusy','Worth trying at least once','Usually a short queue'] },
+    { name:"Ronto Roasters", icon:'🌯', type:'Snack Counter',
+      desc:"Ronto Wrap — a spit-roasted meat wrap. One of the best quick bites at any Disney park.",
+      tips:['Often overlooked but the best food item in GE','Order online via the app to skip the line'] },
+  ];
+
+  const MERCH = [
+    { name:'Build Your Own Lightsaber', loc:"Savi's Workshop", price:'$249.99',
+      desc:"45-minute guided experience building a custom lightsaber with four style choices.",
+      tips:['Reservations required — books out weeks in advance','4 themes: Peace & Justice, Power & Control, Elemental Nature, Protection & Defense','Gets emotional — definitely worth it for fans','The kyber crystal changes color and can be bought separately'] },
+    { name:'Build Your Own Droid', loc:"Droid Depot", price:'$119.99+',
+      desc:"Assemble your own BB or R-series droid that interacts with elements in Galaxy\'s Edge.",
+      tips:['No reservation needed (walk-up)','Takes about 20 minutes','The droid responds to hidden sensors throughout the land','Great for kids and adults — surprisingly fun'] },
+    { name:'Batuu Black Market', loc:'Black Spire Outpost shops', price:'Varies',
+      desc:"Resistance and First Order gear, props, clothing, exclusive GE merchandise.",
+      tips:['First Order and Resistance gear throughout shops','Holocron + kyber crystal combo creates special effects','Limited-run items sell out — shop early in your visit'] },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-galaxys-edge';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:#0d0d1a;flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;color:#fff;';
+
+    const header = document.createElement('div');
+    header.style.cssText = 'flex-shrink:0;background:linear-gradient(160deg,#0d0d1a,#1a1a2e,#2d1b5e);padding:16px 14px;border-bottom:1px solid rgba(255,200,50,.2);';
+    header.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.1);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:#C8A84B;">Star Wars: Galaxy's Edge</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.6);">Hollywood Studios · Black Spire Outpost · Planet Batuu</div>
+        </div>
+        <span style="font-size:24px;">⭐</span>
+      </div>
+      <div style="background:rgba(200,168,75,.1);border:1px solid rgba(200,168,75,.3);border-radius:10px;padding:8px 12px;font-size:12px;color:rgba(255,255,255,.85);line-height:1.5;">
+        The most immersive theme park land ever built. You are not watching Star Wars — you are <em>in</em> it. Speak to citizens, resist Stormtroopers, fly the Millennium Falcon.
+      </div>`;
+
+    const content = document.createElement('div');
+    content.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    // Survival guide
+    const survivalCard = document.createElement('div');
+    survivalCard.style.cssText = 'background:rgba(255,255,255,.05);border-radius:14px;padding:14px;margin-bottom:14px;border:1px solid rgba(200,168,75,.3);';
+    survivalCard.innerHTML = `
+      <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#C8A84B;margin-bottom:10px;">⭐ First-Timer Survival Guide</div>
+      ${[
+        { icon:'⏰', tip:'Rise of the Resistance LL is the #1 priority. Get it the moment the app allows (usually 7am on park day).' },
+        { icon:'🌅', tip:'Arrive 45 min before park open. GE gets crowded fast. Morning is when the land feels most magical.' },
+        { icon:'📱', tip:'Download the Play Disney Parks app. It adds GE interactions — scan droids, intercept transmissions, hack terminals.' },
+        { icon:'🎭', tip:'Engage with Cast Members in character — they are "citizens of Batuu." Ask for the Resistance, get directed to Smugglers Run. Ask about the First Order — risk getting approached by Stormtroopers.' },
+        { icon:'🍸', tip:"Book Oga's Cantina 60 days out at 6am. If you miss it, check the walk-up list in the app at 7am on your park day." },
+        { icon:'🌙', tip:"Visit after 8pm. The land transforms at night — blue lighting, glowing Millennium Falcon engines, ambient sounds." },
+      ].map(t=>`<div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
+        <span style="font-size:16px;flex-shrink:0;">${t.icon}</span>
+        <div style="font-size:12px;color:rgba(255,255,255,.85);line-height:1.5;">${t.tip}</div>
+      </div>`).join('')}`;
+    content.appendChild(survivalCard);
+
+    // Attractions
+    const attrHeader = document.createElement('div');
+    attrHeader.style.cssText = 'font-size:13px;font-weight:800;color:#C8A84B;margin:14px 0 8px;letter-spacing:.05em;';
+    attrHeader.textContent = 'ATTRACTIONS';
+    content.appendChild(attrHeader);
+
+    ATTRACTIONS.forEach(attr => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:rgba(255,255,255,.05);border-radius:12px;margin-bottom:10px;padding:12px 14px;border:1px solid rgba(255,255,255,.1);';
+      card.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+          <div style="font-size:14px;font-weight:700;color:#fff;flex:1;line-height:1.3;">${attr.name}</div>
+          <span style="background:rgba(200,168,75,.2);border-radius:20px;padding:2px 8px;font-size:9px;font-weight:800;color:#C8A84B;flex-shrink:0;margin-left:8px;">${attr.thrill}</span>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:8px;">
+          <span style="font-size:10px;color:rgba(255,255,255,.5);">${attr.type}</span>
+          <span style="font-size:10px;color:rgba(255,255,255,.4);">·</span>
+          <span style="font-size:10px;color:rgba(255,255,255,.5);">Min Height: ${attr.height}</span>
+        </div>
+        ${attr.roles.length ? `<div style="display:flex;gap:5px;margin-bottom:8px;">${attr.roles.map(r=>`<span style="padding:2px 7px;border-radius:20px;font-size:10px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.7);">${r}</span>`).join('')}</div>` : ''}
+        <div style="border-top:1px solid rgba(255,255,255,.08);padding-top:8px;">
+          ${attr.tips.map(t=>`<div style="font-size:11px;color:rgba(255,255,255,.7);padding:2px 0;line-height:1.4;">• ${t}</div>`).join('')}
+        </div>`;
+      content.appendChild(card);
+    });
+
+    // Dining
+    const diningHeader = document.createElement('div');
+    diningHeader.style.cssText = 'font-size:13px;font-weight:800;color:#C8A84B;margin:14px 0 8px;letter-spacing:.05em;';
+    diningHeader.textContent = 'DINING & DRINKS';
+    content.appendChild(diningHeader);
+
+    DINING.forEach(d => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:rgba(255,255,255,.05);border-radius:12px;margin-bottom:10px;padding:12px 14px;border:1px solid rgba(255,255,255,.1);';
+      card.innerHTML = `
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+          <span style="font-size:20px;">${d.icon}</span>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:#fff;">${d.name}</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.5);">${d.type}</div>
+          </div>
+        </div>
+        <div style="font-size:12px;color:rgba(255,255,255,.7);margin-bottom:8px;line-height:1.5;">${d.desc}</div>
+        ${d.tips.map(t=>`<div style="font-size:11px;color:rgba(200,168,75,.9);padding:1px 0;">→ ${t}</div>`).join('')}`;
+      content.appendChild(card);
+    });
+
+    // Experiences
+    const expHeader = document.createElement('div');
+    expHeader.style.cssText = 'font-size:13px;font-weight:800;color:#C8A84B;margin:14px 0 8px;letter-spacing:.05em;';
+    expHeader.textContent = 'SIGNATURE EXPERIENCES';
+    content.appendChild(expHeader);
+
+    MERCH.forEach(m => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:linear-gradient(135deg,rgba(200,168,75,.08),rgba(255,255,255,.03));border-radius:12px;margin-bottom:10px;padding:12px 14px;border:1px solid rgba(200,168,75,.25);';
+      card.innerHTML = `
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+          <div style="font-size:13px;font-weight:700;color:#C8A84B;">${m.name}</div>
+          <div style="font-size:13px;font-weight:800;color:#fff;">${m.price}</div>
+        </div>
+        <div style="font-size:10px;color:rgba(255,255,255,.5);margin-bottom:6px;">${m.loc}</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.75);margin-bottom:8px;line-height:1.5;">${m.desc}</div>
+        ${m.tips.map(t=>`<div style="font-size:11px;color:rgba(255,255,255,.6);padding:1px 0;">• ${t}</div>`).join('')}`;
+      content.appendChild(card);
+    });
+
+    // The Force is strong note
+    const note = document.createElement('div');
+    note.style.cssText = 'background:rgba(200,168,75,.1);border-radius:12px;padding:14px;margin-bottom:20px;text-align:center;border:1px solid rgba(200,168,75,.3);';
+    note.innerHTML = `
+      <div style="font-size:28px;margin-bottom:8px;">⭐</div>
+      <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:#C8A84B;margin-bottom:6px;">A Note on Immersion</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.7);line-height:1.6;">
+        GE works best when you commit to the fiction. Greet Cast Members as "citizens of Batuu" — say "Bright suns" (morning) or "Rising moons" (evening). The more you play along, the more magical it becomes.
+      </div>`;
+    content.appendChild(note);
+
+    s.appendChild(header);
+    s.appendChild(content);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-galaxys-edge')) buildScreen();
+
+  const _prevSS_yyy3 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_yyy3) _prevSS_yyy3(name, el);
+    if (name === 'galaxys-edge') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-galaxys-edge');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectGECard() {
+    if (document.getElementById('ge-home-card')) return true;
+    const ref = document.getElementById('ur-home-card') || document.getElementById('www3-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'ge-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(160deg,#0d0d1a,#1a1a2e,#2d1b5e);border-radius:16px;padding:14px;cursor:pointer;border:1px solid rgba(200,168,75,.3);';
+    card.onclick = () => window.showScreen('galaxys-edge');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#C8A84B;margin-bottom:3px;">⭐ Star Wars: Galaxy's Edge</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.75);">Complete guide · Lightsabers · Oga's Cantina</div>
+        </div>
+        <span style="font-size:22px;color:rgba(200,168,75,.5);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _geCard = false;
+  setInterval(() => { if (!_geCard) _geCard = injectGECard(); }, 23500);
+  setTimeout(() => { _geCard = injectGECard(); }, 20000);
+
+  const _prevRH_yyy3 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_yyy3) _prevRH_yyy3.apply(this, arguments);
+    setTimeout(() => { _geCard = false; _geCard = injectGECard(); }, 4300);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK ZZZ3: Port Canaveral & Cruise Guide ===== */
+(function initCruiseGuide() {
+
+  const CRUISE_LINES = [
+    {
+      name:'Disney Cruise Line', emoji:'🏰', color:'#003087',
+      ships:['Disney Wish (newest — 2022)','Disney Fantasy','Disney Dream','Disney Magic'],
+      signature:['Rotational dining (different restaurant each night)','Adult-only Palo & Remy restaurants','Disney characters on board','Castaway Cay private island (Bahamas)'],
+      itineraries:['3-night Bahamas from Port Canaveral','4-night Bahamas + Nassau','7-night Eastern/Western Caribbean'],
+      priceRange:'$$$$ (Most expensive cruise line)',
+      tips:['Book 12+ months out for peak season','Disney Rewards Visa gives early booking access','Palo brunch is a must-book add-on (~$40/person)','Castaway Cay is the best private island in cruise industry'],
+    },
+    {
+      name:'Royal Caribbean', emoji:'🌊', color:'#005B9A',
+      ships:['Wonder of the Seas (world\'s largest, sometimes here)','Mariner of the Seas','Independence of the Seas'],
+      signature:['FlowRider surf simulator','Rock climbing wall','Broadway shows','Largest ships in the world'],
+      itineraries:['3-4 night Bahamas & CocoCay','7-night Caribbean','Cozumel, Nassau, Perfect Day at CocoCay'],
+      priceRange:'$$–$$$ (Great value for amenities)',
+      tips:['CocoCay private island has incredible amenities — water park, balloon ride','Book dining and shows 60+ days out','Refreshment Package is worth it on warm-weather cruises','Crown & Anchor loyalty program adds up fast'],
+    },
+    {
+      name:'Norwegian Cruise Line (NCL)', emoji:'🎭', color:'#EF3E23',
+      ships:['Norwegian Breakaway','Norwegian Bliss','Norwegian Encore'],
+      signature:['Free at Sea promotions (free drinks, dining, wifi)','Freestyle dining — no set times','The Haven luxury ship-within-a-ship','Broadway shows (Jersey Boys, Kinky Boots)'],
+      itineraries:['7-night Caribbean from Port Canaveral','Bermuda routes','Bahamas short cruises'],
+      priceRange:'$$–$$$ (Free at Sea promos can make it excellent value)',
+      tips:['Free at Sea promotion can save $500+/cabin','The Haven is the best value luxury cruise experience','Freestyle dining means no fixed dinner time — huge perk','Splash Academy kids club is highly rated'],
+    },
+    {
+      name:'Carnival Cruise Line', emoji:'🎉', color:'#E41E2A',
+      ships:['Carnival Magic','Carnival Sunshine','Carnival Elation'],
+      signature:['Guy\'s Burger Joint (free)','BlueIguana Cantina','Serenity adults-only area','IMAX theater on some ships'],
+      itineraries:['3-4 night Bahamas','5-night Bahamas + Grand Turk','7-night Caribbean'],
+      priceRange:'$ – $$ (Most affordable mainstream cruise)',
+      tips:['Best budget option — strong value','CHEERS! drink package is fairly priced','Camp Ocean kids club is great','Grand Turk is a stunning port — do the Margaritaville pool day'],
+    },
+  ];
+
+  const PORT_TIPS = [
+    { icon:'🚗', tip:'Port Canaveral is 45–50 min from Orlando (I-4 East then SR-528). Allow 75 min with traffic. Rideshares: $60–90 one-way.' },
+    { icon:'🚌', tip:'Cocoa Beach shuttles run from I-Drive hotels: $25–35/person. Book in advance for cruise days.' },
+    { icon:'🕐', tip:'Arrive 2 hours before departure minimum. 3 hours is safer. Ships leave without you — no exceptions.' },
+    { icon:'🧳', tip:'Tag your luggage with cruise line tags BEFORE leaving your car/hotel. Porters take checked bags at the terminal.' },
+    { icon:'🏖️', tip:'Arrive a day early? Stay in Cocoa Beach (10 min from port). Ron Jon Surf Shop + Cocoa Beach Pier are must-visits.' },
+    { icon:'📋', tip:'Register kids at youth clubs on embarkation day (they fill up). Book specialty dining and excursions at noon on boarding day.' },
+    { icon:'💳', tip:'Set a credit card on your cruise account during check-in. Easier than managing cash on board.' },
+    { icon:'🍺', tip:'Bring a 12-pack of water and 1 bottle of wine per person on most cruise lines — saves $50+ in drink costs.' },
+  ];
+
+  const COMBO_IDEAS = [
+    { name:'3-Night Bahamas + 4 Days Disney', days:7, desc:'Perfect family combo. Cruise Sat–Tue, Disney Wed–Sat. Kids get both without exhaustion.', budget:'$$$$' },
+    { name:'7-Night Caribbean + 2 Days Universal', days:9, desc:'Adults or older kids. Cruise first, recover at home, then park days. Or reverse for less jet lag.', budget:'$$$' },
+    { name:'4-Night + 3 Days at Theme Parks', days:7, desc:'The most popular Orlando + cruise combo. Fly in Thursday, park Friday–Sat, cruise Sun–Wed, fly home Wed night.', budget:'$$$' },
+    { name:'Cruise Only Weekend', days:3, desc:'3-night Bahamas with a Thursday arrival. Perfect for a long-weekend trip without theme parks.', budget:'$$' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-cruise-guide';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const header = document.createElement('div');
+    header.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#003087,#0077b6,#48cae4);padding:16px 14px 14px;';
+    header.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:#fff;">Port Canaveral & Cruises</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.75);">45 min from Orlando · 4 major cruise lines</div>
+        </div>
+        <span style="font-size:24px;">⛴️</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:8px 12px;font-size:12px;color:rgba(255,255,255,.9);line-height:1.5;">
+        Port Canaveral is one of the busiest cruise ports in the world — and it's a short drive from Orlando. Many visitors combine theme parks with a Bahamas or Caribbean cruise.
+      </div>`;
+
+    const content = document.createElement('div');
+    content.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    // Port logistics
+    const portCard = document.createElement('div');
+    portCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:14px;border:1px solid var(--border,#eee);';
+    portCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:10px;">⚓ Port Logistics</div>`;
+    PORT_TIPS.forEach(t => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;';
+      row.innerHTML = `<span style="font-size:16px;flex-shrink:0;">${t.icon}</span><div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;">${t.tip}</div>`;
+      portCard.appendChild(row);
+    });
+    content.appendChild(portCard);
+
+    // Cruise lines
+    const clHeader = document.createElement('div');
+    clHeader.style.cssText = 'font-size:13px;font-weight:800;color:#003087;margin:0 0 10px;';
+    clHeader.textContent = 'CRUISE LINES FROM PORT CANAVERAL';
+    content.appendChild(clHeader);
+
+    CRUISE_LINES.forEach(line => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:10px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="background:${line.color};padding:10px 14px;display:flex;align-items:center;gap:8px;">
+          <span style="font-size:22px;">${line.emoji}</span>
+          <div style="flex:1;">
+            <div style="font-size:14px;font-weight:700;color:#fff;">${line.name}</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.8);">${line.priceRange}</div>
+          </div>
+        </div>
+        <div style="padding:12px 14px;">
+          <div style="font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:5px;">SIGNATURE FEATURES</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;">
+            ${line.signature.map(f=>`<span style="padding:2px 8px;border-radius:20px;font-size:10px;background:${line.color}12;color:${line.color};font-weight:600;">${f}</span>`).join('')}
+          </div>
+          <div style="font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:4px;">POPULAR ROUTES</div>
+          ${line.itineraries.map(i=>`<div style="font-size:11px;color:var(--text-secondary,#555);padding:2px 0;">🗺️ ${i}</div>`).join('')}
+          <div style="margin-top:8px;background:rgba(0,48,135,.06);border-radius:8px;padding:7px 10px;">
+            <div style="font-size:10px;font-weight:700;color:${line.color};margin-bottom:3px;">PRO TIPS</div>
+            ${line.tips.slice(0,2).map(t=>`<div style="font-size:11px;color:var(--text-secondary,#555);padding:1px 0;">• ${t}</div>`).join('')}
+          </div>
+        </div>`;
+      content.appendChild(card);
+    });
+
+    // Combo itineraries
+    const comboHeader = document.createElement('div');
+    comboHeader.style.cssText = 'font-size:13px;font-weight:800;color:#003087;margin:14px 0 8px;';
+    comboHeader.textContent = '✈️ ORLANDO + CRUISE COMBINATIONS';
+    content.appendChild(comboHeader);
+
+    COMBO_IDEAS.forEach(combo => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:linear-gradient(135deg,#003087,#0077b6);border-radius:12px;margin-bottom:8px;padding:12px 14px;color:#fff;';
+      card.innerHTML = `
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+          <div style="font-size:13px;font-weight:700;">${combo.name}</div>
+          <div style="display:flex;gap:6px;align-items:center;">
+            <span style="font-size:11px;color:rgba(255,255,255,.7);">${combo.days} days</span>
+            <span style="font-size:11px;font-weight:700;color:#48cae4;">${combo.budget}</span>
+          </div>
+        </div>
+        <div style="font-size:12px;color:rgba(255,255,255,.8);line-height:1.5;">${combo.desc}</div>`;
+      content.appendChild(card);
+    });
+
+    // Cocoa Beach tip
+    const beachNote = document.createElement('div');
+    beachNote.style.cssText = 'background:var(--card-bg,#fff);border-radius:12px;padding:14px;margin-bottom:20px;border:1px solid var(--border,#eee);';
+    beachNote.innerHTML = `
+      <div style="font-size:14px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:8px;">🏖️ Pre-Cruise Day: Cocoa Beach</div>
+      <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.6;margin-bottom:8px;">
+        Arriving a day early? Cocoa Beach is 10 minutes from the port and a great way to decompress before boarding.
+      </div>
+      ${[
+        'Ron Jon Surf Shop — iconic 24-hour shop, worth seeing',
+        'Cocoa Beach Pier — restaurants, bars, fishing, ocean views',
+        'Robert\'s Rocket Surf Lessons — early morning sessions',
+        'Atlantic Ocean Bar & Grill — beachfront lunch stop',
+        'Coconuts on the Beach — best live music by the water',
+      ].map(t=>`<div style="font-size:11px;color:var(--text-secondary,#555);padding:2px 0;">📍 ${t}</div>`).join('')}`;
+    content.appendChild(beachNote);
+
+    s.appendChild(header);
+    s.appendChild(content);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-cruise-guide')) buildScreen();
+
+  const _prevSS_zzz3 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_zzz3) _prevSS_zzz3(name, el);
+    if (name === 'cruise-guide') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-cruise-guide');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectCruiseCard() {
+    if (document.getElementById('cruise-home-card')) return true;
+    const ref = document.getElementById('ge-home-card') || document.getElementById('ur-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'cruise-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#003087,#0077b6,#48cae4);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('cruise-guide');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:3px;">⛴️ Port Canaveral & Cruises</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.85);">45 min from Orlando · Disney, Royal Caribbean & more</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.5);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _cruiseCard = false;
+  setInterval(() => { if (!_cruiseCard) _cruiseCard = injectCruiseCard(); }, 24000);
+  setTimeout(() => { _cruiseCard = injectCruiseCard(); }, 20500);
+
+  const _prevRH_zzz3 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_zzz3) _prevRH_zzz3.apply(this, arguments);
+    setTimeout(() => { _cruiseCard = false; _cruiseCard = injectCruiseCard(); }, 4500);
+  };
+})();
+</script>
