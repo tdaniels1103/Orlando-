@@ -55811,3 +55811,444 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK HHHHHH: Universal Annual & Seasonal Pass Guide ===== */
+(function initUniversalAnnualPass() {
+
+  const UPASS_TIERS = [
+    {
+      name:'Power Pass', emoji:'⚡', color:'#1565C0',
+      price:'$329/year',
+      access:'Both Universal parks + Volcano Bay, significant blockout dates (peak periods)',
+      perks:['10% dining discount', '10% merchandise discount', 'Free self-parking (standard)'],
+      bestFor:'Florida residents who can visit off-peak weekdays',
+      blockouts:'Major holidays, spring break weeks, summer weekends',
+      tip:'The most restrictive tier. Blockout dates cover exactly when Florida residents want to visit — school breaks and holidays. Only viable for truly flexible schedules.',
+    },
+    {
+      name:'Seasonal Pass', emoji:'🍂', color:'#2E7D32',
+      price:'$419/year',
+      access:'Both parks + Volcano Bay with fewer blockout dates (primarily peak holiday periods)',
+      perks:['10% dining discount', '10% merchandise discount', 'Free self-parking', 'One free Universal Express use per visit (new perk)'],
+      bestFor:'Orlando area residents who visit 4+ times a year',
+      blockouts:'Christmas week, Thanksgiving, July 4th weekend',
+      tip:'A significant improvement over Power Pass. The blockout calendar is manageable — mostly the core holiday weeks. A strong choice for locals who\'ve planned ahead.',
+    },
+    {
+      name:'Annual Pass', emoji:'🎡', color:'#7B1FA2',
+      price:'$549/year',
+      access:'Both parks + Volcano Bay, very limited blockouts (essentially just Christmas week)',
+      perks:['15% dining discount', '15% merchandise discount', 'Free preferred parking', 'Early Park Admission on select days', 'Discounted Halloween Horror Nights tickets'],
+      bestFor:'Residents and tourists who visit 3+ times per year',
+      blockouts:'Only Christmas week (approximately Dec 18–31)',
+      tip:'The sweet spot tier. Nearly unrestricted access with meaningful dining and merchandise discounts. Preferred parking alone saves $30+/day. Halloween Horror Nights discount is significant if you attend.',
+    },
+    {
+      name:'Preferred Annual Pass', emoji:'👑', color:'#C9A96E',
+      price:'$749/year',
+      access:'Both parks + Volcano Bay, NO blockout dates (all 365 days)',
+      perks:['20% dining discount', '20% merchandise discount', 'Free preferred parking', 'Early Park Admission all days', 'Priority seating at select restaurants', 'Discounted HHN tickets (better rate than Annual Pass)'],
+      bestFor:'Power users, frequent visitors, those visiting during peak periods',
+      blockouts:'None',
+      tip:'No blockouts makes this the only tier valid Christmas week. The 20% dining discount is exceptional — a family of 4 can save $40–50 per day on food alone. Breaks even at approximately 3 visits versus individual day tickets.',
+    },
+  ];
+
+  const UEP_DETAILS = [
+    {
+      perk:'Early Park Admission (EPA)', color:'#1565C0',
+      detail:'Annual and Preferred Annual Pass holders can enter The Wizarding World of Harry Potter (both Hogsmeade and Diagon Alley) 60 minutes before general park opening. Available every day of operation.',
+      value:'Hagrid\'s Motorbike Adventure and Velocicoaster have 60–120 min waits by 10 AM. With EPA, you can ride both before the park opens to the general public. Priceless during peak season.',
+    },
+    {
+      perk:'Dining Discount (10–20%)', color:'#C62828',
+      detail:'Valid at most full-service and counter-service restaurants across both parks and City Walk. Applies to food and non-alcoholic beverages. Does NOT apply during special events or buffets.',
+      value:'A family of 4 spending $180/day on food saves $18–36/day — $90–180 over a 5-day trip. Preferred Pass discount pays for itself quickly for dining-focused visitors.',
+    },
+    {
+      perk:'Free Preferred Parking', color:'#2E7D32',
+      detail:'Annual and Preferred Pass holders receive free Preferred Garage parking (normally $35–45/day). This is the closer garage, not just the standard self-park lot.',
+      value:'A 5-day visit saves $175–225 in parking. That\'s 32% of the Annual Pass cost recovered in parking alone.',
+    },
+    {
+      perk:'Halloween Horror Nights Discount', color:'#7B1FA2',
+      detail:'Passholders receive $20–30 off individual HHN tickets per event night. No limit on number of discounted tickets purchased (within reason).',
+      value:'A couple attending 2 HHN nights saves $40–60. Preferred Pass holders get deeper discounts.',
+    },
+    {
+      perk:'Hotel Benefits (on-site hotels)', color:'#F57F17',
+      detail:'Guests staying at Universal\'s on-site hotels receive free Universal Express unlimited (normally $90–180/person/day). This benefit is separate from Annual Pass but stacks with it.',
+      value:'A family of 4 staying on-site for 4 days saves $1,440 vs. purchasing Express separately. This single benefit often justifies the hotel premium.',
+    },
+  ];
+
+  const UPGRADE_TIPS = [
+    { icon:'💳', tip:'You can upgrade a day ticket to an Annual Pass on the same day — and the day ticket price is credited toward the AP. Buy a day ticket at the gate, then visit the AP desk inside to upgrade. Your visit that day counts.' },
+    { icon:'🏨', tip:'If you\'re staying at a Universal on-site hotel, you already get free Unlimited Express Pass. The Annual Pass benefits (dining, merchandise, EPA) layer on top — and the hotel rate is often lower with AP holder discounts.' },
+    { icon:'👻', tip:'Halloween Horror Nights runs September–November on select nights. The AP discount alone ($20/ticket × 4 people = $80 saved) is a significant portion of the Annual Pass premium over Seasonal Pass.' },
+    { icon:'🔄', tip:'Annual Passes auto-renew at a reduced rate (typically $30–50 less than the original price). You must cancel before the renewal date in your Universal account. Reminder: 30 days before expiration.' },
+    { icon:'🌊', tip:'All AP tiers include Volcano Bay (Universal\'s water park). A single Volcano Bay day ticket is $75+. Including it in AP value calculation changes the math significantly for water park visitors.' },
+    { icon:'⏱️', tip:'Early Park Admission (EPA) for Annual/Preferred pass holders is the most underrated perk. Arriving 60 minutes early for Hagrid\'s or Velocicoaster during peak season is worth more than the pass differential itself.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-universal-ap';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#1565C0,#7B1FA2,#C9A96E);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Universal Annual Pass Guide</div>
+          <div style="font-size:11px;opacity:.8;">Power · Seasonal · Annual · Preferred — which is right for you?</div>
+        </div>
+        <span style="font-size:28px;">🎡</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        Universal Annual Passes cover both theme parks AND Volcano Bay water park — making them more versatile than they first appear. The right tier depends entirely on when you visit and what perks you'll actually use.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    UPASS_TIERS.forEach(tier => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:12px 14px;background:${tier.color}18;border-left:4px solid ${tier.color};">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:22px;">${tier.emoji}</span>
+            <div style="flex:1;">
+              <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--text-primary,#212121);">${tier.name}</div>
+              <div style="font-size:11px;font-weight:800;color:${tier.color};">${tier.price}</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          <div style="font-size:11px;color:var(--text-secondary,#666);margin-bottom:6px;"><strong>Access:</strong> ${tier.access}</div>
+          <div style="font-size:11px;color:#C62828;margin-bottom:6px;"><strong>Blockout dates:</strong> ${tier.blockouts}</div>
+          <div style="font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:4px;">PERKS</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;">
+            ${tier.perks.map(p=>`<span style="font-size:10px;padding:2px 8px;background:${tier.color}18;color:${tier.color};border-radius:20px;">${p}</span>`).join('')}
+          </div>
+          <div style="font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:4px;">BEST FOR: ${tier.bestFor}</div>
+          <div style="display:flex;gap:6px;background:${tier.color}0d;border-radius:8px;padding:7px;margin-top:6px;">
+            <span style="font-size:11px;flex-shrink:0;">💡</span>
+            <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${tier.tip}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const perksCard = document.createElement('div');
+    perksCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+    perksCard.innerHTML = `<div style="padding:12px 14px;background:linear-gradient(135deg,#1565C0,#7B1FA2);color:#fff;">
+      <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;">💎 Deep Dive: Universal Pass Perks</div>
+    </div>
+    <div style="padding:12px 14px;">
+      ${UEP_DETAILS.map(p=>`<div style="margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border,#eee);">
+        <div style="font-size:13px;font-weight:700;color:${p.color};margin-bottom:4px;">${p.perk}</div>
+        <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;margin-bottom:4px;">${p.detail}</div>
+        <div style="font-size:11px;font-weight:700;color:#2E7D32;">💰 ${p.value}</div>
+      </div>`).join('')}
+    </div>`;
+    body.appendChild(perksCard);
+
+    const stratCard = document.createElement('div');
+    stratCard.style.cssText = 'background:linear-gradient(135deg,#1565C0,#7B1FA2);border-radius:16px;margin-bottom:20px;padding:14px;color:#fff;';
+    stratCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">🎯 Universal Pass Buying Strategy</div>
+    ${UPGRADE_TIPS.map(t=>`<div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
+      <span style="font-size:18px;flex-shrink:0;">${t.icon}</span>
+      <div style="font-size:12px;opacity:.95;line-height:1.5;">${t.tip}</div>
+    </div>`).join('')}`;
+    body.appendChild(stratCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-universal-ap')) buildScreen();
+
+  const _prevSS_hhhhhh = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_hhhhhh) _prevSS_hhhhhh(name, el);
+    if (name === 'universal-ap') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-universal-ap');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectUAPCard() {
+    if (document.getElementById('uap-home-card')) return true;
+    const ref = document.getElementById('ap-home-card') || document.getElementById('honeymoon-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'uap-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#1565C0,#7B1FA2,#C9A96E 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('universal-ap');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🎡</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Universal Annual Pass Guide</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Power · Seasonal · Annual · Preferred — EPA & HHN discounts</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _uapCard = false;
+  setInterval(() => { if (!_uapCard) _uapCard = injectUAPCard(); }, 68000);
+  setTimeout(() => { _uapCard = injectUAPCard(); }, 64500);
+  const _prevRH_hhhhhh = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_hhhhhh) _prevRH_hhhhhh.apply(this, arguments);
+    setTimeout(() => { _uapCard = false; _uapCard = injectUAPCard(); }, 22200);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK IIIIII: Orlando Resort Hotels Deep Dive ===== */
+(function initOrlandoResortHotels() {
+
+  const DISNEY_HOTELS = [
+    {
+      name:'Grand Floridian Resort & Spa', emoji:'🏰', color:'#C9A96E', tier:'Deluxe',
+      price:'$800–2,500/night',
+      location:'Magic Kingdom area, connected by monorail',
+      why:'Disney World\'s flagship resort. Victorian grandeur, the only Disney hotel with a AAA Five Diamond restaurant (Victoria & Albert\'s), live orchestra in the lobby, and the closest non-Contemporary hotel to Magic Kingdom.',
+      perks:['Monorail access to Magic Kingdom and EPCOT', 'Spa facility', 'Multiple pools', 'Narcoossee\'s waterfront dining', 'Evening fireworks from the beach'],
+      tip:'Request a Magic Kingdom view room — the fireworks from your balcony are worth the premium. The resort lobby at Christmas with the massive tree is one of the most beautiful hotel spaces in Florida.',
+    },
+    {
+      name:'Animal Kingdom Lodge', emoji:'🦒', color:'#5D4037', tier:'Deluxe',
+      price:'$450–1,200/night',
+      location:'Animal Kingdom area (no direct park transit)',
+      why:'Savanna-view rooms where African wildlife roams outside your window — giraffes at dawn, zebras at midday. The most unique hotel environment in American tourism. Jiko restaurant is among Disney\'s finest.',
+      perks:['Savanna views from 60% of rooms', 'Live animals on the savanna 24/7', 'Jiko restaurant (AAA Four Diamond)', 'African art collection worth touring', 'Cultural representatives from Africa on staff'],
+      tip:'Specifically request a savanna-view room — standard pool views miss the entire point of the hotel. The savanna is most active at dawn (6–7 AM) and dusk (5–7 PM).',
+    },
+    {
+      name:'Polynesian Village Resort', emoji:'🌺', color:'#2E7D32', tier:'Deluxe',
+      price:'$600–1,600/night',
+      location:'Magic Kingdom area, connected by monorail',
+      why:'Iconic Polynesian theming on the Seven Seas Lagoon. One of the original Walt Disney World hotels. Tambu Lounge serves the best Dole Whip in the resort. Monorail access to Magic Kingdom and EPCOT.',
+      perks:['Monorail access', 'Seven Seas Lagoon beach', 'Disney\'s Spirit of Aloha luau dinner show', 'Volcano pool', 'Best location for Magic Kingdom fireworks from the beach'],
+      tip:'The beach at the Polynesian has arguably the best Magic Kingdom fireworks view of any resort — no tickets required, just walk to the beach. The Dole Whip at Tambu Lounge uses soft-serve, not the hard version.',
+    },
+    {
+      name:'Wilderness Lodge', emoji:'🌲', color:'#37474F', tier:'Deluxe',
+      price:'$450–1,100/night',
+      location:'Magic Kingdom area (boat access)',
+      why:'Pacific Northwest National Park lodge theming — genuine geysers, totem poles, 82-foot stone fireplace. The most underrated deluxe resort. Artist Point restaurant is excellent for a forest-atmosphere dinner.',
+      perks:['Geyser eruptions on schedule', 'Boat service to Magic Kingdom', 'Roaring Fork quick service (best Disney resort counter service)', 'Boulder Ridge Cove pool with water slide'],
+      tip:'The boat to Magic Kingdom is slower than monorail but far more pleasant — arrives at the back of the park (Adventureland side). The geyser out front erupts throughout the day — check the schedule.',
+    },
+    {
+      name:'Caribbean Beach Resort', emoji:'🌊', color:'#0277BD', tier:'Moderate',
+      price:'$260–550/night',
+      location:'EPCOT area (Disney Skyliner access)',
+      why:'The best moderate resort for value. Skyliner gondola access to EPCOT and Hollywood Studios. Large sprawling property with multiple pool areas. Sebastian\'s Bistro is a hidden gem.',
+      perks:['Disney Skyliner access (EPCOT and Hollywood Studios)', 'Sebastian\'s Bistro — Caribbean cuisine', 'Fuentes del Morro pool complex', 'Pirate-themed rooms available'],
+      tip:'The Skyliner to EPCOT is genuinely one of the most pleasant ways to reach the park — 10-minute gondola ride over the resort. Morning lines are shorter than afternoon.',
+    },
+    {
+      name:'All-Star Movies Resort', emoji:'🎬', color:'#C62828', tier:'Value',
+      price:'$150–320/night',
+      location:'Animal Kingdom area',
+      why:'The most affordable Disney-owned accommodation. Buses to all parks, early morning Magic hours, free parking. Giant movie prop theming is fun for kids.',
+      perks:['Free Disney transportation', 'Early park entry benefit', '2 pools', 'Complimentary MagicBands for resort guests'],
+      tip:'Value resorts are about location and access, not amenities. They\'re clean, well-run, and give you the full Disney resort experience at a fraction of the deluxe cost. The giant Buzz Lightyear and 101 Dalmatians props are legitimately impressive.',
+    },
+  ];
+
+  const UNIVERSAL_HOTELS = [
+    {
+      name:'Loews Portofino Bay Hotel', emoji:'⛵', color:'#1565C0', tier:'Premier (on-site)',
+      price:'$400–1,000/night',
+      location:'Universal property, connected by boat/walking',
+      why:'The flagship Universal resort. Replicates a seaside Italian village with genuine attention to detail. The piazza is beautiful at night.',
+      perk_star:'Free Unlimited Express Pass for all hotel guests — saving $90–180/person/day during peak season. This single benefit pays for the hotel premium on most stays.',
+      tip:'The Express Pass benefit is the entire reason to consider a Universal on-site hotel. Calculate: family of 4, 3 days, peak season Express = $2,160 in Express savings. The hotel premium is often less.',
+    },
+    {
+      name:'Hard Rock Hotel Universal', emoji:'🎸', color:'#C62828', tier:'Premier (on-site)',
+      price:'$350–800/night',
+      location:'Universal property, walking distance',
+      why:'Rock music theming with genuine memorabilia throughout. Pool has underwater music speakers. Same Express Pass benefit as Portofino.',
+      perk_star:'Free Unlimited Express Pass + water taxi to both parks + priority seating at Hard Rock Cafe',
+      tip:'The pool with underwater speakers is genuinely a differentiating feature — swim to the music. Rock memorabilia is extensive and museum-quality throughout the property.',
+    },
+    {
+      name:'Cabana Bay Beach Resort', emoji:'🏖️', color:'#F57F17', tier:'Prime Value (on-site)',
+      price:'$200–450/night',
+      location:'Universal property, walking distance to Epic Universe',
+      why:'Retro 1950s/60s Florida resort theming. Two lazy rivers, multiple pools. On-site, so you get early park entry — but NOT Express Pass (that\'s Premier/Preferred hotels only).',
+      perk_star:'Early Park Admission to Wizarding World + walking distance to Epic Universe (opening 2025)',
+      tip:'Cabana Bay will be DIRECTLY adjacent to Epic Universe. For Epic Universe\'s opening years, this position is extremely strategic. Largest resort pool complex on the Universal property.',
+    },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-resort-hotels';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#C9A96E,#1565C0,#5D4037);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Resort Hotels Deep Dive</div>
+          <div style="font-size:11px;opacity:.8;">Grand Floridian · Animal Kingdom Lodge · Portofino · Hard Rock</div>
+        </div>
+        <span style="font-size:28px;">🏨</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        Staying on-site at Disney or Universal isn't just about location — it unlocks benefits (early park entry, Express Pass) that change your entire park experience. This guide breaks down which hotels are actually worth it.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    const dHdr = document.createElement('div');
+    dHdr.style.cssText = 'font-family:"Playfair Display",serif;font-size:16px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:10px;padding:10px 0 6px;border-bottom:2px solid #C9A96E;';
+    dHdr.innerHTML = '🏰 Disney Resort Hotels';
+    body.appendChild(dHdr);
+
+    DISNEY_HOTELS.forEach(hotel => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:10px 14px;background:${hotel.color}18;border-left:4px solid ${hotel.color};">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
+            <div style="display:flex;gap:8px;align-items:center;">
+              <span style="font-size:20px;">${hotel.emoji}</span>
+              <div>
+                <div style="font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${hotel.name}</div>
+                <div style="font-size:10px;color:var(--text-secondary,#888);">${hotel.tier} · ${hotel.location}</div>
+              </div>
+            </div>
+            <div style="font-size:11px;font-weight:800;color:${hotel.color};flex-shrink:0;text-align:right;">${hotel.price}</div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;margin-bottom:6px;">${hotel.why}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px;">
+            ${hotel.perks.map(p=>`<span style="font-size:10px;padding:2px 7px;background:${hotel.color}18;color:${hotel.color};border-radius:20px;">${p}</span>`).join('')}
+          </div>
+          <div style="display:flex;gap:5px;background:${hotel.color}0d;border-radius:8px;padding:7px;">
+            <span style="font-size:11px;flex-shrink:0;">💡</span>
+            <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${hotel.tip}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const uHdr = document.createElement('div');
+    uHdr.style.cssText = 'font-family:"Playfair Display",serif;font-size:16px;font-weight:700;color:var(--text-primary,#212121);margin:6px 0 10px;padding:10px 0 6px;border-bottom:2px solid #1565C0;';
+    uHdr.innerHTML = '🎡 Universal On-Site Hotels';
+    body.appendChild(uHdr);
+
+    UNIVERSAL_HOTELS.forEach(hotel => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:10px 14px;background:${hotel.color}18;border-left:4px solid ${hotel.color};">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
+            <div style="display:flex;gap:8px;align-items:center;">
+              <span style="font-size:20px;">${hotel.emoji}</span>
+              <div>
+                <div style="font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${hotel.name}</div>
+                <div style="font-size:10px;color:var(--text-secondary,#888);">${hotel.tier} · ${hotel.location}</div>
+              </div>
+            </div>
+            <div style="font-size:11px;font-weight:800;color:${hotel.color};flex-shrink:0;text-align:right;">${hotel.price}</div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;margin-bottom:6px;">${hotel.why}</div>
+          <div style="background:#2E7D3218;border-radius:8px;padding:7px;margin-bottom:6px;">
+            <div style="font-size:10px;font-weight:700;color:#2E7D32;margin-bottom:2px;">⭐ KEY BENEFIT</div>
+            <div style="font-size:11px;color:var(--text-secondary,#555);">${hotel.perk_star}</div>
+          </div>
+          <div style="display:flex;gap:5px;background:${hotel.color}0d;border-radius:8px;padding:7px;">
+            <span style="font-size:11px;flex-shrink:0;">💡</span>
+            <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${hotel.tip}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const tipCard = document.createElement('div');
+    tipCard.style.cssText = 'background:linear-gradient(135deg,#C9A96E,#1565C0);border-radius:14px;margin-bottom:20px;padding:14px;color:#fff;';
+    tipCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">🎯 On-Site vs Off-Site: The Decision</div>
+    ${[
+      {icon:'✅', tip:'On-site at Universal: Do the math on Express Pass. Family of 4 × 2 days × $110/person/day = $880 in Express value. Premier hotel room often costs less than that premium.'},
+      {icon:'✅', tip:'On-site at Disney: Early entry, free transportation, and the immersive theming are real quality-of-life improvements, even at Value resorts. The transportation system alone can eliminate $100+ in Uber costs.'},
+      {icon:'⚠️', tip:'Off-site makes sense when: staying 1 day only, visiting Universal without caring about Express Pass, or when off-site deals are dramatically better (50%+ savings).'},
+      {icon:'💡', tip:'The best off-site option for Disney visitors is the Swan and Dolphin (Marriott) — technically "off-site" but located inside the Walt Disney World resort boundary. Free Disney transit, Disney perks, but bookable with Marriott points.'},
+    ].map(t=>`<div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
+      <span style="font-size:18px;flex-shrink:0;">${t.icon}</span>
+      <div style="font-size:12px;opacity:.95;line-height:1.5;">${t.tip}</div>
+    </div>`).join('')}`;
+    body.appendChild(tipCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-resort-hotels')) buildScreen();
+
+  const _prevSS_iiiiii = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_iiiiii) _prevSS_iiiiii(name, el);
+    if (name === 'resort-hotels') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-resort-hotels');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectRHCard() {
+    if (document.getElementById('resort-hotels-home-card')) return true;
+    const ref = document.getElementById('uap-home-card') || document.getElementById('ap-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'resort-hotels-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#C9A96E,#1565C0,#5D4037 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('resort-hotels');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🏨</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Resort Hotels Deep Dive</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Grand Floridian · AKL · Portofino · Hard Rock · Cabana Bay</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _rhCard = false;
+  setInterval(() => { if (!_rhCard) _rhCard = injectRHCard(); }, 69000);
+  setTimeout(() => { _rhCard = injectRHCard(); }, 65500);
+  const _prevRH_iiiiii = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_iiiiii) _prevRH_iiiiii.apply(this, arguments);
+    setTimeout(() => { _rhCard = false; _rhCard = injectRHCard(); }, 22600);
+  };
+})();
+</script>
