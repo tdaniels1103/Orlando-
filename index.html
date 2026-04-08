@@ -49012,3 +49012,175 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK AAAAA: Orlando's Best Kept Secret Restaurants ===== */
+(function initSecretRestaurants() {
+
+  const SECRETS = [
+    {
+      name:'The Ravenous Pig', neighborhood:'Winter Park', price:'$$$', cuisine:'American Gastropub',
+      emoji:'🐷', color:'#5D4037',
+      why:'Florida\'s best gastropub. James Beard-recognized. Consistently the answer to "what\'s the best restaurant in Orlando?" from locals who know.',
+      must:['Short Rib Sliders (if on the menu)','Duck Confit','Any charcuterie board','Sunday Brunch (book 3+ weeks out)'],
+      secret:'The bar at The Ravenous Pig is walk-in only — arrive before 5:30pm to grab a bar seat without a reservation.',
+      book:'OpenTable, book 2-3 weeks in advance for weekends.',
+    },
+    {
+      name:'The Rusty Spoon', neighborhood:'Downtown Orlando', price:'$$', cuisine:'Farm-to-Table American',
+      emoji:'🥄', color:'#795548',
+      why:'Chef Kathleen Blake\'s temple to local Florida produce. She gets ingredients from within 100 miles and transforms them into extraordinary comfort food.',
+      must:['Florida Grouper (when in season)','Cast Iron Corn Bread','Pork Belly','Rotating seasonal vegetable dishes'],
+      secret:'The lunch menu at The Rusty Spoon is nearly identical to dinner but costs 30% less. Best lunch value in downtown Orlando.',
+      book:'OpenTable or phone. Walk-in at bar is usually possible.',
+    },
+    {
+      name:'Domu', neighborhood:'East End Market (Baldwin Park)', price:'$$', cuisine:'Japanese Ramen',
+      emoji:'🍜', color:'#1565C0',
+      why:'The best ramen in Central Florida. Small-batch broth simmered 20+ hours. Hidden inside a food hall — most tourists never find it.',
+      must:['Chashu Pork Ramen','Truffle Mushroom Ramen','Takoyaki appetizer','Domu soft-serve ice cream (not ramen, but exceptional)'],
+      secret:'East End Market also houses Lineage Coffee (best espresso in Orlando) and other exceptional vendors. Make it a full market visit.',
+      book:'Walk-in only. Waits on weekday evenings: 20-30 min. Weekends: 45-60 min.',
+    },
+    {
+      name:'Se7en Bites', neighborhood:'Milk District', price:'$', cuisine:'Bakery & Breakfast',
+      emoji:'🥐', color:'#E65100',
+      why:'A local legend. A Southern grandmother\'s kitchen transported to Orlando. Pastries that make you rethink what a pastry can be.',
+      must:['Hand Pies (sweet and savory varieties)','Biscuits with Gravy','Hummingbird Cake (when available)','Quiches and Frittatas'],
+      secret:'The "special board" changes daily. Ask what\'s been made that morning. The most recent batch is always the most impressive.',
+      book:'Walk-in only. Cash preferred. Opens 8am — arrive by 8:30am on weekends to avoid sellouts.',
+    },
+    {
+      name:'Pho 88', neighborhood:'Mills 50', price:'$', cuisine:'Vietnamese',
+      emoji:'🍲', color:'#c62828',
+      why:'The best pho in Florida, according to nearly every Vietnamese food expert who has visited Orlando. Unassuming strip mall location — pure authenticity.',
+      must:['Pho Tai (rare beef)','Bun Bo Hue (spicy lemongrass beef)','Banh Mi sandwiches','Vietnamese iced coffee'],
+      secret:'Mills 50 has a Vietnamese restaurant row on Colonial Drive with 10+ excellent restaurants. Pho 88 is the anchor, but the whole strip is worth exploring.',
+      book:'No reservations. Cash preferred. Lines on weekends — worth every minute.',
+    },
+    {
+      name:'Knife & Spoon', neighborhood:'Ritz-Carlton Grande Lakes', price:'$$$$', cuisine:'Contemporary Steakhouse',
+      emoji:'🥩', color:'#7B1FA2',
+      why:'Chef John Tesar\'s (James Beard nominee) steakhouse inside the Ritz-Carlton. The most seriously chef-driven fine dining in all of Orlando.',
+      must:['40-day dry-aged ribeye','Japanese A5 Wagyu (seasonal)','Any pasta starter','The wine list is extraordinary'],
+      secret:'The hotel bar (The Lobby Lounge at Ritz-Carlton) offers a similar quality cocktail experience at 40% less cost than the restaurant bar. Pre-dinner drink here, then dinner at Knife & Spoon.',
+      book:'OpenTable, book 3-4 weeks in advance. Dinner only.',
+    },
+    {
+      name:'Hawkers Asian Street Food', neighborhood:'Mills 50 (multiple)', price:'$', cuisine:'Pan-Asian Street Food',
+      emoji:'🍱', color:'#33691E',
+      why:'Locally owned (not a national chain despite expansion), extraordinarily good. Malaysian, Thai, Vietnamese, Chinese influences in one menu. James Beard nominated.',
+      must:['Roti Canai with curry dip','Malaysian Laksa','Chicken Inasal (Filipino grilled chicken)','Char Kway Teow (wok-fried noodles)'],
+      secret:'Hawkers is excellent for large groups — the entire menu is designed for sharing. Order 8-10 dishes for a table of 4.',
+      book:'Walk-in. Expect 45-minute wait on weekends. Join waitlist via Yelp when nearby.',
+    },
+    {
+      name:'Bosphorous Turkish Cuisine', neighborhood:'Winter Park', price:'$$', cuisine:'Turkish',
+      emoji:'🫙', color:'#F57F17',
+      why:'Extraordinary Turkish food in an unlikely location. Homemade bread, mezze platters, lamb preparations that transport you to Istanbul.',
+      must:['Hummus with pita (housemade)','Lamb Adana Kebab','Beyti Wrap','Baklava (made in-house)'],
+      secret:'The Winter Park location has outdoor patio seating in a beautiful oak-shaded space. Worth requesting specifically.',
+      book:'OpenTable or walk-in. Usually available same-day.',
+    },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-secret-restaurants';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const header = document.createElement('div');
+    header.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#1a1a1a,#37474F,#607D8B);padding:16px 14px 14px;';
+    header.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:#fff;">Best Kept Secret Restaurants</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.7);">Where locals eat · Hidden gems · Must-try dishes</div>
+        </div>
+        <span style="font-size:24px;">🍽️</span>
+      </div>
+      <div style="background:rgba(255,255,255,.1);border-radius:8px;padding:7px 12px;font-size:11px;color:rgba(255,255,255,.85);">
+        These are the restaurants that Orlando locals are actually proud of — places they take out-of-town guests to show what the city can really do.
+      </div>`;
+
+    const content = document.createElement('div');
+    content.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    SECRETS.forEach(r => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:10px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="background:${r.color};padding:10px 14px;display:flex;align-items:center;gap:10px;">
+          <span style="font-size:24px;">${r.emoji}</span>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:700;color:#fff;">${r.name}</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.8);">${r.cuisine} · ${r.neighborhood} · ${r.price}</div>
+          </div>
+        </div>
+        <div style="padding:11px 14px;">
+          <div style="font-size:12px;color:var(--text-secondary,#555);margin-bottom:7px;line-height:1.5;font-style:italic;">"${r.why}"</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;">
+            ${r.must.slice(0,3).map(m=>`<span style="padding:2px 8px;border-radius:20px;font-size:10px;background:${r.color}12;color:${r.color};font-weight:600;">${m}</span>`).join('')}
+          </div>
+          <div style="background:rgba(0,0,0,.04);border-radius:8px;padding:7px 10px;margin-bottom:6px;border-left:3px solid ${r.color};">
+            <div style="font-size:10px;font-weight:700;color:${r.color};margin-bottom:2px;">💡 INSIDER SECRET</div>
+            <div style="font-size:11px;color:var(--text-secondary,#555);">${r.secret}</div>
+          </div>
+          <div style="font-size:10px;color:var(--text-secondary,#aaa);">📅 ${r.book}</div>
+        </div>`;
+      content.appendChild(card);
+    });
+
+    const spacer = document.createElement('div');
+    spacer.style.height = '20px';
+    content.appendChild(spacer);
+
+    s.appendChild(header);
+    s.appendChild(content);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-secret-restaurants')) buildScreen();
+
+  const _prevSS_aaaaa = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_aaaaa) _prevSS_aaaaa(name, el);
+    if (name === 'secret-restaurants') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-secret-restaurants');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectSecretCard() {
+    if (document.getElementById('secret-rest-home-card')) return true;
+    const ref = document.getElementById('hp-home-card') || document.getElementById('checklist-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'secret-rest-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#1a1a1a,#37474F,#607D8B);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('secret-restaurants');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:3px;">🍽️ Best Kept Secret Restaurants</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.75);">Where locals eat · Ravenous Pig · Domu · Hawkers</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.4);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _secretCard = false;
+  setInterval(() => { if (!_secretCard) _secretCard = injectSecretCard(); }, 37500);
+  setTimeout(() => { _secretCard = injectSecretCard(); }, 34000);
+
+  const _prevRH_aaaaa = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_aaaaa) _prevRH_aaaaa.apply(this, arguments);
+    setTimeout(() => { _secretCard = false; _secretCard = injectSecretCard(); }, 9900);
+  };
+})();
+</script>
