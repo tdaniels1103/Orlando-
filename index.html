@@ -44260,3 +44260,535 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK AAAA: Orlando Golf Guide ===== */
+(function initGolfGuide() {
+
+  const COURSES = [
+    {
+      name:"Bay Hill Club & Lodge", designer:"Arnold Palmer", emoji:"🦅", color:"#2E7D32",
+      par:72, yards:7239, difficulty:"Championship", price:"$250–$400",
+      neighborhood:"Dr. Phillips / I-4 Corridor",
+      signature:"Home of the Arnold Palmer Invitational PGA Tour event every March.",
+      tips:["Lodge guests get preferred tee times","Bay Hill 18th hole is one of the most photographed in Florida","Book through the lodge for better rates","Tournament week in March — watch pros practice for free"],
+    },
+    {
+      name:"Reunion Resort Golf", designer:"Jack Nicklaus / Tom Watson / Arnold Palmer", emoji:"⛳", color:"#1565C0",
+      par:72, yards:"Multiple courses", difficulty:"Resort Premium", price:"$150–$280",
+      neighborhood:"Reunion (Kissimmee)",
+      signature:"Three signature courses by three Hall-of-Famers on one property. Unique anywhere in Florida.",
+      tips:["Nicklaus course is the most photographed","Stay at Reunion Resort for best rates","All three courses play very differently","Views of Walt Disney World from several holes"],
+    },
+    {
+      name:"Disney's Lake Buena Vista Golf Course", designer:"Joe Lee (renovated 2014)", emoji:"🏰", color:"#003087",
+      par:72, yards:6829, difficulty:"Resort Moderate", price:"$80–$160",
+      neighborhood:"Disney Springs Area",
+      signature:"Disney magic on the course — Mickey-shaped bunkers, fairy tale theming. Fun for families.",
+      tips:["Twilight rates after 3pm are excellent value","Book through Disney for package rates","Oak Trail (9-hole) is great for beginners and kids","Annual pass discounts available"],
+    },
+    {
+      name:"Shingle Creek Golf Club", designer:"David Harman", emoji:"🌿", color:"#33691E",
+      par:72, yards:7228, difficulty:"Championship", price:"$70–$150",
+      neighborhood:"International Drive",
+      signature:"Tournament-quality championship course beside I-Drive. Consistently ranked among Florida's best.",
+      tips:["Best value championship course in Orlando","Junior rates very reasonable","Practice facility is excellent","Adjacent to Rosen Shingle Creek hotel"],
+    },
+    {
+      name:"Orange County National Golf Center", designer:"Phil Ritson & Isao Aoki", emoji:"🌳", color:"#558B2F",
+      par:72, yards:"Two 18-hole courses + 9-hole", difficulty:"Public / Excellent Value", price:"$40–$100",
+      neighborhood:"Winter Garden",
+      signature:"The best public golf facility in Central Florida. Two championship courses, enormous practice facility.",
+      tips:["Panther Lake course is the star — challenging and beautiful","Crooked Cat is more forgiving","The Tooth (9-hole par 3) perfect for beginners","45-minute drive from I-Drive — worth it"],
+    },
+    {
+      name:"Celebration Golf Club", designer:"Robert Trent Jones Sr. & Jr.", emoji:"🏘️", color:"#4A148C",
+      par:72, yards:6783, difficulty:"Resort Moderate", price:"$60–$130",
+      neighborhood:"Celebration (near Disney)",
+      signature:"Golf in Disney's planned community. A rare Robert Trent Jones Sr. & Jr. father-son collaboration.",
+      tips:["Walking the course is allowed (rare in Florida resorts)","Celebration town itself is beautiful for lunch after","Water views on many holes","Family-friendly atmosphere"],
+    },
+  ];
+
+  const TIPS_GENERAL = [
+    { icon:'🌡️', tip:'Best golf weather: October–April. Summer heat (June–Sep) means 90°F+ by 10am. Book early tee times (before 9am) in summer.' },
+    { icon:'⛈️', tip:'Florida afternoon thunderstorms are nearly daily June–September. Courses suspend play for lightning — don\'t golf past 2pm in summer.' },
+    { icon:'💧', tip:'Bring twice the water you think you need. Dehydration is the #1 reason rounds go wrong in Florida heat.' },
+    { icon:'🦎', tip:'Florida wildlife on courses includes alligators (give wide berth — do NOT retrieve balls near water), sandhill cranes, and gopher tortoises.' },
+    { icon:'💰', tip:'Twilight rates (usually 2–3pm+) are 30–50% cheaper. Great way to play premium courses affordably.' },
+    { icon:'📱', tip:'GolfNow and TeeOff apps show real-time tee time availability and often have deep discounts on last-minute slots.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-golf-guide';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const header = document.createElement('div');
+    header.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#1B5E20,#2E7D32,#66BB6A);padding:16px 14px 14px;';
+    header.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:#fff;">⛳ Orlando Golf Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">Championship to family-friendly · 6 top courses</div>
+        </div>
+      </div>`;
+
+    const content = document.createElement('div');
+    content.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    // General tips
+    const tipsCard = document.createElement('div');
+    tipsCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:14px;border:1px solid var(--border,#eee);';
+    tipsCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:10px;">🏌️ Orlando Golf Essentials</div>`;
+    TIPS_GENERAL.forEach(t => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;';
+      row.innerHTML = `<span style="font-size:16px;">${t.icon}</span><div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;">${t.tip}</div>`;
+      tipsCard.appendChild(row);
+    });
+    content.appendChild(tipsCard);
+
+    // Courses
+    COURSES.forEach(course => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:10px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="height:60px;background:linear-gradient(135deg,${course.color},${course.color}99);display:flex;align-items:center;padding:0 14px;gap:10px;">
+          <span style="font-size:26px;">${course.emoji}</span>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:700;color:#fff;">${course.name}</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.8);">${course.designer}</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.9);">${course.price}</div>
+          </div>
+        </div>
+        <div style="padding:12px 14px;">
+          <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+            <span style="padding:2px 8px;border-radius:20px;font-size:10px;background:${course.color}15;color:${course.color};font-weight:700;">${course.difficulty}</span>
+            <span style="padding:2px 8px;border-radius:20px;font-size:10px;background:rgba(0,0,0,.05);color:var(--text-secondary,#666);">📍 ${course.neighborhood}</span>
+          </div>
+          <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;margin-bottom:8px;font-style:italic;">"${course.signature}"</div>
+          <div style="border-top:1px solid var(--border,#f0f0f0);padding-top:8px;">
+            ${course.tips.slice(0,3).map(t=>`<div style="font-size:11px;color:var(--text-secondary,#555);padding:2px 0;">• ${t}</div>`).join('')}
+          </div>
+        </div>`;
+      content.appendChild(card);
+    });
+
+    // Mini golf bonus
+    const miniCard = document.createElement('div');
+    miniCard.style.cssText = 'background:linear-gradient(135deg,#E65100,#FF6F00);border-radius:14px;padding:14px;margin-bottom:20px;color:#fff;';
+    miniCard.innerHTML = `
+      <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:8px;">🎯 Mini Golf Picks</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.85);margin-bottom:8px;">Perfect for families and non-golfers — Orlando has some of the best mini golf in the country.</div>
+      ${[
+        { name:"Disney's Fantasia Gardens", note:"Animated movie themes, beautifully maintained. ~$15/round." },
+        { name:'Congo River Golf', note:'Adventure-themed with live gator habitats. Multiple Orlando locations. ~$12/round.' },
+        { name:'Pirate\'s Cove Adventure Golf', note:'Pirate theme on I-Drive. Two courses. ~$12/round.' },
+        { name:'WonderWorks Outta Control Magic Show', note:'Mini golf included in attraction package. Good value.' },
+      ].map(m=>`<div style="margin-bottom:6px;"><div style="font-size:12px;font-weight:700;">${m.name}</div><div style="font-size:11px;color:rgba(255,255,255,.8);">${m.note}</div></div>`).join('')}`;
+    content.appendChild(miniCard);
+
+    s.appendChild(header);
+    s.appendChild(content);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-golf-guide')) buildScreen();
+
+  const _prevSS_aaaa = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_aaaa) _prevSS_aaaa(name, el);
+    if (name === 'golf-guide') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-golf-guide');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectGolfCard() {
+    if (document.getElementById('golf-home-card')) return true;
+    const ref = document.getElementById('cruise-home-card') || document.getElementById('ge-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'golf-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#1B5E20,#2E7D32,#66BB6A);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('golf-guide');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:3px;">⛳ Orlando Golf Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.85);">Bay Hill · Reunion · Disney · Championship to casual</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.5);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _golfCard = false;
+  setInterval(() => { if (!_golfCard) _golfCard = injectGolfCard(); }, 24500);
+  setTimeout(() => { _golfCard = injectGolfCard(); }, 21000);
+
+  const _prevRH_aaaa = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_aaaa) _prevRH_aaaa.apply(this, arguments);
+    setTimeout(() => { _golfCard = false; _golfCard = injectGolfCard(); }, 4700);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK BBBB: Character Meet & Greet Strategy ===== */
+(function initCharacterGuide() {
+
+  const CHARACTERS = [
+    {
+      park:'Magic Kingdom', emoji:'🏰', color:'#003087',
+      meets:[
+        { character:'Mickey Mouse', location:'Town Square Theater', type:'Indoor, A/C', wait:'30–60 min', notes:'The flagship Mickey meet. Photo ops with Mickey in his magician costume. FastPass/LL available.' },
+        { character:'Cinderella', location:'Princess Fairytale Hall', type:'Indoor, A/C', wait:'40–90 min', notes:'Can meet 2 princesses in one queue. Pairs with Aurora, Tiana, or Elena depending on rotation.' },
+        { character:'Rapunzel & Tiana', location:'Princess Fairytale Hall', type:'Indoor, A/C', wait:'40–90 min', notes:'Paired meet. Characters rotate — check app on day of visit for current pairing.' },
+        { character:'Buzz Lightyear', location:'Storybook Circus', type:'Outdoor', wait:'20–40 min', notes:'One of the more unique poses — Buzz often does fun action poses.' },
+        { character:'Seven Dwarfs', location:'Fantasyland (roaming)', type:'Roaming', wait:'Variable', notes:'Appear as a group — rare. Check Times Guide for scheduled appearances.' },
+      ]
+    },
+    {
+      park:'EPCOT', emoji:'🌍', color:'#005B9A',
+      meets:[
+        { character:'Anna & Elsa', location:'World Showcase (Norway)', type:'Indoor, A/C', wait:'45–90 min', notes:'The most popular EPCOT meet. Go within 30 min of park open or accept a long wait.' },
+        { character:'Remy', location:'France Pavilion', type:'Outdoor', wait:'20–45 min', notes:'New character since Ratatouille opened. Adorable and very photogenic.' },
+        { character:'Test Track characters', location:'Future World', type:'Indoor', wait:'10–30 min', notes:'Lightning McQueen and Mater appear near Test Track entrance regularly.' },
+        { character:'Disney Jr. characters', location:'Animation Experience', type:'Varies', wait:'15–30 min', notes:'Doc McStuffins, Vampirina, and others — great for toddlers.' },
+      ]
+    },
+    {
+      park:'Hollywood Studios', emoji:'🎬', color:'#37474F',
+      meets:[
+        { character:'Rey / Star Wars characters', location:"Galaxy's Edge", type:'Outdoor / Roaming', wait:'20–60 min', notes:'Rey, Kylo Ren, Chewbacca, and droids appear throughout GE. No formal line — find them roaming.' },
+        { character:'Toy Story characters', location:'Toy Story Land', type:'Outdoor', wait:'20–45 min', notes:'Jessie, Woody, and Buzz appear in Toy Story Land throughout the day.' },
+        { character:'Mickey & Minnie (Hollywood)', location:'Red Carpet Dreams', type:'Indoor', wait:'20–40 min', notes:'Hollywood glamour outfits. Great backdrop photos.' },
+        { character:'Disney Fairies', location:'Animation Courtyard', type:'Indoor', wait:'15–30 min', notes:'Tinker Bell area — popular for younger girls.' },
+      ]
+    },
+    {
+      park:'Animal Kingdom', emoji:'🦁', color:'#33691E',
+      meets:[
+        { character:'Favorite Friends (Wilderness Explorers)', location:'Discovery Island', type:'Outdoor', wait:'15–30 min', notes:'Russell, Dug, Baloo, King Louie — unique to Animal Kingdom.' },
+        { character:'Kevin & Dug', location:'Discovery Island', type:'Outdoor', wait:'15–35 min', notes:'Up characters near the giant tree. Very popular for photos.' },
+        { character:'Na\'vi characters', location:'Pandora', type:'Outdoor', wait:'20–40 min', notes:'Attend Wilderness Explorer ceremonies or find characters near Flight of Passage exit.' },
+      ]
+    },
+    {
+      park:'Universal Studios', emoji:'🎬', color:'#003087',
+      meets:[
+        { character:'Harry Potter characters', location:'Diagon Alley', type:'Outdoor', wait:'20–60 min', notes:'Harry, Ron, Hermione rotate appearances. Check Universal app for times.' },
+        { character:'SpongeBob & Friends', location:'Springfield', type:'Outdoor', wait:'10–25 min', notes:'SpongeBob, Patrick, Sandy roam the Simpsons area.' },
+        { character:'Shrek / Donkey', location:'Kids Zone', type:'Outdoor', wait:'10–20 min', notes:'DreamWorks characters appear throughout the day.' },
+        { character:'Minions', location:'Minion Land', type:'Indoor + Outdoor', wait:'15–35 min', notes:'Multiple Minions appear in and around the Minion area. Very playful and interactive.' },
+      ]
+    },
+  ];
+
+  const STRATEGY = [
+    { icon:'⏰', title:'Time Your Meets', tip:'First 90 minutes of park opening and last 60 minutes before close have shortest character meet waits. Avoid midday (11am–3pm).' },
+    { icon:'📱', title:'Use the App', tip:'Disney and Universal apps show wait times for character meets in real-time. Check at park open and plan around queue lengths.' },
+    { icon:'🎯', title:'Meet the Hardest First', tip:'Go directly to rarest/most popular characters (Anna & Elsa, Mickey at Town Square) within 20 minutes of park opening.' },
+    { icon:'📸', title:'Park PhotoPass', tip:'Disney PhotoPass photographers at meets often get better angles than personal cameras. Always ask them to shoot even if you want your own photo too.' },
+    { icon:'💌', title:'Characters Love Letters', tip:'Write a letter to your favorite character and present it at the meet. Characters will interact with it and often write back via mail.' },
+    { icon:'🎨', title:'Autograph Books', tip:'Bring a dedicated autograph book (or use a plain notebook). Characters spend time personalizing signatures — makes waits feel worthwhile.' },
+    { icon:'👶', title:'Shy Kids Strategy', tip:'If your child is nervous: watch a meet from a distance first, then approach. Cast Members are trained to handle anxiety — they\'ll never force an interaction.' },
+    { icon:'🎉', title:'Birthday / Anniversary', tip:'Mention milestones at character meets — characters become extra expressive and celebratory. The photos are incredible.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-character-guide';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const header = document.createElement('div');
+    header.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#7B1FA2,#E91E63,#FF6B9D);padding:16px 14px 14px;';
+    header.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:#fff;">Character Meet & Greet Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">All 5 parks · Strategy · Best meets</div>
+        </div>
+        <span style="font-size:24px;">🧸</span>
+      </div>`;
+
+    const content = document.createElement('div');
+    content.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    // Strategy
+    const stratCard = document.createElement('div');
+    stratCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;padding:14px;margin-bottom:14px;border:1px solid var(--border,#eee);';
+    stratCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:10px;">🧠 Master Strategy</div>`;
+    STRATEGY.forEach(s2 => {
+      const row = document.createElement('div');
+      row.style.cssText = 'margin-bottom:10px;';
+      row.innerHTML = `
+        <div style="display:flex;gap:8px;align-items:flex-start;">
+          <span style="font-size:16px;">${s2.icon}</span>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);">${s2.title}</div>
+            <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${s2.tip}</div>
+          </div>
+        </div>`;
+      stratCard.appendChild(row);
+    });
+    content.appendChild(stratCard);
+
+    // Characters by park
+    CHARACTERS.forEach(park => {
+      const parkHeader = document.createElement('div');
+      parkHeader.style.cssText = `background:${park.color};border-radius:10px 10px 0 0;padding:8px 14px;margin-top:14px;`;
+      parkHeader.innerHTML = `<div style="font-size:13px;font-weight:700;color:#fff;">${park.emoji} ${park.park}</div>`;
+      content.appendChild(parkHeader);
+
+      park.meets.forEach((meet, idx) => {
+        const row = document.createElement('div');
+        const isLast = idx === park.meets.length - 1;
+        row.style.cssText = `background:var(--card-bg,#fff);padding:10px 14px;border-left:1px solid ${park.color}33;border-right:1px solid ${park.color}33;${isLast ? `border-bottom:1px solid ${park.color}33;border-radius:0 0 10px 10px;margin-bottom:4px;` : 'border-bottom:1px solid var(--border,#f0f0f0);'}`;
+        row.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3px;">
+            <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);flex:1;">${meet.character}</div>
+            <span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;background:${park.color}15;color:${park.color};flex-shrink:0;">${meet.wait}</span>
+          </div>
+          <div style="font-size:10px;color:var(--text-secondary,#888);margin-bottom:3px;">${meet.location} · ${meet.type}</div>
+          <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.4;">${meet.notes}</div>`;
+        content.appendChild(row);
+      });
+    });
+
+    const spacer = document.createElement('div');
+    spacer.style.height = '20px';
+    content.appendChild(spacer);
+
+    s.appendChild(header);
+    s.appendChild(content);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-character-guide')) buildScreen();
+
+  const _prevSS_bbbb = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_bbbb) _prevSS_bbbb(name, el);
+    if (name === 'character-guide') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-character-guide');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectCharCard() {
+    if (document.getElementById('char-home-card')) return true;
+    const ref = document.getElementById('golf-home-card') || document.getElementById('cruise-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'char-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#7B1FA2,#E91E63,#FF6B9D);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('character-guide');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:3px;">🧸 Character Meet Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.85);">All 5 parks · Best meets · Strategy to skip waits</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.5);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _charCard = false;
+  setInterval(() => { if (!_charCard) _charCard = injectCharCard(); }, 25000);
+  setTimeout(() => { _charCard = injectCharCard(); }, 21500);
+
+  const _prevRH_bbbb = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_bbbb) _prevRH_bbbb.apply(this, arguments);
+    setTimeout(() => { _charCard = false; _charCard = injectCharCard(); }, 4900);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK CCCC: Honeymoon Planning Guide ===== */
+(function initHoneymoonGuide() {
+
+  const EXPERIENCES = [
+    {
+      category:'Magical Extras at Disney', icon:'✨', color:'#7B1FA2',
+      items:[
+        { name:'Honeymoon Button + Celebration', price:'Free', desc:'Get a "Just Married" button at Guest Services. Cast Members will congratulate you all day — often leading to surprise upgrades and complimentary treats.' },
+        { name:'Cinderella\'s Royal Table Dinner', price:'$$$', desc:'Dinner inside Cinderella Castle. Limited availability — book exactly 60 days out at 6am. One of the most romantic settings in any theme park.' },
+        { name:'After-Hours Experience', price:'$150–200/person', desc:'Private after-hours events at Magic Kingdom or EPCOT. Walk-on rides, near-empty parks. The most magical theme park experience you can have as a couple.' },
+        { name:'Disney Private VIP Tour', price:'$450–850/hr (min 7 hrs)', desc:'Private guide, skip every line, customized park experience. The ultimate Disney honeymoon upgrade for couples with flexibility in budget.' },
+        { name:'Fireworks Dessert Party', price:'$90–130/person', desc:'Reserved fireworks viewing area with unlimited desserts and specialty cocktails. At Magic Kingdom or EPCOT. Book 60 days out.' },
+      ]
+    },
+    {
+      category:'Romantic Dining', icon:'🍷', color:'#c62828',
+      items:[
+        { name:'Victoria & Albert\'s', price:'$$$$', desc:'AAA 5-Diamond restaurant at Grand Floridian. The finest dining in all of Orlando. Chef\'s Table with wine pairing is a 3-hour culinary journey. Book months ahead.' },
+        { name:'Capa at Four Seasons', price:'$$$', desc:'Rooftop steakhouse with Disney fireworks views. Spanish-inspired, exceptional wine list. One of the best restaurants in Florida.' },
+        { name:'Ravello at Four Seasons', price:'$$$', desc:'Italian fine dining overlooking the Four Seasons pool. Character breakfasts by day, romantic dinners by night.' },
+        { name:'Narcoossee\'s', price:'$$$', desc:'Waterfront fine dining at Grand Floridian. Disney fireworks view from the water. Best "mid-range" romantic Disney restaurant.' },
+        { name:'Hemingways at Hyatt Regency', price:'$$', desc:'Waterfront dining with Key West vibes. Excellent seafood, great sunset views, more affordable than resort restaurants.' },
+      ]
+    },
+    {
+      category:'Luxe Experiences', icon:'💎', color:'#1565C0',
+      items:[
+        { name:'Four Seasons Honeymoon Package', price:'Inquire', desc:'Champagne, rose petals, couple\'s spa, in-room amenity setup. The hotel does honeymoon packages properly — the room preparation alone is worth it.' },
+        { name:'Grand Bohemian Romance Package', price:'~$350+/night', desc:'Art hotel in downtown Orlando. Candlelit room, champagne, rose petal turndown. Boutique romance at its best.' },
+        { name:'Hot Air Balloon at Dawn', price:'~$280/couple', desc:'Float above Orlando at sunrise with champagne. The most romantic Orlando experience not inside a theme park.' },
+        { name:'Sunset Cruise on Lake Tohopekaliga', price:'~$90/couple', desc:'Private or small-group sunset boat tour on a beautiful Florida lake. Stunning sky, peaceful water, unforgettable.' },
+        { name:'Couple\'s Spa at Spa at Four Seasons', price:'~$400/couple', desc:'Side-by-side treatment rooms, couples massage, access to private pools and spa facilities. A full day of relaxation.' },
+      ]
+    },
+    {
+      category:'Free & Low-Cost Magic', icon:'🌹', color:'#2E7D32',
+      items:[
+        { name:'Sunrise at EPCOT World Showcase', price:'Park admission', desc:'Walk around World Showcase at opening — empty walkways, soft light on the pavilions. Deeply romantic and completely free beyond park entry.' },
+        { name:'Magic Kingdom at Night', price:'Park admission', desc:'Strolling Main Street as the castle is illuminated, the castle projection show, holding hands during the fireworks. No extra cost.' },
+        { name:'Stargazing at Lake Nona', price:'Free', desc:'Blanket, wine from a corner store, a Florida sky. Billions of stars. One of the best free dates in all of Orlando.' },
+        { name:'Craft Beer Tour in Ivanhoe Village', price:'$30–60', desc:'Walk between craft taprooms in this artsy neighborhood — Redlight Redlight, Ten10 Brewing. Relaxed, fun, and affordable.' },
+        { name:'Winter Park Scenic Boat Tour', price:'~$16/person', desc:'1-hour guided tour of Winter Park\'s chain of lakes. Beautiful homes, cypress trees, wildlife. Hidden gem romantic activity.' },
+      ]
+    },
+  ];
+
+  const PLANNING_TIMELINE = [
+    { when:'12 months before', tasks:['Book your hotel (especially Disney and Four Seasons)','Reserve Disney After-Hours if available','Book Victoria & Albert\'s if that\'s your goal'] },
+    { when:'6 months before', tasks:['Book flights for best rates','Research park ticket options and date flexibility','Plan rough itinerary — parks vs resort days'] },
+    { when:'60 days before', tasks:['Book all Disney dining reservations (6am sharp)','Book Fireworks Dessert Party','Reserve any Disney VIP tour','Book Oga\'s Cantina walk-up list strategy'] },
+    { when:'30 days before', tasks:['Book Universal dining (30-day booking window)','Download all park apps and link tickets','Set up Disney MagicBand+','Order Photopass Memory Maker if desired'] },
+    { when:'7 days before', tasks:['Confirm all reservations','Buy souvenirs list — ship to hotel to lighten luggage','Notify hotels of honeymoon — they will prepare something special','Pack comfortable walking shoes — this is non-negotiable'] },
+    { when:'Day of', tasks:['Get "Just Married" buttons at Guest Services','Mention honeymoon at every restaurant — you will be surprised at the treatment','Take photos in front of Cinderella Castle at sunrise before crowds arrive'] },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-honeymoon-guide';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:#1a0a15;flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;color:#fff;';
+
+    const header = document.createElement('div');
+    header.style.cssText = 'flex-shrink:0;background:linear-gradient(160deg,#3B0010,#8B1A4A,#C9A96E 120%);padding:16px 14px 14px;';
+    header.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:#F5E6CA;">Honeymoon Planning Guide</div>
+          <div style="font-size:11px;color:rgba(245,230,202,.7);">The ultimate Orlando honeymoon</div>
+        </div>
+        <span style="font-size:24px;">💍</span>
+      </div>
+      <div style="background:rgba(255,255,255,.1);border-radius:10px;padding:8px 12px;font-size:12px;color:rgba(255,255,255,.85);line-height:1.5;">
+        Orlando is secretly one of the world's best honeymoon destinations — world-class hotels, incredible dining, and experiences you literally cannot get anywhere else on Earth.
+      </div>`;
+
+    const content = document.createElement('div');
+    content.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    // Experiences by category
+    EXPERIENCES.forEach(cat => {
+      const catHeader = document.createElement('div');
+      catHeader.style.cssText = `display:flex;align-items:center;gap:8px;margin:14px 0 8px;`;
+      catHeader.innerHTML = `
+        <span style="font-size:20px;">${cat.icon}</span>
+        <div style="font-size:13px;font-weight:800;color:${cat.color};">${cat.category.toUpperCase()}</div>`;
+      content.appendChild(catHeader);
+
+      cat.items.forEach(item => {
+        const card = document.createElement('div');
+        card.style.cssText = 'background:rgba(255,255,255,.05);border-radius:12px;margin-bottom:8px;padding:11px 13px;border:1px solid rgba(255,255,255,.1);';
+        card.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
+            <div style="font-size:13px;font-weight:700;color:#F5E6CA;flex:1;line-height:1.3;">${item.name}</div>
+            <span style="font-size:11px;font-weight:700;color:#C9A96E;flex-shrink:0;margin-left:8px;">${item.price}</span>
+          </div>
+          <div style="font-size:12px;color:rgba(255,255,255,.7);line-height:1.5;">${item.desc}</div>`;
+        content.appendChild(card);
+      });
+    });
+
+    // Planning timeline
+    const tlHeader = document.createElement('div');
+    tlHeader.style.cssText = 'font-size:13px;font-weight:800;color:#C9A96E;margin:18px 0 10px;';
+    tlHeader.textContent = '📅 PLANNING TIMELINE';
+    content.appendChild(tlHeader);
+
+    PLANNING_TIMELINE.forEach(phase => {
+      const phaseCard = document.createElement('div');
+      phaseCard.style.cssText = 'background:rgba(255,255,255,.04);border-radius:12px;margin-bottom:8px;padding:11px 13px;border-left:3px solid #C9A96E;';
+      phaseCard.innerHTML = `
+        <div style="font-size:12px;font-weight:700;color:#C9A96E;margin-bottom:5px;">${phase.when}</div>
+        ${phase.tasks.map(t=>`<div style="font-size:11px;color:rgba(255,255,255,.8);padding:2px 0;">✓ ${t}</div>`).join('')}`;
+      content.appendChild(phaseCard);
+    });
+
+    const note = document.createElement('div');
+    note.style.cssText = 'background:rgba(201,169,110,.1);border-radius:12px;padding:14px;margin:14px 0 20px;text-align:center;border:1px solid rgba(201,169,110,.3);';
+    note.innerHTML = `
+      <div style="font-size:28px;margin-bottom:8px;">💍</div>
+      <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:#C9A96E;margin-bottom:6px;">The Golden Rule</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.75);line-height:1.6;">
+        Tell everyone — your hotel, restaurants, Cast Members — that you're on your honeymoon. Disney and Universal staff are trained to make special occasions memorable. Cast Members have surprising latitude to make magic happen when they know the occasion.
+      </div>`;
+    content.appendChild(note);
+
+    s.appendChild(header);
+    s.appendChild(content);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-honeymoon-guide')) buildScreen();
+
+  const _prevSS_cccc = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_cccc) _prevSS_cccc(name, el);
+    if (name === 'honeymoon-guide') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-honeymoon-guide');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectHoneymoonCard() {
+    if (document.getElementById('honeymoon-home-card')) return true;
+    const ref = document.getElementById('char-home-card') || document.getElementById('golf-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'honeymoon-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(160deg,#3B0010,#8B1A4A,#C9A96E);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('honeymoon-guide');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#F5E6CA;margin-bottom:3px;">💍 Honeymoon Planning Guide</div>
+          <div style="font-size:11px;color:rgba(245,230,202,.85);">Victoria & Albert's · Disney magic · Timeline</div>
+        </div>
+        <span style="font-size:22px;color:rgba(245,230,202,.5);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _honeymoonCard = false;
+  setInterval(() => { if (!_honeymoonCard) _honeymoonCard = injectHoneymoonCard(); }, 25500);
+  setTimeout(() => { _honeymoonCard = injectHoneymoonCard(); }, 22000);
+
+  const _prevRH_cccc = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_cccc) _prevRH_cccc.apply(this, arguments);
+    setTimeout(() => { _honeymoonCard = false; _honeymoonCard = injectHoneymoonCard(); }, 5100);
+  };
+})();
+</script>
