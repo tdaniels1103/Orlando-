@@ -61278,3 +61278,335 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK JJJJJJJ: Orlando Character Meet & Greet Complete Guide ===== */
+(function initCharacterMeets() {
+
+  const CHARACTER_GUIDES = [
+    {
+      name:'Face Characters — Princesses', emoji:'👑', color:'#C9A96E',
+      location:'Multiple parks',
+      characters:[
+        {name:'Cinderella & Elena', where:'Princess Fairytale Hall (Magic Kingdom)', note:'The most in-demand princess meet. One hall has Cinderella, another has a rotating princess. Queue consistently 45–90 minutes. Use LL.'},
+        {name:'Rapunzel & Tiana', where:'Princess Fairytale Hall (Magic Kingdom)', note:'Located in the second hall. Waits slightly shorter than Cinderella. Both together in the same location.'},
+        {name:'Ariel', where:'Ariel\'s Grotto (Magic Kingdom)', note:'Dedicated grotto in Fantasyland. Ariel in mermaid form — she sits at the edge of the water. Magical setting.'},
+        {name:'Snow White', where:'Storybook Treats (Magic Kingdom, sporadic)', note:'Less consistent availability than other princesses. Check the MDE app day-of for current location.'},
+        {name:'Mulan, Merida, Pocahontas', where:'Various locations, Animal Kingdom & EPCOT', note:'These princesses are at various locations — EPCOT\'s Princess Fantasy Faire and Animal Kingdom\'s Discovery Island. Check app.'},
+      ],
+      tip:'Princess meets at Magic Kingdom run 45–90 minute waits consistently. Use Lightning Lane (available for Princess Fairytale Hall). Alternatively, character dining (Cinderella\'s Royal Table, Akershus) provides princess interaction with a meal.',
+    },
+    {
+      name:'Mickey & Friends', emoji:'🐭', color:'#003087',
+      location:'Primarily Magic Kingdom',
+      characters:[
+        {name:'Mickey Mouse', where:'Town Square Theater (Main Street, MK)', note:'Mickey in a variety of costumes. The most beloved character meet. Shorter lines at park opening and near closing.'},
+        {name:'Minnie Mouse', where:'Fantasyland/Town Square area (MK)', note:'Often near the Pavilion area. Her meet changes seasonally. Check the MDE app.'},
+        {name:'Goofy & Pluto', where:'Pete\'s Silly Sideshow (Storybook Circus, MK)', note:'Together in the same location. Fun circus theming, shorter wait than Mickey. Great for young children.'},
+        {name:'Donald & Daisy', where:'Pete\'s Silly Sideshow (MK) / Character boat locations', note:'Donald and Daisy rotate locations. Pete\'s Silly Sideshow and various character cruises.'},
+        {name:'Chip \'n\' Dale', where:'Various (multiple parks)', note:'Often in Frontierland or Adventureland at MK, and roaming in Animal Kingdom. Lower wait than main characters.'},
+      ],
+      tip:'Mickey at Town Square Theater accepts Lightning Lane — use it. The queue for Mickey can reach 60 minutes without LLP. Arrive at park opening and make Mickey your first stop for a 10-15 minute wait.',
+    },
+    {
+      name:'Star Wars Characters', emoji:'⭐', color:'#1a1a2e',
+      location:'Galaxy\'s Edge, Hollywood Studios',
+      characters:[
+        {name:'Rey', where:'Galaxy\'s Edge (Hollywood Studios)', note:'Roving character throughout the land. No designated meet location — she encounters guests throughout Batuu. Improvisational interaction.'},
+        {name:'Chewbacca', where:'Galaxy\'s Edge (HS)', note:'Walks through the land with handlers. The interactions are extended — Chewie\'s handlers create full scenes.'},
+        {name:'Kylo Ren', where:'Galaxy\'s Edge (HS)', note:'The most dramatic character interaction at any Disney park. Kylo Ren\'s stormtrooper escort and commanding presence transforms the meet into theater.'},
+        {name:'Darth Vader', where:'Launch Bay (HS)', note:'Designated meet location with the most iconic villain in film. The sound design (breathing, soundtrack) creates an impressive experience.'},
+      ],
+      tip:'Galaxy\'s Edge characters are roving — not in designated meet-and-greet lines. Rey and Chewbacca appear throughout the land in "casual" encounters that feel more natural than queue-based meets. Check the My Disney Experience app for scheduled roving times.',
+    },
+    {
+      name:'Character Dining', emoji:'🍽️', color:'#2E7D32',
+      location:'Multiple Disney restaurants',
+      characters:[
+        {name:'Chef Mickey\'s (Contemporary Resort)', where:'Contemporary Resort', note:'Mickey, Minnie, Donald, Goofy, and Pluto visit every table during a buffet meal. All-day (breakfast, brunch, dinner). The most comprehensive character dining for Mickey\'s friends.'},
+        {name:'Cinderella\'s Royal Table (MK)', where:'Cinderella Castle interior', note:'Breakfast inside the actual castle tower. Princess characters visit. The most magical dining environment at Disney World. Requires advance booking at 60 days.'},
+        {name:'Tusker House (Animal Kingdom)', where:'Animal Kingdom', note:'Donald\'s Safari breakfast with Donald, Daisy, Mickey, and Goofy in safari gear. All-you-can-eat African-inspired breakfast. Very popular.'},
+        {name:'Topolino\'s Terrace Breakfast (EPCOT)', where:'Riviera Resort', note:'Mickey, Minnie, Daisy, and Donald in artist costumes on the EPCOT rooftop. Stunning views. Requires Skyliner access from EPCOT area hotels.'},
+        {name:'Akershus Royal Banquet Hall (EPCOT)', where:'Norway Pavilion, EPCOT', note:'Princess character dining: Ariel, Belle, Aurora, Snow White, Cinderella — at your table. All-you-can-eat Norwegian-inspired food. Underrated alternative to Cinderella\'s Royal Table.'},
+      ],
+      tip:'Character dining combines the character experience with a meal — using a Table Service credit if you\'re on the Dining Plan. The value calculation: Chef Mickey\'s ($55/adult) provides 5 character interactions, 45 minutes of visit, all-you-can-eat food. Compare to the park queue (45 min per character × 5 characters = 3+ hours of queue).',
+    },
+  ];
+
+  const MEET_TIPS = [
+    {icon:'📱', tip:'My Disney Experience shows current character locations and scheduled meet times. Check the app the morning of your park day — locations change daily. Set up a notification for your priority character.'},
+    {icon:'⏰', tip:'Character meets have the shortest waits in the first 30 minutes of park opening and the last 30 minutes before closing. These are the two windows when everyone else is at rides.'},
+    {icon:'📸', tip:'Disney PhotoPass photographers are stationed at most character meets. They use the official Disney camera setup with lighting. The photos are included with Memory Maker or can be purchased individually.'},
+    {icon:'👗', tip:'Children in costume have more engaged character interactions. A child dressed as Cinderella meeting Cinderella creates a multi-minute theatrical interaction. Many families plan Disney outfits around their planned character meetings.'},
+    {icon:'💡', tip:'Roving characters (not in queue lines) often have shorter waits because guests don\'t know where to find them. Check the Times Guide in the MDE app — it lists scheduled character appearances and approximate locations.'},
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-character-meets';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#C9A96E,#003087,#2E7D32);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Character Meet & Greet Guide</div>
+          <div style="font-size:11px;opacity:.8;">Princesses · Mickey & Friends · Star Wars · Character Dining</div>
+        </div>
+        <span style="font-size:28px;">👑</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        Disney character meets are one of the most meaningful park experiences for young children — and often for adults who grew up with these characters. Knowing where to find them and how to minimize the queue makes the difference between 2 character interactions and 8.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    CHARACTER_GUIDES.forEach(guide => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:9px 14px;background:${guide.color}18;border-left:4px solid ${guide.color};">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:20px;">${guide.emoji}</span>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${guide.name}</div>
+              <div style="font-size:10px;color:var(--text-secondary,#888);">${guide.location}</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:8px 14px;">
+          ${guide.characters.map(c=>`<div style="margin-bottom:7px;padding-bottom:7px;border-bottom:1px solid var(--border,#f5f5f5);padding-left:8px;border-left:3px solid ${guide.color};">
+            <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);">${c.name}</div>
+            <div style="font-size:10px;color:${guide.color};font-weight:600;">${c.where}</div>
+            <div style="font-size:10px;color:var(--text-secondary,#666);">${c.note}</div>
+          </div>`).join('')}
+          <div style="display:flex;gap:5px;background:${guide.color}0d;border-radius:8px;padding:6px;margin-top:5px;">
+            <span style="font-size:11px;flex-shrink:0;">💡</span>
+            <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${guide.tip}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const tipsCard = document.createElement('div');
+    tipsCard.style.cssText = 'background:linear-gradient(135deg,#C9A96E,#003087);border-radius:14px;margin-bottom:20px;padding:14px;color:#fff;';
+    tipsCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;margin-bottom:8px;">💡 Character Meet Strategy</div>
+    ${MEET_TIPS.map(t=>`<div style="display:flex;gap:10px;margin-bottom:7px;align-items:flex-start;">
+      <span style="font-size:18px;flex-shrink:0;">${t.icon}</span>
+      <div style="font-size:11px;opacity:.95;line-height:1.5;">${t.tip}</div>
+    </div>`).join('')}`;
+    body.appendChild(tipsCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-character-meets')) buildScreen();
+
+  const _prevSS_jjjjjjj = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_jjjjjjj) _prevSS_jjjjjjj(name, el);
+    if (name === 'character-meets') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-character-meets');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectCMCard() {
+    if (document.getElementById('character-meets-home-card')) return true;
+    const ref = document.getElementById('busch-gardens-home-card') || document.getElementById('vip-luxury-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'character-meets-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#C9A96E,#003087,#2E7D32 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('character-meets');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">👑</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Character Meet & Greet Guide</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Princesses · Mickey · Star Wars · Character Dining · Strategy</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _cmCard = false;
+  setInterval(() => { if (!_cmCard) _cmCard = injectCMCard(); }, 96000);
+  setTimeout(() => { _cmCard = injectCMCard(); }, 92500);
+  const _prevRH_jjjjjjj = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_jjjjjjj) _prevRH_jjjjjjj.apply(this, arguments);
+    setTimeout(() => { _cmCard = false; _cmCard = injectCMCard(); }, 33400);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK KKKKKKK: Orlando First-Timer Complete FAQ ===== */
+(function initOrlandoFirstTimer() {
+
+  const FAQ_SECTIONS = [
+    {
+      category:'Planning Fundamentals', emoji:'📋', color:'#003087',
+      questions:[
+        {q:'How many days do I need?', a:'For Disney only: 5–7 days covers all 4 parks comfortably (1–1.5 days per park). For Disney + Universal: 8–10 days. For Disney + Universal + SeaWorld + day trips: 12–14 days. Most families do 7–10 days total.'},
+        {q:'When is the best time to visit?', a:'January–February (after New Year\'s) and September–early November are the least crowded and most affordable periods. Avoid: Christmas week (busiest of the year), Spring Break (mid-March to mid-April), and all Florida summer Saturdays. The sweet spot is mid-January or late September.'},
+        {q:'How far in advance should I book?', a:'Hotel: 6–12 months for peak dates, 3–6 months off-peak. Disney restaurant reservations (ADRs): exactly 60 days before your trip date — set a 6 AM alarm, as the best tables (Cinderella\'s Royal Table, Be Our Guest dinner, Topolino\'s) fill within hours. Park tickets: as soon as your dates are set.'},
+        {q:'Should I stay on Disney property?', a:'On-site Disney hotels offer Early Theme Park Entry (30 minutes before general public) and free transportation (Monorail, boats, buses). The math: a 7-night on-site stay gives you 7 mornings of 30-minute early access. Off-site gives better price per room. The decision depends on whether transportation and early access are worth a 30–50% hotel premium.'},
+      ],
+    },
+    {
+      category:'Tickets & Passes', emoji:'🎟️', color:'#C62828',
+      questions:[
+        {q:'What is the Lightning Lane / Genie+ system?', a:'Genie+ ($35–45/day added cost) replaced FastPass+. It gives you 1 Lightning Lane reservation at a time, usable at most (but not all) attractions. Individual Lightning Lane ($7–25 per ride) covers the top-tier rides (Tron, ROTR, Guardians). The system has been criticized as complex and expensive — budget an extra $50–100/day per person for full Lightning Lane access.'},
+        {q:'Is the Disney Dining Plan worth it?', a:'In 2024, Disney reintroduced the Dining Plan with alcohol now included. The Quick-Service plan ($57/adult/day) makes sense if you plan 2 quick-service meals daily. The Standard plan ($94/adult/day) works if you have one table-service reservation per day. Do the math for your specific restaurant list — the plan is not universally a value.'},
+        {q:'Universal Express Pass — is it worth it?', a:'Universal Express Pass ($90–200/day) provides one-time access to most rides without waiting in the standby line. At Universal Studios Florida and Islands of Adventure, it dramatically reduces a full-park day. On slow days: unnecessary. On busy days (holidays, summer): can save 3–4 hours of waiting. Premier Annual Passholders get it free — the annual pass math often makes the pass more valuable than a single Express ticket.'},
+        {q:'What\'s a park hopper?', a:'Park Hopper adds $65/person to any Disney ticket and allows entry to multiple parks in a single day (after 2 PM). With a park hopper: start at Magic Kingdom for morning, hop to EPCOT for evening (Food & Wine, dinner at World Showcase). Most visitors use the hop for at least 2 of their park days. Worth it for 4+ day trips.'},
+      ],
+    },
+    {
+      category:'Getting Around', emoji:'🚗', color:'#2E7D32',
+      questions:[
+        {q:'Do I need a rental car?', a:'If staying on Disney property: no rental car needed. Disney transportation covers all 4 parks, Springs, and all Disney hotels. If going off-property (Universal, SeaWorld, restaurants): Uber/Lyft is usually cheaper than daily rental car + parking fees for occasional off-property trips. If doing day trips (Clearwater Beach, Kennedy Space Center): rent a car for those specific days only.'},
+        {q:'How does Disney transportation work?', a:'Disney runs the largest private bus fleet in the world. Buses connect every Disney hotel to every park and Disney Springs (20–45 minute frequency). The Monorail covers MK area hotels and EPCOT. The Skyliner gondola connects EPCOT and Hollywood Studios to Caribbean Beach, Pop Century, Art of Animation, and Riviera Resort. Boats serve Grand Floridian, Wilderness Lodge, Fort Wilderness, and Magic Kingdom.'},
+        {q:'How far is everything from each other?', a:'Disney parks cluster within 4 miles of each other. Universal is 10 miles from Magic Kingdom. SeaWorld is 7 miles from Disney. I-Drive (International Drive) runs 11 miles and connects Universal to SeaWorld. Downtown Orlando is 20 miles from Magic Kingdom. All major parks are within 30 minutes of each other by car in non-peak traffic.'},
+        {q:'Parking costs?', a:'Disney park parking: $30/day (standard), $50/day (preferred). Disney Springs: free. Universal: $30/day standard, $50/day preferred, free at CityWalk. SeaWorld: $25/day. All major parks except Disney Springs charge for parking. Annual Passes typically include free parking at their own park(s).'},
+      ],
+    },
+    {
+      category:'First Day Essentials', emoji:'🌟', color:'#7B1FA2',
+      questions:[
+        {q:'What should I do on arrival day?', a:'Don\'t try to do a full park on arrival day. Check in, explore your resort, swim in the pool, visit Disney Springs or CityWalk for dinner. If you must do a park, do a half-day at EPCOT (easy access, no height requirements for most rides) or Magic Kingdom after 4 PM.'},
+        {q:'What to pack?', a:'Essentials: comfortable walking shoes (you\'ll walk 8–15 miles per park day), portable phone charger (battery dies from app use), rain poncho (afternoon Florida storms are guaranteed May–September), refillable water bottle (free water at all Disney quick-service locations), small backpack or fanny pack. Avoid: large backpacks with frames (slow bag check), umbrellas (impractical in theme park crowds), excess clothing.'},
+        {q:'How hot is Florida and when?', a:'June–September: 90–95°F daily, 80%+ humidity. Thunderstorms at 3–4 PM almost daily from May–September. October–April: 70–85°F most days, occasionally cooler. January–February can have 50°F nights. December–February can have brief cool snaps. Pack layers for evening in winter; plan indoor breaks at midday in summer.'},
+        {q:'What apps do I need?', a:'My Disney Experience (MDE): Disney park maps, Lightning Lane booking, restaurant reservations, wait times, mobile order. Universal App: Express Pass reservations, virtual lines, dining. Google Maps: navigation between locations. Unofficial guide apps (Touring Plans): independent wait time predictions and itinerary optimization. All four are worth downloading before your trip.'},
+      ],
+    },
+    {
+      category:'Money & Budget', emoji:'💰', color:'#5D4037',
+      questions:[
+        {q:'What does a typical Orlando trip cost?', a:'Budget breakdown for a family of 4 (7 nights, 5 park days): Hotel $200–1,200/night × 7 = $1,400–8,400. Park tickets: $109–189/person × 4 people × 5 days = $2,180–3,780. Food: $200–400/day × 7 = $1,400–2,800. Total range: $5,000–15,000+. Budget travelers staying off-site hit the low end; Disney on-site with character dining hits the high end.'},
+        {q:'Where can I save money?', a:'Free water at all Disney quick-service restaurants (just ask). Annual Passes if visiting 3+ days per year. Grocery delivery to your hotel (avoid resort convenience store markup). Off-peak travel. Off-site hotels with free parking and free shuttle. Skip Genie+ on slow days. Pack snacks into the parks — all Disney parks allow outside food (no glass, no alcohol). Universal allows outside food too.'},
+        {q:'What is genuinely not worth paying for?', a:'Disney Genie+ on slow January/September days — standby lines are short without it. Premium themed hotel rooms (the standard rooms have the same park access). In-park merchandise bought in the first hour — identical items are at the exit. Expensive character meals for children under 2 (they\'re free but overwhelmed by the experience). Overpriced resort pool toys and sunscreen — buy before arrival.'},
+      ],
+    },
+  ];
+
+  const FIRSTTIMER_MISTAKES = [
+    {icon:'❌', mistake:'Trying to do everything', fix:'Choose 3–4 must-do experiences per park and treat everything else as a bonus. You will not see everything — experienced visitors with Annual Passes haven\'t either.'},
+    {icon:'❌', mistake:'Skipping the midday break', fix:'Return to your hotel from 12–4 PM every day. Pool, nap, shower. Re-enter rested. Families who power through midday without a break run out of energy by 6 PM and miss the best evening events.'},
+    {icon:'❌', mistake:'Booking the wrong hotel', fix:'For first-timers with children: stay on Disney property (the transportation magic is real and worth the premium for ages 3–10). For adults or teens without young children: off-site gives more value per dollar.'},
+    {icon:'❌', mistake:'Not making dining reservations', fix:'For any table-service restaurant, book at 60 days out exactly. The best restaurants (Cinderella\'s Royal Table, Be Our Guest, Topolino\'s, Oga\'s Cantina) book out completely within hours of opening.'},
+    {icon:'❌', mistake:'Overpacking the schedule', fix:'Plan 3–4 major rides/experiences per park day, not 10–12. Theme parks involve far more walking, waiting, and unexpected moments than the guidebooks suggest. Families consistently cite "we tried to do too much" as their biggest first-trip mistake.'},
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-first-timer';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#003087,#C9A96E,#C62828);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">First-Timer Complete FAQ</div>
+          <div style="font-size:11px;opacity:.8;">Planning · Tickets · Transport · Budget · Mistakes to avoid</div>
+        </div>
+        <span style="font-size:28px;">🌟</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        The 25 most important questions every first-time Orlando visitor asks — answered honestly, without the marketing spin.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    FAQ_SECTIONS.forEach(section => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:9px 14px;background:${section.color}18;border-left:4px solid ${section.color};">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:20px;">${section.emoji}</span>
+            <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${section.category}</div>
+          </div>
+        </div>
+        <div style="padding:8px 14px;">
+          ${section.questions.map(faq=>`<div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border,#f5f5f5);">
+            <div style="font-size:12px;font-weight:700;color:${section.color};margin-bottom:3px;">Q: ${faq.q}</div>
+            <div style="font-size:11px;color:var(--text-secondary,#444);line-height:1.6;">${faq.a}</div>
+          </div>`).join('')}
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const mistakesCard = document.createElement('div');
+    mistakesCard.style.cssText = 'background:linear-gradient(135deg,#C62828,#003087);border-radius:14px;margin-bottom:20px;padding:14px;color:#fff;';
+    mistakesCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;margin-bottom:8px;">🚫 5 First-Timer Mistakes (And Fixes)</div>
+    ${FIRSTTIMER_MISTAKES.map(m=>`<div style="background:rgba(255,255,255,.1);border-radius:10px;padding:9px;margin-bottom:7px;">
+      <div style="display:flex;gap:6px;align-items:flex-start;margin-bottom:4px;">
+        <span style="font-size:14px;flex-shrink:0;">${m.icon}</span>
+        <div style="font-size:12px;font-weight:700;">${m.mistake}</div>
+      </div>
+      <div style="font-size:11px;opacity:.9;line-height:1.5;padding-left:20px;">✅ ${m.fix}</div>
+    </div>`).join('')}`;
+    body.appendChild(mistakesCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-first-timer')) buildScreen();
+
+  const _prevSS_kkkkkkk = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_kkkkkkk) _prevSS_kkkkkkk(name, el);
+    if (name === 'first-timer') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-first-timer');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectFTCard() {
+    if (document.getElementById('first-timer-home-card')) return true;
+    const ref = document.getElementById('character-meets-home-card') || document.getElementById('busch-gardens-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'first-timer-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#003087,#C9A96E,#C62828 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('first-timer');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🌟</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">First-Timer Complete FAQ</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">25 essential questions · Budget · Tickets · Mistakes to avoid</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _ftCard = false;
+  setInterval(() => { if (!_ftCard) _ftCard = injectFTCard(); }, 97000);
+  setTimeout(() => { _ftCard = injectFTCard(); }, 93500);
+  const _prevRH_kkkkkkk = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_kkkkkkk) _prevRH_kkkkkkk.apply(this, arguments);
+    setTimeout(() => { _ftCard = false; _ftCard = injectFTCard(); }, 33800);
+  };
+})();
+</script>
