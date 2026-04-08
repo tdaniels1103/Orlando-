@@ -63760,3 +63760,318 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK XXXXXXX: Orlando Transportation & Getting Around Guide ===== */
+(function initOrlandoTransport() {
+
+  const TRANSPORT_OPTIONS = [
+    {
+      mode:'Walt Disney World Internal Transportation', emoji:'🚌', color:'#003087',
+      desc:'Disney operates the world\'s largest private bus fleet with boats, monorails, gondolas, and buses connecting all Disney properties.',
+      options:[
+        {name:'Disney Skyliner (Gondola)', coverage:'Caribbean Beach ↔ EPCOT ↔ Hollywood Studios ↔ Pop Century ↔ Art of Animation ↔ Riviera Resort', note:'The most pleasant Disney transport. Open-air gondolas with Magic Kingdom views. No wait on most morning runs. Holds 10 guests. Weather-sensitive — closes during lightning.'},
+        {name:'Disney Monorail', coverage:'TTC ↔ Magic Kingdom ↔ Grand Floridian ↔ Polynesian ↔ Contemporary | Separate loop: TTC ↔ EPCOT', note:'Two loops. The Magic Kingdom loop serves Magic Kingdom area hotels. Worth riding for the view even if you don\'t need it for transport. The EPCOT loop provides quick TTC–EPCOT access.'},
+        {name:'Disney Buses', coverage:'All Disney resorts to all 4 parks, Disney Springs, and water parks', note:'Run every 20 minutes. From resort to park takes 15–35 minutes depending on route. Bus hub at each park — multiple routes converge. Free to all Disney resort guests.'},
+        {name:'Disney Boats', coverage:'Magic Kingdom area: Grand Floridian, Wilderness Lodge, Fort Wilderness, Polynesian. Hollywood Studios / EPCOT area: BoardWalk, YC&BC, Swan & Dolphin', note:'Scenic but slower than buses. The ferry from TTC to Magic Kingdom is magical — best first approach to the park. Boats from Swan/Dolphin to HS/EPCOT offer a pleasant waterway route.'},
+      ],
+      tip:'Disney transportation adds 15–35 minutes each way vs. driving. For a 7-day trip with 2 park visits per day: that\'s 3.5–8 hours of additional transit time. Car or Lyft from resort to park is 5–8 minutes. The transit experience IS Disney — decide if the magic is worth the time.',
+    },
+    {
+      mode:'Rideshare — Uber & Lyft', emoji:'📱', color:'#7B1FA2',
+      desc:'Uber and Lyft operate extensively throughout the Orlando/Disney area with generally 3–8 minute pickup times.',
+      options:[
+        {name:'To/From Disney Parks', coverage:'All Disney parks and Disney Springs from any hotel or off-site location', note:'Designated rideshare pickup/dropoff areas at each park. Disney has rerouted rideshare pickup to secondary lots — follow the app\'s walking directions, not Google Maps. Often $8–15 for nearby Disney resorts to park.'},
+        {name:'To/From Universal', coverage:'Universal Studios Florida, Islands of Adventure, CityWalk', note:'Drop at the CityWalk entrance. Pickup from the designated Lyft/Uber lot south of CityWalk. Often $10–20 from Disney area.'},
+        {name:'Airport Transfers (MCO)', coverage:'MCO to any Disney or Universal area hotel', note:'Disney area: $35–60 from MCO (vs. $40 Mears Connect shared shuttle). For parties of 3–4, rideshare often beats shuttle pricing. For 1–2 people, compare carefully.'},
+      ],
+      tip:'Surge pricing at park closing (when 30,000+ guests all request rides simultaneously) can push prices 2–5× normal. Strategy: wait 20–30 minutes after park close for surge to subside, or use Disney transportation during peak egress.',
+    },
+    {
+      mode:'Rental Car', emoji:'🚗', color:'#C62828',
+      desc:'MCO has the largest rental car facility in the world — the Rental Car Center is a separate building connected to the terminals by automated people mover.',
+      options:[
+        {name:'On-Property Driving', coverage:'Between Disney parks, Disney Springs, off-site restaurants', note:'Disney doesn\'t require a car for on-property movement, but having one eliminates 20–40 minute bus waits. Parking at Disney parks costs $30/day — add this to rental cost.'},
+        {name:'Off-Property Trips', coverage:'Universal (10 min), SeaWorld (12 min), restaurants on I-Drive, grocery store', note:'For any off-Disney trip, a rental car is dramatically faster than rideshare. I-Drive to Disney: 15 minutes. Universal to Disney: 20 minutes.'},
+        {name:'Day Trips', coverage:'Tampa/Busch Gardens (90 min), Kennedy Space Center (60 min), Clearwater Beach (90 min)', note:'Rental car is essentially required for day trips. One-day rentals from MCO or National at the Disney area Dolphin hotel are typically $40–80/day.'},
+      ],
+      tip:'Rent the car from MCO when you arrive rather than from a Disney-area hotel (25% cheaper). Enterprise, National, and Alamo have the best rates. Budget in advance. Unlimited mileage is standard.',
+    },
+    {
+      mode:'SunRail Commuter Rail', emoji:'🚂', color:'#2E7D32',
+      desc:'Central Florida\'s commuter rail runs north-south through Orlando and into Sanford. Limited coverage for tourists but useful for specific routes.',
+      options:[
+        {name:'Downtown Orlando to Airport', coverage:'Sand Lake Road station → Downtown Orlando (1 transfer at MCO)', note:'Sunrail connects to MCO Terminal B via the automated people mover. For tourists staying near I-Drive, the Sand Lake Road station is accessible. $3–5 tickets.'},
+        {name:'DeBary to Downtown', coverage:'Northern suburbs into downtown — primarily commuter use', note:'Less tourist-relevant but the DeLand station is near Blue Spring State Park (manatee viewing) and Stetson University.'},
+      ],
+      tip:'SunRail is tourist-useful for one specific scenario: downtown Orlando hotel guests connecting to MCO without a car. Otherwise, limited park coverage makes it less practical than buses or rideshare.',
+    },
+  ];
+
+  const TRANSPORT_HACKS = [
+    {icon:'⏰', tip:'The most time-efficient move: arrive at any Disney park 45 minutes before open. The first 90 minutes have the shortest ride lines AND the shortest transportation wait. After that, lines and bus times both build.'},
+    {icon:'🏨', tip:'Disney resort guests can request "text me when my bus is close" in the My Disney Experience app. This eliminates standing at the bus stop — wait in air-conditioned comfort until your bus is 5 minutes out.'},
+    {icon:'🎡', tip:'The Universal Hotels walking path (Hard Rock/Portofino/Royal Pacific → CityWalk → parks) takes 12–18 minutes on foot. No bus needed. This is the fastest way into the Universal parks from those three hotels — faster than any shuttle.'},
+    {icon:'💡', tip:'Uber from a Disney hotel to Universal is faster than Disney bus + Lyft. Disney bus to TTC + internal transit to property exit = 30–45 minutes. Lyft directly from your hotel = 15 minutes.'},
+    {icon:'🛵', tip:'Lime scooters are available throughout the I-Drive corridor and downtown Orlando. For short hops (0.5–1.5 miles) between I-Drive destinations, scooters are faster than car and free parking.'},
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-transport';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#003087,#7B1FA2,#C62828);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Getting Around Orlando</div>
+          <div style="font-size:11px;opacity:.8;">Disney Skyliner · Monorail · Rideshare · Rental Car · SunRail</div>
+        </div>
+        <span style="font-size:28px;">🚌</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        Orlando's transportation landscape is uniquely complex — Disney operates its own transit network, Universal's hotels are walkable to the parks, and the choice between rideshare and rental car changes the trip's cost structure significantly.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    TRANSPORT_OPTIONS.forEach(mode => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:9px 14px;background:${mode.color}18;border-left:4px solid ${mode.color};">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:20px;">${mode.emoji}</span>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${mode.mode}</div>
+              <div style="font-size:10px;color:var(--text-secondary,#666);">${mode.desc}</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:8px 14px;">
+          ${mode.options.map(opt=>`<div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--border,#f5f5f5);">
+            <div style="font-size:12px;font-weight:700;color:${mode.color};margin-bottom:2px;">${opt.name}</div>
+            <div style="font-size:10px;color:var(--text-secondary,#888);font-weight:600;margin-bottom:2px;">${opt.coverage}</div>
+            <div style="font-size:10px;color:var(--text-secondary,#555);line-height:1.5;">${opt.note}</div>
+          </div>`).join('')}
+          <div style="display:flex;gap:5px;background:${mode.color}0d;border-radius:8px;padding:6px;margin-top:4px;">
+            <span style="font-size:11px;flex-shrink:0;">💡</span>
+            <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${mode.tip}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const hacksCard = document.createElement('div');
+    hacksCard.style.cssText = 'background:linear-gradient(135deg,#003087,#C62828);border-radius:14px;margin-bottom:20px;padding:14px;color:#fff;';
+    hacksCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;margin-bottom:8px;">🚌 Transport Hacks</div>
+    ${TRANSPORT_HACKS.map(h=>`<div style="display:flex;gap:10px;margin-bottom:7px;align-items:flex-start;">
+      <span style="font-size:18px;flex-shrink:0;">${h.icon}</span>
+      <div style="font-size:11px;opacity:.95;line-height:1.5;">${h.tip}</div>
+    </div>`).join('')}`;
+    body.appendChild(hacksCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-transport')) buildScreen();
+
+  const _prevSS_xxxxxxx = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_xxxxxxx) _prevSS_xxxxxxx(name, el);
+    if (name === 'transport') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-transport');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectTRCard() {
+    if (document.getElementById('transport-home-card')) return true;
+    const ref = document.getElementById('crowd-calendar-home-card') || document.getElementById('seaworld-deep-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'transport-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#003087,#7B1FA2,#C62828 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('transport');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🚌</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Getting Around Orlando</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Skyliner · Monorail · Rideshare · Rental Car · SunRail</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _trCard = false;
+  setInterval(() => { if (!_trCard) _trCard = injectTRCard(); }, 110000);
+  setTimeout(() => { _trCard = injectTRCard(); }, 106500);
+  const _prevRH_xxxxxxx = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_xxxxxxx) _prevRH_xxxxxxx.apply(this, arguments);
+    setTimeout(() => { _trCard = false; _trCard = injectTRCard(); }, 39000);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK YYYYYYY: Orlando Packing Guide & What to Wear ===== */
+(function initOrlandoPacking() {
+
+  const PACKING_CATEGORIES = [
+    {
+      category:'Footwear (Most Critical Category)', emoji:'👟', color:'#C62828',
+      items:[
+        {item:'Walking shoes (already broken in)', priority:'ESSENTIAL', note:'You will walk 8–15 miles per park day on pavement and concrete. Wearing new shoes to a theme park is the most common first-timer mistake. Break in shoes for 2+ weeks before the trip. Running shoes, not fashion shoes.'},
+        {item:'Flip flops / sandals', priority:'RECOMMENDED', note:'For pool days, water parks, and evenings at the resort. Not for park days — too much walking. Bring both.'},
+        {item:'Water shoes', priority:'OPTIONAL', note:'For water parks (Typhoon Lagoon, Blizzard Beach, Aquatica, Volcano Bay). Park rental available but personal shoes are cleaner and better fitting.'},
+      ],
+    },
+    {
+      category:'Weather & Climate Essentials', emoji:'☀️', color:'#E65100',
+      items:[
+        {item:'Rain poncho (packable)', priority:'ESSENTIAL (May–September)', note:'Florida afternoon thunderstorms are guaranteed in summer — daily, usually 3–4 PM, lasting 30–90 minutes. A packable poncho ($2–4 online) weighs nothing. The $10 Disney ponchos in the park are the same quality at 5× the price.'},
+        {item:'Sunscreen SPF 50+', priority:'ESSENTIAL', note:'Florida sun at 28° latitude burns non-acclimated skin in 15–20 minutes without protection. Reapply every 2 hours. Water-resistant if using water parks. Buy before arrival — park sunscreen is $20/bottle.'},
+        {item:'Lightweight layers for evenings', priority:'RECOMMENDED (October–March)', note:'Florida winter evenings can drop to 50–55°F. A light fleece or zip-up is sufficient. Don\'t overpack heavy winter clothing — daytime temperatures are usually 65–75°F even in "winter."'},
+        {item:'Hat with full brim', priority:'RECOMMENDED', note:'Baseball caps provide limited sun protection. A full-brim hat covers ears and neck. Reduces cumulative UV exposure significantly on 10-hour park days.'},
+        {item:'Cooling towel', priority:'RECOMMENDED (June–September)', note:'Wet with water, drape on neck — provides 20–30 minutes of active cooling via evaporation. Reusable and lightweight. The difference between manageable heat and heat exhaustion in July.'},
+      ],
+    },
+    {
+      category:'Electronics & Phone', emoji:'📱', color:'#003087',
+      items:[
+        {item:'Portable battery charger (20,000mAh+)', priority:'ESSENTIAL', note:'My Disney Experience uses GPS, camera, and data continuously. A full day at the parks depletes most phones completely. A 20,000mAh charger can recharge a modern phone 5 times. The single most impactful piece of non-clothing gear.'},
+        {item:'Short USB-C and Lightning cables', priority:'ESSENTIAL', note:'Short cables (1 foot) for charging while in pocket or park bag. Long cables are cumbersome. Bring backup if traveling with multiple devices.'},
+        {item:'Waterproof phone case', priority:'RECOMMENDED (water rides/parks)', note:'Kali River Rapids and most water rides produce unexpected soaking. A waterproof case ($10–15) protects your phone and allows underwater photos.'},
+      ],
+    },
+    {
+      category:'Comfort & Convenience', emoji:'🎒', color:'#2E7D32',
+      items:[
+        {item:'Small daypack or belt bag', priority:'ESSENTIAL', note:'Carry all daily essentials without a full backpack. Belt bags (fanny packs) are the optimal theme park carry — hands-free, low-profile, under park bag check threshold. Disney requires all bags through security scanners.'},
+        {item:'Reusable water bottle (insulated)', priority:'ESSENTIAL', note:'Free water at all Disney quick-service restaurants (just ask). Free water at all Universal and SeaWorld restaurants. Bringing a water bottle saves $5–10/person/day in beverage purchases.'},
+        {item:'Portable hand fan (battery-powered)', priority:'RECOMMENDED (June–September)', note:'Small battery fans that clip to strollers or bags. Provides continuous cooling while standing in queue lines. The upgrade from "uncomfortable" to "manageable" in Florida summer.'},
+        {item:'Pain reliever / blister treatment', priority:'RECOMMENDED', note:'Ibuprofen for foot pain (common on day 2 and 3 of multi-day trips). Blister treatment (Compeed or similar) — blisters form on day 1 and worsen on subsequent days without treatment.'},
+        {item:'Wet bag / dry bag', priority:'RECOMMENDED', note:'For wet swimsuits after water rides or pool. Keeps wet items contained in your main bag.'},
+      ],
+    },
+    {
+      category:'What NOT to Pack', emoji:'❌', color:'#7B1FA2',
+      items:[
+        {item:'Umbrella', priority:'LEAVE HOME', note:'An umbrella in a theme park crowd is impractical and inconsiderate. It blocks sight lines and creates friction in dense queues. A rain poncho weighs less and is infinitely more practical.'},
+        {item:'Heavy camera with large lens', priority:'RECONSIDER', note:'Modern phone cameras are exceptional. A heavy DSLR adds significant weight on a 12-mile walking day. If you bring a dedicated camera, keep it small and mirrorless.'},
+        {item:'Multiple outfit changes per day', priority:'LEAVE HOME', note:'Pack light — laundry facilities are available at Disney resorts ($3–5/load). Overpacking luggage costs money and time. One outfit per park day plus swimwear is sufficient for most trips.'},
+        {item:'Expensive jewelry', priority:'LEAVE HOME', note:'Inevitable loss risk on water rides, in locker transfers, and in dense crowds. Disney\'s lost and found recovers a fraction of lost items.'},
+      ],
+    },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-packing';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#C62828,#E65100,#2E7D32);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Orlando Packing Guide</div>
+          <div style="font-size:11px;opacity:.8;">Footwear · Rain gear · Electronics · What NOT to bring</div>
+        </div>
+        <span style="font-size:28px;">🎒</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        Theme park packing is counterintuitive — less gear means more comfort. The items that matter most (footwear, rain poncho, phone charger) are inexpensive. The mistakes (new shoes, no poncho, no charger) are disproportionately costly.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    const priorityColors = {'ESSENTIAL':'#C62828', 'RECOMMENDED':'#2E7D32', 'OPTIONAL':'#0277BD', 'LEAVE HOME':'#7B1FA2', 'RECONSIDER':'#F57F17'};
+
+    PACKING_CATEGORIES.forEach(cat => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:9px 14px;background:${cat.color}18;border-left:4px solid ${cat.color};">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:20px;">${cat.emoji}</span>
+            <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${cat.category}</div>
+          </div>
+        </div>
+        <div style="padding:8px 14px;">
+          ${cat.items.map(item=>`<div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--border,#f5f5f5);">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;">
+              <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);">${item.item}</div>
+              <span style="font-size:9px;padding:1px 5px;background:${priorityColors[item.priority] || '#888'}18;color:${priorityColors[item.priority] || '#888'};border-radius:8px;flex-shrink:0;">${item.priority}</span>
+            </div>
+            <div style="font-size:10px;color:var(--text-secondary,#555);line-height:1.5;">${item.note}</div>
+          </div>`).join('')}
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const spacer = document.createElement('div');
+    spacer.style.cssText = 'height:20px;';
+    body.appendChild(spacer);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-packing')) buildScreen();
+
+  const _prevSS_yyyyyyy = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_yyyyyyy) _prevSS_yyyyyyy(name, el);
+    if (name === 'packing') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-packing');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectPackingCard() {
+    if (document.getElementById('packing-home-card')) return true;
+    const ref = document.getElementById('transport-home-card') || document.getElementById('crowd-calendar-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'packing-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#C62828,#E65100,#2E7D32 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('packing');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🎒</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Orlando Packing Guide</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Footwear · Rain poncho · Phone charger · What NOT to bring</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _packingCard = false;
+  setInterval(() => { if (!_packingCard) _packingCard = injectPackingCard(); }, 111000);
+  setTimeout(() => { _packingCard = injectPackingCard(); }, 107500);
+  const _prevRH_yyyyyyy = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_yyyyyyy) _prevRH_yyyyyyy.apply(this, arguments);
+    setTimeout(() => { _packingCard = false; _packingCard = injectPackingCard(); }, 39400);
+  };
+})();
+</script>
