@@ -43431,3 +43431,168 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK WWW3: Disney Resorts Deep Dive ===== */
+(function initDisneyResorts() {
+
+  const TIERS = [
+    {
+      tier:'Value Resorts',
+      color:'#1565C0',
+      emoji:'💙',
+      priceRange:'$120–$200/night',
+      bestFor:'Budget families · First-timers · Those who mainly want the Disney transportation benefit',
+      resorts:[
+        { name:"Disney's Art of Animation", theme:'Cars, Lion King, Finding Nemo, Little Mermaid', highlight:"Family suites sleep 6 in a separate bedroom with full kitchen — often cheaper than 2 standard rooms. The best value family accommodation at Disney.", skyliner:true },
+        { name:"Disney's Pop Century", theme:'Pop Culture through the decades (50s–90s)', highlight:"Skyliner access to EPCOT and Hollywood Studios. Clean, well-maintained, and great transportation.", skyliner:true },
+        { name:"Disney's All-Star Movies, Music, Sports", theme:'Various — themed décor and pool areas', highlight:"Cheapest rooms in all of Disney World. Identical amenities. Choose based on pool theming or vibe preference.", skyliner:false },
+      ],
+    },
+    {
+      tier:'Moderate Resorts',
+      color:'#2E7D32',
+      emoji:'💚',
+      priceRange:'$200–$320/night',
+      bestFor:'Families who want more theming and amenities without Deluxe price',
+      resorts:[
+        { name:"Disney's Port Orleans Riverside", theme:"Southern plantation and bayou", highlight:"The most romantic moderate resort. Magnolia-lined paths, canoe rentals, and one of Disney's most beautiful resort settings. Princess rooms in the Royal Guest Rooms are exceptional.", skyliner:false },
+        { name:"Disney's Coronado Springs", theme:'Spanish Colonial Mexico', highlight:"Disney's best moderate resort for adults — full convention center, Gran Destino Tower has rooftop bar with stunning views. Business-class amenities at moderate pricing.", skyliner:false },
+        { name:"Disney's Caribbean Beach", theme:'Caribbean island villages', highlight:"Skyliner hub — direct gondola access to EPCOT and Hollywood Studios. Large resort with multiple themed village areas.", skyliner:true },
+      ],
+    },
+    {
+      tier:'Deluxe Resorts',
+      color:'#7B1FA2',
+      emoji:'💜',
+      priceRange:'$380–$900/night',
+      bestFor:'Discerning travelers who want the full Disney resort experience as destination in itself',
+      resorts:[
+        { name:"Disney's Grand Floridian", theme:"Victorian Florida · White and gold elegance", highlight:"The crown jewel of Disney resorts. Monorail access to Magic Kingdom, live orchestra in the lobby, Victoria & Albert's restaurant, and unmatched elegance. The signature Disney honeymoon resort.", skyliner:false },
+        { name:"Disney's Wilderness Lodge", theme:'Pacific Northwest national park lodge', highlight:"The most beautiful resort architecture at Disney. 82-foot lobby fireplace, geysers on the property, the most nature-connected feel in any Disney hotel. Animal Kingdom Lodge's primary competitor for theming excellence.", skyliner:false },
+        { name:"Disney's Animal Kingdom Lodge", theme:'African savanna', highlight:"Wake up to giraffes and zebras grazing outside your balcony. The most unique resort experience in the US — a real savanna in your backyard. Jiko and Sanaa restaurants are among Disney's finest.", skyliner:false },
+        { name:"Disney's Yacht & Beach Club", theme:'New England beachside resort', highlight:"Stormalong Bay — the #1 rated pool at any Disney resort. Walking distance to EPCOT via International Gateway. Best non-Magic Kingdom-adjacent resort location.", skyliner:false },
+        { name:"Disney's BoardWalk Inn", theme:'Atlantic City 1930s boardwalk', highlight:"BoardWalk entertainment district at your door: Jellyrolls, live music, waterfront restaurants. Luna Park pool with the unique roller coaster slide.", skyliner:false },
+        { name:"Disney's Contemporary Resort", theme:'Modern · A-frame tower', highlight:"The only resort with a monorail running THROUGH it. California Grill restaurant on top floor with best Magic Kingdom fireworks view. The most architecturally distinctive Disney resort.", skyliner:false },
+      ],
+    },
+    {
+      tier:'Disney Vacation Club (DVC) / Villa Resorts',
+      color:'#B71C1C',
+      emoji:'❤️',
+      priceRange:'$350–$1,200/night (full villas) · Bookable without membership',
+      bestFor:'Families needing kitchen facilities · Extended stays · Groups of 4–8',
+      resorts:[
+        { name:"Disney's Riviera Resort", theme:'French and Italian Riviera', highlight:"Disney's newest DVC resort. Spectacular rooftop restaurant with fireworks views. Skyliner access to EPCOT and Hollywood Studios. The highest-design Disney resort ever built.", skyliner:true },
+        { name:"Bay Lake Tower at Contemporary", theme:'Modern luxury', highlight:"Studio to 3-bedroom villas. Access to Contemporary amenities including monorail and California Grill. Best location if you want Magic Kingdom access.", skyliner:false },
+      ],
+    },
+  ];
+
+  const BOOKING_TIPS = [
+    { icon:'📅', tip:'Book 180+ days in advance for Deluxe rooms. Grand Floridian, Animal Kingdom Lodge, and Wilderness Lodge book out 6 months in advance during peak season.' },
+    { icon:'💰', tip:"Watch the Disney website for seasonal discounts — 20–30% room-only discounts appear periodically and stack significantly for 5+ night stays." },
+    { icon:'🔄', tip:'Disney hotel upgrades are occasionally available at check-in. Arrive early, dress nicely, and ask at the front desk. Cast members have upgrade discretion.' },
+    { icon:'🛎️', tip:"Early check-in (before 3 PM) is not guaranteed but you can drop bags and access all resort amenities — pools, restaurants, and free transportation — immediately on arrival." },
+    { icon:'🏊', tip:"Resort guests can visit OTHER Disney resort pools (during normal hours). Stormalong Bay at Yacht & Beach Club is technically guest-restricted but Wilderness Lodge and Grand Floridian pools are more accessible to visitors." },
+    { icon:'🎁', tip:"Disney resort guests receive shopping package delivery — buy anything in the parks and have it delivered to your hotel room that evening for free." },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-disney-resorts';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;';
+    s.innerHTML = `
+      <div style="background:linear-gradient(135deg,#1A237E,#283593,#5C6BC0);padding:18px 14px 20px;
+        display:flex;align-items:center;gap:12px;flex-shrink:0;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;
+          border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#fff;">Disney Resorts Deep Dive</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">All tiers · Best picks · Booking strategy</div>
+        </div>
+        <span style="font-size:28px;">🏰</span>
+      </div>
+      <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;">
+
+        ${TIERS.map(tier => `
+          <div style="margin-bottom:16px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+              <span style="font-size:22px;">${tier.emoji}</span>
+              <div>
+                <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:${tier.color};">${tier.tier}</div>
+                <div style="font-size:11px;color:var(--text-secondary,#888);">${tier.priceRange} · Best for: ${tier.bestFor}</div>
+              </div>
+            </div>
+            ${tier.resorts.map(resort => `
+              <div style="background:var(--card-bg,#fff);border-radius:12px;margin-bottom:8px;
+                border:1px solid var(--border,#eee);overflow:hidden;">
+                <div style="background:${tier.color}12;padding:8px 12px;border-bottom:1px solid ${tier.color}20;
+                  display:flex;align-items:center;gap:6px;">
+                  <div style="font-size:13px;font-weight:700;color:${tier.color};flex:1;">${resort.name}</div>
+                  ${resort.skyliner ? '<span style="font-size:10px;background:#1565C0;color:#fff;padding:2px 8px;border-radius:20px;font-weight:700;flex-shrink:0;">🚡 Skyliner</span>' : ''}
+                </div>
+                <div style="padding:8px 12px;">
+                  <div style="font-size:11px;color:var(--text-secondary,#888);margin-bottom:4px;">Theme: ${resort.theme}</div>
+                  <div style="font-size:12px;color:var(--text-secondary,#444);line-height:1.5;">${resort.highlight}</div>
+                </div>
+              </div>`).join('')}
+          </div>`).join('')}
+
+        <!-- Booking tips -->
+        <div style="background:linear-gradient(135deg,#1A237E,#283593);border-radius:14px;padding:14px;margin-bottom:20px;color:#fff;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">🎯 Booking & Stay Tips</div>
+          ${BOOKING_TIPS.map(bt => `
+            <div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
+              <span style="font-size:18px;flex-shrink:0;">${bt.icon}</span>
+              <div style="font-size:12px;color:rgba(255,255,255,.9);line-height:1.5;">${bt.tip}</div>
+            </div>`).join('')}
+        </div>
+      </div>`;
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-disney-resorts')) buildScreen();
+
+  const _prevSS_www3 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_www3) _prevSS_www3(name, el);
+    if (name === 'disney-resorts') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-disney-resorts');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectResortCard() {
+    if (document.getElementById('resort-home-card')) return true;
+    const ref = document.getElementById('intl-home-card') || document.getElementById('health-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'resort-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#1A237E,#283593,#5C6BC0);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('disney-resorts');
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:28px;">🏰</span>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Disney Resorts Deep Dive</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.85);">4 tiers · 12 resorts · Best picks & booking tips</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _resortCard = false;
+  setInterval(() => { if (!_resortCard) _resortCard = injectResortCard(); }, 22500);
+  setTimeout(() => { _resortCard = injectResortCard(); }, 19000);
+
+  const _prevRH_www3 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_www3) _prevRH_www3.apply(this, arguments);
+    setTimeout(() => { _resortCard = false; _resortCard = injectResortCard(); }, 4300);
+  };
+})();
+</script>
