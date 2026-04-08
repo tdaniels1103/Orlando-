@@ -43106,3 +43106,165 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK UUU2: Health & Wellness Emergency Guide ===== */
+(function initHealthGuide() {
+
+  const HEAT_GUIDE = {
+    stages:[
+      { level:'Heat Fatigue', symptoms:['Tiredness · Mild headache · Irritability'], color:'#F9A825', action:'Find shade immediately. Drink 16 oz water. Sit for 15 min. If symptoms don\'t improve, seek First Aid.' },
+      { level:'Heat Exhaustion', symptoms:['Heavy sweating · Weakness · Pale/clammy skin · Nausea · Headache · Fainting'], color:'#E65100', action:'Move to air conditioning immediately (ride queue, restaurant, indoor attraction). Drink water and sports drink. Rest 30-60 min. Seek medical attention if symptoms persist.' },
+      { level:'Heat Stroke (EMERGENCY)', symptoms:['High body temp (103°F+) · Red/hot/dry skin · Rapid pulse · Confusion · Loss of consciousness'], color:'#B71C1C', action:'CALL 911 IMMEDIATELY. Do not give water to unconscious person. Cool with ice packs to neck/armpits. Every theme park First Aid can respond within 2-3 minutes.' },
+    ],
+    prevention:[
+      '64 oz water MINIMUM per person per day in summer — more with physical activity',
+      "Start with electrolytes (Gatorade, Liquid IV) — plain water alone doesn't fully prevent heat issues",
+      "Schedule 2 PM break indoors — the hottest most dangerous hour",
+      'Wear light-colored, loose-fitting, moisture-wicking clothing',
+      "Freeze a water bottle overnight — it becomes a 4-hour ice pack in your bag",
+      'Apply sunscreen SPF 50+ and reapply every 90 minutes',
+    ],
+  };
+
+  const INJURY_GUIDE = [
+    { injury:'Blisters', cause:'New shoes + 10+ miles walking per day', treatment:"Prevention: Band-Aid Blister Block applied before walking. Treatment: Don't pop — clean and cover with moleskin or blister bandage.", prevention:"Break in shoes at home. Moisture-wicking socks. Vaseline on friction points." },
+    { injury:'Sunburn', cause:'Florida UV index regularly reaches 11 (extreme)', treatment:"Cool the skin with cold water (not ice). Aloe vera gel. Avoid further sun for 24-48 hours before any body treatments.", prevention:"SPF 50+ broad spectrum every 2 hours. UPF clothing and hats. Shade during 11 AM–3 PM peak UV hours." },
+    { injury:'Ankle Sprain', cause:'Cobblestones, uneven theming paths, riding queues', treatment:"RICE: Rest, Ice (request ice at any First Aid), Compression with an ACE bandage, Elevation. Wheelchair rental available at all parks ($12/day).", prevention:"Supportive, closed-toe shoes. Watch your step in queue areas with theatrical flooring." },
+    { injury:'Back Pain', cause:'Long walking days + amusement rides', treatment:"Park First Aid can provide heating pads. OTC pain relief. Request a mobility device at Guest Relations.", prevention:"Walking pace matters — slower and steady reduces fatigue. Stretch hamstrings and back each morning." },
+    { injury:'Child Motion Sickness', cause:'3D simulators, motion rides', treatment:"Fresh air, horizon gaze, ginger candy (sold at park first aid). Dramamine for children (consult doctor for dosing).", prevention:"Sit toward the back of simulators — less motion. Keep child's eyes focused on the center screen. Light meal before rides." },
+  ];
+
+  const MENTAL_WELLNESS = [
+    { icon:'😰', title:'Crowd Anxiety', tip:"Pre-plan an exit strategy for every venue. Identify quiet zones: Disney\'s Baby Care Centers, Tomorrowland Terrace area, Animal Kingdom Conservation Station. Don't feel obligated to stay." },
+    { icon:'😤', title:"Kids' Meltdowns (Parents)", tip:"Every parent experiences park meltdowns — yours will too. The 2 PM resort break is your most powerful tool. Tired children at full parks = guaranteed conflict. Retreat early, swim, nap." },
+    { icon:'🤯', title:'Decision Fatigue', tip:"Make all dining and LL decisions the night before your park day. Wake up with a clear plan. The single biggest source of vacation stress is in-the-moment decision overload." },
+    { icon:'💑', title:'Couple Disagreements', tip:"Discuss must-dos vs. nice-to-haves before arriving. Build in 1 hour of 'choice time' per person — they pick one thing, you pick one thing. No guilt either way." },
+    { icon:'💵', title:'Budget Anxiety', tip:"Set a daily cash limit for extras (souvenirs, splurge foods) and withdraw it in cash. Visual money is easier to control than tapping credit cards repeatedly." },
+  ];
+
+  const FIRST_AID_LOCATIONS = [
+    { park:'Magic Kingdom', location:'Main Street USA, between the Plaza Restaurant and Crystal Palace. Also near Tomorrowland.' },
+    { park:'EPCOT', location:'Future World East, near the Odyssey Events Pavilion. Also near International Gateway entrance.' },
+    { park:'Hollywood Studios', location:'Near the park entrance, adjacent to the Guest Services building.' },
+    { park:'Animal Kingdom', location:'Near Creature Comforts coffee shop, in Discovery Island.' },
+    { park:'Universal Studios Florida', location:'Near the entrance, Guest Services area. Also in New York area.' },
+    { park:'Islands of Adventure', location:'Port of Entry, immediately to the right of the entrance. Also in Marvel area.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-health-guide';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;';
+    s.innerHTML = `
+      <div style="background:linear-gradient(135deg,#00695C,#00897B,#4DB6AC);padding:18px 14px 20px;
+        display:flex;align-items:center;gap:12px;flex-shrink:0;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;
+          border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#fff;">Health & Wellness Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8);">Heat safety · Injuries · Mental health · First Aid</div>
+        </div>
+        <span style="font-size:28px;">🏥</span>
+      </div>
+      <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;">
+
+        <!-- Heat safety -->
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:8px;">🌡️ Florida Heat Safety</div>
+        ${HEAT_GUIDE.stages.map(stage => `
+          <div style="background:var(--card-bg,#fff);border-radius:12px;margin-bottom:8px;
+            border:1px solid var(--border,#eee);overflow:hidden;">
+            <div style="background:${stage.color};padding:8px 12px;">
+              <div style="font-size:13px;font-weight:700;color:#fff;">${stage.level}</div>
+            </div>
+            <div style="padding:8px 12px;">
+              <div style="font-size:11px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:3px;">SYMPTOMS: ${stage.symptoms.join(' · ')}</div>
+              <div style="font-size:12px;color:var(--text-secondary,#444);line-height:1.5;">${stage.action}</div>
+            </div>
+          </div>`).join('')}
+
+        <div style="background:#E8F5E9;border-radius:12px;padding:12px;margin-bottom:14px;border:1px solid #C8E6C9;">
+          <div style="font-size:12px;font-weight:700;color:#2E7D32;margin-bottom:5px;">☀️ Heat Prevention</div>
+          ${HEAT_GUIDE.prevention.map(p => `<div style="font-size:12px;color:#2E7D32;padding:2px 0;">✓ ${p}</div>`).join('')}
+        </div>
+
+        <!-- Injury guide -->
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--text-primary,#212121);margin-bottom:8px;">🩹 Common Injuries</div>
+        ${INJURY_GUIDE.map(inj => `
+          <div style="background:var(--card-bg,#fff);border-radius:12px;margin-bottom:8px;
+            border:1px solid var(--border,#eee);padding:10px 12px;">
+            <div style="font-size:13px;font-weight:700;color:#B71C1C;margin-bottom:4px;">${inj.injury}</div>
+            <div style="font-size:11px;color:var(--text-secondary,#888);margin-bottom:4px;">Cause: ${inj.cause}</div>
+            <div style="font-size:12px;color:var(--text-secondary,#444);margin-bottom:4px;"><strong>Treatment:</strong> ${inj.treatment}</div>
+            <div style="font-size:12px;color:#2E7D32;"><strong>Prevention:</strong> ${inj.prevention}</div>
+          </div>`).join('')}
+
+        <!-- Mental wellness -->
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--text-primary,#212121);margin:14px 0 8px;">🧠 Mental Wellness Tips</div>
+        ${MENTAL_WELLNESS.map(mw => `
+          <div style="background:var(--card-bg,#fff);border-radius:12px;margin-bottom:8px;
+            border:1px solid var(--border,#eee);padding:10px 12px;display:flex;gap:10px;">
+            <span style="font-size:22px;flex-shrink:0;">${mw.icon}</span>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${mw.title}</div>
+              <div style="font-size:12px;color:var(--text-secondary,#555);margin-top:3px;line-height:1.5;">${mw.tip}</div>
+            </div>
+          </div>`).join('')}
+
+        <!-- First Aid locations -->
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--text-primary,#212121);margin:14px 0 8px;">📍 First Aid Locations</div>
+        <div style="background:var(--card-bg,#fff);border-radius:12px;margin-bottom:20px;border:1px solid var(--border,#eee);overflow:hidden;">
+          ${FIRST_AID_LOCATIONS.map((fa, i) => `
+            <div style="padding:8px 12px;${i < FIRST_AID_LOCATIONS.length-1?'border-bottom:1px solid var(--border,#f5f5f5)':''}">
+              <div style="font-size:12px;font-weight:700;color:#B71C1C;">${fa.park}</div>
+              <div style="font-size:11px;color:var(--text-secondary,#555);">🏥 ${fa.location}</div>
+            </div>`).join('')}
+        </div>
+      </div>`;
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-health-guide')) buildScreen();
+
+  const _prevSS_uuu2 = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_uuu2) _prevSS_uuu2(name, el);
+    if (name === 'health-guide') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-health-guide');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectHealthCard() {
+    if (document.getElementById('health-home-card')) return true;
+    const ref = document.getElementById('itin-home-card') || document.getElementById('shop-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'health-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#00695C,#00897B,#4DB6AC);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('health-guide');
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:28px;">🏥</span>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Health & Wellness Guide</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.85);">Heat safety · Injuries · Mental health · First Aid</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _healthCard = false;
+  setInterval(() => { if (!_healthCard) _healthCard = injectHealthCard(); }, 21500);
+  setTimeout(() => { _healthCard = injectHealthCard(); }, 18000);
+
+  const _prevRH_uuu2 = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_uuu2) _prevRH_uuu2.apply(this, arguments);
+    setTimeout(() => { _healthCard = false; _healthCard = injectHealthCard(); }, 4100);
+  };
+})();
+</script>
