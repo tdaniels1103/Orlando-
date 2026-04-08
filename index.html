@@ -56670,3 +56670,402 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK LLLLLL: Orlando for Adults (No Kids Required) ===== */
+(function initOrlandoAdults() {
+
+  const ADULT_EXPERIENCES = [
+    {
+      name:'EPCOT International Food & Wine Festival', emoji:'🍷', color:'#8B0000',
+      when:'Late August through November',
+      why:'EPCOT transforms into a global food and wine festival with 30+ international marketplaces, celebrity chef demonstrations, and evening concerts. Adults-only energy, though families attend. The most sophisticated food event in Central Florida.',
+      highlights:['30+ international food/drink booths', 'Eat to the Beat concert series (free with admission)', 'Reserve specialty wine dinners at $175–250/person', 'Culinary demonstrations with world-class chefs', 'Beer, wine, cocktails from every represented country'],
+      tip:'Budget $80–120 per adult for food and drinks throughout the day. The Japan booth\'s sake flights and the France booth\'s wine pairings are legendary. The reserve tastings (book in advance) offer access to wines not available at the general booths.',
+    },
+    {
+      name:'Halloween Horror Nights (Universal)', emoji:'🎃', color:'#6A1B9A',
+      when:'Select nights, September–November',
+      why:'The best Halloween event in the United States, arguably in the world. 10+ haunted houses with Hollywood-quality production values, scare zones throughout the park, live entertainment. Not for children — designed entirely for adults.',
+      highlights:['10–12 original haunted houses per year', 'A-list horror IP licenses (Stranger Things, Blumhouse, AHS)', 'Open-bar areas throughout the park', 'Live DJ entertainment and themed cocktails', 'The park is unrecognizable — completely transformed'],
+      tip:'RIP Tour ($225+) gives front-of-line access to all houses plus a private guide. Worth it on peak October weekends when house queues reach 90–120 minutes. Locals buy season passes primarily for HHN access.',
+    },
+    {
+      name:'Bioluminescent Kayaking — Merritt Island', emoji:'🌌', color:'#1565C0',
+      when:'Summer months peak (June–September)',
+      why:'Paddle a kayak through a river at night and the water glows electric blue-green around your oar. Dinoflagellates in the Indian River Lagoon create natural bioluminescence. One of the most otherworldly experiences in Florida.',
+      highlights:['Guided tours run midnight departures on full-moon-free nights', 'Glowing water effect strongest in summer heat', '1.5–2 hour tours', 'Merritt Island — adjacent to Kennedy Space Center', 'No artificial light — stars + glow'],
+      tip:'Book well in advance — tours sell out weeks ahead in summer. The effect requires dark sky conditions (no moon, no light pollution). Tours are cancelled if conditions are wrong. The drive to Merritt Island (90 minutes from Orlando) is worth the experience.',
+    },
+    {
+      name:'Disney Springs Jazz & Cocktails Evening', emoji:'🎷', color:'#C9A96E',
+      when:'Year-round (free admission)',
+      why:'Disney Springs has evolved into a genuine entertainment district with live jazz bands, award-winning restaurants, craft cocktail bars, and no theme park ticket required. An ideal pre-trip or rest-day evening.',
+      highlights:['Jock Lindsey\'s Hangar Bar — hidden gem craft cocktails', 'Frontera Cocina rooftop bar', 'STK Orlando for contemporary steakhouse', 'Live entertainment on the West Side stage', 'Free admission, free parking validation from restaurants'],
+      tip:'Jock Lindsey\'s Hangar Bar is consistently ranked one of the best themed bars in the United States. The adventurer-explorer theme is executed with extraordinary detail. Arrive at 5 PM on weekdays to avoid the queue.',
+    },
+    {
+      name:'The Barn (Whiskey Bar) — Lake Eola', emoji:'🥃', color:'#5D4037',
+      when:'Year-round',
+      why:'Downtown Orlando\'s best whiskey and craft cocktail destination. A converted barn atmosphere with 300+ whiskeys, live music, and a genuinely adult local scene away from the tourist corridors.',
+      highlights:['300+ whiskey selection', 'Craft cocktail menu changes seasonally', 'Live music Friday–Saturday', 'Local craft beer selection', 'Walking distance from Lake Eola park'],
+      tip:'The bartenders here are genuinely knowledgeable about whiskey. Ask for recommendations — they\'ll take you seriously. Lake Eola at sunset before The Barn is one of the classic Orlando local evenings.',
+    },
+    {
+      name:'Cape Canaveral Rocket Launch Viewing', emoji:'🚀', color:'#0d47a1',
+      when:'Variable — check launch schedules',
+      why:'Kennedy Space Center launches rockets several times per month. Viewing from Cocoa Beach (55 minutes from Orlando) is free, atmospheric, and genuinely awe-inspiring. SpaceX Falcon 9 launches occur at night — the flame trail across the dark sky is extraordinary.',
+      highlights:['Free viewing from Cocoa Beach or NASA Causeway', 'Night launches create visible fire column for 10+ minutes', 'SpaceX, ULA, and NASA launches frequent', 'Cape Canaveral Air Force Station launch pads visible from beach'],
+      tip:'Check the launch schedule 48 hours before — scrubs are frequent. A night Falcon 9 launch from Cocoa Beach, followed by craft beer at a beach bar, is a perfect Orlando adult evening. The sound (sonic rumble) arrives 30–45 seconds after the light.',
+    },
+  ];
+
+  const ADULT_DINING = [
+    {
+      name:'The Ravenous Pig — Winter Park', emoji:'🐷', color:'#C62828',
+      desc:'The restaurant that put Orlando craft cuisine on the national map. James Beard Award–recognized chefs create seasonal American fare in an intimate gastropub setting. Reservations essential.',
+      vibe:'Craft cocktails, seasonal menus, locally sourced ingredients. The Sunday brunch is famous.',
+    },
+    {
+      name:'Kadence — Downtown', emoji:'🎵', color:'#1565C0',
+      desc:'8-seat omakase sushi counter. One seating per night. $180–220 per person. Arguably the best sushi experience in Central Florida in an impossibly intimate setting.',
+      vibe:'Reserve weeks in advance. No substitutions, no modifications. Pure sushi craft.',
+    },
+    {
+      name:'Capa — Four Seasons', emoji:'🌹', color:'#B71C1C',
+      desc:'17th-floor rooftop Spanish steakhouse. Best restaurant view in Orlando. Request a window seat facing Magic Kingdom. Fireworks visible on show nights.',
+      vibe:'One of Orlando\'s finest dining experiences. Spanish wine list is exceptional.',
+    },
+    {
+      name:'Se7en Bites — Milk District', emoji:'🥐', color:'#F57F17',
+      desc:'Orlando\'s most beloved neighborhood bakery/café. Spectacular weekend brunch. The most photogenic food in Orlando without trying.',
+      vibe:'Arrive early — brunch wait is 45+ minutes on Saturdays. The biscuits and gravy are transcendent.',
+    },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-adults';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#1a0020,#8B0000,#C9A96E);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Orlando for Adults</div>
+          <div style="font-size:11px;opacity:.8;">Food & Wine · Horror Nights · Bioluminescence · Adult dining</div>
+        </div>
+        <span style="font-size:28px;">🥂</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        Orlando's adult landscape extends far beyond theme parks. World-class dining, a thriving craft cocktail scene, natural wonders, and some of the best seasonal events in the country reward visitors who explore beyond the resort corridors.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    ADULT_EXPERIENCES.forEach(exp => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:10px 14px;background:${exp.color}18;border-left:4px solid ${exp.color};">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:22px;">${exp.emoji}</span>
+            <div>
+              <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--text-primary,#212121);">${exp.name}</div>
+              <div style="font-size:10px;color:var(--text-secondary,#888);">${exp.when}</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;margin-bottom:8px;">${exp.why}</div>
+          <div style="font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin-bottom:4px;">HIGHLIGHTS</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;">
+            ${exp.highlights.map(h=>`<span style="font-size:10px;padding:2px 7px;background:${exp.color}18;color:${exp.color};border-radius:20px;">${h}</span>`).join('')}
+          </div>
+          <div style="display:flex;gap:5px;background:${exp.color}0d;border-radius:8px;padding:7px;">
+            <span style="font-size:11px;flex-shrink:0;">💡</span>
+            <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${exp.tip}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const diningCard = document.createElement('div');
+    diningCard.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border,#eee);';
+    diningCard.innerHTML = `<div style="padding:12px 14px;background:linear-gradient(135deg,#1a0020,#8B0000);color:#fff;">
+      <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;">🍷 Adult Dining Destinations</div>
+    </div>
+    <div style="padding:12px 14px;">
+      ${ADULT_DINING.map(d=>`<div style="margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border,#eee);">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:18px;">${d.emoji}</span>
+          <div style="font-size:13px;font-weight:700;color:${d.color};">${d.name}</div>
+        </div>
+        <div style="font-size:12px;color:var(--text-secondary,#555);line-height:1.5;margin-bottom:4px;padding-left:24px;">${d.desc}</div>
+        <div style="font-size:11px;font-style:italic;color:var(--text-secondary,#888);padding-left:24px;">${d.vibe}</div>
+      </div>`).join('')}
+    </div>`;
+    body.appendChild(diningCard);
+
+    const localCard = document.createElement('div');
+    localCard.style.cssText = 'background:linear-gradient(135deg,#1a0020,#8B0000,#C9A96E);border-radius:16px;margin-bottom:20px;padding:14px;color:#fff;';
+    localCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">🌆 Local Neighborhoods Worth Exploring</div>
+    ${[
+      {name:'Mills 50 District', desc:'Orlando\'s most diverse dining corridor. Vietnamese, Thai, Korean, and fusion restaurants that locals love. Affordable, authentic, packed on weekends.'},
+      {name:'Milk District', desc:'Eclectic arts-focused neighborhood. Se7en Bites, independent coffee shops, vintage stores, local dive bars. Young creative professional scene.'},
+      {name:'Thornton Park', desc:'Tree-lined streets, wine bars, upscale casual dining. Easy walk to Lake Eola. The most charming neighborhood block in downtown Orlando.'},
+      {name:'College Park', desc:'Family-owned restaurants, neighborhood coffee shops, local boutiques. Edgewater Drive on a Sunday morning is pure small-city Florida charm.'},
+    ].map(n=>`<div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.15);">
+      <div style="font-size:13px;font-weight:700;margin-bottom:2px;">${n.name}</div>
+      <div style="font-size:11px;opacity:.9;line-height:1.5;">${n.desc}</div>
+    </div>`).join('')}`;
+    body.appendChild(localCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-adults')) buildScreen();
+
+  const _prevSS_llllll = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_llllll) _prevSS_llllll(name, el);
+    if (name === 'adults') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-adults');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectAdultsCard() {
+    if (document.getElementById('adults-home-card')) return true;
+    const ref = document.getElementById('dining-plan-home-card') || document.getElementById('fireworks-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'adults-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#1a0020,#8B0000,#C9A96E 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('adults');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🥂</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Orlando for Adults</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Food & Wine Fest · Horror Nights · Bioluminescence · Craft cocktails</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _adultsCard = false;
+  setInterval(() => { if (!_adultsCard) _adultsCard = injectAdultsCard(); }, 72000);
+  setTimeout(() => { _adultsCard = injectAdultsCard(); }, 68500);
+  const _prevRH_llllll = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_llllll) _prevRH_llllll.apply(this, arguments);
+    setTimeout(() => { _adultsCard = false; _adultsCard = injectAdultsCard(); }, 23800);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK MMMMMM: Magic Kingdom Complete Strategy Guide ===== */
+(function initMagicKingdomDeep() {
+
+  const MK_LANDS = [
+    {
+      name:'Main Street, U.S.A.', emoji:'🏙️', color:'#C9A96E',
+      desc:'The iconic entrance to the Magic Kingdom. Modeled after Walt Disney\'s childhood hometown of Marceline, Missouri. Every building is a different scale — smaller floors on upper levels create forced perspective.',
+      rides:[],
+      mustdo:['Casey\'s Corner for a hot dog', 'Confectionery for hand-dipped chocolates', 'Main Street Cinema (free, air-conditioned cartoon shorts)', 'Emporium for the most comprehensive Disney merchandise selection'],
+      tip:'Main Street is the arrival and departure corridor. Early morning: walk through quickly to reach the lands. End of night: plan 20–30 minutes for the crowd surge after fireworks. Main Street stays open 30 minutes after park closing.',
+    },
+    {
+      name:'Adventureland', emoji:'🌴', color:'#2E7D32',
+      desc:'The jungle and pirate-themed land. Home to the iconic Jungle Cruise and the beloved Pirates of the Caribbean.',
+      rides:[
+        {name:'Pirates of the Caribbean', type:'Dark ride classic', wait:'20–45 min', note:'The granddaddy of theme park dark rides. Extended recent refurbishment improved queue and added Redd the female pirate captain.'},
+        {name:'Jungle Cruise', type:'Guided boat tour', wait:'30–60 min', note:'Notoriously cheesy puns from the skippers. The jokes ARE the ride. Recent refurbishment added new scenes and removed some culturally dated elements.'},
+        {name:'Magic Carpets of Aladdin', type:'Spinning ride', wait:'10–20 min', note:'Family spinner. Notable only for the hidden camel that spits water at riders — stand clear.'},
+      ],
+      tip:'The Skipper Canteen table service restaurant inside Adventureland has unexpectedly good food and excellent themed décor. For Dole Whip (pineapple soft serve), Aloha Isle in Adventureland is the original and best location in the park.',
+    },
+    {
+      name:'Frontierland', emoji:'🤠', color:'#8B4513',
+      desc:'The American frontier-themed land. Home to two classic roller coasters and the premiere parade viewing area.',
+      rides:[
+        {name:'Big Thunder Mountain Railroad', type:'Mine train coaster', wait:'30–60 min', note:'"The Wildest Ride in the Wilderness." Excellent family coaster — fast, thrilling, no inversions. Single rider available.'},
+        {name:'Splash Mountain → Tiana\'s Bayou Adventure', type:'Log flume', wait:'45–90 min', note:'Major retheme from Song of the South to The Princess and the Frog. New in 2024. The final 52-foot drop remains. Significant wait during hot afternoons.'},
+      ],
+      tip:'Splash Mountain / Tiana\'s: plan for the afternoon when you\'re already hot. The drop soaks the front rows. Towels from nearby souvenir shops. Big Thunder has a single rider line that cuts wait by 50–70%.',
+    },
+    {
+      name:'Liberty Square', emoji:'🗽', color:'#37474F',
+      desc:'Colonial American-themed area connecting Frontierland and Fantasyland. Home to the Haunted Mansion and historical American theming.',
+      rides:[
+        {name:'The Haunted Mansion', type:'Dark ride (Doom Buggy)', wait:'30–60 min', note:'One of the most beloved dark rides in history. 999 happy haunts. Interactive queue with tombstones and ghost portraits. Seasonal Nightmare Before Christmas overlay at other Disney parks — NOT at Walt Disney World.'},
+        {name:'Liberty Belle Riverboat', type:'Riverboat tour', wait:'5–15 min', note:'A relaxing 20-minute float around Tom Sawyer Island. Near-zero wait. Excellent for a quick rest mid-day.'},
+      ],
+      tip:'The Haunted Mansion stretcher room at the beginning is NOT a trick — the room actually descends. It\'s a genuine elevator lowering guests below ground level to reach the underground ride track.',
+    },
+    {
+      name:'Fantasyland', emoji:'🦄', color:'#7B1FA2',
+      desc:'The heart of Magic Kingdom. Disney princess and classic animation theming. The most family-dense area of the park.',
+      rides:[
+        {name:'Seven Dwarfs Mine Train', type:'Family coaster (top ride)', wait:'60–120 min', note:'The most in-demand ride in Magic Kingdom. Swinging mine cars, exceptional dark ride sequences inside. Use Lightning Lane Premier or ride at park opening.'},
+        {name:'Peter Pan\'s Flight', type:'Classic dark ride', wait:'45–90 min', note:'The most inexplicably popular ride vs. actual thrill — it\'s a slow flying ship over London diorama. Queue routinely exceeds Space Mountain. The nighttime flying effect is genuinely magical.'},
+        {name:'Under the Sea – Little Mermaid', type:'Omnimover dark ride', wait:'15–35 min', note:'Modern dark ride with beautiful puppetry and animatronics. Shorter wait than its Fantasyland neighbors. Good family ride.'},
+        {name:'Dumbo the Flying Elephant', type:'Spinner', wait:'20–45 min', note:'The classic. Interactive queue with play area inside means wait is entertainment. Best for ages 2–6.'},
+      ],
+      tip:'Be Our Guest restaurant (attached to Beast\'s Castle) serves the only alcohol in Magic Kingdom — wine and beer at dinner. The Beast\'s West Wing dining room with the enchanted rose and thunderstorm effects is one of the most atmospheric restaurant spaces at Disney.',
+    },
+    {
+      name:'Tomorrowland', emoji:'🚀', color:'#1565C0',
+      desc:'The futuristic land that feels more retro-futuristic than actually futuristic. Contains Space Mountain and Tron Lightcycle Run.',
+      rides:[
+        {name:'Tron Lightcycle / Run', type:'Launched motorcycle coaster', wait:'60–120 min', note:'The newest and fastest ride at Magic Kingdom (opened 2023). Straddled motorcycle seating on a launched coaster under a giant canopy structure. Lightning Lane Premier only or virtual queue on peak days.'},
+        {name:'Space Mountain', type:'Indoor roller coaster', wait:'30–60 min', note:'Classic indoor coaster in complete darkness. Rickety, bumpy, surprisingly intense. The original Space Mountain experience since 1975. You never see the next turn coming.'},
+        {name:'Buzz Lightyear\'s Space Ranger Spin', type:'Interactive shooter', wait:'20–40 min', note:'Laser gun ride where riders compete for points. Young children love the targeting mechanic. Good single rider option.'},
+      ],
+      tip:'Tron Lightcycle Run is the most technologically advanced ride at Walt Disney World and typically requires Lightning Lane Premier ($20–30 extra). The physical experience of leaning forward on the motorcycle during the launch sequence is unlike anything else in the park.',
+    },
+  ];
+
+  const MK_PERFECT_DAY = [
+    {time:'7:45 AM', action:'Arrive at the gates 30 minutes before park open. Get Magic Kingdom entrance photo on the bridge.'},
+    {time:'8:00 AM', action:'Park opens. Walk briskly to Tomorrowland — ride Tron Lightcycle Run (queue opens before rides). Then Space Mountain.'},
+    {time:'9:30 AM', action:'Cross to Fantasyland. Ride Seven Dwarfs Mine Train while walk-on waits still under 30 minutes.'},
+    {time:'10:30 AM', action:'Peter Pan\'s Flight. Under the Sea. Haunted Mansion if you haven\'t.'},
+    {time:'12:00 PM', action:'Lunch at Be Our Guest or Casey\'s Corner. Waits for rides peak 11 AM–2 PM — use this for dining.'},
+    {time:'1:30 PM', action:'Adventureland: Pirates of the Caribbean, Jungle Cruise (walk-on if you used the lunch window correctly).'},
+    {time:'3:00 PM', action:'Frontierland: Big Thunder Mountain, Tiana\'s Bayou Adventure. Afternoon heat — this is when flume rides make sense.'},
+    {time:'5:30 PM', action:'Rest at the hotel or dinner reservation. Parks stay crowded until evening — a 2-hour break beats the afternoon crush.'},
+    {time:'7:30 PM', action:'Return for evening. Rides have reduced waits after 7 PM. Use Lightning Lane now for anything missed.'},
+    {time:'9:00 PM', action:'Disney Enchantment fireworks. Position on Main Street 45 minutes early. Castle projection mapping begins 10 minutes before fireworks.'},
+    {time:'9:30 PM', action:'Immediately after fireworks: Haunted Mansion and Space Mountain have near-walk-on waits as crowds head to exit.'},
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-mk-deep';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#003087,#C9A96E,#7B1FA2);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Magic Kingdom — Deep Dive</div>
+          <div style="font-size:11px;opacity:.8;">Tron · Seven Dwarfs · Pirates · Perfect Day Plan</div>
+        </div>
+        <span style="font-size:28px;">🏰</span>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:15px;font-weight:800;">6</div><div style="font-size:9px;opacity:.8;">LANDS</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:15px;font-weight:800;">Tron</div><div style="font-size:9px;opacity:.8;">NEWEST RIDE</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;">
+          <div style="font-size:15px;font-weight:800;">9 PM</div><div style="font-size:9px;opacity:.8;">FIREWORKS</div>
+        </div>
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    MK_LANDS.forEach(land => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:16px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+      let ridesHTML = land.rides.map(r=>`<div style="background:var(--bg,#f8f8f8);border-radius:10px;padding:9px;margin-bottom:5px;">
+        <div style="font-size:12px;font-weight:800;color:var(--text-primary,#212121);">${r.name}</div>
+        <div style="font-size:10px;font-weight:600;color:${land.color};margin:2px 0;">${r.type} · ${r.wait}</div>
+        <div style="font-size:11px;color:var(--text-secondary,#666);">${r.note}</div>
+      </div>`).join('');
+      let mustHTML = land.mustdo ? `<div style="font-size:10px;font-weight:700;color:var(--text-secondary,#888);margin:5px 0 3px;">MUST DO</div>
+        <div style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:5px;">${land.mustdo.map(m=>`<span style="font-size:10px;padding:2px 7px;background:${land.color}18;color:${land.color};border-radius:20px;">${m}</span>`).join('')}</div>` : '';
+      card.innerHTML = `
+        <div style="padding:10px 14px;background:${land.color}18;border-left:4px solid ${land.color};">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:22px;">${land.emoji}</span>
+            <div>
+              <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--text-primary,#212121);">${land.name}</div>
+              <div style="font-size:11px;color:var(--text-secondary,#555);">${land.desc}</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          ${ridesHTML}
+          ${mustHTML}
+          <div style="display:flex;gap:5px;background:${land.color}0d;border-radius:8px;padding:7px;margin-top:5px;">
+            <span style="font-size:11px;flex-shrink:0;">💡</span>
+            <div style="font-size:11px;color:var(--text-secondary,#555);line-height:1.5;">${land.tip}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const dayCard = document.createElement('div');
+    dayCard.style.cssText = 'background:linear-gradient(135deg,#003087,#7B1FA2);border-radius:16px;margin-bottom:20px;padding:14px;color:#fff;';
+    dayCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">⏱️ Perfect Magic Kingdom Day</div>
+    ${MK_PERFECT_DAY.map(p=>`<div style="display:flex;gap:10px;margin-bottom:7px;align-items:flex-start;">
+      <div style="font-size:10px;font-weight:800;color:#C9A96E;flex-shrink:0;width:50px;padding-top:1px;">${p.time}</div>
+      <div style="font-size:11px;opacity:.9;line-height:1.5;">${p.action}</div>
+    </div>`).join('')}`;
+    body.appendChild(dayCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-mk-deep')) buildScreen();
+
+  const _prevSS_mmmmmm = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_mmmmmm) _prevSS_mmmmmm(name, el);
+    if (name === 'mk-deep') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-mk-deep');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectMKDeepCard() {
+    if (document.getElementById('mk-deep-home-card')) return true;
+    const ref = document.getElementById('adults-home-card') || document.getElementById('dining-plan-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'mk-deep-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#003087,#C9A96E,#7B1FA2 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('mk-deep');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🏰</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Magic Kingdom — Deep Dive</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Tron · Seven Dwarfs · Pirates · Perfect Day Plan</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _mkDeepCard = false;
+  setInterval(() => { if (!_mkDeepCard) _mkDeepCard = injectMKDeepCard(); }, 73000);
+  setTimeout(() => { _mkDeepCard = injectMKDeepCard(); }, 69500);
+  const _prevRH_mmmmmm = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_mmmmmm) _prevRH_mmmmmm.apply(this, arguments);
+    setTimeout(() => { _mkDeepCard = false; _mkDeepCard = injectMKDeepCard(); }, 24200);
+  };
+})();
+</script>
