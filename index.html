@@ -62714,3 +62714,349 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK RRRRRRR: Orlando Hotels by Location & Budget ===== */
+(function initOrlandoHotels() {
+
+  const HOTEL_ZONES = [
+    {
+      zone:'Disney Deluxe Resorts', emoji:'👑', color:'#C9A96E',
+      priceRange:'$450–2,000+/night',
+      hotels:[
+        {name:'Grand Floridian Resort & Spa', price:'$$$$$', note:'Disney\'s flagship. Victorian elegance, Monorail access to Magic Kingdom, multiple restaurants including Victoria & Albert\'s. The most prestigious Disney address.'},
+        {name:'Animal Kingdom Lodge', price:'$$$$', note:'360+ African animals roam the savanna outside your room. Giraffe and zebra wake-up calls. Jiko and Boma restaurants are among Disney\'s best. Unique experience unavailable anywhere else.'},
+        {name:'Polynesian Village Resort', price:'$$$$', note:'South Pacific theming, Monorail to MK, Tambu Lounge\'s Dole Whip is legendary. The new Bungalow overwater villas are some of the most expensive and sought-after rooms at Disney World.'},
+        {name:'Wilderness Lodge', price:'$$$', note:'Pacific Northwest National Park lodge aesthetic. Roaring Rea Springs geyser in the lobby. Boat access to Magic Kingdom. Less celebrated than GF or AKL but exceptional for a different atmosphere.'},
+      ],
+      perk:'Early Theme Park Entry (30 min before public), direct Disney transportation, Resort Airline Check-In (check luggage at hotel)',
+    },
+    {
+      zone:'Disney Moderate Resorts', emoji:'🌴', color:'#2E7D32',
+      priceRange:'$200–450/night',
+      hotels:[
+        {name:'Caribbean Beach Resort', price:'$$$', note:'Sprawling resort with Skyliner gondola access to EPCOT and HS. The best moderate resort for transportation. Old Port Royale food court is solid. Very large property — room location matters.'},
+        {name:'Coronado Springs', price:'$$$', note:'Spanish colonial theming, the Gran Destino Tower adds upscale rooms and the rooftop bar with views. Convention hotel — can feel crowded during events. The lobby is genuinely beautiful.'},
+        {name:'Port Orleans Riverside / French Quarter', price:'$$', note:'Two connected resorts with a river setting. The quietest and most atmospheric moderate resorts. Riverside has woodland character; French Quarter has New Orleans theming.'},
+      ],
+      perk:'Early Theme Park Entry, Disney transportation. Trade-off: larger rooms than Value, but smaller than Deluxe.',
+    },
+    {
+      zone:'Disney Value Resorts', emoji:'💰', color:'#003087',
+      priceRange:'$120–200/night',
+      hotels:[
+        {name:'Pop Century Resort', price:'$', note:'Skyliner access to EPCOT and HS — the transportation advantage makes Pop Century the best value resort for park access. 20th century pop culture theming. Small rooms but the location math works.'},
+        {name:'Art of Animation Resort', price:'$$', note:'Best resort for families with young children — large family suites with Little Mermaid, Cars, Lion King, and Finding Nemo themes. The pool areas are exceptional. Skyliner access.'},
+        {name:'All-Star Movies/Music/Sports', price:'$', note:'The most affordable Disney on-site option. Bus-only transportation (slower). Good option for budget-focused visitors who want Early Entry benefits without paying moderate/deluxe prices.'},
+      ],
+      perk:'Early Theme Park Entry included. Budget option for Early Entry access that no off-site hotel can match.',
+    },
+    {
+      zone:'Universal On-Site (Premier Hotels)', emoji:'🎬', color:'#C62828',
+      priceRange:'$300–600/night',
+      hotels:[
+        {name:'Hard Rock Hotel', price:'$$$', note:'Unlimited Express Pass included with stay. Rock and roll theming, the best pool at Universal, music memorabilia throughout. Walking distance to both parks.'},
+        {name:'Loews Portofino Bay', price:'$$$$', note:'Italian village theming on Universal\'s "bay." Unlimited Express Pass included. The most elegant Universal hotel. Bocce ball court, Italian restaurant, boat service to parks.'},
+        {name:'Royal Pacific Resort', price:'$$$', note:'South Pacific theming, Unlimited Express Pass included, excellent pool with sand beach. Walking distance to CityWalk. The luau (seasonal) is a full evening entertainment option.'},
+      ],
+      perk:'Unlimited Universal Express Pass included — value $130–250/person/day. For groups, this perk makes the hotel math compelling.',
+    },
+    {
+      zone:'Off-Site Value Options', emoji:'🏨', color:'#7B1FA2',
+      priceRange:'$80–200/night',
+      hotels:[
+        {name:'Rosen Inn International', price:'$', note:'Directly on International Drive. Budget rates, clean rooms, free parking, free shuttle to Universal and SeaWorld. The most cost-effective I-Drive base for non-Disney visitors.'},
+        {name:'Drury Inn & Suites', price:'$$', note:'Free hot breakfast every morning (saves $30–50/family/day), free evening kickback with snacks and drinks (saves $50+/evening). Near I-Drive. Exceptional value-to-amenity ratio.'},
+        {name:'Hyatt Regency Grand Cypress', price:'$$$', note:'Upscale resort near Disney with its own lake, water sports, golf, and multiple pools. Lower nightly rate than comparable Disney resorts. The compromise: off-site transportation, but a genuine luxury resort experience.'},
+      ],
+      perk:'No Early Entry (unless purchasing separately). Savings of $100–500+/night vs. comparable on-site options.',
+    },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-hotels-location';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#C9A96E,#003087,#C62828);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Orlando Hotels by Zone & Budget</div>
+          <div style="font-size:11px;opacity:.8;">Disney Deluxe · Moderate · Value · Universal · Off-site options</div>
+        </div>
+        <span style="font-size:28px;">🏨</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        Where you stay shapes the entire Orlando trip. Disney on-site gives Early Entry and magical transportation; Universal Premier hotels give free Express Pass; off-site gives budget savings. Each hotel zone has a different value proposition.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    HOTEL_ZONES.forEach(zone => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:9px 14px;background:${zone.color}18;border-left:4px solid ${zone.color};">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:20px;">${zone.emoji}</span>
+              <div>
+                <div style="font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${zone.zone}</div>
+                <div style="font-size:10px;color:${zone.color};">${zone.priceRange}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:8px 14px;">
+          ${zone.hotels.map(h=>`<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:7px;padding-bottom:7px;border-bottom:1px solid var(--border,#f5f5f5);">
+            <div style="flex:1;margin-right:8px;">
+              <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);">${h.name}</div>
+              <div style="font-size:10px;color:var(--text-secondary,#555);">${h.note}</div>
+            </div>
+            <div style="font-size:12px;font-weight:700;color:${zone.color};flex-shrink:0;">${h.price}</div>
+          </div>`).join('')}
+          <div style="display:flex;gap:5px;background:${zone.color}0d;border-radius:8px;padding:6px;margin-top:4px;">
+            <span style="font-size:11px;flex-shrink:0;">⭐</span>
+            <div style="font-size:10px;color:var(--text-secondary,#555);line-height:1.5;">${zone.perk}</div>
+          </div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const decisionCard = document.createElement('div');
+    decisionCard.style.cssText = 'background:linear-gradient(135deg,#C9A96E,#003087);border-radius:14px;margin-bottom:20px;padding:14px;color:#fff;';
+    decisionCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;margin-bottom:8px;">🏨 Hotel Decision Framework</div>
+    ${[
+      {icon:'👶', text:'Young children (under 10) + Disney focus: Stay Disney on-site (Early Entry transforms the experience). Moderate or Value if budget is limited.'},
+      {icon:'🎢', text:'Coaster enthusiasts visiting Universal 2+ days: Universal Premier hotel (Hard Rock/Portofino/Royal Pacific) — free Unlimited Express Pass essentially pays for the premium.'},
+      {icon:'💵', text:'Budget-focused: Off-site near I-Drive (Rosen, Drury) + purchase park tickets separately. Save $100–300/night; use that savings for better dining or extra park days.'},
+      {icon:'✨', text:'Special occasion / milestone trip: Disney Deluxe (Animal Kingdom Lodge for uniqueness; Grand Floridian for prestige). The transportation, dining, and atmosphere justify the premium once.'},
+      {icon:'🔄', text:'Split approach: 3 nights Disney on-site (for Early Entry days), 4 nights off-site (cheaper). Gets the Early Entry benefit on your highest-priority park days without paying the premium for every night.'},
+    ].map(t=>`<div style="display:flex;gap:10px;margin-bottom:7px;align-items:flex-start;">
+      <span style="font-size:18px;flex-shrink:0;">${t.icon}</span>
+      <div style="font-size:11px;opacity:.95;line-height:1.5;">${t.text}</div>
+    </div>`).join('')}`;
+    body.appendChild(decisionCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-hotels-location')) buildScreen();
+
+  const _prevSS_rrrrrrr = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_rrrrrrr) _prevSS_rrrrrrr(name, el);
+    if (name === 'hotels-location') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-hotels-location');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectHLCard() {
+    if (document.getElementById('hotels-location-home-card')) return true;
+    const ref = document.getElementById('sports-rec-home-card') || document.getElementById('florida-coasts-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'hotels-location-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#C9A96E,#003087,#C62828 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('hotels-location');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🏨</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Hotels by Zone & Budget</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Disney Deluxe · Moderate · Universal Premier · Off-site value</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _hlCard = false;
+  setInterval(() => { if (!_hlCard) _hlCard = injectHLCard(); }, 104000);
+  setTimeout(() => { _hlCard = injectHLCard(); }, 100500);
+  const _prevRH_rrrrrrr = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_rrrrrrr) _prevRH_rrrrrrr.apply(this, arguments);
+    setTimeout(() => { _hlCard = false; _hlCard = injectHLCard(); }, 36600);
+  };
+})();
+</script>
+<script>
+/* ===== BLOCK SSSSSSS: Animal Kingdom Deep Dive ===== */
+(function initAnimalKingdomDeep() {
+
+  const AK_LANDS = [
+    {
+      land:'Pandora — The World of Avatar', emoji:'💙', color:'#1a3a5c',
+      desc:'The most technically impressive land at Disney World. Based on the film Avatar, this mountain valley glows at night with bioluminescent plants that activate after dark — the evening transformation is the most dramatic lighting effect at any Disney park.',
+      rides:[
+        {name:'Avatar Flight of Passage', height:'44"', intensity:4, ll:'Individual LL or Genie+', note:'Riding a Banshee over Pandora — the most immersive simulator Disney has ever created. At capacity, the screen resolution, haptic seat movements, and scent effects create genuine spatial disorientation. Consistently the highest-demand ride at Disney World. Arrive at rope drop or secure LL before 9 AM.'},
+        {name:'Na\'vi River Journey', height:'None', intensity:1, ll:'Standard Genie+', note:'Slow boat through the bioluminescent forest. The Shaman of Songs animatronic is technically Disney\'s most advanced figure — fluid, lifelike movement unlike any other. Short waits relative to quality.'},
+      ],
+      tip:'Pandora at night (after 7 PM) is genuinely different from daytime. The entire landscape glows. Plan to revisit after dark — it\'s worth staying in the park specifically for this.',
+    },
+    {
+      land:'Africa — Harambe Village & Safaris', emoji:'🦁', color:'#8B4513',
+      desc:'The crown jewel of Animal Kingdom — an entire African village and a 110-acre savanna with live animals.',
+      rides:[
+        {name:'Kilimanjaro Safaris', height:'None', intensity:1, ll:'Standard Genie+', note:'Open-vehicle safari through actual African savanna — not a zoo exhibit but free-roaming wildlife in 110 acres. Elephants, rhinos, lions, giraffes, crocodiles, hippos, cheetahs. The most extraordinary animal experience at any theme park in the world. Early morning for most active animals.'},
+        {name:'Gorilla Falls Exploration Trail', height:'None', intensity:0, ll:'N/A (walk-through)', note:'Walking trail through gorilla habitats, hippo pool, and bird exhibits. The silverback gorilla family viewing area is a quiet marvel — often 20 feet away.'},
+        {name:'Festival of the Lion King', height:'None', intensity:2, ll:'None required (plan around showtimes)', note:'The best live show at Disney World. 30 minutes of acrobatics, aerial performers, fire, and the entire Lion King musical score performed live. The most technically impressive theater in a Disney park.'},
+      ],
+      tip:'Kilimanjaro Safaris in the first hour of park (7:00–8:30 AM) shows the highest animal activity — feeding time. The late afternoon safari (4–5 PM) has beautiful golden light for photography.',
+    },
+    {
+      land:'Asia — Anandapur Village', emoji:'🐯', color:'#C62828',
+      desc:'South Asian village setting with two major thrill rides and a tiger habitat.',
+      rides:[
+        {name:'Expedition Everest', height:'44"', intensity:4, ll:'Genie+ or standby', note:'The best roller coaster at any Disney World park (debate, but the Yeti encounter and mountain theming make a strong case). Forward and backward sections, 80 mph, the crashed locomotive scene. The Yeti animatronic has been in "B-mode" (strobe effect) for years due to mechanical issues — eventually returning to full motion.'},
+        {name:'Kali River Rapids', height:'38"', intensity:3, ll:'Genie+', note:'River rapids ride that guarantees soaking. The rainforest destruction storyline is unusually substantive for a Disney ride. Do this at the hottest part of the afternoon — it\'s an intentional shower.'},
+        {name:'Maharajah Jungle Trek', height:'None', intensity:0, ll:'N/A', note:'Walking trail through actual Bengal tiger habitat — the tigers are separated by glass at the viewing window. Often just feet away. Bats, birds, and deer also on the trail. Underappreciated.'},
+      ],
+      tip:'Expedition Everest uses a single-rider line on most days that significantly cuts wait time — check for "Single Rider" sign at the entrance. Wait times of 5–15 minutes vs. 45–60 minute standby are common.',
+    },
+    {
+      land:'DinoLand U.S.A.', emoji:'🦕', color:'#F57F17',
+      desc:'A deliberately campy roadside attraction aesthetic — either charming or dissonant depending on expectations. Home to Dinosaur, the darkest ride in the park.',
+      rides:[
+        {name:'DINOSAUR', height:'40"', intensity:4, ll:'Genie+', note:'Time travel vehicle with aggressive dinosaur encounter in total darkness. Genuinely frightening for young children — multiple intense jump scares. The most thrilling dark ride at Disney World by intensity. Not recommended for ages under 7 or visitors sensitive to darkness and sudden movement.'},
+        {name:'TriceraTop Spin', height:'None', intensity:1, ll:'None', note:'Dumbo-style spinner for young children. Shorter waits than Dumbo. Fun for ages 2–6.'},
+      ],
+      tip:'DinoLand is scheduled for a major reimagining (details unannounced as of 2025). The carnival game area may be replaced entirely. Current state is deliberately retro.',
+    },
+    {
+      land:'Discovery Island & Tree of Life', emoji:'🌳', color:'#2E7D32',
+      desc:'The hub of Animal Kingdom — the 145-foot Tree of Life is carved with 325 animals and houses a 4D theater. The most visually stunning single structure at Disney World.',
+      rides:[
+        {name:'It\'s Tough to Be a Bug!', height:'None', intensity:2, ll:'None needed', note:'4D theater inside the Tree of Life. Bugs spray water, "sting" you in the seat, and the 3D effects are disorienting. Strongly disturbing for children with insect phobias. Otherwise a hidden gem with short waits.'},
+      ],
+      tip:'Walk completely around the Tree of Life\'s base looking for animals carved into the roots and trunk. 325 species are hidden throughout. The detail work took 18 months to complete.',
+    },
+  ];
+
+  const AK_STRATEGY = [
+    {icon:'⏰', tip:'Animal Kingdom is the earliest Disney park — opens at 7 AM on many days to align with animal activity at dawn. The first hour (7–8 AM) is the best time for safaris and has minimal crowds.'},
+    {icon:'🌙', tip:'AK closes at 9–11 PM during peak periods (nights of events). The park transforms after dark — Pandora\'s bioluminescence, the Rivers of Light show (when offered), and dramatically reduced crowds after 7 PM.'},
+    {icon:'🦁', tip:'Festival of the Lion King has 4 daily shows. Arrive 20 minutes before showtime. There is no "bad" seat — the performance is theater in the round with action on all sides.'},
+    {icon:'🐆', tip:'The Wild Africa Trek ($189) is the best premium experience at AK — small group early morning walking tour through the gorge to the hippo pool and savanna overlook. Includes lunch. Book at 60 days.'},
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-ak-deep';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:var(--bg,#f5f5f5);flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#2E7D32,#1a3a5c,#8B4513);padding:16px 14px 14px;color:#fff;';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Animal Kingdom — Deep Dive</div>
+          <div style="font-size:11px;opacity:.8;">Pandora · Safaris · Expedition Everest · Tree of Life · Bioluminescence</div>
+        </div>
+        <span style="font-size:28px;">🌿</span>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;">
+        Animal Kingdom is Disney's most underrated park — a living ecosystem with 2,000+ animals across 500 species, the most immersive simulator in the world (Flight of Passage), and Pandora's bioluminescent forest at night.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    AK_LANDS.forEach(land => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card-bg,#fff);border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--border,#eee);';
+      card.innerHTML = `
+        <div style="padding:9px 14px;background:${land.color}18;border-left:4px solid ${land.color};">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:20px;">${land.emoji}</span>
+            <div>
+              <div style="font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--text-primary,#212121);">${land.land}</div>
+              <div style="font-size:10px;color:var(--text-secondary,#555);">${land.desc}</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:8px 14px;">
+          ${land.rides.map(r=>`<div style="background:var(--bg,#f9f9f9);border-radius:8px;padding:8px;margin-bottom:6px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;">
+              <div style="font-size:12px;font-weight:700;color:var(--text-primary,#212121);">${r.name}</div>
+              <div style="display:flex;gap:4px;align-items:center;">
+                <span style="font-size:10px;font-weight:700;color:${r.height==='None'?'#2E7D32':land.color};">${r.height}</span>
+                ${r.ll ? `<span style="font-size:9px;padding:1px 4px;background:${land.color}18;color:${land.color};border-radius:8px;">${r.ll}</span>` : ''}
+              </div>
+            </div>
+            <div style="font-size:10px;color:var(--text-secondary,#555);">${r.note}</div>
+          </div>`).join('')}
+          <div style="font-size:10px;font-style:italic;color:var(--text-secondary,#888);margin-top:4px;">${land.tip}</div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const stratCard = document.createElement('div');
+    stratCard.style.cssText = 'background:linear-gradient(135deg,#2E7D32,#1a3a5c);border-radius:14px;margin-bottom:20px;padding:14px;color:#fff;';
+    stratCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;margin-bottom:8px;">🌿 Animal Kingdom Strategy</div>
+    ${AK_STRATEGY.map(s=>`<div style="display:flex;gap:10px;margin-bottom:7px;align-items:flex-start;">
+      <span style="font-size:18px;flex-shrink:0;">${s.icon}</span>
+      <div style="font-size:11px;opacity:.95;line-height:1.5;">${s.tip}</div>
+    </div>`).join('')}`;
+    body.appendChild(stratCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-ak-deep')) buildScreen();
+
+  const _prevSS_sssssss = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_sssssss) _prevSS_sssssss(name, el);
+    if (name === 'ak-deep') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-ak-deep');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectAKCard() {
+    if (document.getElementById('ak-deep-home-card')) return true;
+    const ref = document.getElementById('hotels-location-home-card') || document.getElementById('sports-rec-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'ak-deep-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#2E7D32,#1a3a5c,#8B4513 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('ak-deep');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">🌿</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Animal Kingdom — Deep Dive</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.85);">Pandora · Flight of Passage · Safaris · Everest · Bioluminescence</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.7);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _akCard = false;
+  setInterval(() => { if (!_akCard) _akCard = injectAKCard(); }, 105000);
+  setTimeout(() => { _akCard = injectAKCard(); }, 101500);
+  const _prevRH_sssssss = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_sssssss) _prevRH_sssssss.apply(this, arguments);
+    setTimeout(() => { _akCard = false; _akCard = injectAKCard(); }, 37000);
+  };
+})();
+</script>
