@@ -55387,3 +55387,221 @@ body.date-night-mode nav {
   };
 })();
 </script>
+<script>
+/* ===== BLOCK FFFFFF: Orlando Honeymoon & Anniversary Guide ===== */
+(function initOrlandoHoneymoon() {
+
+  const EXPERIENCES = [
+    {
+      name:'Victoria & Albert\'s', emoji:'👑', color:'#C9A96E',
+      type:'Dining', price:'$350+/person',
+      setting:'Grand Floridian Resort, Magic Kingdom area',
+      why:'Disney World\'s only AAA Five Diamond restaurant. An 8–10 course prix-fixe tasting menu in a single intimate dining room seating only 60. The sommelier pairs wines to every course. Jacket required.',
+      romantic:5,
+      tip:'One of the most exclusive restaurant reservations in the United States. Opens at 60 days — books completely within hours. February (Valentine\'s) is impossible without luck. Special occasion dinner that creates a story you tell for decades.',
+      book:'disneyworld.disney.go.com or call 407-939-3862',
+    },
+    {
+      name:'Capa at Four Seasons', emoji:'🌹', color:'#B71C1C',
+      type:'Rooftop dining', price:'$$$',
+      setting:'Four Seasons Orlando, Disney area',
+      why:'Spanish steakhouse on the 17th floor rooftop. Magic Kingdom fireworks visible from specific window seats. The sommelier is one of the best in Orlando. Spanish-influenced elevated cuisine.',
+      romantic:5,
+      tip:'Request a window table when making the reservation — there are only 8 window spots and they go to those who ask first. Fireworks visible on nights when MK has shows (check schedule).',
+      book:'Open Table or Four Seasons website',
+    },
+    {
+      name:'Monsieur Paul at EPCOT', emoji:'🍾', color:'#C62828',
+      type:'Fine dining (World Showcase)', price:'$$$$',
+      setting:'France Pavilion, EPCOT',
+      why:'Michelin-adjacent French fine dining inside EPCOT\'s France Pavilion. Named after the legendary Paul Bocuse. Exquisite classic French technique, exceptional wine list. The most refined EPCOT dining experience.',
+      romantic:5,
+      tip:'Reserve Monsieur Paul for EPCOT\'s Harmonious fireworks night. Request a table near the windows and watch the lagoon show after dinner. The crème brûlée is definitive.',
+      book:'My Disney Experience app at 60 days',
+    },
+    {
+      name:'Sunrise Balloon Flight (Orbit Balloon)', emoji:'🎈', color:'#E65100',
+      type:'Experience', price:'$280/person',
+      setting:'Above Orlando region',
+      why:'Float above the Florida horizon as the sky turns pink and orange. Champagne in hand. The pilot narrates the landmarks below. The most romantic 90 minutes in Orlando.',
+      romantic:5,
+      tip:'Flights launch at dawn and are weather-dependent — operators will reschedule if needed. Dress in layers (it\'s cool at altitude even in summer). The champagne toast after landing is part of the tradition.',
+      book:'Orbit Balloon, Orange Blossom Balloons',
+    },
+    {
+      name:'Couple\'s Spa at Four Seasons', emoji:'🧖', color:'#7B1FA2',
+      type:'Spa', price:'$400–600 for two',
+      setting:'Four Seasons Orlando',
+      why:'Side-by-side treatments in a private couple\'s suite. Access to the spa facilities before and after. Arrive early — the relaxation lounge, sauna, and steam room are included.',
+      romantic:5,
+      tip:'Book a couples\' package that includes 80-minute treatments. The therapists at Four Seasons are elite. You emerge completely transformed. Best experienced midday — breakfast at Four Seasons, spa at noon, pool afternoon.',
+      book:'Four Seasons Spa at 407-313-7777',
+    },
+    {
+      name:'Private Sunset Cruise — Lake Toho', emoji:'⛵', color:'#0277BD',
+      type:'Experience', price:'$90–130/couple',
+      setting:'Lake Tohopekaliga, Kissimmee',
+      why:'The most underrated romantic experience in Orlando. A small boat exclusively for you on one of Central Florida\'s most beautiful lakes as the sun drops behind the cypress trees.',
+      romantic:4,
+      tip:'St. Cloud or Kissimmee lakefront operators offer private pontoon charters. Bring your own wine and food — most operators allow it. The golden hour reflection on Lake Toho is extraordinary.',
+      book:'Lake Toho boat tour operators (search "Lake Toho sunset cruise")',
+    },
+    {
+      name:'Grand Bohemian Hotel Night', emoji:'🎨', color:'#5D4037',
+      type:'Hotel', price:'$350–600/night',
+      setting:'Downtown Orlando',
+      why:'Orlando\'s premier boutique hotel. Original art on every wall — the hotel is also a gallery. The wine bar downstairs is one of the most romantic spots in the city. The rooms have genuine character.',
+      romantic:4,
+      tip:'Book a gallery room with original art. The rooftop pool and the hotel bar create a romantic evening without needing to leave the property. The Boheme restaurant downstairs is excellent for in-hotel dining.',
+      book:'Marriott Autograph Collection — grandbohemianhotel.com',
+    },
+    {
+      name:'The Alfond Inn Weekend Package', emoji:'🌺', color:'#2E7D32',
+      type:'Hotel', price:'$300–500/night',
+      setting:'Winter Park, Park Avenue',
+      why:'Winter Park\'s finest boutique hotel. Walk out the door to Park Avenue\'s restaurants, galleries, and shops. The hotel\'s curated art collection is exceptional.',
+      romantic:4,
+      tip:'Stay Saturday night, walk Park Avenue Sunday morning before the crowds. Brunch at one of the Avenue\'s best spots. Museum at Rollins College is free on Sunday. Drive to Morse Museum afterward.',
+      book:'alfondinnat.com',
+    },
+  ];
+
+  const ROMANTIC_MOMENTS = [
+    { name:'Harmonious Fireworks — EPCOT Lagoon', emoji:'🎆', desc:'Find a spot on the World Showcase promenade by the France Pavilion side. The projection show and fireworks from the lagoon edge is one of the most beautiful sights in Orlando.' },
+    { name:'Magic Kingdom Fireworks — Cinderella Castle', emoji:'🏰', desc:'Wishes (now Disney Enchantment) lights up the castle in projection. Stand on Main Street USA behind the crowds — the crowd reaction is as beautiful as the show itself.' },
+    { name:'Pandora at Night — Animal Kingdom', emoji:'🌿', desc:'Walk through Pandora (World of Avatar) after dark. Every plant glows bioluminescent. The floating mountains reflect in the water. The most alien and beautiful 20-minute walk in Florida.' },
+    { name:'Sunset at Clearwater Beach Pier', emoji:'🌅', desc:'The pier extends into the Gulf. Sunset from the end of the pier is 270 degrees of water and color. Street performers, couples, locals — the whole community gathers.' },
+    { name:'Private Balcony Wine — Grand Floridian', emoji:'🥂', desc:'A bottle from the Grand Floridian\'s extensive room service wine list, two glasses, private balcony overlooking the Seven Seas Lagoon with Magic Kingdom in the distance.' },
+    { name:'Stargazing — Lake Nona Waterfront', emoji:'⭐', desc:'Drive to Lake Nona\'s waterfront parks after dark. Bring a blanket. Away from the theme park lighting, the Florida night sky reveals itself. Zero cost, maximum romance.' },
+  ];
+
+  function buildScreen() {
+    const s = document.createElement('div');
+    s.id = 'screen-honeymoon';
+    s.className = 'screen';
+    s.style.cssText = 'display:none;position:fixed;inset:0;z-index:7800;background:#1a0a15;flex-direction:column;overflow:hidden;font-family:"DM Sans",sans-serif;color:#fff;';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'flex-shrink:0;background:linear-gradient(135deg,#3B0010,#8B1A4A,#C9A96E 150%);padding:16px 14px 14px;border-bottom:1px solid rgba(201,169,110,.2);';
+    hdr.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <button onclick="window.showScreen('home')" style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;color:#fff;cursor:pointer;">‹</button>
+        <div style="flex:1;">
+          <div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;">Honeymoon & Anniversary Guide</div>
+          <div style="font-size:11px;opacity:.7;">Victoria & Albert's · Balloon flight · Romantic moments</div>
+        </div>
+        <span style="font-size:28px;">💍</span>
+      </div>
+      <div style="background:rgba(201,169,110,.15);border:1px solid rgba(201,169,110,.3);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;color:rgba(255,255,255,.9);">
+        Orlando is one of the most surprising honeymoon destinations in the US. Behind the theme parks exists a world of intimate fine dining, luxury spas, and genuinely romantic experiences most visitors never find.
+      </div>`;
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;';
+
+    EXPERIENCES.forEach(exp => {
+      const hearts = '❤️'.repeat(exp.romantic) + '🤍'.repeat(5-exp.romantic);
+      const card = document.createElement('div');
+      card.style.cssText = 'background:rgba(255,255,255,.06);border:1px solid rgba(201,169,110,.2);border-radius:16px;margin-bottom:12px;overflow:hidden;';
+      card.innerHTML = `
+        <div style="padding:10px 14px;background:${exp.color}30;border-left:4px solid ${exp.color};">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
+            <div style="display:flex;gap:8px;align-items:center;">
+              <span style="font-size:20px;">${exp.emoji}</span>
+              <div>
+                <div style="font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:#fff;">${exp.name}</div>
+                <div style="font-size:10px;color:rgba(255,255,255,.6);">${exp.type} · ${exp.setting}</div>
+              </div>
+            </div>
+            <div style="text-align:right;flex-shrink:0;">
+              <div style="font-size:11px;">${hearts}</div>
+              <div style="font-size:10px;font-weight:700;color:#C9A96E;">${exp.price}</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;">
+          <div style="font-size:12px;color:rgba(255,255,255,.8);line-height:1.6;margin-bottom:8px;">${exp.why}</div>
+          <div style="display:flex;gap:6px;background:rgba(201,169,110,.1);border-radius:8px;padding:7px;margin-bottom:6px;">
+            <span style="font-size:12px;flex-shrink:0;">💡</span>
+            <div style="font-size:11px;color:rgba(255,255,255,.65);line-height:1.5;">${exp.tip}</div>
+          </div>
+          <div style="font-size:10px;font-weight:700;color:#C9A96E;">📅 Book: ${exp.book}</div>
+        </div>`;
+      body.appendChild(card);
+    });
+
+    const momentsCard = document.createElement('div');
+    momentsCard.style.cssText = 'background:rgba(255,255,255,.05);border:1px solid rgba(201,169,110,.2);border-radius:16px;margin-bottom:14px;overflow:hidden;';
+    momentsCard.innerHTML = `<div style="padding:12px 14px;background:linear-gradient(135deg,#3B0010,#8B1A4A);">
+      <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;">🌹 Romantic Moments — Free to Priceless</div>
+    </div>
+    <div style="padding:12px 14px;">
+      ${ROMANTIC_MOMENTS.map(m=>`<div style="margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.08);">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+          <span style="font-size:20px;">${m.emoji}</span>
+          <div style="font-size:13px;font-weight:700;color:#F5E6CA;">${m.name}</div>
+        </div>
+        <div style="font-size:12px;color:rgba(255,255,255,.7);line-height:1.5;padding-left:28px;">${m.desc}</div>
+      </div>`).join('')}
+    </div>`;
+    body.appendChild(momentsCard);
+
+    const planCard = document.createElement('div');
+    planCard.style.cssText = 'background:linear-gradient(135deg,#3B0010,#C9A96E);border-radius:16px;margin-bottom:20px;padding:14px;';
+    planCard.innerHTML = `<div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px;">💌 Perfect Orlando Honeymoon: 3 Days</div>
+    ${[
+      {day:'Day 1 Evening', desc:'Check into Grand Bohemian Hotel. Cocktails at The Boheme bar. Dinner at Capa at Four Seasons (request window for Magic Kingdom fireworks).'},
+      {day:'Day 2 Full', desc:'Sunrise hot air balloon flight. Afternoon couples\' spa at Four Seasons. Dinner at Victoria & Albert\'s (must book months ahead).'},
+      {day:'Day 3 Full', desc:'Morning at EPCOT: World Showcase stroll, France pavilion croissants. Dinner at Monsieur Paul. Harmonious fireworks from the lagoon edge.'},
+    ].map(p=>`<div style="margin-bottom:10px;"><div style="font-size:11px;font-weight:800;color:#C9A96E;margin-bottom:3px;">${p.day}</div>
+    <div style="font-size:12px;opacity:.95;line-height:1.5;">${p.desc}</div></div>`).join('')}`;
+    body.appendChild(planCard);
+
+    s.appendChild(hdr);
+    s.appendChild(body);
+    document.body.appendChild(s);
+  }
+
+  if (!document.getElementById('screen-honeymoon')) buildScreen();
+
+  const _prevSS_ffffff = window.showScreen;
+  window.showScreen = function(name, el) {
+    if (_prevSS_ffffff) _prevSS_ffffff(name, el);
+    if (name === 'honeymoon') {
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+      const s = document.getElementById('screen-honeymoon');
+      if (s) { s.style.display = 'flex'; s.style.flexDirection = 'column'; }
+    }
+  };
+
+  function injectHoneymoonCard() {
+    if (document.getElementById('honeymoon-home-card')) return true;
+    const ref = document.getElementById('idrive-home-card') || document.getElementById('usf-home-card');
+    if (!ref) return false;
+    const card = document.createElement('div');
+    card.id = 'honeymoon-home-card';
+    card.style.cssText = 'margin:10px 14px 0;background:linear-gradient(135deg,#3B0010,#8B1A4A,#C9A96E 150%);border-radius:16px;padding:14px;cursor:pointer;';
+    card.onclick = () => window.showScreen('honeymoon');
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span style="font-size:20px;">💍</span>
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;">Honeymoon & Anniversary Guide</div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.75);">Victoria & Albert's · Balloon · Romantic moments</div>
+        </div><span style="font-size:22px;color:rgba(255,255,255,.5);">›</span>
+      </div>`;
+    ref.insertAdjacentElement('afterend', card);
+    return true;
+  }
+
+  let _honeymoonCard = false;
+  setInterval(() => { if (!_honeymoonCard) _honeymoonCard = injectHoneymoonCard(); }, 66000);
+  setTimeout(() => { _honeymoonCard = injectHoneymoonCard(); }, 62500);
+  const _prevRH_ffffff = window.renderHome;
+  window.renderHome = function() {
+    if (_prevRH_ffffff) _prevRH_ffffff.apply(this, arguments);
+    setTimeout(() => { _honeymoonCard = false; _honeymoonCard = injectHoneymoonCard(); }, 21400);
+  };
+})();
+</script>
